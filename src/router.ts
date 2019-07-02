@@ -31,17 +31,7 @@ const router = new Router({
       meta: {
         breadcrumb: "Demo"
       },
-      component: () => import(/* webpackChunkName: "demo" */ "./views/Demo.vue"),
-      children: [
-        {
-          path: "test",
-          name: "test",
-          component: () => import(/* webpackChunkName: "demo" */ "./views/Demo.vue"),
-          meta: {
-            breadcrumb: "Test"
-          },
-        }
-      ]
+      component: () => import(/* webpackChunkName: "demo" */ "./views/Demo.vue")
     },
     {
       path: "/login",
@@ -60,7 +50,7 @@ router.beforeEach((to, from, next) => {
   const authRequired = !publicPages.includes(to.path);
 
   if (authRequired && !store.getters.isAuthenticated) {
-    return next("/login");
+    return next(`/login?return_uri=${to.fullPath}`);
   }
 
   next();

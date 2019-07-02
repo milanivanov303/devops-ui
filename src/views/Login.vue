@@ -77,7 +77,8 @@
     data() {
       return {
         username: "",
-        password: ""
+        password: "",
+        returnUri: "/"
       };
     },
     computed: {
@@ -96,18 +97,20 @@
     },
     methods: {
       login() {
-        const {username, password} = this;
-        this.$store.dispatch("login", {username, password});
+        const {username, password, returnUri} = this;
+        this.$store.dispatch("login", {username, password, returnUri});
       },
       loginSSO() {
-        this.$store.dispatch("loginSSO");
+        return window.location.href = `${config['user-management'].url}/login?redirect_url=${window.location}`;
       }
     },
     created() {
+      this.returnUri = this.$route.query.return_uri;
+
       let token = this.$route.query.token;
       if (token) {
         this.$router.replace('token', null);
-        this.$store.dispatch("loginSSO", token);
+        this.$store.dispatch("loginSSO", {token, returnUri: this.returnUri});
       }
     }
   };

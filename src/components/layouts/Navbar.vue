@@ -6,7 +6,8 @@
       </a>
       <ul class="right hide-on-med-and-down" v-if="user">
         <li class="logged-user">
-          <i class="material-icons left">account_circle</i>{{ user.name }}
+          <i class="material-icons left">account_circle</i>
+          {{ user.name }}
         </li>
         <li>
           <a class="dropdown-trigger" data-target="profile-dropdown">
@@ -14,8 +15,8 @@
           </a>
           <ul id="profile-dropdown" class="dropdown-content">
             <li>
-              <a @click="logout" href="#/logout">
-                <i class="material-icons">exit_to_app</i>Logout
+              <a @click="logout">
+                <i class="material-icons">exit_to_app</i>logout
               </a>
             </li>
           </ul>
@@ -36,12 +37,6 @@ export default {
     logout() {
       this.$store.dispatch("logout");
     }
-  },
-  mounted() {
-    M.Dropdown.init(document.querySelectorAll(".dropdown-trigger"), {
-      constrainWidth: false,
-      coverTrigger: false
-    });
   }
 };
 </script>

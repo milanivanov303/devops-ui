@@ -56,7 +56,7 @@ export default {
     }
   },
   actions: {
-    async login({ dispatch, commit }, { username, password }) {
+    async login({ dispatch, commit }, {username, password, returnUri = "/"}) {
       commit("loggingIn", true);
       commit("hasError", false);
 
@@ -74,7 +74,7 @@ export default {
         localStorage.setItem("user", JSON.stringify(response.data));
         commit("loggedIn", response.data);
 
-        router.push("/");
+        router.push(returnUri);
       } catch (error) {
         commit("hasError", true);
         commit("error", "Incorrect username or password");
@@ -82,13 +82,9 @@ export default {
 
       commit("loggingIn", false);
     },
-    async loginSSO({ dispatch, commit}, token) {
+    async loginSSO({ dispatch, commit}, {token, returnUri = "/"}) {
       commit("loggingInSSO", true);
       commit("hasError", false);
-
-      if (!token) {
-        return window.location.href = `${config['user-management'].url}/login?redirect_url=${window.location}`;
-      }
 
       try {
         const response = await axios.get(`${config["user-management"].url}/v1/auth/identity`, {
@@ -100,7 +96,7 @@ export default {
         localStorage.setItem("user", JSON.stringify(response.data));
         commit("loggedIn", response.data);
 
-        router.push("/");
+        router.push(returnUri);
       } catch (error) {
         commit("hasError", true);
         commit("error", "Could not login with SSO. Please try again later or use the login form");
@@ -111,6 +107,8 @@ export default {
     logout({ commit }) {
       localStorage.removeItem("user");
       commit("logout");
+
+      router.push("/login");
     }
   }
 };
