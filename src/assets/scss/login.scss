@@ -1,0 +1,30 @@
+@charset "UTF-8";
+
+@import "variables";
+
+.login {
+    background: url($login-bg-image) no-repeat center top fixed;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+
+    main, header, footer {
+        padding-left: 0;
+        background: transparent;
+    }
+
+    header {
+        padding-top: 20px;
+    }
+
+    footer {
+        .footer-copyright {
+            color: color('grey', 'lighten-3');
+
+            a {
+                color: color('grey', 'lighten-3');
+            }
+        }
+    }
+}
