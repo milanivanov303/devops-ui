@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import store from "./store";
+import auth from "@/plugins/auth";
 
 Vue.use(Router);
 
@@ -31,7 +31,8 @@ const router = new Router({
       meta: {
         breadcrumb: "Demo"
       },
-      component: () => import(/* webpackChunkName: "demo" */ "./views/Demo.vue")
+      component: () =>
+        import(/* webpackChunkName: "demo" */ "./views/Demo.vue")
     },
     {
       path: "/login",
@@ -39,7 +40,8 @@ const router = new Router({
       meta: {
         layout: "login"
       },
-      component: () => import(/* webpackChunkName: "demo" */ "./views/Login.vue")
+      component: () =>
+        import(/* webpackChunkName: "demo" */ "./views/Login.vue")
     }
   ]
 });
@@ -49,7 +51,7 @@ router.beforeEach((to, from, next) => {
   const publicPages = ["/login"];
   const authRequired = !publicPages.includes(to.path);
 
-  if (authRequired && !store.getters.isAuthenticated) {
+  if (authRequired && !auth.user()) {
     return next(`/login?return_uri=${to.fullPath}`);
   }
 

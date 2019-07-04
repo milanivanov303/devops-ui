@@ -97,20 +97,11 @@
     },
     methods: {
       login() {
-        const {username, password, returnUri} = this;
-        this.$store.dispatch("login", {username, password, returnUri});
+        const {username, password} = this;
+        this.$auth.login(username, password);
       },
       loginSSO() {
-        return window.location.href = `${config['user-management'].url}/login?redirect_url=${window.location}`;
-      }
-    },
-    created() {
-      this.returnUri = this.$route.query.return_uri;
-
-      let token = this.$route.query.token;
-      if (token) {
-        this.$router.replace('token', null);
-        this.$store.dispatch("loginSSO", {token, returnUri: this.returnUri});
+        this.$auth.loginSSO();
       }
     }
   };

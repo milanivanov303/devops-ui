@@ -30,12 +30,12 @@
 export default {
   computed: {
     user() {
-      return this.$store.getters.user;
+      return this.$auth.user();
     }
   },
   methods: {
     logout() {
-      this.$store.dispatch("logout");
+      this.$auth.logout();
     }
   }
 };
