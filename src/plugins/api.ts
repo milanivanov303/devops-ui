@@ -45,6 +45,15 @@ class Api {
       console.log(error);
     }
   }
+
+  async post(uri, data) {
+    try {
+      const response = await _axios.post(`${this.url}/${uri}`, data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 export default Api;

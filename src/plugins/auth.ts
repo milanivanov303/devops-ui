@@ -1,8 +1,8 @@
 import Vue from "vue";
 import axios from "axios";
 import store from "@/store";
-import router from "../router";
-import config from "@/plugins/config";
+import router from "@/router";
+import config from "@/config";
 
 const authStore = {
   state: {
@@ -178,7 +178,7 @@ class Auth {
     return null;
   }
 
-  async getToken(code) {
+  async getToken(code: string) {
     try {
       const response = await _axios.get(
         `${config["user-management"].url}/v1/auth/token`,

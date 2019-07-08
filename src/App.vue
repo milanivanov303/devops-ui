@@ -12,9 +12,6 @@ export default {
     layout() {
       return (this.$route.meta.layout || "default") + "-layout";
     }
-  },
-  mounted() {
-    M.AutoInit();
   }
 };
 </script>

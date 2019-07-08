@@ -37,6 +37,9 @@ export default {
     logout() {
       this.$auth.logout();
     }
+  },
+  mounted() {
+    M.AutoInit();
   }
 };
 </script>

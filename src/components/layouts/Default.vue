@@ -21,16 +21,12 @@
 import Header from "@/components/layouts/Header.vue";
 import Footer from "@/components/layouts/Footer.vue";
 import Breadcrumbs from "@/components/layouts/Breadcrumbs.vue";
-import * as M from "materialize-css/dist/js/materialize";
 
 export default {
   components: {
     Header,
     Breadcrumbs,
     Footer
-  },
-  mounted() {
-    M.AutoInit();
   }
 };
 </script>

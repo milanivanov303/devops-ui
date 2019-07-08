@@ -10,20 +10,27 @@ const router = new Router({
     {
       path: "/",
       name: "dashboard",
+      alias: '/dashboard',
       meta: {
         breadcrumb: "Dashboard"
       },
-      component: () =>
-        import(/* webpackChunkName: "dashboard" */ "./views/Dashboard.vue")
+      component: () => import(/* webpackChunkName: "dashboard" */ "./views/Dashboard.vue")
     },
     {
-      path: "/extranet",
-      name: "extranet",
+      path: "/extranet/branches",
+      name: "extranet-branches",
       meta: {
         breadcrumb: "Extranet"
       },
-      component: () =>
-        import(/* webpackChunkName: "extranet" */ "./views/Extranet.vue")
+      component: () => import(/* webpackChunkName: "extranet-branches" */ "./views/extranet/Branches.vue")
+    },
+    {
+      path: "/extranet/branches/:branch",
+      name: "extranet-branch",
+      meta: {
+        breadcrumb: "Branch"
+      },
+      component: () => import(/* webpackChunkName: "extranet-branch" */ "./views/extranet/Branch.vue")
     },
     {
       path: "/demo",
@@ -31,8 +38,7 @@ const router = new Router({
       meta: {
         breadcrumb: "Demo"
       },
-      component: () =>
-        import(/* webpackChunkName: "demo" */ "./views/Demo.vue")
+      component: () => import(/* webpackChunkName: "demo" */ "./views/Demo.vue")
     },
     {
       path: "/login",
@@ -40,8 +46,7 @@ const router = new Router({
       meta: {
         layout: "login"
       },
-      component: () =>
-        import(/* webpackChunkName: "demo" */ "./views/Login.vue")
+      component: () => import(/* webpackChunkName: "demo" */ "./views/Login.vue")
     }
   ]
 });

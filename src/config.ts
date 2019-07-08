@@ -1,6 +1,6 @@
 import Vue from "vue";
 
-let config = require("../../config");
+let config = require("../config");
 
 let ConfigPlugin = {
   install(Vue, options) {
