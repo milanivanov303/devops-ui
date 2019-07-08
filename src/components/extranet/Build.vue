@@ -6,7 +6,7 @@
 
     <div ref="start-build-modal" class="modal">
       <div class="modal-content">
-        <h4 class="left-align">Start Build</h4>
+        <h4 class="left-align">Build</h4>
         <div v-if="build.started" class="row">
           <div class="col s12">
             <pre>{{ build.log }}</pre>
@@ -15,36 +15,46 @@
         <div v-else>
           <div class="row">
             <div class="input-field col s12">
-            <select id="client" ref="client" v-model="build.client">
-              <option value=""></option>
-              <option v-for="client in clients" :value="client.package">{{ client.name }}</option>
-            </select>
-            <label for="client">Client</label>
-          </div>
+              <select id="client" ref="client" v-model="build.client">
+                <option value=""></option>
+                <option v-for="client in clients" :value="client.package">
+                  {{ client.name }}
+                </option>
+              </select>
+              <label for="client">Client</label>
+            </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-            <select id="java-version" ref="java-version" v-model="build.javaVersion">
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-            </select>
-            <label for="java-version">Java Version</label>
-          </div>
+              <select id="java-version" ref="java-version" v-model="build.javaVersion">
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+              <label for="java-version">Java Version</label>
+            </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button :class="{'waves-effect': true, btn: true, disabled: build.started}" @click="start()">Start</button>
-        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+        <button
+          :class="{ 'waves-effect': true, btn: true, disabled: build.started }"
+          @click="start()"
+        >
+          Start
+        </button>
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat"
+          >Close</a
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import * as M from "materialize-css/dist/js/materialize";
 import Api from "@/plugins/api";
 import config from "@/config";
 
@@ -57,6 +67,7 @@ export default {
       build: {
         started: false,
         running: false,
+        deploing: false,
         log: "",
         logFile: "",
         branch: this.container.Config.Labels.branch,
@@ -72,14 +83,21 @@ export default {
     open() {
       this.build.started = false;
       this.build.running = false;
-      M.Modal.getInstance(this.$refs['start-build-modal']).open();
+      this.build.log = "";
+      this.build.logFile = "";
+      setTimeout(() => {
+        M.FormSelect.init(this.$refs.client);
+        M.FormSelect.init(this.$refs["java-version"]);
+      }, 100);
+      M.Modal.getInstance(this.$refs["start-build-modal"]).open();
     },
     start() {
-      api.post("extranet/start-build", {
+      api.post("extranet/build/start", {
         branch: this.build.branch,
         client: this.build.client,
         java_version: this.build.javaVersion
-      }).then((build) => {
+      })
+      .then(build => {
         this.build.logFile = build.log_file;
         this.build.started = true;
         this.build.running = true;
@@ -88,29 +106,63 @@ export default {
     },
     check() {
       setTimeout(() => {
-        api.post("extranet/check-build", {
+        api.post("extranet/build/check", {
           branch: this.build.branch,
-          log_file: this.build.logFile
-        }).then((build) => {
+          log_file: this.build.logFile,
+          log_lines: this.build.log.length
+        })
+        .then(build => {
           this.build.log = build.log;
           this.build.running = build.running;
           if (build.running) {
-            this.check();
+            return this.check();
+          }
+
+          let warFile = this.getWarFile();
+          if (warFile) {
+            this.deploy(warFile);
           }
         });
       }, 5000);
+    },
+    getWarFile() {
+      let logLines = this.build.log.trim().split(/\r?\n/);
+      let warFile  = logLines[logLines.length - 1];
+
+      warFile = warFile.split('/');
+      warFile[warFile.length - 1] = 'LOCAL_' + warFile[warFile.length - 1];
+      warFile = warFile.join('/');
+
+      if (warFile.match('.war$')) {
+        return warFile;
+      }
+
+      return null;
+    },
+    deploy(warFile) {
+      let host = config.extranet.docker.host;
+      let port = this.container.NetworkSettings.Ports['22/tcp'][0].HostPort;
+
+      this.build.deploing = true;
+      api.post("extranet/build/deploy", {
+        container: {
+          host: host,
+          port: port
+        },
+        war_file: warFile
+      }).then((response) => {
+        this.build.deploing = false;
+      });
     }
   },
   mounted() {
-    M.Modal.init(this.$refs['start-build-modal']);
-    M.FormSelect.init(this.$refs['java-version']);
+    M.Modal.init(this.$refs["start-build-modal"]);
 
-    let loader = this.$loading.show({ container: this.$el });
+    const loader = this.$loading.show({ container: this.$el });
 
     api.get("extranet/clients").then(clients => {
       this.clients = clients;
       loader.hide();
-      setTimeout(() => M.FormSelect.init(this.$refs.client), 100);
     });
   }
 };

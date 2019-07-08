@@ -1,12 +1,10 @@
 import axios from "axios";
 import auth from "@/plugins/auth";
 
-declare var config: object;
-
 const _axios = axios.create();
 
 _axios.interceptors.request.use(config => {
-  let token = sessionStorage.getItem(`token.${_axios.prototype.code}`);
+  const token = sessionStorage.getItem(`token.${_axios.prototype.code}`);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -28,9 +26,6 @@ _axios.interceptors.response.use(null, error => {
 });
 
 class Api {
-  private url: string;
-  private code: string;
-
   constructor(url, code) {
     this.url = url;
     this.code = code;

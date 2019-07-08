@@ -48,7 +48,7 @@ const _axios = axios.create();
 _axios.interceptors.request.use(config => {
   config.withCredentials = true;
 
-  let token = sessionStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -78,13 +78,13 @@ class Auth {
     });
   }
 
-  getParam(name: string) {
-    let url = new URL(window.location.toString());
+  getParam(name) {
+    const url = new URL(window.location.toString());
     return url.searchParams.get(name);
   }
 
   getReturnUri() {
-    let returnUri = this.getParam("return_uri");
+    const returnUri = this.getParam("return_uri");
     if (returnUri) {
       return returnUri;
     }
@@ -99,7 +99,7 @@ class Auth {
   getSsoUrl() {
     let redirectUrl = `${window.location.origin}/login`;
 
-    let returnUri = this.getReturnUri();
+    const returnUri = this.getReturnUri();
     if (returnUri) {
       redirectUrl += `?return_uri=${returnUri}`;
     }
@@ -134,7 +134,7 @@ class Auth {
 
     localStorage.setItem("sso-login", "true");
 
-    let token = this.getParam("token");
+    const token = this.getParam("token");
     if (token) {
       sessionStorage.setItem("token", token);
     }
@@ -170,7 +170,7 @@ class Auth {
   }
 
   user() {
-    let user = sessionStorage.getItem("user");
+    const user = sessionStorage.getItem("user");
     if (user) {
       return JSON.parse(user);
     }
@@ -178,13 +178,13 @@ class Auth {
     return null;
   }
 
-  async getToken(code: string) {
+  async getToken(code) {
     try {
       const response = await _axios.get(
         `${config["user-management"].url}/v1/auth/token`,
         {
           params: {
-            code: code
+            code
           }
         }
       );

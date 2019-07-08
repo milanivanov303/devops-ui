@@ -25,7 +25,7 @@ export default {
     };
   },
   mounted() {
-    let loader = this.$loading.show({ container: this.$el });
+    const loader = this.$loading.show({ container: this.$el });
 
     api.get("extranet/branches").then(branches => {
       this.branches = branches;

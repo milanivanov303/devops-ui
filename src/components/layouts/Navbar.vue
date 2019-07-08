@@ -13,7 +13,7 @@
           <a class="dropdown-trigger" data-target="profile-dropdown">
             <i class="material-icons">expand_more</i>
           </a>
-          <ul id="profile-dropdown" class="dropdown-content">
+          <ul id="profile-dropdown" ref="profile-dropdown" class="dropdown-content">
             <li>
               <a @click="logout">
                 <i class="material-icons">exit_to_app</i>logout
@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import * as M from "materialize-css/dist/js/materialize";
+
 export default {
   computed: {
     user() {
@@ -39,7 +41,7 @@ export default {
     }
   },
   mounted() {
-    M.AutoInit();
+    M.Dropdown.init(this.$refs["profile-dropdown"]);
   }
 };
 </script>

@@ -4,11 +4,11 @@ import router from "@/router";
 import store from "@/store";
 import DefaultLayout from "@/components/layouts/Default.vue";
 import LoginLayout from "@/components/layouts/Login.vue";
-import * as M from "materialize-css/dist/js/materialize";
 import "@/config";
 import "@/plugins/auth";
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/vue-loading.css";
+
 Vue.use(Loading);
 
 Vue.component("default-layout", DefaultLayout);

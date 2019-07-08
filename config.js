@@ -5,5 +5,11 @@ module.exports = {
   devops: {
     url: process.env.VUE_APP_DEVOPS_API_URL,
     code: "JQq5BzW7a7d"
+  },
+  extranet: {
+    docker: {
+      host: "extranetdk.codixfr.private",
+      image: "avitohol.codixfr.private:5000/extranet-base:1.6.3"
+    }
   }
 };

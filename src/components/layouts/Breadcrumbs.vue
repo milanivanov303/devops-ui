@@ -1,8 +1,10 @@
 <template>
   <div class="row">
     <div class="col s12">
-      <router-link to="/" >Home</router-link>
-      <router-link v-for="route in routes" v-bind:to="route.path" >{{ route.meta.breadcrumb }}</router-link>
+      <router-link to="/">Home</router-link>
+      <router-link v-for="route in routes" :to="route.path" :key="route.path">
+        {{ route.meta.breadcrumb }}
+      </router-link>
     </div>
   </div>
 </template>
@@ -24,7 +26,7 @@ export default {
 
   a:not(:first-child) {
     &:before {
-      content: '/';
+      content: "/";
       vertical-align: top;
       display: inline-block;
       font-weight: normal;

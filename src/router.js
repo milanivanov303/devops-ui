@@ -4,17 +4,23 @@ import auth from "@/plugins/auth";
 
 Vue.use(Router);
 
+const Dashboard = () => import(/* webpackChunkName: "dashboard" */ "./views/Dashboard.vue");
+const Branches = () => import(/* webpackChunkName: "extranet" */ "./views/extranet/Branches.vue");
+const Branch = () => import(/* webpackChunkName: "extranet" */ "./views/extranet/Branch.vue");
+const Demo = () => import(/* webpackChunkName: "demo" */ "./views/Demo.vue");
+const Login = () => import(/* webpackChunkName: "login" */ "./views/Login.vue");
+
 const router = new Router({
   mode: "history",
   routes: [
     {
       path: "/",
       name: "dashboard",
-      alias: '/dashboard',
+      alias: "/dashboard",
       meta: {
         breadcrumb: "Dashboard"
       },
-      component: () => import(/* webpackChunkName: "dashboard" */ "./views/Dashboard.vue")
+      component: Dashboard
     },
     {
       path: "/extranet/branches",
@@ -22,7 +28,7 @@ const router = new Router({
       meta: {
         breadcrumb: "Extranet"
       },
-      component: () => import(/* webpackChunkName: "extranet-branches" */ "./views/extranet/Branches.vue")
+      component: Branches
     },
     {
       path: "/extranet/branches/:branch",
@@ -30,7 +36,7 @@ const router = new Router({
       meta: {
         breadcrumb: "Branch"
       },
-      component: () => import(/* webpackChunkName: "extranet-branch" */ "./views/extranet/Branch.vue")
+      component: Branch
     },
     {
       path: "/demo",
@@ -38,7 +44,7 @@ const router = new Router({
       meta: {
         breadcrumb: "Demo"
       },
-      component: () => import(/* webpackChunkName: "demo" */ "./views/Demo.vue")
+      component: Demo
     },
     {
       path: "/login",
@@ -46,7 +52,7 @@ const router = new Router({
       meta: {
         layout: "login"
       },
-      component: () => import(/* webpackChunkName: "demo" */ "./views/Login.vue")
+      component: Login
     }
   ]
 });

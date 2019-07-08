@@ -36,7 +36,7 @@
 export default {
   methods: {
     isActive(path) {
-      let regexp = RegExp('^/' + path);
+      const regexp = RegExp(`^/${  path}`);
 
       if (path === "dashboard" && this.$route.path === "/") {
         return true;

@@ -1,9 +1,9 @@
 import Vue from "vue";
 
-let config = require("../config");
+const config = require("../config");
 
-let ConfigPlugin = {
-  install(Vue, options) {
+const ConfigPlugin = {
+  install(Vue) {
     Vue.$config = config;
     Object.defineProperties(Vue.prototype, {
       $config: {
