@@ -1,6 +1,12 @@
 <template>
   <div class="extranet-branch">
-    {{ branch }}
+    <div class="row" >
+      <div class="col s12" >
+        <h4>Branch</h4>
+        <p>Name: {{ branch }}</p>
+      </div>
+    </div>
+
     <Container v-bind:branch="branch"></Container>
   </div>
 </template>

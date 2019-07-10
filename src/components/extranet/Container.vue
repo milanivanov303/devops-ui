@@ -1,32 +1,28 @@
 <template>
-  <div class="container">
-    <div v-if="container">
-      <p>Container: {{ container.Name }}</p>
-      <p>
-        Status:
-        <i
-          :class="[
-            'material-icons',
-            'codix-text',
-            'text-' + container.State.Status
-          ]"
-          >fiber_manual_record</i
-        >
-        {{ container.State.Status }}
-      </p>
-      <button v-if="!container.State.Running" class="btn" @click="start()">
-        Start
-      </button>
-      <button v-else class="btn" @click="stop()">Stop</button>
+  <div class="row">
+      <div class="col s12" >
+        <h4>Container</h4>
+        <div v-if="container">
+          <p>Name: {{ container.Name }}</p>
+          <p>
+            Status:
+            <i :class="['material-icons', 'codix-text', 'text-' + container.State.Status]">fiber_manual_record</i>
+            {{ container.State.Status }}
+            <button v-if="container.State.Running" class="btn" @click="stop()">Stop</button>
+            <button v-else class="btn" @click="start()">Start</button>
+          </p>
 
-      <Build v-bind:container="container"></Build>
+          <Builds v-bind:container="container"></Builds>
+      </div>
+
+      <button v-else class="btn" @click="create()">Create</button>
+
     </div>
-    <button v-else class="btn" @click="create()">Create</button>
   </div>
 </template>
 
 <script>
-import Build from "@/components/extranet/Build";
+import Builds from "@/components/extranet/Builds";
 import Api from "@/plugins/api";
 import config from "@/config";
 
@@ -34,7 +30,7 @@ const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   components: {
-    Build
+    Builds
   },
   data() {
     return {
