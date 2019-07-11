@@ -82,10 +82,17 @@ export default {
     },
     get() {
       this.showLoader();
-      api.get(`docker/containers/${this.getName()}`).then(container => {
-        this.container = container;
-        this.loader.hide();
-      });
+      api.get(`docker/containers/${this.getName()}`).then(response => {
+        if (response) {
+          this.container = response.data;
+          this.container.Host = response.meta.host;
+          this.container.Ports = {
+            ssh: this.container.NetworkSettings.Ports["22/tcp"][0].HostPort,
+            web: this.container.NetworkSettings.Ports["80/tcp"][0].HostPort
+          };
+        }
+      })
+      .finally(() => this.loader.hide());
     }
   },
   mounted() {

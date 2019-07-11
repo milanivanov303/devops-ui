@@ -4,8 +4,8 @@
       <h4>Builds</h4>
 
       <ol>
-        <li v-for="deployedBuild in deployedBuilds" >
-          <b>{{ deployedBuild.file }}</b> deployed on <b>{{ deployedBuild.date }}</b>
+        <li v-for="(build, index) in deployedBuilds" :key="index">
+          <a :href="getDeployedBuildUrl(build)" target="_blank">{{ build.file }}</a> deployed on <b>{{ build.date }}</b>
         </li>
       </ol>
 
@@ -37,11 +37,17 @@ export default {
     getDeployedBuilds() {
       const loader = this.$loading.show({ container: this.$el });
 
-      let port = this.container.NetworkSettings.Ports['22/tcp'][0].HostPort;
+      let host = this.container.Host;
+      let port = this.container.Ports.ssh;
 
-      api.get(`extranet/build/deployed-builds?port=${port}`).then((response) => {
+      api.get(`extranet/build/deployed-builds?host=${host}&port=${port}`).then((response) => {
         this.deployedBuilds = response.builds;
-      }).finally(() => loader.hide());
+      }).finally(() =>
+        loader.hide()
+      );
+    },
+    getDeployedBuildUrl(build) {
+      return `http://${this.container.Host}:${this.container.Ports.web}/${build.file.replace('.war', '')}/`;
     }
   },
   mounted() {

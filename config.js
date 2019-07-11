@@ -8,8 +8,7 @@ module.exports = {
   },
   extranet: {
     docker: {
-      host: "extranetdk.codixfr.private",
-      image: "avitohol.codixfr.private:5000/extranet-base:1.6.3"
+      image: "avitohol.codixfr.private:5000/extranet-base:1.6.4"
     }
   }
 };

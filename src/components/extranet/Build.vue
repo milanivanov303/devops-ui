@@ -5,30 +5,9 @@
       <div ref="start-build-modal" class="modal">
         <div class="modal-content">
           <h4 class="left-align">Build</h4>
-          <div v-if="build.started">
+          <div v-if="build.status">
 
-            <div v-if="build.running" class="row">
-              <div v-if="build.running" class="col s12">
-                <p>Build is running ...</p>
-                <div class="progress">
-                  <div class="indeterminate"></div>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="build.failed" class="row">
-              <div class="col s12">
-                build failed!!!
-              </div>
-            </div>
-
-            <div v-if="build.running || build.failed" class="row">
-              <div class="col s12">
-                <pre>{{ build.log }}</pre>
-              </div>
-            </div>
-
-            <div v-if="build.deployRunning" class="row">
+            <div v-if="build.deploy.status === 'running'" class="row">
               <div class="col s12">
                 Deploying build ....
                 <div class="progress">
@@ -37,16 +16,46 @@
               </div>
             </div>
 
-            <div v-if="build.deploySuccess" class="row">
+            <div v-else-if="build.deploy.status === 'success'" class="row">
               <div class="col s12">
                 deployed
               </div>
             </div>
 
-            <div v-if="build.deployFailed" class="row">
+            <div v-else-if="build.deploy.status === 'failed'" class="row">
               <div class="col s12">
                 deployed has failed
                 <p>{{ build.deploy.error }}</p>
+              </div>
+            </div>
+
+            <div v-else-if="build.status === 'starting'" class="row">
+              <div class="col s12">
+                <p>Build starting ...</p>
+                <div class="progress">
+                  <div class="indeterminate"></div>
+                </div>
+              </div>
+            </div>
+
+            <div v-else-if="build.status === 'running'" class="row">
+              <div class="col s12">
+                <p>Build is running ...</p>
+                <div class="progress">
+                  <div class="indeterminate"></div>
+                </div>
+              </div>
+            </div>
+
+            <div v-else-if="build.status === 'failed'" class="row">
+              <div class="col s12">
+                build failed!!!
+              </div>
+            </div>
+
+            <div v-if="build.status === 'running' || build.status === 'failed'" class="row">
+              <div class="col s12">
+                <pre>{{ build.log }}</pre>
               </div>
             </div>
 
@@ -56,7 +65,7 @@
               <div class="input-field col s12">
                 <select id="client" ref="client" v-model="build.client">
                   <option value=""></option>
-                  <option v-for="client in clients" :value="client.package">
+                  <option v-for="(client, index) in clients" :value="client.package" :key="index">
                     {{ client.name }}
                   </option>
                 </select>
@@ -78,7 +87,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button :class="{ 'waves-effect': true, btn: true, disabled: build.started }" @click="start()">
+          <button :class="{ 'waves-effect': true, btn: true, disabled: build.status }" @click="start()">
             Start
           </button>
           <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
@@ -100,15 +109,12 @@ const build = {
   javaVersion: 8,
   log: "",
   logFile: "",
-  started: false,
-  running: false,
-  success: false,
-  failed: false,
+  status: null,
   error: "",
-  deployRunning: false,
-  deploySuccess: false,
-  deployFailed: false,
-  deployError: ""
+  deploy: {
+    status: null,
+    error: ""
+  }
 };
 
 export default {
@@ -139,7 +145,7 @@ export default {
       M.Modal.getInstance(this.$refs["start-build-modal"]).open();
     },
     start() {
-      this.build.started = true;
+      this.build.status = "starting";
       api.post("extranet/build/start", {
         branch: this.container.Config.Labels.branch,
         client: this.build.client,
@@ -147,16 +153,17 @@ export default {
       })
       .then(build => {
         if (build.started) {
-          this.build.running = true;
+          this.build.status = "running";
           this.build.logFile = build.log_file;
           this.check();
           return;
         }
-        this.build.failed = true;
-        this.build.error = response.error;
+        this.build.status = "failed";
+        this.build.error = build.error;
       })
-      .catch(() => {
-        this.build.failed = true;
+      .catch((error) => {
+        this.build.status = "failed";
+        this.build.error = error;
       });
     },
     check() {
@@ -164,21 +171,22 @@ export default {
         api.post("extranet/build/check", {
           branch: this.container.Config.Labels.branch,
           log_file: this.build.logFile,
-          log_lines: this.build.log.length
+          log_start_line: this.build.log.split("\n").length
         })
         .then(build => {
-          this.build.log = build.log;
-          this.build.running = build.running;
+          this.build.log += build.log;
+
           if (build.running) {
             return this.check();
           }
 
           let warFile = this.getWarFile();
           if (warFile) {
+            this.build.status = "success";
             return this.deploy(warFile);
           }
 
-          this.build.failed = true;
+          this.build.status = "failed";
         });
       }, 2000);
     },
@@ -197,24 +205,23 @@ export default {
       return null;
     },
     deploy(warFile) {
-      let port = this.container.NetworkSettings.Ports['22/tcp'][0].HostPort;
-
-      this.build.deployRunning = true;
+      this.build.deploy.status = "running";
       api.post("extranet/build/deploy", {
-        port: port,
+        host: this.container.Host,
+        port: this.container.Ports.ssh,
         war_file: warFile
       }).then((response) => {
-        this.build.deploy.running = false;
         if (response.deployed) {
-          this.build.deploySuccess = true;
+          this.build.deploy.status = "success";
           this.$emit('deployed', warFile);
           return;
         }
-        this.build.deployFailed = true;
-        this.build.deployError = response.error;
+        this.build.deploy.status = "failed";
+        this.build.deploy.error = response.error;
       })
-      .catch(() => {
-        this.build.deployFailed = true;
+      .catch((error) => {
+        this.build.deploy.status = "failed";
+        this.build.deploy.error = error;
       });
     }
   },
@@ -228,3 +235,10 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" >
+  pre {
+    max-height: 200px;
+    overflow: auto;
+  }
+</style>
