@@ -12,16 +12,16 @@
 </template>
 
 <script>
-import Container from "@/components/extranet/Container";
+import Container from '@/components/extranet/Container';
 
 export default {
   components: {
-    Container
+    Container,
   },
   computed: {
     branch() {
       return this.$route.params.branch;
-    }
-  }
+    },
+  },
 };
 </script>

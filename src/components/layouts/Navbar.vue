@@ -27,21 +27,21 @@
 </template>
 
 <script>
-import * as M from "materialize-css/dist/js/materialize";
+import * as M from 'materialize-css/dist/js/materialize';
 
 export default {
   computed: {
     user() {
       return this.$auth.user();
-    }
+    },
   },
   methods: {
     logout() {
       this.$auth.logout();
-    }
+    },
   },
   mounted() {
-    M.Dropdown.init(this.$refs["profile-dropdown"]);
-  }
+    M.Dropdown.init(this.$refs['profile-dropdown']);
+  },
 };
 </script>

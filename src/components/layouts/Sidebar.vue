@@ -13,17 +13,17 @@
           </router-link>
         </li>
         <li v-bind:class="{ active: isActive('extranet/branches') }">
-          <router-link to="/extranet/branches">
+          <router-link to="/dashboard/extranet/branches">
             <i class="material-icons">apps</i> Extranet
           </router-link>
           <ul>
             <li v-bind:class="{ active: isActive('extranet/branches') }">
-              <router-link to="/extranet/branches">Branches</router-link>
+              <router-link to="/dashboard/extranet/branches">Branches</router-link>
             </li>
           </ul>
         </li>
         <li v-bind:class="{ active: isActive('demo') }">
-          <router-link to="/demo">
+          <router-link to="/dashboard/demo">
             <i class="material-icons">event</i> Demo
           </router-link>
         </li>
@@ -36,14 +36,14 @@
 export default {
   methods: {
     isActive(path) {
-      const regexp = RegExp(`^/${  path}`);
+      const regexp = RegExp(`^/${path}`);
 
-      if (path === "dashboard" && this.$route.path === "/") {
+      if (path === 'dashboard' && this.$route.path === '/') {
         return true;
       }
 
       return regexp.test(this.$route.path);
-    }
-  }
+    },
+  },
 };
 </script>

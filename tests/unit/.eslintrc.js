@@ -1,7 +1,6 @@
 module.exports = {
-  root: true,
   env: {
-    node: true,
+    mocha: true,
   },
   extends: [
     'plugin:vue/essential',
@@ -10,7 +9,7 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-shadow': 'off',
+    'no-shadow': [2, { builtinGlobals: false, hoist: 'functions', allow: [] }],
     'no-param-reassign': [2, { props: false }],
     'no-underscore-dangle': [1, { allow: [] }],
     'import/extensions': ['error', 'always', {

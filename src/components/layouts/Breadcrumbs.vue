@@ -14,8 +14,8 @@ export default {
   computed: {
     routes() {
       return this.$route.matched;
-    }
-  }
+    },
+  },
 };
 </script>
 

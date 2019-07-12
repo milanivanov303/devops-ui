@@ -18,16 +18,16 @@
 </template>
 
 <script>
-import Header from "@/components/layouts/Header.vue";
-import Footer from "@/components/layouts/Footer.vue";
-import Breadcrumbs from "@/components/layouts/Breadcrumbs.vue";
+import Header from '@/components/layouts/Header';
+import Footer from '@/components/layouts/Footer';
+import Breadcrumbs from '@/components/layouts/Breadcrumbs';
 
 export default {
   components: {
     Header,
     Breadcrumbs,
-    Footer
-  }
+    Footer,
+  },
 };
 </script>
 

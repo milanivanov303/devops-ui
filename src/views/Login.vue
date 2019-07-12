@@ -83,17 +83,17 @@
 </template>
 
 <script>
-import Alert from "@/components/Alert";
+import Alert from '@/components/Alert';
 
 export default {
   components: {
-    Alert
+    Alert,
   },
   data() {
     return {
-      username: "",
-      password: "",
-      returnUri: "/"
+      username: '',
+      password: '',
+      returnUri: '/',
     };
   },
   computed: {
@@ -108,7 +108,7 @@ export default {
     },
     getError() {
       return this.$store.getters.getError;
-    }
+    },
   },
   methods: {
     login() {
@@ -117,8 +117,8 @@ export default {
     },
     loginSSO() {
       this.$auth.loginSSO();
-    }
-  }
+    },
+  },
 };
 </script>
 

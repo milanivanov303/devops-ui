@@ -6,7 +6,11 @@
           <p>Name: {{ container.Name }}</p>
           <p>
             Status:
-            <i :class="['material-icons', 'codix-text', 'text-' + container.State.Status]">fiber_manual_record</i>
+            <i :class="['material-icons',
+                        'codix-text',
+                        'text-' + container.State.Status]">
+              fiber_manual_record
+            </i>
             {{ container.State.Status }}
             <button v-if="container.State.Running" class="btn" @click="stop()">Stop</button>
             <button v-else class="btn" @click="start()">Start</button>
@@ -22,23 +26,23 @@
 </template>
 
 <script>
-import Builds from "@/components/extranet/Builds";
-import Api from "@/plugins/api";
-import config from "@/config";
+import Builds from '@/components/extranet/Builds';
+import Api from '@/plugins/api';
+import config from '@/config';
 
 const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   components: {
-    Builds
+    Builds,
   },
   data() {
     return {
-      container: null
+      container: null,
     };
   },
   props: {
-    branch: {}
+    branch: {},
   },
   methods: {
     getName() {
@@ -57,12 +61,12 @@ export default {
           Tty: true,
           Image: config.extranet.docker.image,
           HostConfig: {
-            PublishAllPorts: true
+            PublishAllPorts: true,
           },
           Labels: {
-            type: "extranet",
-            branch: this.branch
-          }
+            type: 'extranet',
+            branch: this.branch,
+          },
         })
         .then(() => {
           this.start();
@@ -82,21 +86,21 @@ export default {
     },
     get() {
       this.showLoader();
-      api.get(`docker/containers/${this.getName()}`).then(response => {
+      api.get(`docker/containers/${this.getName()}`).then((response) => {
         if (response) {
           this.container = response.data;
           this.container.Host = response.meta.host;
           this.container.Ports = {
-            ssh: this.container.NetworkSettings.Ports["22/tcp"][0].HostPort,
-            web: this.container.NetworkSettings.Ports["80/tcp"][0].HostPort
+            ssh: this.container.NetworkSettings.Ports['22/tcp'][0].HostPort,
+            web: this.container.NetworkSettings.Ports['80/tcp'][0].HostPort,
           };
         }
       })
-      .finally(() => this.loader.hide());
-    }
+        .finally(() => this.loader.hide());
+    },
   },
   mounted() {
     this.get();
-  }
+  },
 };
 </script>
