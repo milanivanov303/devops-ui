@@ -1,6 +1,6 @@
 {
-  "name": "fron-end",
-  "version": "0.1.0",
+  "name": "devops-ui",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
