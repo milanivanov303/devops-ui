@@ -12,6 +12,7 @@ services:
         ports:
             - ${WEB_CONTAINER_HTTP_PORT}:8080
             - ${WEB_CONTAINER_UI_PORT}:8000
+        tty: true
         volumes:
             - ${WEB_CONTAINER_VOLUME}:/var/www/html
         working_dir: /var/www/html
