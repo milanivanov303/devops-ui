@@ -96,6 +96,11 @@ export default {
       returnUri: '/',
     };
   },
+  created() {
+    if (localStorage.getItem('sso-login') === 'true') {
+      this.$store.dispatch('loginSSO');
+    }    
+  },
   computed: {
     isLoggingIn() {
       return this.$store.getters.isLoggingIn;
@@ -113,10 +118,14 @@ export default {
   methods: {
     login() {
       const { username, password } = this;
-      this.$auth.login(username, password);
+      this.$store.dispatch('login', { username, password })
+        .then(() => this.$router.push({ name: 'dashboard' }))
+        .catch((err) => {
+          return err;
+        });
     },
     loginSSO() {
-      this.$auth.loginSSO();
+      this.$store.dispatch('loginSSO');
     },
   },
 };

@@ -1,3 +1,4 @@
+import store from '../store';
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
 const Branches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
@@ -7,18 +8,7 @@ const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue')
 
 export default [
   {
-    path: '*',
-    meta: {
-      name: 'dashboard',
-      requiresAuth: true,
-    },
-    redirect: {
-      path: '/dashboard',
-    },
-  },
-  // This  allows you to have pages apart of the app but no rendered inside the dash
-  {
-    path: '/',
+    path: '/login',
     meta: {
       name: 'login',
       layout: 'login',
@@ -26,9 +16,14 @@ export default [
     },
     component: Login,
     // redirect if already signed in
-
+    beforeEnter: (to, from, next) => {
+      if (store.getters.user) {
+        next('/dashbaord');
+      } else {
+        next();
+      }
+    },
   },
-  // add any extra routes that you want rendered in the dashboard as a child below.
   {
     path: '/dashboard',
     meta: {
@@ -38,34 +33,42 @@ export default [
       breadcrumb: 'Dashboard',
     },
     component: Dashboard,
-    children: [
-      {
-        path: 'extranet/branches',
-        meta: {
-          breadcrumb: 'Extranet',
-          requiresAuth: true,
-          name: 'extranet-branches',
-        },
-        component: Branches,
-      },
-      {
-        path: 'extranet/branches/:branch',
-        name: 'extranet-branch',
-        meta: {
-          requiresAuth: true,
-          breadcrumb: 'Branch',
-        },
-        component: Branch,
-      },
-      {
-        path: 'demo',
-        meta: {
-          name: 'demo',
-          requiresAuth: true,
-          breadcrumb: 'Demo',
-        },
-        component: Demo,
-      },
-    ],
+  },
+  {
+    path: '/extranet/branches',
+    meta: {
+      breadcrumb: 'Extranet',
+      requiresAuth: true,
+      name: 'extranet-branches',
+    },
+    component: Branches,
+  },
+  {
+    path: '/extranet/branches/:branch',
+    name: 'extranet-branch',
+    meta: {
+      requiresAuth: true,
+      breadcrumb: 'Branch',
+    },
+    component: Branch,
+  },
+  {
+    path: '/demo',
+    meta: {
+      name: 'demo',
+      requiresAuth: true,
+      breadcrumb: 'Demo',
+    },
+    component: Demo,
+  },
+  {
+    path: '*',
+    meta: {
+      name: 'dashboard',
+      requiresAuth: true,
+    },
+    redirect: {
+      path: '/dashboard',
+    },
   },
 ];

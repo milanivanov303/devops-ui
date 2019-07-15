@@ -1,16 +1,23 @@
-import Vue from 'vue';
-import axios from 'axios';
-import store from '../store';
-import router from '../router';
-import config from '../config';
+// import Vue from 'vue';
+import Axios from 'axios';
+// import store from '../store';
+// import router from '../router';
 
-let user = sessionStorage.getItem('user');
-if (user) {
-  user = JSON.parse(user);
-} else {
-  user = {};
-}
+const axios = Axios.create();
 
+axios.interceptors.request.use((config) => {
+  config.withCredentials = true;
+
+  const token = sessionStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+export default axios;
+/*
 const authStore = {
   state: {
     loggingIn: false,
@@ -52,20 +59,20 @@ const authStore = {
   },
 };
 
-store.registerModule('auth', authStore);
+// store.registerModule('auth', authStore);
 
-const axiosAuth = axios.create();
+// const axiosAuth = axios.create();
 
-axiosAuth.interceptors.request.use((config) => {
-  config.withCredentials = true;
+// axiosAuth.interceptors.request.use((config) => {
+//   config.withCredentials = true;
 
-  const token = sessionStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+//   const token = sessionStorage.getItem('token');
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
 
-  return config;
-});
+//   return config;
+// });
 
 class Auth {
   static install(Vue) {
@@ -214,3 +221,4 @@ const auth = new Auth();
 Vue.use(auth);
 
 export default auth;
+*/

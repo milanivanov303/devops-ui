@@ -13,17 +13,17 @@
           </router-link>
         </li>
         <li v-bind:class="{ active: isActive('extranet/branches') }">
-          <router-link to="/dashboard/extranet/branches">
+          <router-link to="/extranet/branches">
             <i class="material-icons">apps</i> Extranet
           </router-link>
           <ul>
             <li v-bind:class="{ active: isActive('extranet/branches') }">
-              <router-link to="/dashboard/extranet/branches">Branches</router-link>
+              <router-link to="/extranet/branches">Branches</router-link>
             </li>
           </ul>
         </li>
         <li v-bind:class="{ active: isActive('demo') }">
-          <router-link to="/dashboard/demo">
+          <router-link to="/demo">
             <i class="material-icons">event</i> Demo
           </router-link>
         </li>

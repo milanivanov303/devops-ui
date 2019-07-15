@@ -10,10 +10,10 @@
 
 <script>
 import Branch from '@/components/extranet/Branch';
-import Api from '@/plugins/api';
+//import Api from '@/plugins/api';
 import config from '@/config';
 
-const api = new Api(config.devops.url, config.devops.code);
+//const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   components: {
@@ -26,11 +26,15 @@ export default {
   },
   mounted() {
     const loader = this.$loading.show({ container: this.$el });
-
-    api.get('extranet/branches').then((branches) => {
-      this.branches = branches;
-      loader.hide();
-    });
+    // api.get('extranet/branches').then((branches) => {
+    //   this.branches = branches;
+    //   loader.hide();
+    // });
+    this.$store.dispatch('devopsapi/get', 'extranet/branches')
+        .then((branches) => {
+          this.branches = branches;
+          loader.hide();
+        });
   },
 };
 </script>

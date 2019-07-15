@@ -32,13 +32,15 @@ import * as M from 'materialize-css/dist/js/materialize';
 export default {
   computed: {
     user() {
-      return this.$auth.user();
+      return this.$store.getters.user;
     },
   },
   methods: {
-    logout() {
-      this.$auth.logout();
-    },
+    logout(){
+			this.$store.dispatch('logout').then(() => {
+			  this.$router.push('/login');
+			});
+		}
   },
   mounted() {
     M.Dropdown.init(this.$refs['profile-dropdown']);
