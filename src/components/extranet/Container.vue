@@ -27,10 +27,10 @@
 
 <script>
 import Builds from '@/components/extranet/Builds';
-//import Api from '@/plugins/api';
+// import Api from '@/plugins/api';
 import config from '@/config';
 
-//const api = new Api(config.devops.url, config.devops.code);
+// const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   components: {
@@ -56,19 +56,19 @@ export default {
     create() {
       this.showLoader();
       this.$store.dispatch('devopsapi/post', `docker/containers/${this.getName()}`, {
-          Hostname: this.branch,
-          Tty: true,
-          Image: config.extranet.docker.image,
-          HostConfig: {
-            PublishAllPorts: true,
-          },
-          Labels: {
-            type: 'extranet',
-            branch: this.branch,
-          },
-        })
+        Hostname: this.branch,
+        Tty: true,
+        Image: config.extranet.docker.image,
+        HostConfig: {
+          PublishAllPorts: true,
+        },
+        Labels: {
+          type: 'extranet',
+          branch: this.branch,
+        },
+      })
         .then(() => {
-           this.start();
+          this.start();
         });
       // api.post(`docker/containers/${this.getName()}`, {
       //     Hostname: this.branch,
@@ -93,7 +93,7 @@ export default {
       // });
       this.$store.dispatch('devopsapi/post', `docker/containers/start/${this.getName()}`)
         .then(() => {
-           this.get();
+          this.get();
         });
     },
     stop() {
@@ -103,7 +103,7 @@ export default {
       // });
       this.$store.dispatch('devopsapi/post', `docker/containers/stop/${this.getName()}`)
         .then(() => {
-           this.get();
+          this.get();
         });
     },
     get() {

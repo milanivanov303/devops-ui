@@ -10,10 +10,10 @@
 
 <script>
 import Branch from '@/components/extranet/Branch';
-//import Api from '@/plugins/api';
-import config from '@/config';
+// import Api from '@/plugins/api';
+// import config from '@/config';
 
-//const api = new Api(config.devops.url, config.devops.code);
+// const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   components: {
@@ -31,10 +31,10 @@ export default {
     //   loader.hide();
     // });
     this.$store.dispatch('devopsapi/get', 'extranet/branches')
-        .then((branches) => {
-          this.branches = branches;
-          loader.hide();
-        });
+      .then((branches) => {
+        this.branches = branches;
+        loader.hide();
+      });
   },
 };
 </script>

@@ -16,7 +16,6 @@ axios.interceptors.request.use((config) => {
 
 axios.interceptors.response.use(null, async (error) => {
   if (error.response.status === 401) {
-    debugger;
     const token = await store.dispatch('getToken', axios.prototype.code);
     error.config.headers.Authorization = `Bearer ${token}`;
     return axios.request(error.config);

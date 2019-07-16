@@ -75,7 +75,6 @@ nav {
     li > a {
         color: white;
         font-size: 12px;
-        background-color: $sidenav-bg-color;
         & > i.material-icons {
             color: white;
         }
@@ -104,6 +103,7 @@ a.sidenav-trigger.top-nav {
 }
 
 .dropdown-content {
+    background-color: $sidenav-bg-color;
     li > a > i {
         font-size: 22px;
         margin-right: 5px;

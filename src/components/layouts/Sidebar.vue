@@ -52,6 +52,6 @@ export default {
     M.Dropdown.init(document.querySelector('.dorpdown-extranet'), {
       coverTrigger: false,
     });
-  },  
+  },
 };
 </script>

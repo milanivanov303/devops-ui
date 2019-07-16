@@ -102,10 +102,10 @@
 
 <script>
 import * as M from 'materialize-css/dist/js/materialize';
-//import Api from '@/plugins/api';
-import config from '@/config';
+// import Api from '@/plugins/api';
+// import config from '@/config';
 
-//const api = new Api(config.devops.url, config.devops.code);
+// const api = new Api(config.devops.url, config.devops.code);
 
 const build = {
   client: '',
@@ -134,13 +134,14 @@ export default {
     getClients() {
       const loader = this.$loading.show({ container: this.$el });
 
-      api.get('extranet/clients').then((clients) => {
-        this.clients = clients;
-        loader.hide();
-      });
+      // api.get('extranet/clients').then((clients) => {
+      //   this.clients = clients;
+      //   loader.hide();
+      // });
       this.$store.dispatch('devopsapi/get', 'extranet/clients')
         .then((clients) => {
           this.clients = clients;
+          loader.hide();
         });
     },
     open() {
@@ -267,7 +268,7 @@ export default {
           }
           this.build.deploy.status = 'failed';
           this.build.deploy.error = response.error;
-          })
+        })
         .catch((error) => {
           this.build.deploy.status = 'failed';
           this.build.deploy.error = error;

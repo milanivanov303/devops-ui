@@ -12,7 +12,6 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-shadow': 'off',
     'no-param-reassign': [2, { props: false }],
-    'no-underscore-dangle': [1, { allow: [] }],
     'import/extensions': ['error', 'always', {
       js: 'never',
       mjs: 'never',

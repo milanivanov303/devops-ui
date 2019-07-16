@@ -99,7 +99,7 @@ export default {
   created() {
     if (localStorage.getItem('sso-login') === 'true') {
       this.$store.dispatch('loginSSO');
-    }    
+    }
   },
   computed: {
     isLoggingIn() {
@@ -120,9 +120,7 @@ export default {
       const { username, password } = this;
       this.$store.dispatch('login', { username, password })
         .then(() => this.$router.push({ name: 'dashboard' }))
-        .catch((err) => {
-          return err;
-        });
+        .catch(err => err);
     },
     loginSSO() {
       this.$store.dispatch('loginSSO');

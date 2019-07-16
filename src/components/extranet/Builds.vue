@@ -17,11 +17,11 @@
 </template>
 
 <script>
-//import Api from '@/plugins/api';
-import config from '@/config';
+// import Api from '@/plugins/api';
+// import config from '@/config';
 import Build from '@/components/extranet/Build';
 
-//const api = new Api(config.devops.url, config.devops.code);
+// const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   components: {
@@ -47,7 +47,7 @@ export default {
       // }).finally(() => loader.hide());
       this.$store.dispatch('devopsapi/get', `extranet/build/deployed-builds?host=${host}&port=${port}`)
         .then((response) => {
-           this.deployedBuilds = response.builds;
+          this.deployedBuilds = response.builds;
         })
         .finally(() => loader.hide());
     },

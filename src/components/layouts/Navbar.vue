@@ -36,11 +36,12 @@ export default {
     },
   },
   methods: {
-    logout(){
-			this.$store.dispatch('logout').then(() => {
-			  this.$router.push('/login');
-			});
-		}
+    logout() {
+      this.$store.dispatch('logout')
+        .then(() => {
+          this.$router.push('/login');
+        });
+    },
   },
   mounted() {
     M.Dropdown.init(this.$refs['profile-dropdown']);
