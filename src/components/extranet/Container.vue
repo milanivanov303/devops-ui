@@ -55,18 +55,22 @@ export default {
     },
     create() {
       this.showLoader();
-      this.$store.dispatch('devopsapi/post', `docker/containers/${this.getName()}`, {
-        Hostname: this.branch,
-        Tty: true,
-        Image: config.extranet.docker.image,
-        HostConfig: {
-          PublishAllPorts: true,
+      const payload = {
+        uri: `docker/containers/${this.getName()}`,
+        data: {
+          Hostname: this.branch,
+          Tty: true,
+          Image: config.extranet.docker.image,
+          HostConfig: {
+            PublishAllPorts: true,
+          },
+          Labels: {
+            type: 'extranet',
+            branch: this.branch,
+          },
         },
-        Labels: {
-          type: 'extranet',
-          branch: this.branch,
-        },
-      })
+      };
+      this.$store.dispatch('devopsapi/post', payload)
         .then(() => {
           this.start();
         });
@@ -91,7 +95,10 @@ export default {
       // api.post(`docker/containers/start/${this.getName()}`).then(() => {
       //   this.get();
       // });
-      this.$store.dispatch('devopsapi/post', `docker/containers/start/${this.getName()}`)
+      const payload = {
+        uri: `docker/containers/start/${this.getName()}`,
+      };
+      this.$store.dispatch('devopsapi/post', payload)
         .then(() => {
           this.get();
         });
@@ -101,14 +108,20 @@ export default {
       // api.post(`docker/containers/stop/${this.getName()}`).then(() => {
       //   this.get();
       // });
-      this.$store.dispatch('devopsapi/post', `docker/containers/stop/${this.getName()}`)
+      const payload = {
+        uri: `docker/containers/stop/${this.getName()}`,
+      };
+      this.$store.dispatch('devopsapi/post', payload)
         .then(() => {
           this.get();
         });
     },
     get() {
       this.showLoader();
-      this.$store.dispatch('devopsapi/get', `docker/containers/${this.getName()}`)
+      const payload = {
+        uri: `docker/containers/${this.getName()}`,
+      };
+      this.$store.dispatch('devopsapi/get', payload)
         .then((response) => {
           if (response) {
             this.container = response.data;

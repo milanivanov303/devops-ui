@@ -30,7 +30,10 @@ export default {
     //   this.branches = branches;
     //   loader.hide();
     // });
-    this.$store.dispatch('devopsapi/get', 'extranet/branches')
+    const payload = {
+      uri: 'extranet/branches',
+    };
+    this.$store.dispatch('devopsapi/get', payload)
       .then((branches) => {
         this.branches = branches;
         loader.hide();

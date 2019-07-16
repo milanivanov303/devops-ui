@@ -4,10 +4,10 @@ import axios from '../../../plugins/api';
 import config from '../../../config';
 
 export default {
-  get({ commit }, uri, options) {
+  get({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      const query = queryString.stringify(options, { arrayFormat: 'index' });
-      axios.get(`${config.devops.url}/${uri}?${query}`)
+      const query = queryString.stringify(payload.options, { arrayFormat: 'index' });
+      axios.get(`${config.devops.url}/${payload.uri}?${query}`)
         .then((response) => {
           resolve(response.data);
         })
@@ -17,10 +17,12 @@ export default {
         });
     });
   },
-  post({ commit }, uri, data) {
+  post({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      axios.get(`${config.devops.url}/${uri}`, data)
+      axios.post(`${config.devops.url}/${payload.uri}`, payload.data)
         .then((response) => {
+          console.log(response);
+          debugger;
           resolve(response.data);
         })
         .catch((err) => {

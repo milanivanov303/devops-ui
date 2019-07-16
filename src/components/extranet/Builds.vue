@@ -45,7 +45,10 @@ export default {
       // api.get(`extranet/build/deployed-builds?host=${host}&port=${port}`).then((response) => {
       //   this.deployedBuilds = response.builds;
       // }).finally(() => loader.hide());
-      this.$store.dispatch('devopsapi/get', `extranet/build/deployed-builds?host=${host}&port=${port}`)
+      const payload = {
+        uri: `extranet/build/deployed-builds?host=${host}&port=${port}`,
+      };
+      this.$store.dispatch('devopsapi/get', payload)
         .then((response) => {
           this.deployedBuilds = response.builds;
         })

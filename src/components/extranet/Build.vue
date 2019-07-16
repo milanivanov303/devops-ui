@@ -138,7 +138,10 @@ export default {
       //   this.clients = clients;
       //   loader.hide();
       // });
-      this.$store.dispatch('devopsapi/get', 'extranet/clients')
+      const payload = {
+        uri: 'extranet/clients',
+      };
+      this.$store.dispatch('devopsapi/get', payload)
         .then((clients) => {
           this.clients = clients;
           loader.hide();
@@ -154,11 +157,15 @@ export default {
     },
     start() {
       this.build.status = 'starting';
-      this.$store.dispatch('devopsapi/post', 'extranet/build/start', {
-        branch: this.container.Config.Labels.branch,
-        client: this.build.client,
-        java_version: this.build.javaVersion,
-      })
+      const payload = {
+        uri: 'extranet/build/start',
+        data: {
+          branch: this.container.Config.Labels.branch,
+          client: this.build.client,
+          java_version: this.build.javaVersion,
+        },
+      };
+      this.$store.dispatch('devopsapi/post', payload)
         .then((build) => {
           if (build.started) {
             this.build.status = 'running';
@@ -195,11 +202,15 @@ export default {
     },
     check() {
       setTimeout(() => {
-        this.$store.dispatch('devopsapi/post', 'extranet/build/check', {
-          branch: this.container.Config.Labels.branch,
-          log_file: this.build.logFile,
-          log_start_line: this.build.log.split('\n').length,
-        })
+        const payload = {
+          uri: 'extranet/build/check',
+          data: {
+            branch: this.container.Config.Labels.branch,
+            log_file: this.build.logFile,
+            log_start_line: this.build.log.split('\n').length,
+          },
+        };
+        this.$store.dispatch('devopsapi/post', payload)
           .then((build) => {
             this.build.log += build.log;
 
@@ -255,11 +266,15 @@ export default {
     },
     deploy(warFile) {
       this.build.deploy.status = 'running';
-      this.$store.dispatch('devopsapi/post', 'extranet/build/deploy', {
-        host: this.container.Host,
-        port: this.container.Ports.ssh,
-        war_file: warFile,
-      })
+      const payload = {
+        uri: 'extranet/build/deploy',
+        data: {
+          host: this.container.Host,
+          port: this.container.Ports.ssh,
+          war_file: warFile,
+        },
+      };
+      this.$store.dispatch('devopsapi/post', payload)
         .then((response) => {
           if (response.deployed) {
             this.build.deploy.status = 'success';
