@@ -1,8 +1,9 @@
 import Axios from 'axios';
 import store from '../store';
-
+import config from '../config';
 
 const axios = Axios.create();
+axios.prototype.code = config.devops.code;
 
 axios.interceptors.request.use((config) => {
   const token = sessionStorage.getItem(`token.${axios.prototype.code}`);
@@ -13,13 +14,12 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
-axios.interceptors.response.use(null, (error) => {
+axios.interceptors.response.use(null, async (error) => {
   if (error.response.status === 401) {
-    return store.getToken(axios.prototype.code).then((token) => {
-      sessionStorage.setItem(`token.${axios.prototype.code}`, token);
-      error.config.headers.Authorization = `Bearer ${token}`;
-      return axios.request(error.config);
-    });
+    debugger;
+    const token = await store.dispatch('getToken', axios.prototype.code);
+    error.config.headers.Authorization = `Bearer ${token}`;
+    return axios.request(error.config);
   }
 
   return Promise.reject(error);

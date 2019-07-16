@@ -75,6 +75,7 @@ nav {
     li > a {
         color: white;
         font-size: 12px;
+        background-color: $sidenav-bg-color;
         & > i.material-icons {
             color: white;
         }

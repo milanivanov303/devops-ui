@@ -17,11 +17,11 @@
 </template>
 
 <script>
-import Api from '@/plugins/api';
+//import Api from '@/plugins/api';
 import config from '@/config';
 import Build from '@/components/extranet/Build';
 
-const api = new Api(config.devops.url, config.devops.code);
+//const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   components: {
@@ -42,9 +42,14 @@ export default {
       const host = this.container.Host;
       const port = this.container.Ports.ssh;
 
-      api.get(`extranet/build/deployed-builds?host=${host}&port=${port}`).then((response) => {
-        this.deployedBuilds = response.builds;
-      }).finally(() => loader.hide());
+      // api.get(`extranet/build/deployed-builds?host=${host}&port=${port}`).then((response) => {
+      //   this.deployedBuilds = response.builds;
+      // }).finally(() => loader.hide());
+      this.$store.dispatch('devopsapi/get', `extranet/build/deployed-builds?host=${host}&port=${port}`)
+        .then((response) => {
+           this.deployedBuilds = response.builds;
+        })
+        .finally(() => loader.hide());
     },
     getDeployedBuildUrl(build) {
       return `http://${this.container.Host}:${this.container.Ports.web}/${build.file.replace('.war', '')}/`;

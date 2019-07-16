@@ -102,10 +102,10 @@
 
 <script>
 import * as M from 'materialize-css/dist/js/materialize';
-import Api from '@/plugins/api';
+//import Api from '@/plugins/api';
 import config from '@/config';
 
-const api = new Api(config.devops.url, config.devops.code);
+//const api = new Api(config.devops.url, config.devops.code);
 
 const build = {
   client: '',
@@ -138,6 +138,10 @@ export default {
         this.clients = clients;
         loader.hide();
       });
+      this.$store.dispatch('devopsapi/get', 'extranet/clients')
+        .then((clients) => {
+          this.clients = clients;
+        });
     },
     open() {
       this.build = JSON.parse(JSON.stringify(build));
@@ -149,7 +153,7 @@ export default {
     },
     start() {
       this.build.status = 'starting';
-      api.post('extranet/build/start', {
+      this.$store.dispatch('devopsapi/post', 'extranet/build/start', {
         branch: this.container.Config.Labels.branch,
         client: this.build.client,
         java_version: this.build.javaVersion,
@@ -168,10 +172,29 @@ export default {
           this.build.status = 'failed';
           this.build.error = error;
         });
+      // api.post('extranet/build/start', {
+      //   branch: this.container.Config.Labels.branch,
+      //   client: this.build.client,
+      //   java_version: this.build.javaVersion,
+      // })
+      //   .then((build) => {
+      //     if (build.started) {
+      //       this.build.status = 'running';
+      //       this.build.logFile = build.log_file;
+      //       this.check();
+      //       return;
+      //     }
+      //     this.build.status = 'failed';
+      //     this.build.error = build.error;
+      //   })
+      //   .catch((error) => {
+      //     this.build.status = 'failed';
+      //     this.build.error = error;
+      //   });
     },
     check() {
       setTimeout(() => {
-        api.post('extranet/build/check', {
+        this.$store.dispatch('devopsapi/post', 'extranet/build/check', {
           branch: this.container.Config.Labels.branch,
           log_file: this.build.logFile,
           log_start_line: this.build.log.split('\n').length,
@@ -192,6 +215,27 @@ export default {
             this.build.status = 'failed';
             return this.build.status;
           });
+        // api.post('extranet/build/check', {
+        //   branch: this.container.Config.Labels.branch,
+        //   log_file: this.build.logFile,
+        //   log_start_line: this.build.log.split('\n').length,
+        // })
+        //   .then((build) => {
+        //     this.build.log += build.log;
+
+        //     if (build.running) {
+        //       return this.check();
+        //     }
+
+        //     const warFile = this.getWarFile();
+        //     if (warFile) {
+        //       this.build.status = 'success';
+        //       return this.deploy(warFile);
+        //     }
+
+        //     this.build.status = 'failed';
+        //     return this.build.status;
+        //   });
       }, 2000);
     },
     getWarFile() {
@@ -210,23 +254,41 @@ export default {
     },
     deploy(warFile) {
       this.build.deploy.status = 'running';
-      api.post('extranet/build/deploy', {
+      this.$store.dispatch('devopsapi/post', 'extranet/build/deploy', {
         host: this.container.Host,
         port: this.container.Ports.ssh,
         war_file: warFile,
-      }).then((response) => {
-        if (response.deployed) {
-          this.build.deploy.status = 'success';
-          this.$emit('deployed', warFile);
-          return;
-        }
-        this.build.deploy.status = 'failed';
-        this.build.deploy.error = response.error;
       })
+        .then((response) => {
+          if (response.deployed) {
+            this.build.deploy.status = 'success';
+            this.$emit('deployed', warFile);
+            return;
+          }
+          this.build.deploy.status = 'failed';
+          this.build.deploy.error = response.error;
+          })
         .catch((error) => {
           this.build.deploy.status = 'failed';
           this.build.deploy.error = error;
         });
+      // api.post('extranet/build/deploy', {
+      //   host: this.container.Host,
+      //   port: this.container.Ports.ssh,
+      //   war_file: warFile,
+      // }).then((response) => {
+      //   if (response.deployed) {
+      //     this.build.deploy.status = 'success';
+      //     this.$emit('deployed', warFile);
+      //     return;
+      //   }
+      //   this.build.deploy.status = 'failed';
+      //   this.build.deploy.error = response.error;
+      // })
+      //   .catch((error) => {
+      //     this.build.deploy.status = 'failed';
+      //     this.build.deploy.error = error;
+      //   });
     },
   },
   mounted() {

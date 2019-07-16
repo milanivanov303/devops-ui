@@ -4,23 +4,29 @@ import axios from '../../../plugins/api';
 import config from '../../../config';
 
 export default {
-  async get(uri, options) {
-    try {
+  get({ commit }, uri, options) {
+    return new Promise((resolve, reject) => {
       const query = queryString.stringify(options, { arrayFormat: 'index' });
-      const response = await axios.get(`${config.devops.url}/${uri}?${query}`);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
+      axios.get(`${config.devops.url}/${uri}?${query}`)
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((err) => {
+          commit('error', err);
+          reject(err);
+        });
+    });
   },
-  async post(uri, data) {
-    try {
-      const response = await axios.post(`${config.devops.url}/${uri}`, data);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
+  post({ commit }, uri, data) {
+    return new Promise((resolve, reject) => {
+      axios.get(`${config.devops.url}/${uri}`, data)
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((err) => {
+          commit('error', err);
+          reject(err);
+        });
+    });
   },
 };

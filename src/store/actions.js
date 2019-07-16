@@ -75,12 +75,11 @@ export default {
             code,
           },
         }).then((response) => {
-        const { token } = response.data.token;
-        resolve(token);
+        sessionStorage.setItem(`token.${code}`, response.data.token);
+        resolve(response.data.token);
       })
         .catch((err) => {
           commit('hasError', true);
-          localStorage.removeItem('token');
           reject(err);
         });
     });
