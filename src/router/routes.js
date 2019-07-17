@@ -49,6 +49,7 @@ export default [
     meta: {
       requiresAuth: true,
       breadcrumb: 'Branch',
+      transitionName: 'slide',
     },
     component: Branch,
   },

@@ -21,8 +21,6 @@ export default {
     return new Promise((resolve, reject) => {
       axios.post(`${config.devops.url}/${payload.uri}`, payload.data)
         .then((response) => {
-          console.log(response);
-          debugger;
           resolve(response.data);
         })
         .catch((err) => {
