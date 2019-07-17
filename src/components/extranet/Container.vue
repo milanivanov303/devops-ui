@@ -56,7 +56,7 @@ export default {
     create() {
       this.showLoader();
       const payload = {
-        uri: `docker/containers/${this.getName()}`,
+        container: this.getName(),
         data: {
           Hostname: this.branch,
           Tty: true,
@@ -70,48 +70,27 @@ export default {
           },
         },
       };
-      this.$store.dispatch('devopsapi/post', payload)
+      this.$store.dispatch('extranet/createContainer', payload)
         .then(() => {
           this.start();
         });
-      // api.post(`docker/containers/${this.getName()}`, {
-      //     Hostname: this.branch,
-      //     Tty: true,
-      //     Image: config.extranet.docker.image,
-      //     HostConfig: {
-      //       PublishAllPorts: true,
-      //     },
-      //     Labels: {
-      //       type: 'extranet',
-      //       branch: this.branch,
-      //     },
-      //   })
-      //   .then(() => {
-      //     this.start();
-      //   });
     },
     start() {
       this.showLoader();
-      // api.post(`docker/containers/start/${this.getName()}`).then(() => {
-      //   this.get();
-      // });
       const payload = {
-        uri: `docker/containers/start/${this.getName()}`,
+        container: this.getName(),
       };
-      this.$store.dispatch('devopsapi/post', payload)
+      this.$store.dispatch('extranet/startContainer', payload)
         .then(() => {
           this.get();
         });
     },
     stop() {
       this.showLoader();
-      // api.post(`docker/containers/stop/${this.getName()}`).then(() => {
-      //   this.get();
-      // });
       const payload = {
-        uri: `docker/containers/stop/${this.getName()}`,
+        container: this.getName(),
       };
-      this.$store.dispatch('devopsapi/post', payload)
+      this.$store.dispatch('extranet/stopContainer', payload)
         .then(() => {
           this.get();
         });
@@ -119,9 +98,9 @@ export default {
     get() {
       this.showLoader();
       const payload = {
-        uri: `docker/containers/${this.getName()}`,
+        container: this.getName(),
       };
-      this.$store.dispatch('devopsapi/get', payload)
+      this.$store.dispatch('extranet/getContainer', payload)
         .then((response) => {
           if (response) {
             this.container = response.data;
@@ -133,17 +112,6 @@ export default {
           }
         })
         .finally(() => this.loader.hide());
-      // api.get(`docker/containers/${this.getName()}`).then((response) => {
-      //   if (response) {
-      //     this.container = response.data;
-      //     this.container.Host = response.meta.host;
-      //     this.container.Ports = {
-      //       ssh: this.container.NetworkSettings.Ports['22/tcp'][0].HostPort,
-      //       web: this.container.NetworkSettings.Ports['80/tcp'][0].HostPort,
-      //     };
-      //   }
-      // })
-      //   .finally(() => this.loader.hide());
     },
   },
   mounted() {

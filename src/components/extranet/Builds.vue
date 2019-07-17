@@ -42,13 +42,11 @@ export default {
       const host = this.container.Host;
       const port = this.container.Ports.ssh;
 
-      // api.get(`extranet/build/deployed-builds?host=${host}&port=${port}`).then((response) => {
-      //   this.deployedBuilds = response.builds;
-      // }).finally(() => loader.hide());
       const payload = {
-        uri: `extranet/build/deployed-builds?host=${host}&port=${port}`,
+        host,
+        port,
       };
-      this.$store.dispatch('devopsapi/get', payload)
+      this.$store.dispatch('extranet/deployedBuild', payload)
         .then((response) => {
           this.deployedBuilds = response.builds;
         })

@@ -1,22 +1,22 @@
 // import Vue from 'vue';
-import Axios from 'axios';
+// import Axios from 'axios';
 // import store from '../store';
 // import router from '../router';
 
-const axios = Axios.create();
+// const axios = Axios.create();
 
-axios.interceptors.request.use((config) => {
-  config.withCredentials = true;
+// axios.interceptors.request.use((config) => {
+//   config.withCredentials = true;
 
-  const token = sessionStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+//   const token = sessionStorage.getItem('token');
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
 
-  return config;
-});
+//   return config;
+// });
 
-export default axios;
+// export default axios;
 /*
 const authStore = {
   state: {

@@ -1,7 +1,22 @@
 // https://vuex.vuejs.org/en/actions.html
-import axios from '../plugins/auth';
+import Axios from 'axios';
 import { getParam, getSsoUrl, getReturnUri } from '../plugins/helpers';
 import config from '../config';
+
+const axios = Axios.create({
+  baseURL: `${config['user-management'].url}/v1`,
+});
+
+axios.interceptors.request.use((config) => {
+  config.withCredentials = true;
+
+  const token = sessionStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
 
 export default {
   login({ commit }, userData) {
@@ -41,10 +56,7 @@ export default {
       window.location.href = getSsoUrl();
     }
     try {
-      const response = await axios.get(
-        `${config['user-management'].url}/v1/auth/identity`,
-      );
-
+      const response = await axios.get('/auth/identity');
       const user = response.data;
       commit('user', user);
       sessionStorage.setItem('user', JSON.stringify(user));
@@ -60,28 +72,21 @@ export default {
     return commit('loggingInSSO', false);
   },
   logout({ commit }) {
-    return new Promise((resolve) => {
-      commit('loggedOut');
-      localStorage.setItem('sso-login', 'false');
-      sessionStorage.clear();
-      resolve();
-    });
+    commit('loggedOut');
+    localStorage.setItem('sso-login', 'false');
+    sessionStorage.clear();
   },
   getToken({ commit }, code) {
-    return new Promise((resolve, reject) => {
-      axios.get(`${config['user-management'].url}/v1/auth/token`,
-        {
-          params: {
-            code,
-          },
-        }).then((response) => {
-        sessionStorage.setItem(`token.${code}`, response.data.token);
-        resolve(response.data.token);
+    return axios.get('/auth/token',
+      {
+        params: {
+          code,
+        },
       })
-        .catch((err) => {
-          commit('hasError', true);
-          reject(err);
-        });
-    });
+      .then(response => response.data.token)
+      .catch((err) => {
+        commit('hasError', true);
+        return err;
+      });
   },
 };
