@@ -88,7 +88,7 @@ export default {
           this.container.Host = response.meta.host;
           this.container.Ports = {
             ssh: this.container.NetworkSettings.Ports["22/tcp"][0].HostPort,
-            web: this.container.NetworkSettings.Ports["80/tcp"][0].HostPort
+            web: this.container.NetworkSettings.Ports["8591/tcp"][0].HostPort
           };
         }
       })
