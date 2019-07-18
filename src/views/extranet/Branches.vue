@@ -9,28 +9,25 @@
 </template>
 
 <script>
-import Branch from "@/components/extranet/Branch";
-import Api from "@/plugins/api";
-import config from "@/config";
-
-const api = new Api(config.devops.url, config.devops.code);
+import Branch from '@/components/extranet/Branch';
 
 export default {
   components: {
-    Branch
+    Branch,
   },
   data() {
     return {
-      branches: []
+      branches: [],
     };
   },
   mounted() {
     const loader = this.$loading.show({ container: this.$el });
 
-    api.get("extranet/branches").then(branches => {
-      this.branches = branches;
-      loader.hide();
-    });
-  }
+    this.$store.dispatch('extranet/getBranches')
+      .then((branches) => {
+        this.branches = branches;
+        loader.hide();
+      });
+  },
 };
 </script>

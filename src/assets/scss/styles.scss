@@ -83,6 +83,9 @@ nav {
             background-color: lighten($sidenav-bg-color, 4%);
         }
     }
+    .dropdown-content {
+        background-color: $sidenav-bg-color;
+    }
 }
 a.sidenav-trigger.top-nav {
     position: absolute;
@@ -102,7 +105,7 @@ a.sidenav-trigger.top-nav {
     }
 }
 
-.dropdown-content {
+.dropdown-content {    
     li > a > i {
         font-size: 22px;
         margin-right: 5px;

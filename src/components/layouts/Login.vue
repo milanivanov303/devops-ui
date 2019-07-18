@@ -17,16 +17,16 @@
 </template>
 
 <script>
-import * as M from "materialize-css/dist/js/materialize";
-import Footer from "@/components/layouts/Footer.vue";
+import * as M from 'materialize-css/dist/js/materialize';
+import Footer from '@/components/layouts/Footer';
 
 export default {
   components: {
-    Footer
+    Footer,
   },
   mounted() {
     M.AutoInit();
-  }
+  },
 };
 </script>
 

@@ -11,13 +11,11 @@
 
 <script>
 export default {
-  props: {
-    msg: ""
-  },
+  props: ['msg'],
   mounted() {
-    document.getElementsByClassName("alert-close")[0].addEventListener("click", ({target}) => {
-      target.closest(".alert").classList.add("hide");
+    document.getElementsByClassName('alert-close')[0].addEventListener('click', ({ target }) => {
+      target.closest('.alert').classList.add('hide');
     });
-  }
+  },
 };
 </script>
