@@ -87,7 +87,10 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button :class="{ 'waves-effect': true, btn: true, disabled: build.status }" @click="start()">
+          <button
+            :class="{ 'waves-effect': true, btn: true, disabled: build.status }"
+            @click="start()"
+          >
             Start
           </button>
           <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
@@ -98,104 +101,108 @@
 </template>
 
 <script>
-import * as M from "materialize-css/dist/js/materialize";
-import Api from "@/plugins/api";
-import config from "@/config";
+import * as M from 'materialize-css/dist/js/materialize';
+// import Api from '@/plugins/api';
+// import config from '@/config';
 
-const api = new Api(config.devops.url, config.devops.code);
+// const api = new Api(config.devops.url, config.devops.code);
 
 const build = {
-  client: "",
+  client: '',
   javaVersion: 8,
-  log: "",
-  logFile: "",
+  log: '',
+  logFile: '',
   status: null,
-  error: "",
+  error: '',
   deploy: {
     status: null,
-    error: ""
-  }
+    error: '',
+  },
 };
 
 export default {
   data() {
     return {
       clients: [],
-      build: build
+      build,
     };
   },
   props: {
-    container: {}
+    container: {},
   },
   methods: {
     getClients() {
       const loader = this.$loading.show({ container: this.$el });
 
-      api.get("extranet/clients").then(clients => {
-        this.clients = clients;
-        loader.hide();
-      });
+      this.$store.dispatch('extranet/getClients')
+        .then((clients) => {
+          this.clients = clients;
+          loader.hide();
+        });
     },
     open() {
       this.build = JSON.parse(JSON.stringify(build));
       setTimeout(() => {
         M.FormSelect.init(this.$refs.client);
-        M.FormSelect.init(this.$refs["java-version"]);
+        M.FormSelect.init(this.$refs['java-version']);
       }, 100);
-      M.Modal.getInstance(this.$refs["start-build-modal"]).open();
+      M.Modal.getInstance(this.$refs['start-build-modal']).open();
     },
     start() {
-      this.build.status = "starting";
-      api.post("extranet/build/start", {
+      this.build.status = 'starting';
+      const payload = {
         branch: this.container.Config.Labels.branch,
         client: this.build.client,
-        java_version: this.build.javaVersion
-      })
-      .then(build => {
-        if (build.started) {
-          this.build.status = "running";
-          this.build.logFile = build.log_file;
-          this.check();
-          return;
-        }
-        this.build.status = "failed";
-        this.build.error = build.error;
-      })
-      .catch((error) => {
-        this.build.status = "failed";
-        this.build.error = error;
-      });
+        java_version: this.build.javaVersion,
+      };
+      this.$store.dispatch('extranet/startBuild', payload)
+        .then((build) => {
+          if (build.started) {
+            this.build.status = 'running';
+            this.build.logFile = build.log_file;
+            this.check();
+            return;
+          }
+          this.build.status = 'failed';
+          this.build.error = build.error;
+        })
+        .catch((error) => {
+          this.build.status = 'failed';
+          this.build.error = error;
+        });
     },
     check() {
       setTimeout(() => {
-        api.post("extranet/build/check", {
+        const payload = {
           branch: this.container.Config.Labels.branch,
           log_file: this.build.logFile,
-          log_start_line: this.build.log.split("\n").length
-        })
-        .then(build => {
-          this.build.log += build.log;
+          log_start_line: this.build.log.split('\n').length,
+        };
+        this.$store.dispatch('extranet/checkBuild', payload)
+          .then((build) => {
+            this.build.log += build.log;
 
-          if (build.running) {
-            return this.check();
-          }
+            if (build.running) {
+              return this.check();
+            }
 
-          let warFile = this.getWarFile();
-          if (warFile) {
-            this.build.status = "success";
-            return this.deploy(warFile);
-          }
+            const warFile = this.getWarFile();
+            if (warFile) {
+              this.build.status = 'success';
+              return this.deploy(warFile);
+            }
 
-          this.build.status = "failed";
-        });
+            this.build.status = 'failed';
+            return this.build.status;
+          });
       }, 2000);
     },
     getWarFile() {
-      let logLines = this.build.log.trim().split(/\r?\n/);
-      let warFile  = logLines[logLines.length - 1];
+      const logLines = this.build.log.trim().split(/\r?\n/);
+      let warFile = logLines[logLines.length - 1];
 
       warFile = warFile.split('/');
-      warFile[warFile.length - 1] = 'LOCAL_' + warFile[warFile.length - 1];
+      warFile[warFile.length - 1] = `LOCAL_${warFile[warFile.length - 1]}`;
       warFile = warFile.join('/');
 
       if (warFile.match('.war$')) {
@@ -205,34 +212,36 @@ export default {
       return null;
     },
     deploy(warFile) {
-      this.build.deploy.status = "running";
-      api.post("extranet/build/deploy", {
+      this.build.deploy.status = 'running';
+      const payload = {
         host: this.container.Host,
         port: this.container.Ports.ssh,
-        war_file: warFile
-      }).then((response) => {
-        if (response.deployed) {
-          this.build.deploy.status = "success";
-          this.$emit('deployed', warFile);
-          return;
-        }
-        this.build.deploy.status = "failed";
-        this.build.deploy.error = response.error;
-      })
-      .catch((error) => {
-        this.build.deploy.status = "failed";
-        this.build.deploy.error = error;
-      });
-    }
+        war_file: warFile,
+      };
+      this.$store.dispatch('extranet/deployBuild', payload)
+        .then((response) => {
+          if (response.deployed) {
+            this.build.deploy.status = 'success';
+            this.$emit('deployed', warFile);
+            return;
+          }
+          this.build.deploy.status = 'failed';
+          this.build.deploy.error = response.error;
+        })
+        .catch((error) => {
+          this.build.deploy.status = 'failed';
+          this.build.deploy.error = error;
+        });
+    },
   },
   mounted() {
-    M.Modal.init(this.$refs["start-build-modal"], {
+    M.Modal.init(this.$refs['start-build-modal'], {
       dismissible: false,
-      preventScrolling: true
+      preventScrolling: true,
     });
 
     this.getClients();
-  }
+  },
 };
 </script>
 
