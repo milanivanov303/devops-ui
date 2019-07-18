@@ -37,5 +37,9 @@ printf "\n"
 
 if [[ ${EXIT_CODE} -eq 0 ]]; then
     printf "\n"
-    echo "App running on ports: ${WEB_CONTAINER_HTTP_PORT:-80} and ${WEB_CONTAINER_HTTPS_PORT:-443}"
+    if [ ${APP_ENV} = "local" ]; then
+    echo "App running on ports: ${NODE_CONTAINER_HTTP_PORT} and ${NODE_CONTAINER_UI_PORT}"
+    else
+    echo "App running on ports: ${APACHE_CONTAINER_HTTP_PORT} and ${APACHE_CONTAINER_HTTPS_PORT}"
+    fi
 fi
