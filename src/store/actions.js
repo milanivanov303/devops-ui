@@ -19,27 +19,24 @@ axios.interceptors.request.use((config) => {
 });
 
 export default {
-  login({ commit }, userData) {
-    return new Promise((resolve, reject) => {
-      commit('loggingIn', true);
-      commit('hasError', false);
-      axios.post(`${config['user-management'].url}/v1/auth/login`,
-        { username: userData.username, password: userData.password })
-        .then((response) => {
-          const user = response.data;
-          commit('user', user);
-          sessionStorage.setItem('user', JSON.stringify(user));
-          commit('loggingIn', false);
-          resolve(user);
-        })
-        .catch((err) => {
-          console.log('login error');
-          commit('hasError', true);
-          commit('loggingIn', false);
-          commit('error', 'Incorrect username or password');
-          reject(err);
-        });
-    });
+  async login({ commit }, userData) {
+    commit('loggingIn', true);
+    commit('hasError', false);
+
+    try {
+      const response = await axios.post('/auth/login',
+        { username: userData.username, password: userData.password });
+      const user = response.data;
+      commit('user', user);
+      sessionStorage.setItem('user', JSON.stringify(user));
+      commit('loggingIn', false);
+    } catch (error) {
+      commit('hasError', true);
+      commit('loggingIn', false);
+      commit('error', 'Incorrect username or password');
+    }
+
+    commit('loggingIn', false);
   },
   async loginSSO({ commit }) {
     commit('loggingInSSO', true);
@@ -76,17 +73,17 @@ export default {
     localStorage.setItem('sso-login', 'false');
     sessionStorage.clear();
   },
-  getToken({ commit }, code) {
-    return axios.get('/auth/token',
-      {
+  async getToken({ commit }, code) {
+    try {
+      const response = await axios.get('/auth/token', {
         params: {
           code,
         },
-      })
-      .then(response => response.data.token)
-      .catch((err) => {
-        commit('hasError', true);
-        return err;
       });
+      return response.data.token;
+    } catch (err) {
+      commit('hasError', true);
+      return err;
+    }
   },
 };
