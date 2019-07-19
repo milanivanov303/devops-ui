@@ -5,10 +5,14 @@
         <div v-if="container">
           <p>Name: {{ container.Name }}</p>
           <p>
+            WEB port: {{ this.container.Ports.web }}
+          </p>
+          <p>
+            SSH port: {{ this.container.Ports.ssh }} (ssh ex1@{{ this.container.Host }} -p {{ this.container.Ports.ssh }})
+          </p>
+          <p>
             Status:
-            <i :class="['material-icons',
-                        'codix-text',
-                        'text-' + container.State.Status]">
+            <i :class="['material-icons', 'codix-text', 'text-' + container.State.Status]">
               fiber_manual_record
             </i>
             {{ container.State.Status }}
