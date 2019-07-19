@@ -8,7 +8,8 @@
             WEB port: {{ this.container.Ports.web }}
           </p>
           <p>
-            SSH port: {{ this.container.Ports.ssh }} (ssh ex1@{{ this.container.Host }} -p {{ this.container.Ports.ssh }})
+            SSH port: {{ this.container.Ports.ssh }}
+            (ssh ex1@{{ this.container.Host }} -p {{ this.container.Ports.ssh }})
           </p>
           <p>
             Status:
