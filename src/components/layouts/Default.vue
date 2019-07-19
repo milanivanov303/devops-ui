@@ -7,7 +7,11 @@
         <div class="col s12">
           <div class="card">
             <div class="card-content">
-              <slot />
+              <transition
+                :name="transitionName"
+                mode="out-in">
+                <slot />
+              </transition>
             </div>
           </div>
         </div>
@@ -22,11 +26,38 @@ import Header from '@/components/layouts/Header';
 import Footer from '@/components/layouts/Footer';
 import Breadcrumbs from '@/components/layouts/Breadcrumbs';
 
+const DEFAULT_TRANSITION = 'fade';
+
 export default {
   components: {
     Header,
     Breadcrumbs,
     Footer,
+  },
+  data() {
+    return {
+      transitionName: DEFAULT_TRANSITION,
+    };
+  },
+  computed: {
+    layout() {
+      return `${this.$route.meta.layout || 'default'}-layout`;
+    },
+  },
+  created() {
+    this.$router.beforeEach((to, from, next) => {
+      let transitionName = to.meta.transitionName || from.meta.transitionName;
+
+      if (transitionName === 'slide') {
+        const toDepth = to.path.split('/').length;
+        const fromDepth = from.path.split('/').length;
+        transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left';
+      }
+
+      this.transitionName = transitionName || DEFAULT_TRANSITION;
+
+      next();
+    });
   },
 };
 </script>

@@ -1,5 +1,5 @@
 module.exports = {
-  "user-management": {
+  'user-management': {
     url: process.env.VUE_APP_USER_MANAGEMENT_URL,
   },
   devops: {
@@ -9,6 +9,6 @@ module.exports = {
   extranet: {
     docker: {
       image: process.env.VUE_APP_EXTRANET_IMAGE,
-    }
-  }
+    },
+  },
 };
