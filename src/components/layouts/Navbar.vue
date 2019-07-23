@@ -27,8 +27,6 @@
 </template>
 
 <script>
-import * as M from 'materialize-css/dist/js/materialize';
-
 export default {
   computed: {
     user() {
