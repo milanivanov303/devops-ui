@@ -247,3 +247,10 @@ p {
   opacity: 0;
   transform: translate(-2em, 0);
 }
+
+.input-field.invalid {
+  color: red;
+}
+.input-field.invalid input {
+  background-color: #ffc9aa;
+}

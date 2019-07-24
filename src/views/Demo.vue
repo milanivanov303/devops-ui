@@ -1,11 +1,16 @@
 <template>
-  <h5>This is an demo page</h5>
+  <rgister-demo/>
 </template>
 <script>
+import RgisterDemo from '@/components/demo/Register';
+
 export default {
   data() {
     return {
     };
+  },
+  components: {
+    'rgister-demo': RgisterDemo,
   },
 };
 </script>
