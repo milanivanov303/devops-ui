@@ -77,7 +77,6 @@
                 </form>
             </div>
             <div v-if="$v.$invalid" class="alert error col s12 m4 l4 right">
-                <h2 class="center flow-text white-text">Form errors</h2>
                 <span class="white-text">
                     <p v-if="!$v.name.required">Name field must not be empty.</p>
                     <p v-if="!$v.name.minLen">Name must contain at least 6 charaters.</p>
@@ -185,18 +184,25 @@ import queryString from 'query-string';
         };
         console.log(formData)
       },
-    },
-    mounted () {
+      prefillForm() {
         // ?name=Tzetzo&mail=tzeco@cso.bg&company=codix&phone=123125412&business=Leasing'
         const data = queryString.parse(location.search);
         if(data) {
-            this.name = data.name;
+            this.name = data.name;            
             this.email = data.email;
             this.company = data.company;
             this.business = data.business;
             this.phone = data.phone;
+            const fields = document.querySelectorAll('.input-field');
+            // fields.forEach(element => {
+            //     console.log(element.children.label.classList.add('active'));
+            // });  
         }
         console.log(data);
+      },
+    },
+    mounted () {
+        this.prefillForm();
     },
   };
 </script>
