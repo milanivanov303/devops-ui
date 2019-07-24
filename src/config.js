@@ -1,6 +1,6 @@
-import Vue from "vue";
+import Vue from 'vue';
 
-const config = require("../config");
+const config = require('../config');
 
 const ConfigPlugin = {
   install(Vue) {
@@ -9,10 +9,10 @@ const ConfigPlugin = {
       $config: {
         get() {
           return config;
-        }
-      }
+        },
+      },
     });
-  }
+  },
 };
 
 Vue.use(ConfigPlugin);
