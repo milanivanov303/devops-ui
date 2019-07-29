@@ -15,7 +15,7 @@ import 'vue-loading-overlay/dist/vue-loading.css';
 
 Vue.use(Loading);
 Vue.use(Vuelidate);
-Vue.use(M);
+Vue.prototype.$M = M;
 
 Vue.component('default-layout', DefaultLayout);
 Vue.component('login-layout', LoginLayout);

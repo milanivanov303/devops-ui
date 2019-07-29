@@ -5,64 +5,84 @@ import config from '../../../config';
 const api = new Api(config.devops.url, config.devops.code);
 
 export default {
-  getClients({ commit }, payload) {
-    return api.get('extranet/clients', payload)
-      .catch((err) => {
-        commit('err', err);
-      });
+  async getClients({ commit }, payload) {
+    try {
+      const response = await api.get('extranet/clients', payload);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
   },
-  getBranches({ commit }, payload) {
-    return api.get('extranet/branches', payload)
-      .catch((err) => {
-        commit('err', err);
-      });
+  async getBranches({ commit }, payload) {
+    try {
+      const response = await api.get('extranet/branches', payload);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
   },
-  startBuild({ commit }, payload) {
-    return api.post('extranet/build/start', payload)
-      .catch((err) => {
-        commit('err', err);
-      });
+  async startBuild({ commit }, payload) {
+    try {
+      const response = await api.post('extranet/build/start', payload);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
   },
-  checkBuild({ commit }, payload) {
-    return api.post('extranet/build/check', payload)
-      .catch((err) => {
-        commit('err', err);
-      });
+  async checkBuild({ commit }, payload) {
+    try {
+      const response = await api.post('extranet/build/check', payload);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
   },
-  deployBuild({ commit }, payload) {
-    return api.post('extranet/build/deploy', payload)
-      .catch((err) => {
-        commit('err', err);
-      });
+  async deployBuild({ commit }, payload) {
+    try {
+      const response = await api.post('extranet/build/deploy', payload);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
   },
-  deployedBuild({ commit }, payload) {
-    return api.get(`extranet/build/deployed-builds?host=${payload.host}&port=${payload.port}`)
-      .catch((err) => {
-        commit('err', err);
-      });
+  async deployedBuild({ commit }, payload) {
+    try {
+      const response = await api.get(`extranet/build/deployed-builds?host=${payload.host}&port=${payload.port}`);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
   },
-  createContainer({ commit }, payload) {
-    return api.post(`docker/containers/${payload.container}`, payload.data)
-      .catch((err) => {
-        commit('err', err);
-      });
+  async createContainer({ commit }, payload) {
+    try {
+      const response = await api.post(`docker/containers/${payload.container}`, payload.data);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
   },
-  startContainer({ commit }, payload) {
-    return api.post(`docker/containers/start/${payload.container}`)
-      .catch((err) => {
-        commit('err', err);
-      });
+  async startContainer({ commit }, payload) {
+    try {
+      const response = await api.post(`docker/containers/start/${payload.container}`);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
   },
-  stopContainer({ commit }, payload) {
-    return api.post(`docker/containers/stop/${payload.container}`)
-      .catch((err) => {
-        commit('err', err);
-      });
+  async stopContainer({ commit }, payload) {
+    try {
+      const response = await api.post(`docker/containers/stop/${payload.container}`);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
   },
-  getContainer({ commit }, payload) {
-    return api.get(`docker/containers/${payload.container}`)
-      .catch((err) => {
-        commit('err', err);
-      });
+  async getContainer({ commit }, payload) {
+    try {
+      const response = await api.get(`docker/containers/${payload.container}`);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
   },
 };

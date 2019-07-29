@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import Alert from '@/components/Alert';
+import Alert from '@/components/partials/Alert';
 import Loading from '@/components/layouts/Loading';
 
 export default {

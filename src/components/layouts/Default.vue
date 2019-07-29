@@ -39,11 +39,6 @@ export default {
       transitionName: DEFAULT_TRANSITION,
     };
   },
-  computed: {
-    layout() {
-      return `${this.$route.meta.layout || 'default'}-layout`;
-    },
-  },
   created() {
     this.$router.beforeEach((to, from, next) => {
       let transitionName = to.meta.transitionName || from.meta.transitionName;

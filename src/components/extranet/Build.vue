@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import * as M from 'materialize-css/dist/js/materialize';
+// import * as M from 'materialize-css/dist/js/materialize';
 // import Api from '@/plugins/api';
 // import config from '@/config';
 
@@ -143,10 +143,10 @@ export default {
     open() {
       this.build = JSON.parse(JSON.stringify(build));
       setTimeout(() => {
-        M.FormSelect.init(this.$refs.client);
-        M.FormSelect.init(this.$refs['java-version']);
+        this.$M.FormSelect.init(this.$refs.client);
+        this.$M.FormSelect.init(this.$refs['java-version']);
       }, 100);
-      M.Modal.getInstance(this.$refs['start-build-modal']).open();
+      this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
     },
     start() {
       this.build.status = 'starting';
@@ -235,7 +235,7 @@ export default {
     },
   },
   mounted() {
-    M.Modal.init(this.$refs['start-build-modal'], {
+    this.$M.Modal.init(this.$refs['start-build-modal'], {
       dismissible: false,
       preventScrolling: true,
     });

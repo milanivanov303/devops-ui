@@ -75,6 +75,7 @@ nav {
     li > a {
         color: white;
         font-size: 12px;
+        padding: 0 16px;
         & > i.material-icons {
             color: white;
         }
@@ -83,8 +84,20 @@ nav {
             background-color: lighten($sidenav-bg-color, 4%);
         }
     }
+    li.active a{
+        color: white !important;
+    }
     .dropdown-content {
         background-color: $sidenav-bg-color;
+    }
+    .collapsible-body {
+        background-color: darken($sidenav-bg-color, 4%);
+    }
+    .divider {
+        margin:0;
+        height:8px;
+        border-bottom:1px solid #e0e0e0;
+        background-color: transparent;
     }
 }
 a.sidenav-trigger.top-nav {

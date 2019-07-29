@@ -32,25 +32,13 @@ class Api {
     axios.prototype.code = code;
   }
 
-  async get(uri, options) {
-    try {
-      const query = queryString.stringify(options, { arrayFormat: 'index' });
-      const response = await axios.get(`${this.url}/${uri}?${query}`);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
+  get(uri, options) {
+    const query = queryString.stringify(options, { arrayFormat: 'index' });
+    return axios.get(`${this.url}/${uri}?${query}`);
   }
 
-  async post(uri, data) {
-    try {
-      const response = await axios.post(`${this.url}/${uri}`, data);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
+  post(uri, data) {
+    return axios.post(`${this.url}/${uri}`, data);
   }
 }
 

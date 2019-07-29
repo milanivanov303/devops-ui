@@ -42,7 +42,7 @@ export default {
     },
   },
   mounted() {
-    M.Dropdown.init(this.$refs['profile-dropdown']);
+    this.$M.Dropdown.init(this.$refs['profile-dropdown']);
   },
 };
 </script>
