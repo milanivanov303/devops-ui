@@ -6,7 +6,7 @@
       <i class="material-icons left">assignment_ind</i>Schedule a demo
     </router-link>
     <router-link to="/demo"
-                 class="btn-floating btn waves-effect waves-light red"
+                 class="btn-floating btn waves-effect waves-light"
                  v-else>
       <i class="material-icons">chevron_left</i>
     </router-link>

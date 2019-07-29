@@ -195,7 +195,7 @@ export default {
   methods: {
     selectedBusiness(value) {
       this.$v.business.$touch();
-      this.business = value;
+      this.business = value.name;
     },
     selectedStartDate(value) {
       this.$v.startDate.$touch();
@@ -218,7 +218,7 @@ export default {
         name: this.name,
         email: this.email,
         company: this.company,
-        business: this.business.name,
+        business: this.business,
         // start: `${this.startDate} ${this.startTime}`,
         // end: `${this.endDate} ${this.endTime}`,
         country: 'bulgaria',
@@ -253,6 +253,8 @@ export default {
     },
   },
   mounted() {
+    const businessSelect = document.querySelector('#business_select');
+    this.$M.FormSelect.init(businessSelect);
     this.prefillForm();
   },
 };
