@@ -1,4 +1,5 @@
 // https://vuex.vuejs.org/en/actions.html
+// https://vuex.vuejs.org/en/actions.html
 import Api from '../../../plugins/api';
 import config from '../../../config';
 
@@ -16,6 +17,14 @@ export default {
   async getBranches({ commit }, payload) {
     try {
       const response = await api.get('extranet/branches', payload);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
+  },
+  async getContainers({ commit }, payload) {
+    try {
+      const response = await api.get('docker/containers', payload);
       return response.data;
     } catch (err) {
       return commit('error', err);
