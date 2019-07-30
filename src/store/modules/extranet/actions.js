@@ -24,12 +24,12 @@ export default {
   },
   async getContainers({ commit }, payload) {
     try {
-      payload = {
-        'filters': JSON.stringify({
-          'label': ['type=extranet'],
-          'status': ['created', 'restarting', 'running', 'removing', 'paused', 'exited', 'dead'],
-        })
-      };
+      if (!payload) {
+        payload.filters = JSON.stringify({
+          label: ['type=extranet'],
+          status: ['created', 'restarting', 'running', 'removing', 'paused', 'exited', 'dead'],
+        });
+      }
       const response = await api.get('docker/containers', payload);
       return response.data;
     } catch (err) {

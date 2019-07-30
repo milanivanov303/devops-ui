@@ -23,11 +23,11 @@ export default {
   },
   methods: {
     getContainer(branch) {
-      let container = this.containers.filter(container => {
-        return container.Labels.branch === branch.name;
-      });
+      const container = this.containers.filter(container => (
+        container.Labels.branch === branch.name
+      ));
       return container.length === 1 ? container[0] : null;
-    }
+    },
   },
   mounted() {
     const loader = this.$loading.show({ container: this.$el });
