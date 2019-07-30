@@ -34,10 +34,7 @@
 
 <script>
 import Builds from '@/components/extranet/Builds';
-// import Api from '@/plugins/api';
 import config from '@/config';
-
-// const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   components: {
