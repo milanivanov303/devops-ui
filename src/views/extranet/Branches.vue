@@ -38,7 +38,14 @@ export default {
         loader.hide();
       });
 
-    this.$store.dispatch('extranet/getContainers')
+    const payload = {
+      filters: JSON.stringify({
+        label: ['type=extranet'],
+        status: ['created', 'restarting', 'running', 'removing', 'paused', 'exited', 'dead'],
+      }),
+    };
+
+    this.$store.dispatch('extranet/getContainers', payload)
       .then((containers) => {
         this.containers = containers.data;
         loader.hide();
