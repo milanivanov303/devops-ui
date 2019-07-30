@@ -41,18 +41,21 @@ export default [
       breadcrumb: 'Extranet',
       requiresAuth: true,
       name: 'extranet-branches',
-    },
-    component: Branches,
-  },
-  {
-    path: '/extranet/branches/:branch',
-    name: 'extranet-branch',
-    meta: {
-      requiresAuth: true,
-      breadcrumb: 'Branch',
       transitionName: 'slide',
     },
-    component: Branch,
+    component: Branches,
+    children: [
+      {
+        path: ':branch',
+        meta: {
+          name: 'extranet-branch',
+          requiresAuth: true,
+          breadcrumb: 'Branch',
+          transitionName: 'slide',
+        },
+        component: Branch,
+      },
+    ],
   },
   {
     path: '/demo',
