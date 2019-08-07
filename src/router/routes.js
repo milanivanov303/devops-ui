@@ -4,7 +4,7 @@ const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Das
 const Branches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
 const Branch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
 const Demo = () => import(/* webpackChunkName: "demo" */ '../views/Demo.vue');
-const RegisterDemo = () => import(/* webpackChunkName: "register" */ '../components/demo/Register.vue');
+const RegisterDemo = () => import(/* webpackChunkName: "demo" */ '../components/demo/Register.vue');
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 
 export default [

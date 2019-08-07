@@ -2,4 +2,5 @@
 
 export default {
   getError: state => state.error,
+  getDemos: state => state.demos,
 };

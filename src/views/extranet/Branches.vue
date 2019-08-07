@@ -1,7 +1,8 @@
 <template>
   <div class="branches">
     <div class="row">
-      <div :class="{'col s12 m6 l5': $route.meta.name === 'extranet-branch'}">
+      <div v-if="$route.meta.name !== 'extranet-build'"
+           :class="{'col s12 m6 l5': $route.meta.name === 'extranet-branch'}">
         <div v-bind:key="branch.name" v-for="branch in branches">
           <div :class="{'col s12 m6 l4': $route.meta.name === 'extranet-branches'}">
             <Branch :branch="branch"
@@ -13,8 +14,9 @@
       </div>
       <div class="col s12 m6 l7 card">
         <transition name="branch-info" mode="out-in">
-          <router-view />
+          <router-view :key="$route.path"/>
         </transition>
+      </div>
     </div>
   </div>
 </template>
