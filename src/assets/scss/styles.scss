@@ -267,3 +267,35 @@ p {
 .input-field.invalid input {
   background-color: #ffc9aa;
 }
+.validator {
+    margin: 1rem auto;
+    font-weight: bold;
+}
+
+.modal.right-sheet {
+    margin: 0;
+    width: 30%;
+    left: 70%;
+    right: 0 !important;
+    min-height: 100%;
+    height: auto;
+    top: 0% !important;
+    transition: transform cubic-bezier(0.22, 0.61, 0.36, 1) .2s;
+    will-change: transform;
+    transform: translate(100%, 0) scale(1) !important;
+    opacity: 1 !important;
+  
+    @media #{$small-and-down} {
+      width: 90%;
+      left: 0;
+    }
+  }
+  
+  .modal.right-sheet.open {
+     transition: transform cubic-bezier(0.22, 0.61, 0.36, 1) .35s .25s;
+  }
+  
+  .modal.right-sheet.open:not([style*="display: none"]):not([style*="opacity: 0;"]) {
+    transform: translate(0, 0%) !important;
+  }
+  

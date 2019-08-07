@@ -17,7 +17,6 @@
 </template>
 
 <script>
-import * as M from 'materialize-css/dist/js/materialize';
 import Footer from '@/components/layouts/Footer';
 
 export default {
@@ -25,7 +24,7 @@ export default {
     Footer,
   },
   mounted() {
-    M.AutoInit();
+    this.$M.AutoInit();
   },
 };
 </script>

@@ -6,7 +6,7 @@
                 ref="custom-select"
                 v-model="value"
                 @change="returnSelectedValue()">
-            <option disabled selected>Choose your option</option>
+            <option disabled value="">Choose your option</option>
             <option v-for="(option, key) in select.options"
                     v-bind:key="key"
                     v-bind:value="option">{{ option.name }}</option>
@@ -19,7 +19,7 @@
 export default {
   data() {
     return {
-      value: '',
+      value: this.select.selected,
     };
   },
   props: {

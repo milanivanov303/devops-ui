@@ -12,4 +12,15 @@ export default {
       commit('error', error);
     }
   },
+  async getDemos({ commit, state }, payload) {
+    if (state.demos.length) {
+      return;
+    }
+    try {
+      const response = await api.get('demos', payload);
+      commit('fillDemos', response.data.data);
+    } catch (error) {
+      commit('error', error);
+    }
+  },
 };

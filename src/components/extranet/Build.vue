@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col s12" >
       <button class="btn" @click="open()">Start</button>
-      <div ref="start-build-modal" class="modal">
+      <div ref="start-build-modal" class="modal right-sheet">
         <div class="modal-content">
           <h4 class="left-align">Build</h4>
           <div v-if="build.status">
@@ -64,10 +64,10 @@
             <div class="row">
               <div class="input-field col s12">
                 <select id="client" ref="client" v-model="build.client">
-                  <option value=""></option>
-                  <option v-for="(client, index) in clients" :value="client.package" :key="index">
-                    {{ client.name }}
-                  </option>
+                  <option disabled value="">Choose your option</option>
+                  <option v-for="(client, index) in clients"
+                         :value="client.package"
+                         :key="index">{{ client.name }}</option>
                 </select>
                 <label for="client">Client</label>
               </div>
