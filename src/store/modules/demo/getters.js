@@ -2,5 +2,6 @@
 
 export default {
   getError: state => state.error,
-  getDemos: state => state.demos,
+  requstedDemos: state => state.demos.filter(demos => demos.status === 'requested'),
+  demoKeys: state => state.demos,
 };
