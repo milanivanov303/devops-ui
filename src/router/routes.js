@@ -57,7 +57,7 @@ export default [
     ],
   },
   {
-    path: '/demo',
+    path: '/demo/:id?',
     meta: {
       name: 'demo',
       requiresAuth: true,

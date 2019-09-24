@@ -5,9 +5,16 @@ import config from '../../../config';
 const api = new Api(config.devops.url, config.devops.code);
 
 export default {
-  async submitRequest({ commit }, payload) {
+  async submitDemo({ commit }, payload) {
     try {
-      await api.post('demos', payload);
+      let response = '';
+      if (payload.action === 'update') {
+        response = await api.put(`demos/${payload.formData.id}`, payload.formData);
+      }
+      if (payload.action === 'add_new') {
+        response = await api.post('demos', payload.formData);
+      }
+      commit('updateDemos', response.data.data);
     } catch (error) {
       commit('error', error);
     }

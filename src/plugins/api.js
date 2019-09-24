@@ -29,15 +29,21 @@ class Api {
   constructor(url, code) {
     this.url = url;
     this.code = code;
-    axios.prototype.code = code;
   }
 
   get(uri, options) {
+    axios.prototype.code = this.code;
     const query = queryString.stringify(options, { arrayFormat: 'index' });
     return axios.get(`${this.url}/${uri}?${query}`);
   }
 
+  put(uri, data) {
+    axios.prototype.code = this.code;
+    return axios.put(`${this.url}/${uri}`, data);
+  }
+
   post(uri, data) {
+    axios.prototype.code = this.code;
     return axios.post(`${this.url}/${uri}`, data);
   }
 }

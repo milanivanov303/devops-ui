@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Loading from 'vue-loading-overlay';
 import Vuelidate from 'vuelidate';
 import * as M from 'materialize-css/dist/js/materialize';
+import * as vuePartials from 'vue-partials';
 import App from './App';
 import router from './router';
 import store from './store';
@@ -14,6 +15,7 @@ import './plugins/auth';
 import 'vue-loading-overlay/dist/vue-loading.css';
 
 Vue.use(Loading);
+Vue.use(vuePartials);
 Vue.use(Vuelidate);
 Vue.prototype.$M = M;
 
