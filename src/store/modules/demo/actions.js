@@ -9,20 +9,18 @@ export default {
     try {
       let response = '';
       if (payload.action === 'update') {
-        response = await api.put(`demos/${payload.formData.id}`, payload.formData);
+        response = await api.put(`demos/${payload.demoId}`, payload.formData);
+        commit('updateDemos', response.data.data);
       }
       if (payload.action === 'add_new') {
         response = await api.post('demos', payload.formData);
+        commit('addDemo', response.data.data);
       }
-      commit('updateDemos', response.data.data);
     } catch (error) {
       commit('error', error);
     }
   },
-  async getDemos({ commit, state }, payload) {
-    if (state.demos.length) {
-      return;
-    }
+  async getDemos({ commit }, payload) {
     try {
       const response = await api.get('demos', payload);
       commit('fillDemos', response.data.data);

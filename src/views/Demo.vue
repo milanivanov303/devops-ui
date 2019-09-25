@@ -146,7 +146,7 @@
                 <label for="status-aproved">
                   <input id="status-aproved"
                          class="with-gap"
-                         :disabled="modalData.status !== 'requested'"
+                         :disabled="statusCheck"
                          type="radio"
                          value="approved"
                          v-model="modalData.status"
@@ -158,7 +158,7 @@
                 <label for="status-rejected">
                   <input id="status-rejected"
                          class="with-gap"
-                         :disabled="modalData.status !== 'requested'"
+                         :disabled="statusCheck"
                          type="radio"
                          value="rejected"
                          v-model="modalData.status"/>
@@ -176,7 +176,7 @@
               </div>
               <div class="input-field col s12 m6 l6">
                 <a href="#!"
-                   @click="cancel"
+                   @click="close"
                    class="modal-close waves-effect waves-blue btn-flat left">Close</a>
               </div>
             </div>
@@ -202,6 +202,7 @@ export default {
     return {
       isOpen: false,
       action: '',
+      demoId: '',
       dateNow: DateTime.local().toISO(),
       request: {
         data: 'demo/demos',
@@ -211,6 +212,7 @@ export default {
           email: '',
           business: '',
           status: '',
+          url: value => this.demoUrl(value),
         },
         add: true,
         export: false,
@@ -290,6 +292,10 @@ export default {
     getError() {
       return this.$store.getters['demo/getError'];
     },
+    statusCheck() {
+      const statuses = ['requested', 'approved', 'rejected'];
+      return !statuses.includes(this.modalData.status);
+    },
   },
   methods: {
     selectedBusiness(value) {
@@ -307,7 +313,8 @@ export default {
         preventScrolling: true,
       }).open();
     },
-    cancel() {
+    close() {
+      this.action = '';
       this.isOpen = false;
       this.$M.Modal.init(this.$refs['register-demo-modal']).close();
     },
@@ -334,6 +341,7 @@ export default {
 
       if (demoDetails) {
         this.action = 'update';
+        this.demoId = demoDetails.id;
 
         this.modalData.name = demoDetails.name;
         this.modalData.email = demoDetails.email;
@@ -350,13 +358,24 @@ export default {
           .filter(val => val.name === demoDetails.business)[0];
         this.selectBusiness.selected = business || this.selectBusiness.options.other;
       }
-
       this.openModal();
+    },
+    demoUrl(value) {
+      let url;
+      if (value) {
+        url = `<a target="_blank"
+                  title="Demo url" 
+                  href='${value}'>
+                  <i class="material-icons">cast_connected</i>
+                </a>`;
+      }
+      return url;
     },
     onSubmit() {
       const payload = {
         formData: this.modalData,
         action: this.action,
+        demoId: this.demoId,
       };
 
       payload.formData.active_from = DateTime.fromISO(this.modalData.active_from)
@@ -365,8 +384,7 @@ export default {
         .toFormat('yyyy-MM-dd HH:mm:ss');
 
       this.$store.dispatch('demo/submitDemo', payload);
-      this.isOpen = false;
-      this.$M.Modal.init(this.$refs['register-demo-modal']).close();
+      this.close();
     },
     async prepareData() {
       const loader = this.$loading.show({ container: this.$el });
