@@ -209,9 +209,11 @@ export default {
         columns: {
           company: '',
           name: '',
-          email: '',
           business: '',
+          active_from: '',
+          active_to: '',
           status: '',
+          code: '',
           url: value => this.demoUrl(value),
         },
         add: true,
@@ -310,7 +312,7 @@ export default {
       this.$M.Modal.init(this.$refs['register-demo-modal'], {
         onOpenStart: this.isOpen = true,
         dismissible: false,
-        preventScrolling: true,
+        preventScrolling: false,
       }).open();
     },
     close() {
@@ -350,8 +352,10 @@ export default {
         this.modalData.details = demoDetails.details;
         this.modalData.country = demoDetails.country;
         this.modalData.business = demoDetails.business;
-        this.modalData.active_from = DateTime.fromSQL(demoDetails.active_from).toISO();
-        this.modalData.active_to = DateTime.fromSQL(demoDetails.active_to).toISO();
+        this.modalData.active_from = DateTime.fromSQL(demoDetails.active_from).toISO()
+          || DateTime.local().toISO();
+        this.modalData.active_to = DateTime.fromSQL(demoDetails.active_to).toISO()
+          || DateTime.local().plus({ days: 1 }).toISO();
         this.modalData.status = demoDetails.status;
 
         const business = Object.values(this.selectBusiness.options)
@@ -364,7 +368,7 @@ export default {
       let url;
       if (value) {
         url = `<a target="_blank"
-                  title="Demo url" 
+                  title="${value}" 
                   href='${value}'>
                   <i class="material-icons">cast_connected</i>
                 </a>`;

@@ -312,6 +312,6 @@ p {
     }
   }   
   .datetime-input {
-    width: 88% !important;
+    max-width: calc(100% - 3rem) !important;
     float: right !important;
   }

@@ -1,7 +1,7 @@
 // https://vuex.vuejs.org/en/state.html
 let user = null;
-if (sessionStorage.getItem('user')) {
-  user = JSON.parse(sessionStorage.getItem('user'));
+if (localStorage.getItem('user')) {
+  user = JSON.parse(localStorage.getItem('user'));
 }
 
 export default {

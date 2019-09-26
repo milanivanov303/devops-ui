@@ -10,7 +10,7 @@ const axios = Axios.create({
 axios.interceptors.request.use((config) => {
   config.withCredentials = true;
 
-  const token = sessionStorage.getItem('token');
+  const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -28,7 +28,7 @@ export default {
         { username: userData.username, password: userData.password });
       const user = response.data;
       commit('user', user);
-      sessionStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify(user));
       commit('loggingIn', false);
     } catch (error) {
       commit('hasError', true);
@@ -47,7 +47,7 @@ export default {
     const token = getParam('token');
 
     if (token) {
-      sessionStorage.setItem('token', token);
+      localStorage.setItem('token', token);
     }
     if (!token) {
       window.location.href = getSsoUrl();
@@ -56,7 +56,7 @@ export default {
       const response = await axios.get('/auth/identity');
       const user = response.data;
       commit('user', user);
-      sessionStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify(user));
       window.location.replace(getReturnUri());
     } catch (error) {
       commit('hasError', true);
@@ -70,8 +70,8 @@ export default {
   },
   logout({ commit }) {
     commit('loggedOut');
-    localStorage.setItem('sso-login', 'false');
-    sessionStorage.clear();
+    // localStorage.setItem('sso-login', 'false');
+    localStorage.clear();
   },
   async getToken({ commit }, code) {
     try {

@@ -128,7 +128,7 @@ export default {
     login() {
       const { username, password } = this;
       this.$store.dispatch('login', { username, password })
-        .then(() => this.$router.push('/dashboard'))
+        .then(() => this.$router.push(this.$route.query.return_uri))
         .catch(err => err);
     },
     loginSSO() {

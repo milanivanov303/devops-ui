@@ -5,7 +5,7 @@ import store from '../store';
 const axios = Axios.create();
 
 axios.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem(`token.${axios.prototype.code}`);
+  const token = localStorage.getItem(`token.${axios.prototype.code}`);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -17,7 +17,7 @@ axios.interceptors.response.use(null, (error) => {
   if (error.response.status === 401) {
     return store.dispatch('getToken', axios.prototype.code)
       .then((token) => {
-        sessionStorage.setItem(`token.${axios.prototype.code}`, token);
+        localStorage.setItem(`token.${axios.prototype.code}`, token);
         error.config.headers.Authorization = `Bearer ${token}`;
         return axios.request(error.config);
       });
