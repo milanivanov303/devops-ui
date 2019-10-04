@@ -5,7 +5,6 @@
     <div id="action" ref="register-demo-modal" class="modal right-sheet">
       <div class="modal-content">
         <h1 class="center flow-text" >Schedule a demo</h1>
-        <Alert v-if="getError" v-bind:msg="getError" />
         <div class="row">
           <form @submit.prevent="onSubmit">
             <div class="row">
@@ -209,9 +208,11 @@ export default {
         columns: {
           company: '',
           name: '',
-          email: '',
           business: '',
+          active_from: '',
+          active_to: '',
           status: '',
+          code: '',
           url: value => this.demoUrl(value),
         },
         add: true,
@@ -289,9 +290,9 @@ export default {
     },
   },
   computed: {
-    getError() {
-      return this.$store.getters['demo/getError'];
-    },
+    // getError() {
+    //   return this.$store.getters['demo/getError'];
+    // },
     statusCheck() {
       const statuses = ['requested', 'approved', 'rejected'];
       return !statuses.includes(this.modalData.status);
@@ -310,7 +311,7 @@ export default {
       this.$M.Modal.init(this.$refs['register-demo-modal'], {
         onOpenStart: this.isOpen = true,
         dismissible: false,
-        preventScrolling: true,
+        preventScrolling: false,
       }).open();
     },
     close() {
@@ -350,8 +351,10 @@ export default {
         this.modalData.details = demoDetails.details;
         this.modalData.country = demoDetails.country;
         this.modalData.business = demoDetails.business;
-        this.modalData.active_from = DateTime.fromSQL(demoDetails.active_from).toISO();
-        this.modalData.active_to = DateTime.fromSQL(demoDetails.active_to).toISO();
+        this.modalData.active_from = DateTime.fromSQL(demoDetails.active_from).toISO()
+          || DateTime.local().toISO();
+        this.modalData.active_to = DateTime.fromSQL(demoDetails.active_to).toISO()
+          || DateTime.local().plus({ days: 1 }).toISO();
         this.modalData.status = demoDetails.status;
 
         const business = Object.values(this.selectBusiness.options)
@@ -364,7 +367,7 @@ export default {
       let url;
       if (value) {
         url = `<a target="_blank"
-                  title="Demo url" 
+                  title="${value}" 
                   href='${value}'>
                   <i class="material-icons">cast_connected</i>
                 </a>`;
@@ -389,7 +392,7 @@ export default {
     async prepareData() {
       const loader = this.$loading.show({ container: this.$el });
       const payload = {
-        orders: JSON.stringify({ active_from: 'desc' }),
+        orders: JSON.stringify({ id: 'desc' }),
       };
       await this.$store.dispatch('demo/getDemos', payload).then(() => {
         loader.hide();
