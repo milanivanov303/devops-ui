@@ -5,7 +5,6 @@
     <div id="action" ref="register-demo-modal" class="modal right-sheet">
       <div class="modal-content">
         <h1 class="center flow-text" >Schedule a demo</h1>
-        <Alert v-if="getError" v-bind:msg="getError" />
         <div class="row">
           <form @submit.prevent="onSubmit">
             <div class="row">
@@ -291,9 +290,9 @@ export default {
     },
   },
   computed: {
-    getError() {
-      return this.$store.getters['demo/getError'];
-    },
+    // getError() {
+    //   return this.$store.getters['demo/getError'];
+    // },
     statusCheck() {
       const statuses = ['requested', 'approved', 'rejected'];
       return !statuses.includes(this.modalData.status);
@@ -393,7 +392,7 @@ export default {
     async prepareData() {
       const loader = this.$loading.show({ container: this.$el });
       const payload = {
-        orders: JSON.stringify({ active_from: 'desc' }),
+        orders: JSON.stringify({ id: 'desc' }),
       };
       await this.$store.dispatch('demo/getDemos', payload).then(() => {
         loader.hide();
