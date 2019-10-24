@@ -29,6 +29,28 @@
               </div>
             </div>
 
+            <div v-else-if="build.repack.status === 'running'" class="row">
+              <div class="col s12">
+                Repacking build ....
+                <div class="progress">
+                  <div class="indeterminate"></div>
+                </div>
+              </div>
+            </div>
+
+            <div v-else-if="build.repack.status === 'success'" class="row">
+              <div class="col s12">
+                repacked
+              </div>
+            </div>
+
+            <div v-else-if="build.repack.status === 'failed'" class="row">
+              <div class="col s12">
+                repack has failed
+                <p>{{ build.repack.error }}</p>
+              </div>
+            </div>
+
             <div v-else-if="build.status === 'starting'" class="row">
               <div class="col s12">
                 <p>Build starting ...</p>
@@ -59,12 +81,18 @@
               </div>
             </div>
 
+            <div v-if="build.repack.status === 'running' || build.repack.status === 'failed'" class="row">
+              <div class="col s12">
+                <pre>{{ build.log }}</pre>
+              </div>
+            </div>
+
           </div>
           <div v-else>
             <div class="row">
               <div class="input-field col s12">
                 <select id="client" ref="client" v-model="build.client">
-                  <option disabled value="">Choose your option</option>
+                  <option disabled value="">Choose client</option>
                   <option v-for="(client, index) in clients"
                          :value="client.package"
                          :key="index">{{ client.name }}</option>
@@ -84,6 +112,17 @@
                 <label for="java-version">Java Version</label>
               </div>
             </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <select id="instance" ref="instance" v-model="build.instance">
+                  <option disabled value="">Choose instance</option>
+                  <option v-for="(instance, index) in instances"
+                          :value="instance"
+                          :key="index">{{ instance.name }}</option>
+                </select>
+                <label for="instance">Instance</label>
+              </div>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -101,148 +140,193 @@
 </template>
 
 <script>
-// import * as M from 'materialize-css/dist/js/materialize';
-// import Api from '@/plugins/api';
-// import config from '@/config';
 
-// const api = new Api(config.devops.url, config.devops.code);
+  var Stomp = require('stompjs');
+  var client = Stomp.client('ws://localhost:15674/ws');
 
-const build = {
-  client: '',
-  javaVersion: 8,
-  log: '',
-  logFile: '',
-  status: null,
-  error: '',
-  deploy: {
+  client.connect(
+    'devops',
+    'devops',
+    () => console.log('connected'),
+    (error) => console.log(error),
+    'devops'
+  );
+
+  const build = {
+    client: '',
+    javaVersion: 8,
+    instance: '',
+    log: '',
+    logFile: '',
     status: null,
     error: '',
-  },
-};
-
-export default {
-  data() {
-    return {
-      clients: [],
-      build,
-    };
-  },
-  props: {
-    container: {},
-  },
-  methods: {
-    getClients() {
-      const loader = this.$loading.show({ container: this.$el });
-
-      this.$store.dispatch('extranet/getClients')
-        .then((clients) => {
-          this.clients = clients;
-          loader.hide();
-        });
+    repack: {
+      status: null,
+      error: '',
     },
-    open() {
-      this.build = JSON.parse(JSON.stringify(build));
-      setTimeout(() => {
-        this.$M.FormSelect.init(this.$refs.client);
-        this.$M.FormSelect.init(this.$refs['java-version']);
-      }, 100);
-      this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
+    deploy: {
+      status: null,
+      error: '',
     },
-    start() {
-      this.build.status = 'starting';
-      const payload = {
-        branch: this.container.Config.Labels.branch,
-        client: this.build.client,
-        java_version: this.build.javaVersion,
+  };
+
+  export default {
+    data() {
+      return {
+        clients: [],
+        build,
       };
-      this.$store.dispatch('extranet/startBuild', payload)
-        .then((build) => {
-          if (build.started) {
-            this.build.status = 'running';
-            this.build.logFile = build.log_file;
-            this.check();
-            return;
-          }
-          this.build.status = 'failed';
-          this.build.error = build.error;
-        })
-        .catch((error) => {
-          this.build.status = 'failed';
-          this.build.error = error;
-        });
     },
-    check() {
-      setTimeout(() => {
+    props: {
+      container: {},
+    },
+    computed: {
+        instances() {
+            return this.$store.state.mmpi.instances;
+        }
+    },
+    methods: {
+      getClients() {
+        const loader = this.$loading.show({ container: this.$el });
+
+        this.$store.dispatch('extranet/getClients')
+          .then((clients) => {
+            this.clients = clients;
+            loader.hide();
+          });
+      },
+      getInstances() {
+          const loader = this.$loading.show({ container: this.$el });
+
+          const payload = {
+              'filters': JSON.stringify({
+                  'anyOf': [
+                      {'instance_type_id': 'DEV'},
+                      {'instance_type_id': 'VAL'}
+                  ]
+              })
+          };
+
+          this.$store.dispatch('mmpi/getInstances', payload)
+              .then((instances) => {
+                  loader.hide();
+              });
+      },
+      open() {
+        this.build = JSON.parse(JSON.stringify(build));
+        setTimeout(() => {
+          this.$M.FormSelect.init(this.$refs.client);
+          this.$M.FormSelect.init(this.$refs['java-version']);
+            this.$M.FormSelect.init(this.$refs.instance);
+        }, 100);
+        this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
+      },
+      start() {
+        this.build.status = 'starting';
         const payload = {
           branch: this.container.Config.Labels.branch,
-          log_file: this.build.logFile,
-          log_start_line: this.build.log.split('\n').length,
+          client: this.build.client,
+          java_version: this.build.javaVersion
         };
-        this.$store.dispatch('extranet/checkBuild', payload)
+        this.$store.dispatch('extranet/startBuild', payload)
           .then((build) => {
-            this.build.log += build.log;
-
-            if (build.running) {
-              return this.check();
+            if (build.status === 'started') {
+              this.build.status = 'running';
+              return this.watchBuild(build.queue);
             }
-
-            const warFile = this.getWarFile();
-            if (warFile) {
-              this.build.status = 'success';
-              return this.deploy(warFile);
-            }
-
             this.build.status = 'failed';
-            return this.build.status;
+            this.build.error = build.error;
+          })
+          .catch((error) => {
+            this.build.status = 'failed';
+            this.build.error = error;
           });
-      }, 2000);
-    },
-    getWarFile() {
-      const logLines = this.build.log.trim().split(/\r?\n/);
-      let warFile = logLines[logLines.length - 1];
+      },
+      watchBuild(queue) {
+        if (!client.connected) {
+          return;
+        }
 
-      warFile = warFile.split('/');
-      warFile[warFile.length - 1] = `LOCAL_${warFile[warFile.length - 1]}`;
-      warFile = warFile.join('/');
+        client.subscribe(`/queue/${queue}`, (message) => {
+          var build = JSON.parse(message.body);
 
-      if (warFile.match('.war$')) {
-        return warFile;
-      }
-
-      return null;
-    },
-    deploy(warFile) {
-      this.build.deploy.status = 'running';
-      const payload = {
-        host: this.container.Host,
-        port: this.container.Ports.ssh,
-        war_file: warFile,
-      };
-      this.$store.dispatch('extranet/deployBuild', payload)
-        .then((response) => {
-          if (response.deployed) {
-            this.build.deploy.status = 'success';
-            this.$emit('deployed', warFile);
-            return;
+          if (build.status === 'success') {
+            this.repack(build.war_file);
           }
-          this.build.deploy.status = 'failed';
-          this.build.deploy.error = response.error;
-        })
-        .catch((error) => {
-          this.build.deploy.status = 'failed';
-          this.build.deploy.error = error;
-        });
-    },
-  },
-  mounted() {
-    this.$M.Modal.init(this.$refs['start-build-modal'], {
-      dismissible: false,
-      preventScrolling: true,
-    });
 
-    this.getClients();
-  },
-};
+          this.build.status = build.status;
+          this.build.log += build.log || '';
+        });
+      },
+      repack(warFile) {
+        this.build.repack.status = 'starting';
+        const payload = {
+            war_file: warFile,
+            instance: this.build.instance
+        };
+        this.$store.dispatch('extranet/repackBuild', payload)
+          .then((repack) => {
+              if (repack.status === 'started') {
+                this.build.repack.status = 'running';
+                return this.watchRepack(repack.queue);
+              }
+              this.build.repack.status = 'failed';
+              this.build.repack.error = repack.error;
+          })
+          .catch((error) => {
+              this.build.repack.status = 'failed';
+              this.build.repack.error = error;
+          });
+      },
+      watchRepack(queue) {
+          if (!client.connected) {
+              return;
+          }
+
+          client.subscribe(`/queue/${queue}`, (message) => {
+              var repack = JSON.parse(message.body);
+
+              if (repack.status === 'success') {
+                  this.deploy(repack.war_file);
+              }
+
+              this.build.repack.status = repack.status;
+              this.build.log += repack.log || '';
+          });
+      },
+      deploy(warFile) {
+        this.build.deploy.status = 'running';
+        const payload = {
+          host: this.container.Host,
+          port: this.container.Ports.ssh,
+          war_file: warFile,
+        };
+        this.$store.dispatch('extranet/deployBuild', payload)
+          .then((deploy) => {
+            if (deploy.status === 'success') {
+              this.build.deploy.status = 'success';
+              this.$emit('deployed', warFile);
+              return;
+            }
+            this.build.deploy.status = 'failed';
+            this.build.deploy.error = deploy.error;
+          })
+          .catch((error) => {
+            this.build.deploy.status = 'failed';
+            this.build.deploy.error = error;
+          });
+      },
+    },
+    mounted() {
+      this.$M.Modal.init(this.$refs['start-build-modal'], {
+        dismissible: false,
+        preventScrolling: true,
+      });
+
+      this.getClients();
+      this.getInstances();
+    },
+  };
 </script>
 
 <style lang="scss" >

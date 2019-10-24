@@ -17,6 +17,7 @@
     "luxon": "^1.17.3",
     "materialize-css": "^1.0.0",
     "query-string": "^6.8.1",
+    "stompjs": "^2.3.3",
     "vue": "^2.6.10",
     "vue-breadcrumbs": "^1.2.0",
     "vue-class-component": "^7.0.2",

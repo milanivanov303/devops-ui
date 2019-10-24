@@ -1,5 +1,4 @@
 // https://vuex.vuejs.org/en/actions.html
-// https://vuex.vuejs.org/en/actions.html
 import Api from '../../../plugins/api';
 import config from '../../../config';
 
@@ -41,6 +40,14 @@ export default {
   async checkBuild({ commit }, payload) {
     try {
       const response = await api.post('extranet/build/check', payload);
+      return response.data;
+    } catch (err) {
+      return commit('error', err);
+    }
+  },
+  async repackBuild({ commit }, payload) {
+    try {
+      const response = await api.post('extranet/build/repack', payload);
       return response.data;
     } catch (err) {
       return commit('error', err);

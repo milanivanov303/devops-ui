@@ -177,17 +177,11 @@ export default {
         name: 'business',
         icon: 'business_center',
         options: {
-          dc: {
-            name: 'Debt Collection',
+          cfc: {
+            name: 'Commercial Finance - Classical',
           },
-          leasing: {
-            name: 'Leasing',
-          },
-          cf: {
-            name: 'Commercial Finance',
-          },
-          other: {
-            name: 'Other',
+          cfr: {
+            name: 'Commercial Finance - Reverse',
           },
         },
         label: 'Business area',
