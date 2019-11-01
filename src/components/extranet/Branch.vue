@@ -17,7 +17,7 @@
 export default {
   props: {
     branch: {},
-    count: 0
+    count: 0,
   },
 };
 </script>

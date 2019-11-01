@@ -6,7 +6,7 @@
         <div class="modal-content">
           <h4 class="left-align">Build</h4>
 
-          <div v-if="summary === null">
+          <div :class="{'hide': build.summary}">
             <div class="row">
               <div class="input-field col s12">
                 <select id="client" ref="client" v-model="build.client">
@@ -43,19 +43,19 @@
             </div>
           </div>
 
-          <div v-else>
+          <div :class="{'hide': !build.summary}">
             <div class="row">
               <div class="col s12">
-                <p>{{ summary }}</p>
+                <p>{{ build.summary }}</p>
                 <div class="progress">
-                  <div v-if="progress" class="determinate" :style="{width: progress + '%'}"></div>
+                  <div v-if="build.progress" class="determinate" :style="{width: build.progress + '%'}"></div>
                   <div v-else class="indeterminate"></div>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col s12">
-                <div class="log">{{ log }}</div>
+                <div class="log">{{ build.log }}</div>
               </div>
             </div>
           </div>
@@ -63,7 +63,7 @@
         </div>
         <div class="modal-footer">
           <button
-            :class="{ 'waves-effect': true, btn: true, disabled: summary }"
+            :class="{ 'waves-effect': true, btn: true, disabled: build.summary }"
             @click="start()"
           >
             Start
@@ -95,11 +95,10 @@
     client: [],
     javaVersion: 8,
     instance: [],
+    summary: "",
+    progress: null,
+    log: '',
   };
-
-  const summary = null;
-  const progress = null;
-  const log = '';
 
   const report = {
     'build': {
@@ -145,8 +144,6 @@
       return {
         build,
         report,
-        summary,
-        log,
       };
     },
     computed: {
@@ -158,7 +155,7 @@
       },
       instances() {
         return this.$store.state.mmpi.instances;
-      }
+      },
     },
     methods: {
       getClients() {
@@ -189,7 +186,7 @@
         this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
       },
       start() {
-        this.summary = this.report.build.starting;
+        this.build.summary = this.report.build.starting;
 
         this.$store.dispatch('extranet/startBuild', {
           branch: this.branch,
@@ -207,16 +204,16 @@
               (message) => {
                 var data = JSON.parse(message.body);
 
-                this.summary  = this.report[data.action][data.status];
-                this.progress = data.progress || null;
-                this.log     += data.log || '';
+                this.build.summary = this.report[data.action][data.status];
+                this.build.progress = data.progress || null;
+                this.build.log += data.log || '';
               },
               build.broadcast
             );
           })
           .catch((error) => {
-            this.summary = this.report.build.failed;
-            this.log = error;
+            this.build.summary = this.report.build.failed;
+            this.build.log = error;
           });
       },
     },
