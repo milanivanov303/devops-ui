@@ -9,6 +9,7 @@ export default {
     try {
       const response = await api.get('extranet/clients', payload);
       commit('clients', response.data);
+      return response.data;
     } catch (err) {
       return commit('error', err);
     }
@@ -17,6 +18,7 @@ export default {
     try {
       const response = await api.get('extranet/branches', payload);
       commit('branches', response.data);
+      return response.data;
     } catch (err) {
       return commit('error', err);
     }
@@ -26,6 +28,7 @@ export default {
       const response = await api.get('extranet/containers', payload);
       commit('containers', response.data.data);
       commit('host', response.data.meta.host);
+      return response.data;
     } catch (err) {
       return commit('error', err);
     }

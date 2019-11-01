@@ -9,6 +9,7 @@ export default {
     try {
       const response = await api.get('instances', payload);
       commit('instances', response.data.data);
+      return response.data;
     } catch (err) {
       return commit('error', err);
     }
