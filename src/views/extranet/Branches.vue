@@ -35,7 +35,7 @@ export default {
     },
     containers() {
       return this.$store.state.extranet.containers;
-    ,
+    },
   },
   methods: {
     getContainersCount(branch) {

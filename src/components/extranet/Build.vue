@@ -48,7 +48,11 @@
               <div class="col s12">
                 <p>{{ build.summary }}</p>
                 <div class="progress">
-                  <div v-if="build.progress" class="determinate" :style="{width: build.progress + '%'}"></div>
+                  <div
+                    v-if="build.progress"
+                    class="determinate"
+                    :style="{width: build.progress + '%'}">
+                  </div>
                   <div v-else class="indeterminate"></div>
                 </div>
               </div>
