@@ -1,7 +1,7 @@
 // https://vuex.vuejs.org/en/getters.html
 
 export default {
-  getContainersByBranch: state => branch => {
+  getContainersByBranch: state => (branch) => {
     if (!state.containers) {
       return [];
     }

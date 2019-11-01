@@ -35,13 +35,13 @@ export default {
     },
     host() {
       return this.$store.state.extranet.host;
-    }
+    },
   },
   methods: {
     getDeployedBuildUrl(container) {
-      let port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
+      const port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
       return `http://${this.host}:${port}${container.Names[0]}/`;
     },
-  }
+  },
 };
 </script>

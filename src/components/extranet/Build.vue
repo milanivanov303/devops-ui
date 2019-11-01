@@ -81,156 +81,157 @@
 
 <script>
 
-  var Stomp = require('stompjs');
-  var ws = new WebSocket('ws://bezmer.codixfr.private:15674/ws');
-  var client = Stomp.over(ws);
+const Stomp = require('stompjs');
 
-  client.connect(
-    'devops',
-    'spoved',
-    () => {},
-    () => {},
-    'devops'
-  );
+const ws = new WebSocket('ws://bezmer.codixfr.private:15674/ws');
+const client = Stomp.over(ws);
 
-  //client.debug = function(str) {};
+client.connect(
+  'devops',
+  'spoved',
+  () => {},
+  () => {},
+  'devops',
+);
 
-  const build = {
-    client: [],
-    javaVersion: 8,
-    instance: [],
-    summary: "",
-    progress: null,
-    log: '',
-  };
+// client.debug = function(str) {};
 
-  const report = {
-    'build': {
-      'starting': 'Build will start shortly ...',
-      'running': 'Build is running ...',
-      'success': 'Build successfully',
-      'failed': 'Build has failed. Check log for details'
-    },
-    'build.download': {
-      'running': 'Downloading build ...',
-      'success': 'Build was downloaded successfully',
-      'failed': 'Could not download build!'
-    },
-    'repack.upload': {
-      'running': 'Uploading build to instance for repack...',
-      'success': 'Build was uploaded successfully',
-      'failed': 'Could not upload build!'
-    },
-    'repack': {
-      'running': 'Repack is running ...',
-      'success': 'Repacked successfully',
-      'failed': 'Could not repack build!'
-    },
-    'repack.download': {
-      'running': 'Downloading repacked build ...',
-      'success': 'Repacked build downloaded successfully',
-      'failed': 'Could not download repacked build!'
-    },
-    'container': {
-      'running': 'Creating container for deploy ...',
-      'success': 'Container was created successfully',
-      'failed': 'Could not created container'
-    },
-    'deploy': {
-      'running': 'Deploying build ...',
-      'success': 'Doployed successfully',
-      'failed': 'Could not deploy build'
-    }
-  };
+const build = {
+  client: [],
+  javaVersion: 8,
+  instance: [],
+  summary: '',
+  progress: null,
+  log: '',
+};
 
-  export default {
-    data() {
-      return {
-        build,
-        report,
+const report = {
+  build: {
+    starting: 'Build will start shortly ...',
+    running: 'Build is running ...',
+    success: 'Build successfully',
+    failed: 'Build has failed. Check log for details',
+  },
+  'build.download': {
+    running: 'Downloading build ...',
+    success: 'Build was downloaded successfully',
+    failed: 'Could not download build!',
+  },
+  'repack.upload': {
+    running: 'Uploading build to instance for repack...',
+    success: 'Build was uploaded successfully',
+    failed: 'Could not upload build!',
+  },
+  repack: {
+    running: 'Repack is running ...',
+    success: 'Repacked successfully',
+    failed: 'Could not repack build!',
+  },
+  'repack.download': {
+    running: 'Downloading repacked build ...',
+    success: 'Repacked build downloaded successfully',
+    failed: 'Could not download repacked build!',
+  },
+  container: {
+    running: 'Creating container for deploy ...',
+    success: 'Container was created successfully',
+    failed: 'Could not created container',
+  },
+  deploy: {
+    running: 'Deploying build ...',
+    success: 'Doployed successfully',
+    failed: 'Could not deploy build',
+  },
+};
+
+export default {
+  data() {
+    return {
+      build,
+      report,
+    };
+  },
+  computed: {
+    branch() {
+      return this.$route.params.branch;
+    },
+    clients() {
+      return this.$store.state.extranet.clients;
+    },
+    instances() {
+      return this.$store.state.mmpi.instances;
+    },
+  },
+  methods: {
+    getClients() {
+      const loader = this.$loading.show({ container: this.$el });
+      this.$store.dispatch('extranet/getClients').then(() => loader.hide());
+    },
+    getInstances() {
+      const loader = this.$loading.show({ container: this.$el });
+
+      const payload = {
+        filters: JSON.stringify({
+          anyOf: [
+            { instance_type_id: 'DEV' },
+            { instance_type_id: 'VAL' },
+          ],
+        }),
       };
+
+      this.$store.dispatch('mmpi/getInstances', payload).then(() => loader.hide());
     },
-    computed: {
-      branch() {
-        return this.$route.params.branch;
-      },
-      clients() {
-        return this.$store.state.extranet.clients;
-      },
-      instances() {
-        return this.$store.state.mmpi.instances;
-      },
+    open() {
+      this.build = JSON.parse(JSON.stringify(build));
+      setTimeout(() => {
+        this.$M.FormSelect.init(this.$refs.client);
+        this.$M.FormSelect.init(this.$refs['java-version']);
+        this.$M.FormSelect.init(this.$refs.instance);
+      }, 100);
+      this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
     },
-    methods: {
-      getClients() {
-        const loader = this.$loading.show({ container: this.$el });
-        this.$store.dispatch('extranet/getClients').then(() => loader.hide());
-      },
-      getInstances() {
-          const loader = this.$loading.show({ container: this.$el });
+    start() {
+      this.build.summary = this.report.build.starting;
 
-          const payload = {
-              'filters': JSON.stringify({
-                  'anyOf': [
-                      {'instance_type_id': 'DEV'},
-                      {'instance_type_id': 'VAL'}
-                  ]
-              })
-          };
+      this.$store.dispatch('extranet/startBuild', {
+        branch: this.branch,
+        client: this.build.client,
+        java_version: this.build.javaVersion,
+        instance: this.build.instance,
+      })
+        .then((build) => {
+          if (!client.connected) {
+            return;
+          }
 
-          this.$store.dispatch('mmpi/getInstances', payload).then(() => loader.hide());
-      },
-      open() {
-        this.build = JSON.parse(JSON.stringify(build));
-        setTimeout(() => {
-          this.$M.FormSelect.init(this.$refs.client);
-          this.$M.FormSelect.init(this.$refs['java-version']);
-          this.$M.FormSelect.init(this.$refs.instance);
-        }, 100);
-        this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
-      },
-      start() {
-        this.build.summary = this.report.build.starting;
+          client.subscribe(
+            `/queue/${build.broadcast.queue}`,
+            (message) => {
+              const data = JSON.parse(message.body);
 
-        this.$store.dispatch('extranet/startBuild', {
-          branch: this.branch,
-          client: this.build.client,
-          java_version: this.build.javaVersion,
-          instance: this.build.instance,
+              this.build.summary = this.report[data.action][data.status];
+              this.build.progress = data.progress || null;
+              this.build.log += data.log || '';
+            },
+            build.broadcast,
+          );
         })
-          .then((build) => {
-            if (!client.connected) {
-              return;
-            }
-
-            client.subscribe(
-              `/queue/${build.broadcast.queue}`,
-              (message) => {
-                var data = JSON.parse(message.body);
-
-                this.build.summary = this.report[data.action][data.status];
-                this.build.progress = data.progress || null;
-                this.build.log += data.log || '';
-              },
-              build.broadcast
-            );
-          })
-          .catch((error) => {
-            this.build.summary = this.report.build.failed;
-            this.build.log = error;
-          });
-      },
+        .catch((error) => {
+          this.build.summary = this.report.build.failed;
+          this.build.log = error;
+        });
     },
-    mounted() {
-      this.$M.Modal.init(this.$refs['start-build-modal'], {
-        dismissible: false,
-        preventScrolling: true,
-      });
+  },
+  mounted() {
+    this.$M.Modal.init(this.$refs['start-build-modal'], {
+      dismissible: false,
+      preventScrolling: true,
+    });
 
-      this.getClients();
-      this.getInstances();
-    },
-  };
+    this.getClients();
+    this.getInstances();
+  },
+};
 </script>
 
 <style lang="scss" >
