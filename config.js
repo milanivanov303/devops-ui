@@ -10,9 +10,4 @@ module.exports = {
     url: process.env.VUE_APP_MMPI_API_URL,
     code: process.env.VUE_APP_MMPI_API_CODE,
   },
-  extranet: {
-    docker: {
-      image: process.env.VUE_APP_EXTRANET_IMAGE,
-    },
-  },
 };
