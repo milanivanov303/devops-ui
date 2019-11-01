@@ -5,96 +5,14 @@
       <div ref="start-build-modal" class="modal right-sheet">
         <div class="modal-content">
           <h4 class="left-align">Build</h4>
-          <div v-if="build.status">
 
-            <div v-if="build.deploy.status === 'running'" class="row">
-              <div class="col s12">
-                Deploying build ....
-                <div class="progress">
-                  <div class="indeterminate"></div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="build.deploy.status === 'success'" class="row">
-              <div class="col s12">
-                deployed
-              </div>
-            </div>
-
-            <div v-else-if="build.deploy.status === 'failed'" class="row">
-              <div class="col s12">
-                deployed has failed
-                <p>{{ build.deploy.error }}</p>
-              </div>
-            </div>
-
-            <div v-else-if="build.repack.status === 'running'" class="row">
-              <div class="col s12">
-                Repacking build ....
-                <div class="progress">
-                  <div class="indeterminate"></div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="build.repack.status === 'success'" class="row">
-              <div class="col s12">
-                repacked
-              </div>
-            </div>
-
-            <div v-else-if="build.repack.status === 'failed'" class="row">
-              <div class="col s12">
-                repack has failed
-                <p>{{ build.repack.error }}</p>
-              </div>
-            </div>
-
-            <div v-else-if="build.status === 'starting'" class="row">
-              <div class="col s12">
-                <p>Build starting ...</p>
-                <div class="progress">
-                  <div class="indeterminate"></div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="build.status === 'running'" class="row">
-              <div class="col s12">
-                <p>Build is running ...</p>
-                <div class="progress">
-                  <div class="indeterminate"></div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="build.status === 'failed'" class="row">
-              <div class="col s12">
-                build failed!!!
-              </div>
-            </div>
-
-            <div v-if="build.status === 'running' || build.status === 'failed'" class="row">
-              <div class="col s12">
-                <pre>{{ build.log }}</pre>
-              </div>
-            </div>
-
-            <div v-if="build.repack.status === 'running' || build.repack.status === 'failed'" class="row">
-              <div class="col s12">
-                <pre>{{ build.log }}</pre>
-              </div>
-            </div>
-
-          </div>
-          <div v-else>
+          <div v-if="summary === null">
             <div class="row">
               <div class="input-field col s12">
                 <select id="client" ref="client" v-model="build.client">
                   <option disabled value="">Choose client</option>
                   <option v-for="(client, index) in clients"
-                         :value="client.package"
+                         :value="client"
                          :key="index">{{ client.name }}</option>
                 </select>
                 <label for="client">Client</label>
@@ -124,10 +42,28 @@
               </div>
             </div>
           </div>
+
+          <div v-else>
+            <div class="row">
+              <div class="col s12">
+                <p>{{ summary }}</p>
+                <div class="progress">
+                  <div v-if="progress" class="determinate" :style="{width: progress + '%'}"></div>
+                  <div v-else class="indeterminate"></div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <div class="log">{{ log }}</div>
+              </div>
+            </div>
+          </div>
+
         </div>
         <div class="modal-footer">
           <button
-            :class="{ 'waves-effect': true, btn: true, disabled: build.status }"
+            :class="{ 'waves-effect': true, btn: true, disabled: summary }"
             @click="start()"
           >
             Start
@@ -142,58 +78,92 @@
 <script>
 
   var Stomp = require('stompjs');
-  var client = Stomp.client('ws://localhost:15674/ws');
+  var ws = new WebSocket('ws://bezmer.codixfr.private:15674/ws');
+  var client = Stomp.over(ws);
 
   client.connect(
     'devops',
-    'devops',
-    () => console.log('connected'),
-    (error) => console.log(error),
+    'spoved',
+    () => {},
+    () => {},
     'devops'
   );
 
+  //client.debug = function(str) {};
+
   const build = {
-    client: '',
+    client: [],
     javaVersion: 8,
-    instance: '',
-    log: '',
-    logFile: '',
-    status: null,
-    error: '',
-    repack: {
-      status: null,
-      error: '',
+    instance: [],
+  };
+
+  const summary = null;
+  const progress = null;
+  const log = '';
+
+  const report = {
+    'build': {
+      'starting': 'Build will start shortly ...',
+      'running': 'Build is running ...',
+      'success': 'Build successfully',
+      'failed': 'Build has failed. Check log for details'
     },
-    deploy: {
-      status: null,
-      error: '',
+    'build.download': {
+      'running': 'Downloading build ...',
+      'success': 'Build was downloaded successfully',
+      'failed': 'Could not download build!'
     },
+    'repack.upload': {
+      'running': 'Uploading build to instance for repack...',
+      'success': 'Build was uploaded successfully',
+      'failed': 'Could not upload build!'
+    },
+    'repack': {
+      'running': 'Repack is running ...',
+      'success': 'Repacked successfully',
+      'failed': 'Could not repack build!'
+    },
+    'repack.download': {
+      'running': 'Downloading repacked build ...',
+      'success': 'Repacked build downloaded successfully',
+      'failed': 'Could not download repacked build!'
+    },
+    'container': {
+      'running': 'Creating container for deploy ...',
+      'success': 'Container was created successfully',
+      'failed': 'Could not created container'
+    },
+    'deploy': {
+      'running': 'Deploying build ...',
+      'success': 'Doployed successfully',
+      'failed': 'Could not deploy build'
+    }
   };
 
   export default {
     data() {
       return {
-        clients: [],
         build,
+        report,
+        summary,
+        log,
       };
     },
-    props: {
-      container: {},
-    },
     computed: {
-        instances() {
-            return this.$store.state.mmpi.instances;
-        }
+      branch() {
+        return this.$route.params.branch;
+      },
+      clients() {
+        return this.$store.state.extranet.clients;
+      },
+      instances() {
+        return this.$store.state.mmpi.instances;
+      }
     },
     methods: {
       getClients() {
         const loader = this.$loading.show({ container: this.$el });
-
-        this.$store.dispatch('extranet/getClients')
-          .then((clients) => {
-            this.clients = clients;
-            loader.hide();
-          });
+        this.$store.dispatch('extranet/getClients').then(() => loader.hide());
       },
       getInstances() {
           const loader = this.$loading.show({ container: this.$el });
@@ -207,113 +177,46 @@
               })
           };
 
-          this.$store.dispatch('mmpi/getInstances', payload)
-              .then((instances) => {
-                  loader.hide();
-              });
+          this.$store.dispatch('mmpi/getInstances', payload).then(() => loader.hide());
       },
       open() {
         this.build = JSON.parse(JSON.stringify(build));
         setTimeout(() => {
           this.$M.FormSelect.init(this.$refs.client);
           this.$M.FormSelect.init(this.$refs['java-version']);
-            this.$M.FormSelect.init(this.$refs.instance);
+          this.$M.FormSelect.init(this.$refs.instance);
         }, 100);
         this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
       },
       start() {
-        this.build.status = 'starting';
-        const payload = {
-          branch: this.container.Config.Labels.branch,
+        this.summary = this.report.build.starting;
+
+        this.$store.dispatch('extranet/startBuild', {
+          branch: this.branch,
           client: this.build.client,
-          java_version: this.build.javaVersion
-        };
-        this.$store.dispatch('extranet/startBuild', payload)
+          java_version: this.build.javaVersion,
+          instance: this.build.instance,
+        })
           .then((build) => {
-            if (build.status === 'started') {
-              this.build.status = 'running';
-              return this.watchBuild(build.queue);
-            }
-            this.build.status = 'failed';
-            this.build.error = build.error;
-          })
-          .catch((error) => {
-            this.build.status = 'failed';
-            this.build.error = error;
-          });
-      },
-      watchBuild(queue) {
-        if (!client.connected) {
-          return;
-        }
-
-        client.subscribe(`/queue/${queue}`, (message) => {
-          var build = JSON.parse(message.body);
-
-          if (build.status === 'success') {
-            this.repack(build.war_file);
-          }
-
-          this.build.status = build.status;
-          this.build.log += build.log || '';
-        });
-      },
-      repack(warFile) {
-        this.build.repack.status = 'starting';
-        const payload = {
-            war_file: warFile,
-            instance: this.build.instance
-        };
-        this.$store.dispatch('extranet/repackBuild', payload)
-          .then((repack) => {
-              if (repack.status === 'started') {
-                this.build.repack.status = 'running';
-                return this.watchRepack(repack.queue);
-              }
-              this.build.repack.status = 'failed';
-              this.build.repack.error = repack.error;
-          })
-          .catch((error) => {
-              this.build.repack.status = 'failed';
-              this.build.repack.error = error;
-          });
-      },
-      watchRepack(queue) {
-          if (!client.connected) {
-              return;
-          }
-
-          client.subscribe(`/queue/${queue}`, (message) => {
-              var repack = JSON.parse(message.body);
-
-              if (repack.status === 'success') {
-                  this.deploy(repack.war_file);
-              }
-
-              this.build.repack.status = repack.status;
-              this.build.log += repack.log || '';
-          });
-      },
-      deploy(warFile) {
-        this.build.deploy.status = 'running';
-        const payload = {
-          host: this.container.Host,
-          port: this.container.Ports.ssh,
-          war_file: warFile,
-        };
-        this.$store.dispatch('extranet/deployBuild', payload)
-          .then((deploy) => {
-            if (deploy.status === 'success') {
-              this.build.deploy.status = 'success';
-              this.$emit('deployed', warFile);
+            if (!client.connected) {
               return;
             }
-            this.build.deploy.status = 'failed';
-            this.build.deploy.error = deploy.error;
+
+            client.subscribe(
+              `/queue/${build.broadcast.queue}`,
+              (message) => {
+                var data = JSON.parse(message.body);
+
+                this.summary  = this.report[data.action][data.status];
+                this.progress = data.progress || null;
+                this.log     += data.log || '';
+              },
+              build.broadcast
+            );
           })
           .catch((error) => {
-            this.build.deploy.status = 'failed';
-            this.build.deploy.error = error;
+            this.summary = this.report.build.failed;
+            this.log = error;
           });
       },
     },
@@ -330,8 +233,9 @@
 </script>
 
 <style lang="scss" >
-  pre {
-    max-height: 200px;
+  .log {
+    height: 60vh;
     overflow: auto;
+    white-space: pre;
   }
 </style>

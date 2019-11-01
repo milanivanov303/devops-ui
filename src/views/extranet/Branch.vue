@@ -7,21 +7,41 @@
       </div>
     </div>
 
-    <Container v-bind:branch="branch"></Container>
+    <ol>
+      <li v-for="(container, index) in containers" :key="index">
+        <a :href="getDeployedBuildUrl(container)" target="_blank">
+          {{ container.Names[0].replace(/^\/|/, '') }} - {{ container.Status }}
+        </a>
+      </li>
+    </ol>
+
+    <Build />
   </div>
 </template>
 
 <script>
-import Container from '@/components/extranet/Container';
+import Build from '@/components/extranet/Build';
 
 export default {
   components: {
-    Container,
+    Build,
   },
   computed: {
     branch() {
       return this.$route.params.branch;
     },
+    containers() {
+      return this.$store.getters['extranet/getContainersByBranch'](this.branch);
+    },
+    host() {
+      return this.$store.state.extranet.host;
+    }
   },
+  methods: {
+    getDeployedBuildUrl(container) {
+      let port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
+      return `http://${this.host}:${port}${container.Names[0]}/`;
+    },
+  }
 };
 </script>
