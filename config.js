@@ -15,5 +15,5 @@ module.exports = {
     username: process.env.VUE_APP_WS_USERNAME,
     password: process.env.VUE_APP_WS_PASSWORD,
     vhost: process.env.VUE_APP_WS_VHOST,
-  }
+  },
 };

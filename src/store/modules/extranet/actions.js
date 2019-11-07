@@ -12,9 +12,8 @@ export default {
     try {
       const response = await api.get('extranet/clients', payload);
       commit('clients', response.data);
-      return response.data;
     } catch (err) {
-      return commit('error', err);
+      commit('error', err);
     }
   },
   async getBranches({ commit, state }, payload) {
@@ -24,9 +23,8 @@ export default {
     try {
       const response = await api.get('extranet/branches', payload);
       commit('branches', response.data);
-      return response.data;
     } catch (err) {
-      return commit('error', err);
+      commit('error', err);
     }
   },
   async getContainers({ commit }, payload) {
@@ -34,9 +32,8 @@ export default {
       const response = await api.get('extranet/containers', payload);
       commit('containers', response.data.data);
       commit('host', response.data.meta.host);
-      return response.data;
     } catch (err) {
-      return commit('error', err);
+      commit('error', err);
     }
   },
   async startBuild({ commit }, payload) {
