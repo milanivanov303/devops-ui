@@ -5,7 +5,10 @@ import config from '../../../config';
 const api = new Api(config.devops.url, config.devops.code);
 
 export default {
-  async getClients({ commit }, payload) {
+  async getClients({ commit, state }, payload) {
+    if (state.clients.length) {
+      return;
+    }
     try {
       const response = await api.get('extranet/clients', payload);
       commit('clients', response.data);
@@ -14,7 +17,10 @@ export default {
       return commit('error', err);
     }
   },
-  async getBranches({ commit }, payload) {
+  async getBranches({ commit, state }, payload) {
+    if (state.branches.length) {
+      return;
+    }
     try {
       const response = await api.get('extranet/branches', payload);
       commit('branches', response.data);

@@ -5,7 +5,6 @@
       <div ref="start-build-modal" class="modal right-sheet">
         <div class="modal-content">
           <h4 class="left-align">Build</h4>
-
           <div :class="{'hide': build.summary}">
             <div class="row">
               <div class="input-field col s12">
@@ -42,7 +41,6 @@
               </div>
             </div>
           </div>
-
           <div :class="{'hide': !build.summary}">
             <div class="row">
               <div class="col s12">
@@ -63,7 +61,6 @@
               </div>
             </div>
           </div>
-
         </div>
         <div class="modal-footer">
           <button
@@ -81,20 +78,7 @@
 
 <script>
 
-const Stomp = require('stompjs');
-
-const ws = new WebSocket('ws://bezmer.codixfr.private:15674/ws');
-const client = Stomp.over(ws);
-
-client.connect(
-  'devops',
-  'spoved',
-  () => {},
-  () => {},
-  'devops',
-);
-
-// client.debug = function(str) {};
+import client from '../../plugins/ws';
 
 const build = {
   client: [],
@@ -183,11 +167,15 @@ export default {
     },
     open() {
       this.build = JSON.parse(JSON.stringify(build));
-      setTimeout(() => {
-        this.$M.FormSelect.init(this.$refs.client);
-        this.$M.FormSelect.init(this.$refs['java-version']);
-        this.$M.FormSelect.init(this.$refs.instance);
-      }, 100);
+
+      this.$M.Modal.init(this.$refs['start-build-modal'], {
+        dismissible: false,
+        preventScrolling: true,
+      });
+
+      this.$M.FormSelect.init(this.$refs.client);
+      this.$M.FormSelect.init(this.$refs['java-version']);
+      this.$M.FormSelect.init(this.$refs.instance);
       this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
     },
     start() {
@@ -204,7 +192,7 @@ export default {
             return;
           }
 
-          client.subscribe(
+          const subscribe = client.subscribe(
             `/queue/${build.broadcast.queue}`,
             (message) => {
               const data = JSON.parse(message.body);
@@ -212,6 +200,11 @@ export default {
               this.build.summary = this.report[data.action][data.status];
               this.build.progress = data.progress || null;
               this.build.log += data.log || '';
+
+              if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
+                this.$store.dispatch('extranet/getContainers');
+                subscribe.unsubscribe();
+              }
             },
             build.broadcast,
           );
@@ -223,11 +216,6 @@ export default {
     },
   },
   mounted() {
-    this.$M.Modal.init(this.$refs['start-build-modal'], {
-      dismissible: false,
-      preventScrolling: true,
-    });
-
     this.getClients();
     this.getInstances();
   },

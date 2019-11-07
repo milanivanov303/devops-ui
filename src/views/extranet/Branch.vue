@@ -10,7 +10,7 @@
     <ol>
       <li v-for="(container, index) in containers" :key="index">
         <a :href="getDeployedBuildUrl(container)" target="_blank">
-          {{ container.Names[0].replace(/^\/|/, '') }} - {{ container.Status }}
+          {{ container.Labels.build }} - {{ container.Status }}
         </a>
       </li>
     </ol>
@@ -40,7 +40,7 @@ export default {
   methods: {
     getDeployedBuildUrl(container) {
       const port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
-      return `http://${this.host}:${port}${container.Names[0]}/`;
+      return `http://${this.host}:${port}/${container.Labels.build}/`;
     },
   },
 };
