@@ -5,68 +5,13 @@
       <div ref="start-build-modal" class="modal right-sheet">
         <div class="modal-content">
           <h4 class="left-align">Build</h4>
-          <div v-if="build.status">
-
-            <div v-if="build.deploy.status === 'running'" class="row">
-              <div class="col s12">
-                Deploying build ....
-                <div class="progress">
-                  <div class="indeterminate"></div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="build.deploy.status === 'success'" class="row">
-              <div class="col s12">
-                deployed
-              </div>
-            </div>
-
-            <div v-else-if="build.deploy.status === 'failed'" class="row">
-              <div class="col s12">
-                deployed has failed
-                <p>{{ build.deploy.error }}</p>
-              </div>
-            </div>
-
-            <div v-else-if="build.status === 'starting'" class="row">
-              <div class="col s12">
-                <p>Build starting ...</p>
-                <div class="progress">
-                  <div class="indeterminate"></div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="build.status === 'running'" class="row">
-              <div class="col s12">
-                <p>Build is running ...</p>
-                <div class="progress">
-                  <div class="indeterminate"></div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="build.status === 'failed'" class="row">
-              <div class="col s12">
-                build failed!!!
-              </div>
-            </div>
-
-            <div v-if="build.status === 'running' || build.status === 'failed'" class="row">
-              <div class="col s12">
-                <pre>{{ build.log }}</pre>
-              </div>
-            </div>
-
-          </div>
-          <div v-else>
+          <div :class="{'hide': build.summary}">
             <div class="row">
               <div class="input-field col s12">
                 <select id="client" ref="client" v-model="build.client">
-                  <option disabled value="">Choose your option</option>
+                  <option disabled value="">Choose client</option>
                   <option v-for="(client, index) in clients"
-                         :value="client.package"
+                         :value="client"
                          :key="index">{{ client.name }}</option>
                 </select>
                 <label for="client">Client</label>
@@ -84,11 +29,42 @@
                 <label for="java-version">Java Version</label>
               </div>
             </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <select id="instance" ref="instance" v-model="build.instance">
+                  <option disabled value="">Choose instance</option>
+                  <option v-for="(instance, index) in instances"
+                          :value="instance"
+                          :key="index">{{ instance.name }}</option>
+                </select>
+                <label for="instance">Instance</label>
+              </div>
+            </div>
+          </div>
+          <div :class="{'hide': !build.summary}">
+            <div class="row">
+              <div class="col s12">
+                <p>{{ build.summary }}</p>
+                <div class="progress">
+                  <div
+                    v-if="build.progress"
+                    class="determinate"
+                    :style="{width: build.progress + '%'}">
+                  </div>
+                  <div v-else class="indeterminate"></div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <div class="log">{{ build.log }}</div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
           <button
-            :class="{ 'waves-effect': true, btn: true, disabled: build.status }"
+            :class="{ 'waves-effect': true, btn: true, disabled: build.summary }"
             @click="start()"
           >
             Start
@@ -101,153 +77,155 @@
 </template>
 
 <script>
-// import * as M from 'materialize-css/dist/js/materialize';
-// import Api from '@/plugins/api';
-// import config from '@/config';
 
-// const api = new Api(config.devops.url, config.devops.code);
+import client from '../../plugins/ws';
 
 const build = {
-  client: '',
+  client: [],
   javaVersion: 8,
+  instance: [],
+  summary: '',
+  progress: null,
   log: '',
-  logFile: '',
-  status: null,
-  error: '',
+};
+
+const report = {
+  build: {
+    starting: 'Build will start shortly ...',
+    running: 'Build is running ...',
+    success: 'Build successfully',
+    failed: 'Build has failed. Check log for details',
+  },
+  'build.download': {
+    running: 'Downloading build ...',
+    success: 'Build was downloaded successfully',
+    failed: 'Could not download build!',
+  },
+  'repack.upload': {
+    running: 'Uploading build to instance for repack...',
+    success: 'Build was uploaded successfully',
+    failed: 'Could not upload build!',
+  },
+  repack: {
+    running: 'Repack is running ...',
+    success: 'Repacked successfully',
+    failed: 'Could not repack build!',
+  },
+  'repack.download': {
+    running: 'Downloading repacked build ...',
+    success: 'Repacked build downloaded successfully',
+    failed: 'Could not download repacked build!',
+  },
+  container: {
+    running: 'Creating container for deploy ...',
+    success: 'Container was created successfully',
+    failed: 'Could not created container',
+  },
   deploy: {
-    status: null,
-    error: '',
+    running: 'Deploying build ...',
+    success: 'Doployed successfully',
+    failed: 'Could not deploy build',
   },
 };
 
 export default {
   data() {
     return {
-      clients: [],
       build,
+      report,
     };
   },
-  props: {
-    container: {},
+  computed: {
+    branch() {
+      return this.$route.params.branch;
+    },
+    clients() {
+      return this.$store.state.extranet.clients;
+    },
+    instances() {
+      return this.$store.state.mmpi.instances;
+    },
   },
   methods: {
     getClients() {
       const loader = this.$loading.show({ container: this.$el });
+      this.$store.dispatch('extranet/getClients').then(() => loader.hide());
+    },
+    getInstances() {
+      const loader = this.$loading.show({ container: this.$el });
 
-      this.$store.dispatch('extranet/getClients')
-        .then((clients) => {
-          this.clients = clients;
-          loader.hide();
-        });
+      const payload = {
+        filters: JSON.stringify({
+          anyOf: [
+            { instance_type_id: 'DEV' },
+            { instance_type_id: 'VAL' },
+          ],
+        }),
+      };
+
+      this.$store.dispatch('mmpi/getInstances', payload).then(() => loader.hide());
     },
     open() {
       this.build = JSON.parse(JSON.stringify(build));
-      setTimeout(() => {
-        this.$M.FormSelect.init(this.$refs.client);
-        this.$M.FormSelect.init(this.$refs['java-version']);
-      }, 100);
+
+      this.$M.Modal.init(this.$refs['start-build-modal'], {
+        dismissible: false,
+        preventScrolling: true,
+      });
+
+      this.$M.FormSelect.init(this.$refs.client);
+      this.$M.FormSelect.init(this.$refs['java-version']);
+      this.$M.FormSelect.init(this.$refs.instance);
       this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
     },
     start() {
-      this.build.status = 'starting';
-      const payload = {
-        branch: this.container.Config.Labels.branch,
+      this.build.summary = this.report.build.starting;
+
+      this.$store.dispatch('extranet/startBuild', {
+        branch: this.branch,
         client: this.build.client,
         java_version: this.build.javaVersion,
-      };
-      this.$store.dispatch('extranet/startBuild', payload)
+        instance: this.build.instance,
+      })
         .then((build) => {
-          if (build.started) {
-            this.build.status = 'running';
-            this.build.logFile = build.log_file;
-            this.check();
+          if (!client.connected) {
             return;
           }
-          this.build.status = 'failed';
-          this.build.error = build.error;
+
+          const subscribe = client.subscribe(
+            `/queue/${build.broadcast.queue}`,
+            (message) => {
+              const data = JSON.parse(message.body);
+
+              this.build.summary = this.report[data.action][data.status];
+              this.build.progress = data.progress || null;
+              this.build.log += data.log || '';
+
+              if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
+                this.$store.dispatch('extranet/getContainers');
+                subscribe.unsubscribe();
+              }
+            },
+            build.broadcast,
+          );
         })
         .catch((error) => {
-          this.build.status = 'failed';
-          this.build.error = error;
-        });
-    },
-    check() {
-      setTimeout(() => {
-        const payload = {
-          branch: this.container.Config.Labels.branch,
-          log_file: this.build.logFile,
-          log_start_line: this.build.log.split('\n').length,
-        };
-        this.$store.dispatch('extranet/checkBuild', payload)
-          .then((build) => {
-            this.build.log += build.log;
-
-            if (build.running) {
-              return this.check();
-            }
-
-            const warFile = this.getWarFile();
-            if (warFile) {
-              this.build.status = 'success';
-              return this.deploy(warFile);
-            }
-
-            this.build.status = 'failed';
-            return this.build.status;
-          });
-      }, 2000);
-    },
-    getWarFile() {
-      const logLines = this.build.log.trim().split(/\r?\n/);
-      let warFile = logLines[logLines.length - 1];
-
-      warFile = warFile.split('/');
-      warFile[warFile.length - 1] = `LOCAL_${warFile[warFile.length - 1]}`;
-      warFile = warFile.join('/');
-
-      if (warFile.match('.war$')) {
-        return warFile;
-      }
-
-      return null;
-    },
-    deploy(warFile) {
-      this.build.deploy.status = 'running';
-      const payload = {
-        host: this.container.Host,
-        port: this.container.Ports.ssh,
-        war_file: warFile,
-      };
-      this.$store.dispatch('extranet/deployBuild', payload)
-        .then((response) => {
-          if (response.deployed) {
-            this.build.deploy.status = 'success';
-            this.$emit('deployed', warFile);
-            return;
-          }
-          this.build.deploy.status = 'failed';
-          this.build.deploy.error = response.error;
-        })
-        .catch((error) => {
-          this.build.deploy.status = 'failed';
-          this.build.deploy.error = error;
+          this.build.summary = this.report.build.failed;
+          this.build.log = error;
         });
     },
   },
   mounted() {
-    this.$M.Modal.init(this.$refs['start-build-modal'], {
-      dismissible: false,
-      preventScrolling: true,
-    });
-
     this.getClients();
+    this.getInstances();
   },
 };
 </script>
 
 <style lang="scss" >
-  pre {
-    max-height: 200px;
+  .log {
+    height: 60vh;
     overflow: auto;
+    white-space: pre;
   }
 </style>

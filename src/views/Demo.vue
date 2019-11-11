@@ -238,23 +238,11 @@ export default {
         displayed: 'name',
         icon: 'business_center',
         options: {
-          dc: {
-            name: 'Debt Collection',
+          cfc: {
+            name: 'Commercial Finance - Classical',
           },
-          leas: {
-            name: 'Factoring',
-          },
-          fac: {
-            name: 'Leasing',
-          },
-          cf: {
-            name: 'Commercial finance',
-          },
-          conf: {
-            name: 'Consumer finance',
-          },
-          other: {
-            name: 'Other',
+          cfr: {
+            name: 'Commercial Finance - Reverse',
           },
         },
         label: 'Business area',
@@ -367,7 +355,7 @@ export default {
       let url;
       if (value) {
         url = `<a target="_blank"
-                  title="${value}" 
+                  title="${value}"
                   href='${value}'>
                   <i class="material-icons">cast_connected</i>
                 </a>`;

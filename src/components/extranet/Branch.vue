@@ -1,17 +1,12 @@
 <template>
   <div class="card">
     <div class="card-content">
-      <span class="card-title">
-        <router-link v-bind:to="'/extranet/branches/' + branch.name">
+      <div class="card-title">
+        <router-link v-bind:to="'/extranet/branches/' + branch.name" class="collection-item">
+          <span class="badge" v-if="count">{{ count }}</span>
           {{ branch.name }}
         </router-link>
-        <i
-          v-if="container"
-          :class="['material-icons', 'codix-text', 'text-' + container.State, 'right']"
-        >
-          fiber_manual_record
-        </i>
-      </span>
+      </div>
       <p>Hash: {{ branch.hash }}</p>
       <p>Version: {{ branch.version }}</p>
     </div>
@@ -22,7 +17,7 @@
 export default {
   props: {
     branch: {},
-    container: null,
+    count: {},
   },
 };
 </script>
