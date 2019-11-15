@@ -5,62 +5,66 @@
       <div ref="start-build-modal" class="modal right-sheet">
         <div class="modal-content">
           <h4 class="left-align">Build</h4>
-          <div :class="{'hide': build.summary}">
-            <div class="row">
-              <div class="input-field col s12">
-                <select id="client" ref="client" v-model="build.client">
-                  <option disabled value="">Choose client</option>
-                  <option v-for="(client, index) in clients"
-                         :value="client"
-                         :key="index">{{ client.name }}</option>
-                </select>
-                <label for="client">Client</label>
+          <template v-if="build.started === false">
+            <div key="form" >
+              <div class="row">
+                <div class="input-field col s12">
+                  <select id="client" ref="client" v-model="form.client">
+                    <option disabled value="">Choose client</option>
+                    <option v-for="(client, index) in clients"
+                           :value="client"
+                           :key="index">{{ client.name }}</option>
+                  </select>
+                  <label for="client">Client</label>
+                </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <select id="java-version" ref="java-version" v-model="build.javaVersion">
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                  <option value="8">8</option>
-                </select>
-                <label for="java-version">Java Version</label>
+              <div class="row">
+                <div class="input-field col s12">
+                  <select id="java-version" ref="java-version" v-model="form.javaVersion">
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                  </select>
+                  <label for="java-version">Java Version</label>
+                </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <select id="instance" ref="instance" v-model="build.instance">
-                  <option disabled value="">Choose instance</option>
-                  <option v-for="(instance, index) in instances"
-                          :value="instance"
-                          :key="index">{{ instance.name }}</option>
-                </select>
-                <label for="instance">Instance</label>
-              </div>
-            </div>
-          </div>
-          <div :class="{'hide': !build.summary}">
-            <div class="row">
-              <div class="col s12">
-                <p>{{ build.summary }}</p>
-                <div class="progress">
-                  <div
-                    v-if="build.progress"
-                    class="determinate"
-                    :style="{width: build.progress + '%'}">
-                  </div>
-                  <div v-else class="indeterminate"></div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <select id="instance" ref="instance" v-model="form.instance">
+                    <option disabled value="">Choose instance</option>
+                    <option v-for="(instance, index) in instances"
+                            :value="instance"
+                            :key="index">{{ instance.name }}</option>
+                  </select>
+                  <label for="instance">Instance</label>
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col s12">
-                <div class="log">{{ build.log }}</div>
+          </template>
+          <template v-else>
+            <div key="build" >
+              <div class="row">
+                <div class="col s12">
+                  <p>{{ build.summary }}</p>
+                  <div v-if="build.status === 'running'" class="progress">
+                    <div
+                      v-if="build.progress"
+                      class="determinate"
+                      :style="{width: build.progress + '%'}">
+                    </div>
+                    <div v-else class="indeterminate"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s12">
+                  <div class="log">{{ build.log }}</div>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
         <div class="modal-footer">
           <button
@@ -78,62 +82,28 @@
 
 <script>
 
-import client from '../../plugins/ws';
+import client from '@/plugins/ws';
 
-const build = {
-  client: [],
-  javaVersion: 8,
-  instance: [],
-  summary: '',
-  progress: null,
-  log: '',
-};
-
-const report = {
-  build: {
-    starting: 'Build will start shortly ...',
-    running: 'Build is running ...',
-    success: 'Build successfully',
-    failed: 'Build has failed. Check log for details',
-  },
-  'build.download': {
-    running: 'Downloading build ...',
-    success: 'Build was downloaded successfully',
-    failed: 'Could not download build!',
-  },
-  'repack.upload': {
-    running: 'Uploading build to instance for repack...',
-    success: 'Build was uploaded successfully',
-    failed: 'Could not upload build!',
-  },
-  repack: {
-    running: 'Repack is running ...',
-    success: 'Repacked successfully',
-    failed: 'Could not repack build!',
-  },
-  'repack.download': {
-    running: 'Downloading repacked build ...',
-    success: 'Repacked build downloaded successfully',
-    failed: 'Could not download repacked build!',
-  },
-  container: {
-    running: 'Creating container for deploy ...',
-    success: 'Container was created successfully',
-    failed: 'Could not created container',
-  },
-  deploy: {
-    running: 'Deploying build ...',
-    success: 'Doployed successfully',
-    failed: 'Could not deploy build',
-  },
-};
+function initialState() {
+  return {
+    form: {
+      client: [],
+      javaVersion: 8,
+      instance: [],
+    },
+    build: {
+      started: false,
+      status: '',
+      summary: '',
+      progress: null,
+      log: '',
+    },
+  };
+}
 
 export default {
   data() {
-    return {
-      build,
-      report,
-    };
+    return initialState();
   },
   computed: {
     branch() {
@@ -166,28 +136,34 @@ export default {
       this.$store.dispatch('mmpi/getInstances', payload).then(() => loader.hide());
     },
     open() {
-      this.build = JSON.parse(JSON.stringify(build));
+      this.form = initialState()['form'];
+      this.build = initialState()['build'];
 
       this.$M.Modal.init(this.$refs['start-build-modal'], {
         dismissible: false,
         preventScrolling: true,
+        onOpenEnd: () => {
+          this.$M.FormSelect.init(this.$refs.client);
+          this.$M.FormSelect.init(this.$refs['java-version']);
+          this.$M.FormSelect.init(this.$refs.instance);
+        }
       });
 
-      this.$M.FormSelect.init(this.$refs.client);
-      this.$M.FormSelect.init(this.$refs['java-version']);
-      this.$M.FormSelect.init(this.$refs.instance);
       this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
     },
     start() {
-      this.build.summary = this.report.build.starting;
+      this.build.started = true;
+      this.build.summary = 'Build will start shortly ...';
 
       this.$store.dispatch('extranet/startBuild', {
         branch: this.branch,
-        client: this.build.client,
-        java_version: this.build.javaVersion,
-        instance: this.build.instance,
+        client: this.form.client,
+        java_version: this.form.javaVersion,
+        instance: this.form.instance,
       })
         .then((build) => {
+          this.build.status = 'running';
+
           if (!client.connected) {
             return;
           }
@@ -197,11 +173,18 @@ export default {
             (message) => {
               const data = JSON.parse(message.body);
 
-              this.build.summary = this.report[data.action][data.status];
+              if (data.summary) {
+                this.build.summary = data.summary;
+              }
               this.build.progress = data.progress || null;
-              this.build.log += data.log || '';
+
+              if (data.log) {
+                this.build.log += data.log;
+                this.scrollLogContainer();
+              }
 
               if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
+                this.build.status = data.status;
                 this.$store.dispatch('extranet/getContainers');
                 subscribe.unsubscribe();
               }
@@ -210,10 +193,17 @@ export default {
           );
         })
         .catch((error) => {
-          this.build.summary = this.report.build.failed;
+          this.build.status = 'failed';
+          this.build.summary = 'Could not start build';
           this.build.log = error;
         });
     },
+    scrollLogContainer() {
+      setTimeout(() => {
+        var container = this.$el.querySelector(".log");
+        container.scrollTop = container.scrollHeight;
+      }, 100);
+    }
   },
   mounted() {
     this.getClients();
