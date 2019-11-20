@@ -46,19 +46,24 @@
           </template>
           <template v-else>
             <div key="build" >
-              <div class="row">
+
+              <div v-if="build.status === 'success'" class="center" >
+                <i class="material-icons large green-text">check_circle_outline</i>
+                <p>Build completed successfully</p>
+              </div>
+
+              <div v-else-if="build.status === 'failed'" class="center">
+                <i class="material-icons large red-text">error_outline</i>
+                <p>{{ build.error || build.summary }}</p>
+              </div>
+
+              <div v-else class="row">
                 <div class="col s12">
                   <p>{{ build.summary }}</p>
-                  <div v-if="build.status === 'running'" class="progress">
-                    <div
-                      v-if="build.progress"
-                      class="determinate"
-                      :style="{width: build.progress + '%'}">
-                    </div>
-                    <div v-else class="indeterminate"></div>
-                  </div>
+                  <Progress v-if="build.status === 'running'" :progress="build.progress"></Progress>
                 </div>
               </div>
+
               <div class="row">
                 <div class="col s12">
                   <div class="log">{{ build.log }}</div>
@@ -75,13 +80,13 @@
       </Modal>
 
     </div>
-
   </div>
 </template>
 
 <script>
 
 import Modal from '@/components/partials/Modal';
+import Progress from '@/components/partials/Progress';
 import client from '@/plugins/ws';
 
 function initialState() {
@@ -98,6 +103,7 @@ function initialState() {
       summary: '',
       progress: null,
       log: '',
+      error: null,
     },
   };
 }
@@ -105,6 +111,7 @@ function initialState() {
 export default {
   components: {
     Modal,
+    Progress,
   },
   data() {
     return initialState();
@@ -140,8 +147,8 @@ export default {
       this.$store.dispatch('mmpi/getInstances', payload).then(() => loader.hide());
     },
     open() {
-      this.form = initialState()['form'];
-      this.build = initialState()['build'];
+      this.form = initialState().form;
+      this.build = initialState().build;
 
       this.showModal = true;
     },
@@ -160,7 +167,7 @@ export default {
         java_version: this.form.javaVersion,
         instance: this.form.instance,
       })
-        .then((build) => {
+        .then((response) => {
           this.build.status = 'running';
 
           if (!client.connected) {
@@ -168,7 +175,7 @@ export default {
           }
 
           const subscribe = client.subscribe(
-            `/queue/${build.broadcast.queue}`,
+            `/queue/${response.data.broadcast.queue}`,
             (message) => {
               const data = JSON.parse(message.body);
 
@@ -188,21 +195,25 @@ export default {
                 subscribe.unsubscribe();
               }
             },
-            build.broadcast,
+            response.data.broadcast,
           );
         })
         .catch((error) => {
           this.build.status = 'failed';
           this.build.summary = 'Could not start build';
-          this.build.log = error;
+          if (error.response.status === 403) {
+            this.build.error = 'You do not have insufficient rights to remove this build';
+          } else {
+            this.build.error = error;
+          }
         });
     },
     scrollLogContainer() {
       setTimeout(() => {
-        var container = this.$el.querySelector(".log");
+        const container = this.$el.querySelector('.log');
         container.scrollTop = container.scrollHeight;
       }, 100);
-    }
+    },
   },
   mounted() {
     this.getClients();

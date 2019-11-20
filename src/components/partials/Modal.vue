@@ -14,18 +14,18 @@
 </template>
 
 <script>
-  export default {
-    mounted() {
-      this.$M.Modal
-        .init(this.$el, {
-          dismissible: false,
-          preventScrolling: true,
-          onOpenStart: () => this.$emit('open'),
-          onOpenEnd: () => this.$emit('opened'),
-          onCloseStart: () => this.$emit('close'),
-          onCloseEnd: () => this.$emit('closed')
-        })
-        .open();
-    },
-  };
+export default {
+  mounted() {
+    this.$M.Modal
+      .init(this.$el, {
+        dismissible: false,
+        preventScrolling: true,
+        onOpenStart: () => this.$emit('open'),
+        onOpenEnd: () => this.$emit('opened'),
+        onCloseStart: () => this.$emit('close'),
+        onCloseEnd: () => this.$emit('closed'),
+      })
+      .open();
+  },
+};
 </script>

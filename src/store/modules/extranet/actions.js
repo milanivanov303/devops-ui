@@ -36,15 +36,18 @@ export default {
       commit('error', err);
     }
   },
-  async startBuild({ commit }, payload) {
+  startBuild({ commit }, payload) {
     try {
-      const response = await api.post('extranet/build', payload);
-      return response.data;
+      return api.post('extranet/build', payload);
     } catch (err) {
       return commit('error', err);
     }
   },
-  async removeBuild({ commit }, id) {
-    return await api.delete(`extranet/build/${id}`);
+  removeBuild({ commit }, id) {
+    try {
+      return api.delete(`extranet/build/${id}`);
+    } catch (err) {
+      return commit('error', err);
+    }
   },
 };
