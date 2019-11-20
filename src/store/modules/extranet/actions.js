@@ -38,10 +38,13 @@ export default {
   },
   async startBuild({ commit }, payload) {
     try {
-      const response = await api.post('extranet/start-build', payload);
+      const response = await api.post('extranet/build', payload);
       return response.data;
     } catch (err) {
       return commit('error', err);
     }
+  },
+  async removeBuild({ commit }, id) {
+    return await api.delete(`extranet/build/${id}`);
   },
 };

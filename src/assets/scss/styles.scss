@@ -284,22 +284,27 @@ p {
     will-change: transform;
     transform: translate(100%, 0) scale(1) !important;
     opacity: 1 !important;
-  
+
     @media #{$small-and-down} {
       width: 90%;
       left: 0;
     }
-  }
+}
   
-  .modal.right-sheet.open {
-     transition: transform cubic-bezier(0.22, 0.61, 0.36, 1) .35s .25s;
-  }
+.modal.right-sheet.open {
+    transition: transform cubic-bezier(0.22, 0.61, 0.36, 1) .35s .25s;
+}
   
-  .modal.right-sheet.open:not([style*="display: none"]):not([style*="opacity: 0;"]) {
+.modal.right-sheet.open:not([style*="display: none"]):not([style*="opacity: 0;"]) {
     transform: translate(0, 0%) !important;
-  }
+}
 
-  .datetime-theme {
+.modal.confirm {
+    width: 30%;
+    height: 30%;
+}
+
+.datetime-theme {
     .vdatetime-popup__header,
     .vdatetime-calendar__month__day--selected > span > span,
     .vdatetime-calendar__month__day--selected:hover > span > span {
@@ -310,8 +315,8 @@ p {
     .vdatetime-popup__actions__button {
         color: $sidenav-bg-color;
     }
-  }   
-  .datetime-input {
+}
+.datetime-input {
     max-width: calc(100% - 3rem) !important;
     float: right !important;
-  }
+}

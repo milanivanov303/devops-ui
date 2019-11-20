@@ -45,6 +45,10 @@ class Api {
   post(uri, data) {
     return this.axios.post(`${this.url}/${uri}`, data);
   }
+
+  delete(uri) {
+    return this.axios.delete(`${this.url}/${uri}`);
+  }
 }
 
 export default Api;

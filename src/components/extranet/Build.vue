@@ -1,10 +1,11 @@
 <template>
   <div class="row">
     <div class="col s12" >
-      <button class="btn" @click="open()">Start</button>
-      <div ref="start-build-modal" class="modal right-sheet">
-        <div class="modal-content">
-          <h4 class="left-align">Build</h4>
+      <button class="btn" @click="open()">Create new build</button>
+
+      <Modal v-if="showModal" @close="showModal = false" @opened="initForm()" class="right-sheet">
+        <template v-slot:header>Create new build</template>
+        <template v-slot:content>
           <template v-if="build.started === false">
             <div key="form" >
               <div class="row">
@@ -12,8 +13,8 @@
                   <select id="client" ref="client" v-model="form.client">
                     <option disabled value="">Choose client</option>
                     <option v-for="(client, index) in clients"
-                           :value="client"
-                           :key="index">{{ client.name }}</option>
+                            :value="client"
+                            :key="index">{{ client.name }}</option>
                   </select>
                   <label for="client">Client</label>
                 </div>
@@ -65,27 +66,27 @@
               </div>
             </div>
           </template>
-        </div>
-        <div class="modal-footer">
-          <button
-            :class="{ 'waves-effect': true, btn: true, disabled: build.summary }"
-            @click="start()"
-          >
+        </template>
+        <template v-slot:footer>
+          <button v-if="!build.started" class="waves-effect btn" @click="start()">
             Start
           </button>
-          <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
-        </div>
-      </div>
+        </template>
+      </Modal>
+
     </div>
+
   </div>
 </template>
 
 <script>
 
+import Modal from '@/components/partials/Modal';
 import client from '@/plugins/ws';
 
 function initialState() {
   return {
+    showModal: false,
     form: {
       client: [],
       javaVersion: 8,
@@ -102,6 +103,9 @@ function initialState() {
 }
 
 export default {
+  components: {
+    Modal,
+  },
   data() {
     return initialState();
   },
@@ -139,17 +143,12 @@ export default {
       this.form = initialState()['form'];
       this.build = initialState()['build'];
 
-      this.$M.Modal.init(this.$refs['start-build-modal'], {
-        dismissible: false,
-        preventScrolling: true,
-        onOpenEnd: () => {
-          this.$M.FormSelect.init(this.$refs.client);
-          this.$M.FormSelect.init(this.$refs['java-version']);
-          this.$M.FormSelect.init(this.$refs.instance);
-        }
-      });
-
-      this.$M.Modal.getInstance(this.$refs['start-build-modal']).open();
+      this.showModal = true;
+    },
+    initForm() {
+      this.$M.FormSelect.init(this.$refs.client);
+      this.$M.FormSelect.init(this.$refs['java-version']);
+      this.$M.FormSelect.init(this.$refs.instance);
     },
     start() {
       this.build.started = true;
