@@ -1,26 +1,30 @@
 <template>
   <div class="row">
     <div class="col s12" >
-      <button class="btn" @click="open()">Create new build</button>
+      <button class="btn" @click="open()">
+        <i class="material-icons left">add</i> New build
+      </button>
 
       <Modal v-if="showModal" @close="showModal = false" @opened="initForm()" class="right-sheet">
-        <template v-slot:header>Create new build</template>
+        <template v-slot:header>New build</template>
         <template v-slot:content>
           <template v-if="build.started === false">
             <div key="form" >
               <div class="row">
-                <div class="input-field col s12">
-                  <select id="client" ref="client" v-model="form.client">
-                    <option disabled value="">Choose client</option>
-                    <option v-for="(client, index) in clients"
-                            :value="client"
-                            :key="index">{{ client.name }}</option>
-                  </select>
-                  <label for="client">Client</label>
+                <div class="col s12" >
+                  <Autocomplete
+                    label="Client"
+                    icon="people"
+                    :items="clients"
+                    @select="form.client = $event"
+                    :invalid="$v.form.client.$error"
+                    @blur="$v.form.client.$touch()"
+                  />
                 </div>
               </div>
               <div class="row">
                 <div class="input-field col s12">
+                  <i class="material-icons prefix" >history</i>
                   <select id="java-version" ref="java-version" v-model="form.javaVersion">
                     <option value="4">4</option>
                     <option value="5">5</option>
@@ -32,14 +36,15 @@
                 </div>
               </div>
               <div class="row">
-                <div class="input-field col s12">
-                  <select id="instance" ref="instance" v-model="form.instance">
-                    <option disabled value="">Choose instance</option>
-                    <option v-for="(instance, index) in instances"
-                            :value="instance"
-                            :key="index">{{ instance.name }}</option>
-                  </select>
-                  <label for="instance">Instance</label>
+                <div class="col s12" >
+                  <Autocomplete
+                    label="Instance"
+                    icon="dynamic_feed"
+                    :items="instances"
+                    @select="form.instance = $event"
+                    :invalid="$v.form.instance.$error"
+                    @blur="$v.form.instance.$touch()"
+                  />
                 </div>
               </div>
             </div>
@@ -74,7 +79,7 @@
         </template>
         <template v-slot:footer>
           <button v-if="!build.started" class="waves-effect btn" @click="start()">
-            Start
+            <i class="material-icons left">play_arrow</i> Start
           </button>
         </template>
       </Modal>
@@ -85,17 +90,20 @@
 
 <script>
 
+import { required } from 'vuelidate/lib/validators';
 import Modal from '@/components/partials/Modal';
+import Autocomplete from '@/components/partials/Autocomplete';
 import Progress from '@/components/partials/Progress';
 import client from '@/plugins/ws';
+
 
 function initialState() {
   return {
     showModal: false,
     form: {
-      client: [],
+      client: null,
       javaVersion: 8,
-      instance: [],
+      instance: null,
     },
     build: {
       started: false,
@@ -111,6 +119,7 @@ function initialState() {
 export default {
   components: {
     Modal,
+    Autocomplete,
     Progress,
   },
   data() {
@@ -125,6 +134,22 @@ export default {
     },
     instances() {
       return this.$store.state.mmpi.instances;
+    },
+  },
+  validations: {
+    form: {
+      client: {
+        required,
+        name: {
+          required,
+        },
+      },
+      instance: {
+        required,
+        name: {
+          required,
+        },
+      },
     },
   },
   methods: {
@@ -142,6 +167,9 @@ export default {
             { instance_type_id: 'VAL' },
           ],
         }),
+        orders: JSON.stringify({
+          name: 'asc',
+        }),
       };
 
       this.$store.dispatch('mmpi/getInstances', payload).then(() => loader.hide());
@@ -153,20 +181,25 @@ export default {
       this.showModal = true;
     },
     initForm() {
-      this.$M.FormSelect.init(this.$refs.client);
       this.$M.FormSelect.init(this.$refs['java-version']);
-      this.$M.FormSelect.init(this.$refs.instance);
     },
     start() {
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        return;
+      }
+
       this.build.started = true;
       this.build.summary = 'Build will start shortly ...';
 
-      this.$store.dispatch('extranet/startBuild', {
+      const payload = {
         branch: this.branch,
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-      })
+      };
+
+      this.$store.dispatch('extranet/startBuild', payload)
         .then((response) => {
           this.build.status = 'running';
 
@@ -202,7 +235,7 @@ export default {
           this.build.status = 'failed';
           this.build.summary = 'Could not start build';
           if (error.response.status === 403) {
-            this.build.error = 'You do not have insufficient rights to remove this build';
+            this.build.error = 'You do not have insufficient rights to create build';
           } else {
             this.build.error = error;
           }

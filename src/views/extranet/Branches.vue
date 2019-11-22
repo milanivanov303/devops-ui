@@ -13,10 +13,14 @@
           </div>
         </div>
       </div>
-      <div class="col s12 m6 l7 card">
-        <transition name="branch-info" mode="out-in">
-          <router-view :key="$route.path"/>
-        </transition>
+      <div class="col s12 m6 l7">
+        <div class="card">
+          <div class="card-content">
+            <transition name="branch-info" mode="out-in">
+              <router-view :key="$route.path"/>
+            </transition>
+          </div>
+        </div>
       </div>
     </div>
   </div>

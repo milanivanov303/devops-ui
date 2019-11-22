@@ -1,9 +1,16 @@
 <template>
   <div class="modal modal-fixed-footer">
     <div class="modal-content">
-      <h4>
-        <slot name="header"></slot>
-      </h4>
+      <div class="row">
+        <div class="col s12">
+          <h4 class="left">
+            <slot name="header"></slot>
+          </h4>
+          <a href="#!" class="modal-close waves-effect waves-green btn-flat right">
+            <i class="material-icons">close</i>
+          </a>
+        </div>
+      </div>
       <slot name="content"></slot>
     </div>
     <div class="modal-footer">

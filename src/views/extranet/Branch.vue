@@ -5,78 +5,7 @@
         <h4>{{ branch }}</h4>
       </div>
     </div>
-
-    <table>
-      <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Created By</th>
-        <th>Url</th>
-        <th></th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="(container, index) in containers" :key="index">
-        <td>{{ index+1 }}</td>
-        <td>{{ container.Labels.build }}</td>
-        <td>{{ container.Status }}</td>
-        <td>{{ container.Labels.username }}</td>
-        <td>
-          <a
-            v-if="container.State === 'running'"
-            :href="getDeployedBuildUrl(container)"
-            target="_blank"
-          >
-            <i class="material-icons">cast_connected</i>
-          </a>
-        </td>
-        <td>
-          <button
-            class="btn-small red"
-            title="Remove build"
-            @click="openRemoveBuildModal(container)"
-          >
-            <i class="material-icons left">delete</i> Remove
-          </button>
-        </td>
-      </tr>
-      <tr v-if="containers.length === 0">
-        <td colspan="5">There are no running builds for this branch</td>
-      </tr>
-      </tbody>
-    </table>
-
-    <Modal v-if="build.showModal" @close="build.showModal = false" class="confirm">
-      <template v-slot:content>
-        <div v-if="build.removing" class="center" >
-          <Preloader class="big"></Preloader>
-          <p>Removing build <b>{{ build.container.Labels.build }}</b> ... </p>
-        </div>
-        <div v-else-if="build.removed" class="center" >
-          <i class="material-icons large green-text">check_circle_outline</i>
-          <p>Build was removed successfully</p>
-        </div>
-        <div v-else-if="build.error" class="center">
-          <i class="material-icons large red-text">error_outline</i>
-          <p>{{ build.error }}</p>
-        </div>
-        <div v-else>
-          Are you sure you what to remove <b>{{ build.container.Labels.build }}</b> build?
-        </div>
-      </template>
-      <template v-slot:footer>
-        <button
-          v-if="!build.removing && !build.removed"
-          class="waves-effect btn"
-          @click="removeBuild(build.container)"
-        >
-          Remove
-        </button>
-      </template>
-    </Modal>
-
+    <Builds :containers="containers"></Builds>
     <br>
     <Build />
   </div>
@@ -84,8 +13,7 @@
 
 <script>
 import Build from '@/components/extranet/Build';
-import Modal from '@/components/partials/Modal';
-import Preloader from '@/components/partials/Preloader';
+import Builds from '@/components/extranet/Builds';
 
 function initialState() {
   return {
@@ -102,8 +30,7 @@ function initialState() {
 export default {
   components: {
     Build,
-    Modal,
-    Preloader,
+    Builds,
   },
   data() {
     return initialState();
