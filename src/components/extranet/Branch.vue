@@ -22,10 +22,10 @@ export default {
   methods: {
     getRoute(branch) {
       return {
-        path: '/extranet/branches/' + branch.name,
-        query: this.$route.query
+        path: `/extranet/branches/${branch.name}`,
+        query: this.$route.query,
       };
-    }
-  }
+    },
+  },
 };
 </script>

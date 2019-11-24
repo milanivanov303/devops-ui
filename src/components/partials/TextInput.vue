@@ -16,34 +16,34 @@
 </template>
 
 <script lang="js">
-  export default {
-    props: {
-      id: String,
-      type: String,
-      label: String,
-      icon: String,
-      value: String,
-      invalid: Boolean,
+export default {
+  props: {
+    id: String,
+    type: String,
+    label: String,
+    icon: String,
+    value: String,
+    invalid: Boolean,
+  },
+  data() {
+    return {
+      inputId: this.getInputId(),
+      inputType: this.getInputType(),
+    };
+  },
+  methods: {
+    getInputId() {
+      if (this.id) {
+        return this.id;
+      }
+      return `el-${Math.random()}`;
     },
-    data() {
-      return {
-        inputId: this.getInputId(),
-        inputType: this.getInputType(),
-      };
+    getInputType() {
+      return this.type || 'text';
     },
-    methods: {
-      getInputId() {
-        if (this.id) {
-          return this.id;
-        }
-        return `el-${Math.random()}`;
-      },
-      getInputType() {
-        return this.type || 'text';
-      },
-    },
-    mounted() {
-      this.$M.updateTextFields();
-    },
-  };
+  },
+  mounted() {
+    this.$M.updateTextFields();
+  },
+};
 </script>

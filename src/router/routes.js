@@ -74,8 +74,8 @@ export default [
               name: 'extranet-branch',
               requiresAuth: true,
               transitionName: 'slide',
-              title: (params) => params.branch,
-              breadcrumb: (params) => params.branch
+              title: params => params.branch,
+              breadcrumb: params => params.branch,
             },
             component: ExtranetBranch,
           },

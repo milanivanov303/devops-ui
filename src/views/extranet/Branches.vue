@@ -33,63 +33,61 @@
 </template>
 
 <script>
-  import Branch from '@/components/extranet/Branch';
-  import Autocomplete from "@/components/partials/Autocomplete";
-  import TextInput from "@/components/partials/TextInput";
+import Branch from '@/components/extranet/Branch';
+import TextInput from '@/components/partials/TextInput';
 
-  export default {
-    components: {
-      TextInput,
-      Autocomplete,
-      Branch,
+export default {
+  components: {
+    TextInput,
+    Branch,
+  },
+  data() {
+    return {
+      search: this.$route.query.search,
+    };
+  },
+  computed: {
+    branches() {
+      return this.$store.state.extranet.branches;
     },
-    data() {
-      return {
-        search: this.$route.query.search
-      };
-    },
-    computed: {
-      branches() {
-        return this.$store.state.extranet.branches;
-      },
-      filteredBranches() {
-        if (!this.search) {
-          return this.branches;
-        }
+    filteredBranches() {
+      if (!this.search) {
+        return this.branches;
+      }
 
-        const regexp = new RegExp(this.search, 'i');
-        return this.branches.filter(branch => branch.name.match(regexp));
-      },
-      containers() {
-        return this.$store.state.extranet.containers;
-      },
+      const regexp = new RegExp(this.search, 'i');
+      return this.branches.filter(branch => branch.name.match(regexp));
     },
-    methods: {
-      getContainersCount(branch) {
-        return this.$store.getters['extranet/getContainersByBranch'](branch).length;
-      },
-      getBranches() {
-        const loader = this.$loading.show({ container: this.$el });
-        this.$store.dispatch('extranet/getBranches').then(() => loader.hide());
-      },
-      getContainers() {
-        this.$store.dispatch('extranet/getContainers');
-      },
+    containers() {
+      return this.$store.state.extranet.containers;
     },
-    mounted() {
-      this.getBranches();
-      this.getContainers();
+  },
+  methods: {
+    getContainersCount(branch) {
+      return this.$store.getters['extranet/getContainersByBranch'](branch).length;
     },
-    watch: {
-      search(value) {
-        let query = {};
-        if (value) {
-          query = { search: value };
-        }
-        this.$router.push({ query });
-      },
+    getBranches() {
+      const loader = this.$loading.show({ container: this.$el });
+      this.$store.dispatch('extranet/getBranches').then(() => loader.hide());
     },
-  };
+    getContainers() {
+      this.$store.dispatch('extranet/getContainers');
+    },
+  },
+  mounted() {
+    this.getBranches();
+    this.getContainers();
+  },
+  watch: {
+    search(value) {
+      let query = {};
+      if (value) {
+        query = { search: value };
+      }
+      this.$router.push({ query });
+    },
+  },
+};
 </script>
 
 <style lang="scss">

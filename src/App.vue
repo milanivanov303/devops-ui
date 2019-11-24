@@ -7,33 +7,33 @@
 </template>
 
 <script lang="js">
-  export default {
-    data() {
-      return {
-        defaultTitle: document.title
-      };
+export default {
+  data() {
+    return {
+      defaultTitle: document.title,
+    };
+  },
+  computed: {
+    layout() {
+      return `${this.$route.meta.layout || 'default'}-layout`;
     },
-    computed: {
-      layout() {
-        return `${this.$route.meta.layout || 'default'}-layout`;
-      },
-    },
-    watch: {
-      $route (to) {
-        if (to.meta.title) {
-          document.title = `${this.getTitle(to)} | ${this.defaultTitle}`;
-        }
+  },
+  watch: {
+    $route(to) {
+      if (to.meta.title) {
+        document.title = `${this.getTitle(to)} | ${this.defaultTitle}`;
       }
     },
-    methods: {
-      getTitle(route) {
-        if (typeof route.meta.title === 'function') {
-          return route.meta.title(this.$route.params);
-        }
-        return route.meta.title;
+  },
+  methods: {
+    getTitle(route) {
+      if (typeof route.meta.title === 'function') {
+        return route.meta.title(this.$route.params);
       }
-    }
-  };
+      return route.meta.title;
+    },
+  },
+};
 </script>
 
 <style lang="scss">

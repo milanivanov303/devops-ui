@@ -28,27 +28,27 @@
 </template>
 
 <script lang="js">
-  import Breadcrumbs from "@/components/layouts/Breadcrumbs";
+import Breadcrumbs from '@/components/layouts/Breadcrumbs';
 
-  export default {
-    components: {
-      Breadcrumbs
+export default {
+  components: {
+    Breadcrumbs,
+  },
+  computed: {
+    user() {
+      return this.$store.getters.user;
     },
-    computed: {
-      user() {
-        return this.$store.getters.user;
-      },
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch('logout')
+        .then(() => {
+          this.$router.push('/login');
+        });
     },
-    methods: {
-      logout() {
-        this.$store.dispatch('logout')
-          .then(() => {
-            this.$router.push('/login');
-          });
-      },
-    },
-    mounted() {
-      this.$M.Dropdown.init(this.$refs['profile-dropdown']);
-    },
-  };
+  },
+  mounted() {
+    this.$M.Dropdown.init(this.$refs['profile-dropdown']);
+  },
+};
 </script>

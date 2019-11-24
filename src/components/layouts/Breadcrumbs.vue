@@ -3,11 +3,8 @@
       <li>
         <router-link to="/">Home</router-link>
       </li>
-      <li v-for="(route, index) in routes">
-        <router-link
-          :to="(index < Object.keys(routes).length - 1) ? route.path : ''"
-          :key="route.path"
-        >
+      <li v-for="(route, index) in routes" :key="route.path">
+        <router-link :to="(index < Object.keys(routes).length - 1) ? route.path : ''">
           {{ getBreadcrumb(route) }}
         </router-link>
       </li>
@@ -15,21 +12,21 @@
 </template>
 
 <script lang="js">
-  export default {
-    computed: {
-      routes() {
-        return this.$route.matched;
-      },
+export default {
+  computed: {
+    routes() {
+      return this.$route.matched;
     },
-    methods: {
-      getBreadcrumb(route) {
-        if (typeof route.meta.breadcrumb === 'function') {
-          return route.meta.breadcrumb(this.$route.params);
-        }
-        return route.meta.breadcrumb;
+  },
+  methods: {
+    getBreadcrumb(route) {
+      if (typeof route.meta.breadcrumb === 'function') {
+        return route.meta.breadcrumb(this.$route.params);
       }
-    }
-  };
+      return route.meta.breadcrumb;
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
