@@ -1,22 +1,28 @@
 <template>
   <div class="branches">
     <div class="row">
-      <div v-if="$route.meta.name !== 'extranet-build'"
-           :class="{'col s12 m6 l5': $route.meta.name === 'extranet-branch'}">
-        <div v-bind:key="branch.name" v-for="branch in branches">
-          <div :class="{'col s12 m6 l4': $route.meta.name === 'extranet-branches'}">
-            <Branch
-              :branch="branch"
-              :count="getContainersCount(branch.name)"
-              :class="{'selected-branch': $route.path === `/extranet/branches/${branch.name}`}"
-            />
-          </div>
+      <div class="col s12 m6 l6">
+        <TextInput label="Search" icon="search" v-model="search"/>
+      </div>
+    </div>
+    <div class="row">
+      <div :class="{'col s12 m6 l5 scroll': $route.meta.name === 'extranet-branch'}">
+        <div
+          :class="{'col s12 m6 l4': $route.meta.name === 'extranet-branches'}"
+          :key="branch.name"
+          v-for="branch in filteredBranches"
+        >
+          <Branch
+            :branch="branch"
+            :count="getContainersCount(branch.name)"
+            :class="{'selected-branch': $route.path === `/extranet/branches/${branch.name}`}"
+          />
         </div>
       </div>
-      <div class="col s12 m6 l7">
+      <div v-if="$route.meta.name === 'extranet-branch'" class="col s12 m6 l7">
         <div class="card">
           <div class="card-content">
-            <transition name="branch-info" mode="out-in">
+            <transition name="branch" mode="out-in">
               <router-view :key="$route.path"/>
             </transition>
           </div>
@@ -27,48 +33,71 @@
 </template>
 
 <script>
-import Branch from '@/components/extranet/Branch';
+  import Branch from '@/components/extranet/Branch';
+  import Autocomplete from "@/components/partials/Autocomplete";
+  import TextInput from "@/components/partials/TextInput";
 
-export default {
-  components: {
-    Branch,
-  },
-  computed: {
-    branches() {
-      return this.$store.state.extranet.branches;
+  export default {
+    components: {
+      TextInput,
+      Autocomplete,
+      Branch,
     },
-    containers() {
-      return this.$store.state.extranet.containers;
+    data() {
+      return {
+        search: this.$route.query.search
+      };
     },
-  },
-  methods: {
-    getContainersCount(branch) {
-      return this.$store.getters['extranet/getContainersByBranch'](branch).length;
+    computed: {
+      branches() {
+        return this.$store.state.extranet.branches;
+      },
+      filteredBranches() {
+        if (!this.search) {
+          return this.branches;
+        }
+
+        const regexp = new RegExp(this.search, 'i');
+        return this.branches.filter(branch => branch.name.match(regexp));
+      },
+      containers() {
+        return this.$store.state.extranet.containers;
+      },
     },
-    getBranches() {
-      const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('extranet/getBranches').then(() => loader.hide());
+    methods: {
+      getContainersCount(branch) {
+        return this.$store.getters['extranet/getContainersByBranch'](branch).length;
+      },
+      getBranches() {
+        const loader = this.$loading.show({ container: this.$el });
+        this.$store.dispatch('extranet/getBranches').then(() => loader.hide());
+      },
+      getContainers() {
+        this.$store.dispatch('extranet/getContainers');
+      },
     },
-    getContainers() {
-      this.$store.dispatch('extranet/getContainers');
+    mounted() {
+      this.getBranches();
+      this.getContainers();
     },
-  },
-  mounted() {
-    this.getBranches();
-    this.getContainers();
-  },
-};
+    watch: {
+      search(value) {
+        let query = {};
+        if (value) {
+          query = { search: value };
+        }
+        this.$router.push({ query });
+      },
+    },
+  };
 </script>
 
-<style>
-.selected-branch{
-  background-color: #ccc;
-}
-.branch-info-enter-active {
-  transition: opacity 1s, transform 1s;
-}
-.branch-info-enter {
-  opacity: 0;
-  transform: translateX(20%);
-}
+<style lang="scss">
+  .selected-branch {
+    background-color: #ccc;
+  }
+  .scroll {
+    max-height: 72.5vh;
+    overflow-x: auto;
+  }
 </style>

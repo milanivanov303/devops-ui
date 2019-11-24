@@ -15,25 +15,10 @@
 import Build from '@/components/extranet/Build';
 import Builds from '@/components/extranet/Builds';
 
-function initialState() {
-  return {
-    build: {
-      container: null,
-      showModal: false,
-      removing: false,
-      removed: false,
-      error: null,
-    },
-  };
-}
-
 export default {
   components: {
     Build,
     Builds,
-  },
-  data() {
-    return initialState();
   },
   computed: {
     branch() {
@@ -41,9 +26,6 @@ export default {
     },
     containers() {
       return this.$store.getters['extranet/getContainersByBranch'](this.branch);
-    },
-    host() {
-      return this.$store.state.extranet.host;
     },
   },
   methods: {

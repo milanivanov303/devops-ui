@@ -2,18 +2,13 @@
   <div class="page">
     <Header />
     <main>
-      <Breadcrumbs />
       <div class="row">
         <div class="col s12">
-          <div class="card">
-            <div class="card-content">
-              <transition
-                :name="transitionName"
-                mode="out-in">
-                <slot />
-              </transition>
-            </div>
-          </div>
+          <transition
+            :name="transitionName"
+            mode="out-in">
+            <slot />
+          </transition>
         </div>
       </div>
     </main>
@@ -24,14 +19,12 @@
 <script>
 import Header from '@/components/layouts/Header';
 import Footer from '@/components/layouts/Footer';
-import Breadcrumbs from '@/components/layouts/Breadcrumbs';
 
 const DEFAULT_TRANSITION = 'fade';
 
 export default {
   components: {
     Header,
-    Breadcrumbs,
     Footer,
   },
   data() {
@@ -58,5 +51,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../../assets/scss/styles";
+  main {
+      padding-top: 1rem;
+  }
 </style>

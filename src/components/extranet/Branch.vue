@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-content">
       <div class="card-title">
-        <router-link v-bind:to="'/extranet/branches/' + branch.name" class="collection-item">
+        <router-link v-bind:to="getRoute(branch)" class="collection-item">
           <span class="badge" v-if="count">{{ count }}</span>
           {{ branch.name }}
         </router-link>
@@ -19,5 +19,13 @@ export default {
     branch: {},
     count: {},
   },
+  methods: {
+    getRoute(branch) {
+      return {
+        path: '/extranet/branches/' + branch.name,
+        query: this.$route.query
+      };
+    }
+  }
 };
 </script>

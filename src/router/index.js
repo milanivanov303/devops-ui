@@ -40,6 +40,7 @@ router.beforeEach((to, from, next) => {
       return next(`/login?return_uri=${to.fullPath}`);
     }
   }
+
   return next();
 });
 

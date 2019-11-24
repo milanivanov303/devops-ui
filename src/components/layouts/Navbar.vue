@@ -1,6 +1,7 @@
 <template>
   <nav class="top-nav">
     <div class="nav-wrapper">
+      <Breadcrumbs />
       <a href="#" data-target="nav-mobile" class="sidenav-trigger">
         <i class="material-icons">menu</i>
       </a>
@@ -26,23 +27,28 @@
   </nav>
 </template>
 
-<script>
-export default {
-  computed: {
-    user() {
-      return this.$store.getters.user;
+<script lang="js">
+  import Breadcrumbs from "@/components/layouts/Breadcrumbs";
+
+  export default {
+    components: {
+      Breadcrumbs
     },
-  },
-  methods: {
-    logout() {
-      this.$store.dispatch('logout')
-        .then(() => {
-          this.$router.push('/login');
-        });
+    computed: {
+      user() {
+        return this.$store.getters.user;
+      },
     },
-  },
-  mounted() {
-    this.$M.Dropdown.init(this.$refs['profile-dropdown']);
-  },
-};
+    methods: {
+      logout() {
+        this.$store.dispatch('logout')
+          .then(() => {
+            this.$router.push('/login');
+          });
+      },
+    },
+    mounted() {
+      this.$M.Dropdown.init(this.$refs['profile-dropdown']);
+    },
+  };
 </script>

@@ -21,6 +21,9 @@
               </a>
               <div class="collapsible-body">
                 <ul>
+                  <li class="white-text" v-bind:class="{ active: isActive('extranet/dashboard') }">
+                    <router-link to="/extranet/dashboard"> Dashboard</router-link>
+                  </li>
                   <li class="white-text" v-bind:class="{ active: isActive('extranet/branches') }">
                     <router-link to="/extranet/branches"> Branches</router-link>
                   </li>

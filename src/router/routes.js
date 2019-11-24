@@ -1,8 +1,9 @@
 import store from '../store';
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
-const Branches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
-const Branch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
+const ExtranetDashboard = () => import(/* webpackChunkName: "extranet-dashboard" */ '../views/extranet/Dashboard.vue');
+const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
+const ExtranetBranch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
 const Demo = () => import(/* webpackChunkName: "demo" */ '../views/Demo.vue');
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 
@@ -35,24 +36,50 @@ export default [
     component: Dashboard,
   },
   {
-    path: '/extranet/branches',
+    path: '/extranet',
     meta: {
-      breadcrumb: 'Extranet',
       requiresAuth: true,
-      name: 'extranet-branches',
+      name: 'extranet',
       transitionName: 'slide',
+      title: 'Extranet Dashboard',
+      breadcrumb: 'Extranet',
     },
-    component: Branches,
+    component: ExtranetDashboard,
     children: [
       {
-        path: ':branch',
+        path: 'dashboard',
         meta: {
-          name: 'extranet-branch',
           requiresAuth: true,
-          breadcrumb: 'Branch',
+          name: 'extranet',
           transitionName: 'slide',
+          title: 'Extranet Dashboard',
+          breadcrumb: 'Dashboard',
         },
-        component: Branch,
+        component: ExtranetDashboard,
+      },
+      {
+        path: 'branches',
+        meta: {
+          requiresAuth: true,
+          name: 'extranet-branches',
+          transitionName: 'slide',
+          title: 'Extranet Branches',
+          breadcrumb: 'Branches',
+        },
+        component: ExtranetBranches,
+        children: [
+          {
+            path: ':branch',
+            meta: {
+              name: 'extranet-branch',
+              requiresAuth: true,
+              transitionName: 'slide',
+              title: (params) => params.branch,
+              breadcrumb: (params) => params.branch
+            },
+            component: ExtranetBranch,
+          },
+        ],
       },
     ],
   },
