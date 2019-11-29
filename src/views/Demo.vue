@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div class="col s12 l11 offset-l1">
     <Table v-bind:request="request" v-on:selectedRow="selectedRow"></Table>
 
     <Modal v-if="showModal" @close="showModal = false" @opened="initForm()" class="right-sheet">
       <template v-slot:header>Schedule a demo</template>
       <template v-slot:content>
-        <form @submit.prevent="onSubmit">
+        <form @submit.prevent="onSubmit" class=" col s12 l11 offset-l1">
           <div class="row">
             <div class="input-field col s12 m7 l7" :class="{invalid: $v.modalData.name.$error}">
               <i class="material-icons prefix">person</i>

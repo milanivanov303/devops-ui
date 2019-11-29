@@ -2,21 +2,21 @@
   <ul id="nav-mobile" class="sidenav sidenav-fixed">
     <li class="logo">
       <a id="logo-container" class="brand-logo">
-        <img src="../../assets/images/logo.png" alt="DevOps Management" />
+        "DevOps Management"
       </a>
     </li>
     <li>
       <ul>
         <li v-bind:class="{ active: isActive('dashboard') }">
           <router-link to="/dashboard">
-            <i class="material-icons">laptop_chromebook</i> Dashboard
+            <i class="material-icons">web</i> Dashboard
           </router-link>
         </li>
         <li v-bind:class="{ active: isActive('extranet/branches') }">
           <ul class="collapsible collapsible-accordion">
             <li>
               <a class="collapsible-header">
-                <i class="material-icons">apps</i> Extranet
+                <i class="material-icons">laptop_chromebook</i> Extranet
                 <i class="material-icons right">arrow_drop_down</i>
               </a>
               <div class="collapsible-body">

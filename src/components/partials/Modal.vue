@@ -2,7 +2,7 @@
   <div class="modal modal-fixed-footer">
     <div class="modal-content">
       <div class="row">
-        <div class="col s12">
+        <div class="col s12 l11 offset-l1">
           <h4 class="left">
             <slot name="header"></slot>
           </h4>
@@ -10,7 +10,7 @@
             <i class="material-icons">close</i>
           </a>
         </div>
-      </div>
+      </div >
       <slot name="content"></slot>
     </div>
     <div class="modal-footer">

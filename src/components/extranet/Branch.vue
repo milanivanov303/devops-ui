@@ -1,16 +1,17 @@
 <template>
-  <div class="card">
-    <div class="card-content">
-      <div class="card-title">
-        <router-link v-bind:to="getRoute(branch)" class="collection-item">
-          <span class="badge" v-if="count">{{ count }}</span>
-          {{ branch.name }}
-        </router-link>
+  <router-link v-bind:to="getRoute(branch)" class="collection-item">
+    <div class="card">
+      <div class="card-content">
+        <div class="card-title">
+            <span class="badge" v-if="count">{{ count }}</span>
+            {{ branch.name }}
+          
+        </div>
+        <p>Hash: {{ branch.hash }}</p>
+        <p>Version: {{ branch.version }}</p>
       </div>
-      <p>Hash: {{ branch.hash }}</p>
-      <p>Version: {{ branch.version }}</p>
     </div>
-  </div>
+  </router-link>
 </template>
 
 <script>
