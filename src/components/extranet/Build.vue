@@ -16,7 +16,7 @@
                     label="Client"
                     icon="people"
                     :items="clients"
-                    @select="form.client = $event"
+                    v-model="form.client"
                     :invalid="$v.form.client.$error"
                     @blur="$v.form.client.$touch()"
                   />
@@ -41,7 +41,7 @@
                     label="Instance"
                     icon="dynamic_feed"
                     :items="instances"
-                    @select="form.instance = $event"
+                    v-model="form.instance"
                     :invalid="$v.form.instance.$error"
                     @blur="$v.form.instance.$touch()"
                   />
