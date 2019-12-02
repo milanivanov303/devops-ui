@@ -162,9 +162,22 @@ export default {
 
       const payload = {
         filters: JSON.stringify({
-          anyOf: [
-            { instance_type_id: 'DEV' },
-            { instance_type_id: 'VAL' },
+          allOf: [
+            {
+              instance_type_id: {
+                value: ['DEV', 'VAL'],
+                operator: 'in'
+              }
+            },
+            {
+              owner: {
+                allOf: [
+                  {
+                    key: "codix"
+                  }
+                ]
+              }
+            }
           ],
         }),
         orders: JSON.stringify({
