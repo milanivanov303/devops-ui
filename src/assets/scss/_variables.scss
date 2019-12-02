@@ -4,16 +4,10 @@
 // Codix colors
 // ==========================================================================
 $codix: (
-        "base":       #0090C9,
-        //"lighten-5":  #234361,
-        //"lighten-4":  #21405d,
-        //"lighten-3":  #203e59,
-        "lighten-2":  #95E0FF,
-        "lighten-1":  #00B6FF,
-        "darken-1":   #00658F,
-        "darken-2":   #003A52,
-        //"darken-3":   #182e43,
-        //"darken-4":   #172c3f,
+        "base":       #29A19C,
+        "lighten-1":  #A3F7BF,
+        "darken-1":   #393E46,
+        "darken-2":   #222831,
         "running":    color("green", "base"),
         "exited":     color("red", "base"),
         "paused":     color("yellow", "base")
@@ -40,7 +34,8 @@ $secondary-color: $primary-color !default;
 $link-color: color("codix", darken-2) !default;
 $button-color:  color("codix", darken-1) !default;
 $wrong-color: #C40147;
-$light-color:  color("codix", lighten-2) !default;
+$light-color:  color("codix", lighten-1) !default;
+$hover-color: lighten(color("codix", lighten-1), 10%);
 
 // 4. Cards
 // ==========================================================================

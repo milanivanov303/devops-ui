@@ -7,7 +7,7 @@
       <template v-slot:content>
         <form @submit.prevent="onSubmit" class=" col s12 l11 offset-l1">
           <div class="row">
-            <div class="input-field col s12 m7 l7" :class="{invalid: $v.modalData.name.$error}">
+            <div class="input-field col s12 m7 l10" :class="{invalid: $v.modalData.name.$error}">
               <i class="material-icons prefix">person</i>
               <input
                 type="text"
@@ -16,7 +16,7 @@
                 v-model="modalData.name">
               <label :class="{active: modalData.name}" for="name">Name</label>
             </div>
-            <div class="validator col s12 m4 l4 offset-l1 offset-m1">
+            <div class="validator col s12 m7 l10 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.modalData.name.$error">
                 <p v-if="!$v.modalData.name.required">Name field must not be empty.</p>
                 <p v-if="!$v.modalData.name.minLen">Name must contain at least 6 charaters.</p>
@@ -27,7 +27,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="input-field col s12 m7 l7" :class="{invalid: $v.modalData.email.$error}">
+            <div class="input-field col s12 m7 l10" :class="{invalid: $v.modalData.email.$error}">
               <i class="material-icons prefix">mail</i>
               <input
                 type="email"
@@ -36,7 +36,7 @@
                 v-model="modalData.email">
               <label :class="{active: modalData.email}" for="email">Mail</label>
             </div>
-            <div class="validator col s12 m4 l4 offset-l1 offset-m1">
+            <div class="validator col s12 m7 l10 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.modalData.email.$error">
                 <p v-if="!$v.modalData.email.email">Please provide a valid email address.</p>
                 <p v-if="!$v.modalData.email.required">Email must not be empty.</p>
@@ -47,7 +47,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="input-field col s12 m7 l7"
+            <div class="input-field col s12 m7 l10"
                  :class="{invalid: $v.modalData.company.$error}">
               <i class="material-icons prefix">business</i>
               <input
@@ -57,7 +57,7 @@
                 v-model="modalData.company">
               <label :class="{active: modalData.company}" for="company">Company</label>
             </div>
-            <div class="validator col s12 m4 l4 offset-l1 offset-m1">
+            <div class="validator col s12 m7 l10 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.modalData.company.$error">
                 <p v-if="!$v.modalData.company.required">Company field must not be empty.</p>
               </div>
@@ -67,7 +67,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="input-field col s12 m7 l7" :class="{invalid: $v.modalData.phone.$error}">
+            <div class="input-field col s12 m7 l10" :class="{invalid: $v.modalData.phone.$error}">
               <i class="material-icons prefix">call</i>
               <input
                 type="text"
@@ -76,18 +76,18 @@
                 v-model="modalData.phone">
               <label :class="{active: modalData.phone}" for="phone">Phone</label>
             </div>
-            <div class="validator col s12 m4 l4 offset-l1 offset-m1">
+            <div class="validator col s12 m7 l10 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.modalData.phone.$error">
                 <p v-if="!$v.modalData.phone.numeric">Phone field must contain only numbers.</p>
               </div>
             </div>
           </div>
           <div class="row">
-            <Select class="col s12 m7 l7"
+            <Select class="col s12 m7 l10"
                     v-if="isOpen === true"
                     :select="selectBusiness"
                     @selectedVal="selectedBusiness"/>
-            <div class="validator col s12 m4 l4 offset-l1 offset-m1">
+            <div class="validator col s12 m7 l4 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.modalData.business.error">
                 <p v-if="!$v.modalData.business.required">Business field must not be empty.</p>
               </div>

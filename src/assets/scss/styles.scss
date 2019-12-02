@@ -52,7 +52,17 @@
         }
     }
 }
-.logo{ width: 100px;}
+.codix-logo{ 
+    width: 100px;
+}
+.logo{
+    text-align: center;
+    img{
+        width: 100%;
+        
+    }
+}
+
 nav {
     background-color: $navbar-bg-color;
     border-bottom: 1px solid $navbar-border-color;
@@ -63,25 +73,22 @@ nav {
 .sidenav {
     background-color: $sidenav-bg-color;
     box-shadow: 10px 0px 10px rgba(0, 0, 0, .2);
-
-    .logo {
-        padding: 20px 0 40px;
-        text-align: center;
-    }
     
-    li > a {
-        color: white;
-        font-size: 12px;
-        padding: 0 16px;
-        & > i.material-icons {
-            color:white;
-        }
+    li {
+        a {
+            color: white;
+            font-size: 12px;
+            padding: 0 16px;
+            & > i.material-icons {
+                color:white;
+            }
 
-        &:hover {
-            background-color: lighten(color("codix", lighten-2), 5%);
-            color: $link-color;
-            i.material-icons {
+            &:hover {
+                background-color: lighten(color("codix", lighten-1), 5%);
                 color: $link-color;
+                i.material-icons {
+                    color: $link-color;
+                }
             }
         }
     }
@@ -109,6 +116,11 @@ nav {
                 }
             }
         }
+        li:hover{
+            a {
+                color: $link-color !important;
+            }
+        }
         li.active {
            a {
                 color: $link-color;
@@ -126,12 +138,12 @@ nav {
         background-color: lighten($sidenav-bg-color, 10%);
     }*/
     .collapsible-header:hover {
-        background-color: lighten(color("codix", lighten-2), 5%);
+        background-color: lighten(color("codix", lighten-1), 5%);
     }
     .collapsible-body {
-        background-color: $primary-color;
+        background-color: lighten($sidenav-bg-color, 15%);
         
-        & li.active{
+        li.active{
             a{
                 background-color: $light-color;
                 color: white;
@@ -192,17 +204,17 @@ h3 {
 
     &.error {
         @extend .red;
-        @extend .lighten-2;
+        @extend .lighten-1;
     }
 
     &.success {
         @extend .green;
-        @extend .lighten-2;
+        @extend .lighten-1;
     }
 
     &.info {
         @extend .blue;
-        @extend .lighten-2;
+        @extend .lighten-1;
     }
 }
 
@@ -311,13 +323,17 @@ p {
 
 .input-field.invalid {
   color: $wrong-color;
+  margin: 0px;
 }
 .input-field.invalid input {
   border-bottom-color: $wrong-color;
 }
 .validator {
-    margin: 1rem auto;
     font-weight: bold;
+    margin: 0px;
+    p{
+        margin: 0px;
+    }
 }
 
 .modal.right-sheet {
@@ -372,18 +388,22 @@ p {
 
 #select-branch {
     :hover {
-        background-color: color("codix", lighten-2);
+        background-color: $hover-color;
     }
 }
 
 .scroll{
     .card:hover{
-        background-color: color("codix", lighten-2);
+        background-color:$hover-color;
+        color: $link-color !important;
     }
 }
-
-
-
+a.collection-item.router-link-exact-active.router-link-active.selected-branch {
+    .card{
+            background-color: lighten($color: $sidenav-bg-color, $amount: 10%);
+            color: white;
+        }
+    }
 button{
     background-color: color("codix", base);
 }

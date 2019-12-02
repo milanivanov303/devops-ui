@@ -5,7 +5,7 @@
         <div class="col s4"></div>
         <div class="col s4 center-align"></div>
         <div class="col s4 right-align">
-          <img class="logo" src="../../assets/images/logo.png"/>
+          <img class="codix-logo" src="../../assets/images/logo.png"/>
           <div>Copyright © 2019 Codix | Devops Management v1.0</div>
         </div>
       </div>
