@@ -1,7 +1,7 @@
 <template>
     <div>
         <input type="text" value="" v-model="search" placeholder="Search">
-        <table class="responsive-table highlight">
+        <table class="responsive-table">
             <thead>
             <tr>
                 <th v-for="(value, key) in head"

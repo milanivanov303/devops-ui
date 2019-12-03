@@ -5,7 +5,7 @@
       <div class="col s10 offset-s1 m8 offset-m2 l6 offset-l3 xl4 offset-xl4">
         <div class="card">
           <div class="card-content">
-            <span class="card-title center">Devops Management</span>
+            <span class="card-title center">DevOps Management</span>
             <Alert v-if="hasError" v-bind:msg="getError" />
             <div class="row">
               <div class="col s12 m8">
@@ -54,17 +54,12 @@
                   </div>
                 </div>
               </div>
-              <div class="col s12 m4 center">
-                <div>
+              <div class="col s12 m4 center">                         
+                <a class="sso-btn" href="#" v-if="!isLoggingInSSO"
+                  @click="loginSSO()">
                   <i class="large material-icons">person_pin</i>
-                </div>
-                <button
-                  v-if="!isLoggingInSSO"
-                  class="btn waves-effect waves-light w-100"
-                  @click="loginSSO()"
-                >
-                  Login with SSO
-                </button>
+                  </a>
+                  <p>Quick login with SSO</p>
                 <div v-if="isLoggingInSSO" class="preloader-wrapper small active">
                   <div class="spinner-layer spinner-blue-only">
                     <div class="circle-clipper left">

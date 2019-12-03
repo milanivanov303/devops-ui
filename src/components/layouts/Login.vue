@@ -3,8 +3,8 @@
     <header>
       <div class="row">
         <div class="col s12">
-          <a href="\" class="brand-logo">
-            <img src="/assets/images/logo.png" alt="Devops Management" />
+          <a href="\">
+            <img class="brand-logo" src="../../assets/logo.png" alt="DevOps Management">
           </a>
         </div>
       </div>

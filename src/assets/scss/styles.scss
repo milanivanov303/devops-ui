@@ -43,22 +43,18 @@
         }
 
         .footer-copyright {
-            a {
-                line-height: 25px;
-                i.left {
-                    margin-right: 5px;
-                }
+            img{
+                width: 100px;
             }
         }
     }
 }
-.codix-logo{ 
-    width: 100px;
-}
+
 .logo{
+    padding-top: 15px;
     text-align: center;
     img{
-        width: 100%;
+        width: 90%;
         
     }
 }
@@ -134,9 +130,6 @@ nav {
         }
     }
     
-    /*.dropdown-content {
-        background-color: lighten($sidenav-bg-color, 10%);
-    }*/
     .collapsible-header:hover {
         background-color: lighten(color("codix", lighten-1), 5%);
     }
@@ -178,10 +171,13 @@ a.sidenav-trigger.top-nav {
 }
 
 
-.dropdown-content {    
+.dropdown-content {   
+    width: 120px !important;
+    top: 43px !important;
     li > a > i {
         font-size: 22px;
         margin-right: 5px;
+        padding: 0px;
     }
 }
 
@@ -327,6 +323,9 @@ p {
 }
 .input-field.invalid input {
   border-bottom-color: $wrong-color;
+}
+.input-field {
+    margin:0px;
 }
 .validator {
     font-weight: bold;

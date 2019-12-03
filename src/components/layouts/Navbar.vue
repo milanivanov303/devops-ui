@@ -5,7 +5,7 @@
       <a href="#" data-target="nav-mobile" class="sidenav-trigger">
         <i class="material-icons">menu</i>
       </a>
-      <ul class="right hide-on-med-and-down" v-if="user">
+      <ul class="right" v-if="user">
         <li class="logged-user">
           <i class="material-icons left">account_circle</i>
           {{ user.name }}
@@ -28,12 +28,8 @@
 </template>
 
 <script lang="js">
-import Breadcrumbs from '@/components/layouts/Breadcrumbs';
 
 export default {
-  components: {
-    Breadcrumbs,
-  },
   computed: {
     user() {
       return this.$store.getters.user;

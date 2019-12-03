@@ -3,7 +3,7 @@
 @import "variables";
 
 .login {
-    background: url($login-bg-image) no-repeat center top fixed;
+    background: $sidenav-bg-color;
     background-size: cover;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -28,9 +28,26 @@
         }
     }
     .card {
+
         box-shadow: 10px 10px 10px rgba(255, 255, 255, 0.4);
+        margin-top: 100px;
     }
     button{
-        background-color: $primary-color !important;
+        background-color:$button-color;
     }
+   .sso-btn{
+       i{
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4);
+            color: $button-color;
+            font-size: 9em;
+       }
+   }
+
+   img{
+       width: 100px;
+
+       &.brand-logo{
+            height: 50px;
+       }
+   }
 }

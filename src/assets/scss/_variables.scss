@@ -32,7 +32,7 @@ $login-bg-image: "/assets/images/login_background.png";
 $primary-color: color("codix", "base") !default;
 $secondary-color: $primary-color !default;
 $link-color: color("codix", darken-2) !default;
-$button-color:  color("codix", darken-1) !default;
+$button-color:  color("codix", base) !default;
 $wrong-color: #C40147;
 $light-color:  color("codix", lighten-1) !default;
 $hover-color: lighten(color("codix", lighten-1), 10%);
