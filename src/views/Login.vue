@@ -5,17 +5,19 @@
       <div class="col s10 offset-s1 m8 offset-m2 l6 offset-l3 xl4 offset-xl4">
         <div class="card">
           <div class="card-content">
-            <span class="card-title">Devops Management - Login</span>
+            <span class="card-title center">DevOps Management</span>
             <Alert v-if="hasError" v-bind:msg="getError" />
             <div class="row">
               <div class="col s12 m8">
                 <div class="row">
                   <div class="input-field col s12">
+                    <i class="material-icons prefix">account_circle</i>
                     <input type="text" id="username-input" v-model="username" />
                     <label for="username-input">Username</label>
                   </div>
 
                   <div class="input-field col s12">
+                    <i class="material-icons prefix">lock</i>
                     <input
                       type="password"
                       id="password-input"
@@ -45,24 +47,19 @@
                           <div class="circle"></div>
                         </div>
                         <div class="circle-clipper right">
-                          <div class="circle"></div>
+                        <div class="circle"></div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="col s12 m4 center">
-                <div>
-                  <i class="large material-icons">supervisor_account</i>
-                </div>
-                <button
-                  v-if="!isLoggingInSSO"
-                  class="btn waves-effect waves-light w-100"
-                  @click="loginSSO()"
-                >
-                  Login with SSO
-                </button>
+              <div class="col s12 m4 center">                         
+                <a class="sso-btn" href="#" v-if="!isLoggingInSSO"
+                  @click="loginSSO()">
+                  <i class="large material-icons">person_pin</i>
+                  </a>
+                  <p>Quick login with SSO</p>
                 <div v-if="isLoggingInSSO" class="preloader-wrapper small active">
                   <div class="spinner-layer spinner-blue-only">
                     <div class="circle-clipper left">

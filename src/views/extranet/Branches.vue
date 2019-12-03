@@ -1,13 +1,13 @@
 <template>
   <div class="branches">
     <div class="row">
-      <div class="col s12 m6 l6">
+      <div class="col s12 m6 l5">
         <TextInput label="Search" icon="search" v-model="search"/>
       </div>
     </div>
     <div class="row">
       <div :class="{'col s12 m6 l5 scroll': $route.meta.name === 'extranet-branch'}">
-        <div
+        <div id="select-branch"
           :class="{'col s12 m6 l4': $route.meta.name === 'extranet-branches'}"
           :key="branch.name"
           v-for="branch in filteredBranches"
@@ -77,6 +77,8 @@ export default {
   mounted() {
     this.getBranches();
     this.getContainers();
+    document.querySelector('.selected-branch').scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+
   },
   watch: {
     search(value) {

@@ -43,13 +43,19 @@
         }
 
         .footer-copyright {
-            a {
-                line-height: 25px;
-                i.left {
-                    margin-right: 5px;
-                }
+            img{
+                width: 100px;
             }
         }
+    }
+}
+
+.logo{
+    padding-top: 15px;
+    text-align: center;
+    img{
+        width: 90%;
+        
     }
 }
 
@@ -62,41 +68,86 @@ nav {
 
 .sidenav {
     background-color: $sidenav-bg-color;
+    box-shadow: 10px 0px 10px rgba(0, 0, 0, .2);
+    
+    li {
+        a {
+            color: white;
+            font-size: 12px;
+            padding: 0 16px;
+            & > i.material-icons {
+                color:white;
+            }
 
-    .logo {
-        padding: 20px 0 40px;
-        text-align: center;
+            &:hover {
+                background-color: lighten(color("codix", lighten-1), 5%);
+                color: $link-color;
+                i.material-icons {
+                    color: $link-color;
+                }
+            }
+        }
     }
 
     li.active {
-        background: lighten($sidenav-bg-color, 4%);
-    }
-
-    li > a {
-        color: white;
-        font-size: 12px;
-        padding: 0 16px;
-        & > i.material-icons {
-            color: white;
+        background-color: $light-color;
+        box-shadow: 0px 10px 15px rgba(0, 0, 0, .4);
+        a {
+            color: $link-color;
+            & > i.material-icons {
+                color: $link-color;
+            }
         }
+        a:hover{
+            color: $link-color;
+            i{
+                color: $link-color;
+            }
+        }
+        li {
+            a {
+                color: white;
+                i {
+                    color:white;
+                }
+            }
+        }
+        li:hover{
+            a {
+                color: $link-color !important;
+            }
+        }
+        li.active {
+           a {
+                color: $link-color;
+            }
+            li{
+                a{
+                    color: white;
+                }
+            }
 
-        &:hover {
-            background-color: lighten($sidenav-bg-color, 4%);
         }
     }
-    li.active a{
-        color: white !important;
-    }
-    .dropdown-content {
-        background-color: $sidenav-bg-color;
+    
+    .collapsible-header:hover {
+        background-color: lighten(color("codix", lighten-1), 5%);
     }
     .collapsible-body {
-        background-color: darken($sidenav-bg-color, 4%);
+        background-color: lighten($sidenav-bg-color, 15%);
+        
+        li.active{
+            a{
+                background-color: $light-color;
+                color: white;
+            }
+        }
     }
+
     .divider {
         margin:0;
         height:8px;
-        border-bottom:1px solid #e0e0e0;
+        border-bottom:1px solid #003A52;
         background-color: transparent;
     }
 }
@@ -112,16 +163,21 @@ a.sidenav-trigger.top-nav {
 }
 
 .card {
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, .2);
     .card-title {
         font-size: 20px;
         font-weight: 400;
     }
 }
 
-.dropdown-content {    
+
+.dropdown-content {   
+    width: 120px !important;
+    top: 43px !important;
     li > a > i {
         font-size: 22px;
         margin-right: 5px;
+        padding: 0px;
     }
 }
 
@@ -144,17 +200,17 @@ h3 {
 
     &.error {
         @extend .red;
-        @extend .lighten-2;
+        @extend .lighten-1;
     }
 
     &.success {
         @extend .green;
-        @extend .lighten-2;
+        @extend .lighten-1;
     }
 
     &.info {
         @extend .blue;
-        @extend .lighten-2;
+        @extend .lighten-1;
     }
 }
 
@@ -262,14 +318,21 @@ p {
 }
 
 .input-field.invalid {
-  color: red;
+  color: $wrong-color;
+  margin: 0px;
 }
 .input-field.invalid input {
-  background-color: #ffc9aa;
+  border-bottom-color: $wrong-color;
+}
+.input-field {
+    margin:0px;
 }
 .validator {
-    margin: 1rem auto;
     font-weight: bold;
+    margin: 0px;
+    p{
+        margin: 0px;
+    }
 }
 
 .modal.right-sheet {
@@ -319,4 +382,35 @@ p {
 .datetime-input {
     max-width: calc(100% - 3rem) !important;
     float: right !important;
+}
+
+
+#select-branch {
+    :hover {
+        background-color: $hover-color;
+    }
+}
+
+.scroll{
+    .card:hover{
+        background-color:$hover-color;
+        color: $link-color !important;
+    }
+}
+a.collection-item.router-link-exact-active.router-link-active.selected-branch {
+    .card{
+            background-color: lighten($color: $sidenav-bg-color, $amount: 10%);
+            color: white;
+        }
+    }
+button{
+    background-color: color("codix", base);
+}
+.validator{
+    .red-text{
+        color: $wrong-color !important;
+    }
+}
+.red{
+    background-color: $wrong-color !important;
 }

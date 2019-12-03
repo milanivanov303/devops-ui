@@ -2,7 +2,7 @@
   <div class="container center vw">
     <div id="logo-container" class="brand-logo">
         <img class="responsive-img"
-             src="../../assets/images/dev-ops-management.png"
+             src="../../assets/images/logoDO.png"
              alt="DevOps Management" />
     </div>
     <div class="preloader-wrapper big active">

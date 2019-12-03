@@ -6,10 +6,10 @@
       </button>
 
       <Modal v-if="showModal" @close="showModal = false" @opened="initForm()" class="right-sheet">
-        <template v-slot:header>New build</template>
+        <template v-slot:header>Create new build</template>
         <template v-slot:content>
           <template v-if="build.started === false">
-            <div key="form" >
+            <div  class="col s12 l11 offset-l1" key="form" >
               <div class="row">
                 <div class="col s12" >
                   <Autocomplete
