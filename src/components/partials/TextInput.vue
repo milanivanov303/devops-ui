@@ -11,7 +11,7 @@
       @change="$emit('change')"
       @click="$emit('click')"
     >
-    <label v-if="label" :for="inputId">{{ label }}</label>
+    <label :class="{'active': value}" v-if="label" :for="inputId">{{ label }}</label>
   </div>
 </template>
 
@@ -41,9 +41,6 @@ export default {
     getInputType() {
       return this.type || 'text';
     },
-  },
-  mounted() {
-    this.$M.updateTextFields();
   },
 };
 </script>

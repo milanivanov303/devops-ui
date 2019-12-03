@@ -6,11 +6,13 @@
       ref="input"
       type="text"
       class="autocomplete"
-      v-model="currentValue"
-      @blur="emitEvent('blur')"
-      @click="emitEvent('click')"
+      :value="computedValue"
+      @input="input($refs.input.value)"
+      @blur="$emit('blur')"
+      @change="$emit('change')"
+      @click="$emit('click')"
     >
-    <label v-if="label" :for="inputId">{{ label }}</label>
+    <label :class="{'active': computedValue}" v-if="label" :for="inputId">{{ label }}</label>
   </div>
 </template>
 
@@ -21,6 +23,7 @@ export default {
     id: String,
     label: String,
     icon: String,
+    value: String,
     invalid: Boolean,
     items: {
       type: Array,
@@ -33,14 +36,15 @@ export default {
   data() {
     return {
       inputId: this.getInputId(),
-      currentValue: null,
     };
   },
-  watch: {
-    currentValue(value) {
-      const item = this.items.find(item => item[this.getValueKey()] === value);
-      this.$emit('select', item || value);
-    },
+  computed: {
+    computedValue() {
+      if (!this.value) {
+        return '';
+      }
+      return this.value[this.getValueKey()] || this.value;
+    }
   },
   methods: {
     getInputId() {
@@ -62,8 +66,9 @@ export default {
       });
       return data;
     },
-    emitEvent(event) {
-      this.$emit(event);
+    input(value) {
+      const item = this.items.find(item => item[this.getValueKey()] === value);
+      this.$emit('input', item || value);
     },
   },
   mounted() {
@@ -71,7 +76,7 @@ export default {
       minLength: this.minLength || 0,
       limit: this.limit || Number.MAX_SAFE_INTEGER,
       data: this.getData(),
-      onAutocomplete: (value) => { this.currentValue = value; },
+      onAutocomplete: (value) => { this.input(value); },
     });
   },
 };

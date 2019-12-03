@@ -16,7 +16,7 @@
                     label="Client"
                     icon="people"
                     :items="clients"
-                    @select="form.client = $event"
+                    v-model="form.client"
                     :invalid="$v.form.client.$error"
                     @blur="$v.form.client.$touch()"
                   />
@@ -41,7 +41,7 @@
                     label="Instance"
                     icon="dynamic_feed"
                     :items="instances"
-                    @select="form.instance = $event"
+                    v-model="form.instance"
                     :invalid="$v.form.instance.$error"
                     @blur="$v.form.instance.$touch()"
                   />
@@ -162,9 +162,22 @@ export default {
 
       const payload = {
         filters: JSON.stringify({
-          anyOf: [
-            { instance_type_id: 'DEV' },
-            { instance_type_id: 'VAL' },
+          allOf: [
+            {
+              instance_type_id: {
+                value: ['DEV', 'VAL'],
+                operator: 'in'
+              }
+            },
+            {
+              owner: {
+                allOf: [
+                  {
+                    key: "codix"
+                  }
+                ]
+              }
+            }
           ],
         }),
         orders: JSON.stringify({
