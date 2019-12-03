@@ -1,7 +1,6 @@
 <template>
   <nav class="top-nav">
     <div class="nav-wrapper">
-      <Breadcrumbs />
       <a href="#" data-target="nav-mobile" class="sidenav-trigger">
         <i class="material-icons">menu</i>
       </a>
@@ -44,7 +43,10 @@ export default {
     },
   },
   mounted() {
-    this.$M.Dropdown.init(this.$refs['profile-dropdown']);
+    this.$M.Dropdown.init(this.$refs['profile-dropdown'], {
+      constrainWidth: false,
+      coverTrigger: false
+    });
   },
 };
 </script>
