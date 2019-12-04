@@ -19,4 +19,7 @@ export default {
   user(state, user) {
     state.user = user;
   },
+  users(state, users) {
+    state.users = users;
+  },
 };

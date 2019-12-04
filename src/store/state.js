@@ -9,6 +9,7 @@ export default {
   user,
   loggingIn: false,
   loggingInSSO: false,
+  users: [],
   hasError: false,
   error: '',
 };

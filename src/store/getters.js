@@ -6,4 +6,5 @@ export default {
   hasError: state => state.hasError,
   getError: state => state.error,
   user: state => state.user,
+  users: state => state.users,
 };

@@ -5,6 +5,9 @@ const ExtranetDashboard = () => import(/* webpackChunkName: "extranet-dashboard"
 const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
 const ExtranetBranch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
 const Demo = () => import(/* webpackChunkName: "demo" */ '../views/Demo.vue');
+const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
+const AdministrationGroups = () => import(/* webpackChunkName: "administration-groups" */ '../views/administration/Groups.vue');
+
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 
 export default [
@@ -91,6 +94,28 @@ export default [
       breadcrumb: 'Demo',
     },
     component: Demo,
+  },
+  {
+    path: '/administration/users',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-users',
+      transitionName: 'slide',
+      title: 'Users',
+      breadcrumb: 'Users',
+    },
+    component: AdministrationUsers,
+  },
+  {
+    path: '/administration/groups',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-groups',
+      transitionName: 'slide',
+      title: 'Groups',
+      breadcrumb: 'Groups',
+    },
+    component: AdministrationGroups,
   },
   {
     path: '*',

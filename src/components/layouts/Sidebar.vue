@@ -4,37 +4,50 @@
         <img src="../../assets/logo.png" alt="DevOps Management">
     </li>
     <li>
-      <ul>
+      <ul class="collapsible collapsible-accordion">
         <li v-bind:class="{ active: isActive('dashboard') }">
           <router-link to="/dashboard">
             <i class="material-icons">web</i> Dashboard
           </router-link>
         </li>
-        <li v-bind:class="{ active: isActive('extranet/branches') }">
-          <ul class="collapsible collapsible-accordion">
-            <li>
-              <a class="collapsible-header">
-                <i class="material-icons">laptop_chromebook</i> Extranet
-                <i class="material-icons right">arrow_drop_down</i>
-              </a>
-              <div class="collapsible-body">
-                <ul>
-                  <li v-bind:class="{ active: isActive('extranet/dashboard') }">
-                    <router-link to="/extranet/dashboard"> Dashboard</router-link>
-                  </li>
-                  <li v-bind:class="{ active: isActive('extranet/branches') }">
-                    <router-link to="/extranet/branches"> Branches</router-link>
-                  </li>
-                  <li><div class="divider"></div></li>
-                </ul>
-              </div>
-            </li>
-          </ul>
+        <li v-bind:class="{ active: isActive('extranet') }">
+          <a class="collapsible-header">
+            <i class="material-icons">laptop_chromebook</i> Extranet
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li v-bind:class="{ active: isActive('extranet/dashboard') }">
+                <router-link to="/extranet/dashboard"> Dashboard</router-link>
+              </li>
+              <li v-bind:class="{ active: isActive('extranet/branches') }">
+                <router-link to="/extranet/branches"> Branches</router-link>
+              </li>
+              <li><div class="divider"></div></li>
+            </ul>
+          </div>
         </li>
         <li v-bind:class="{ active: isActive('demo') }">
           <router-link to="/demo">
             <i class="material-icons">event</i> Demo
           </router-link>
+        </li>
+        <li v-bind:class="{ active: isActive('administration') }">
+          <a class="collapsible-header">
+            <i class="material-icons">settings</i> Administration
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li v-bind:class="{ active: isActive('administration/users') }">
+                <router-link to="/administration/users"> Users</router-link>
+              </li>
+              <li v-bind:class="{ active: isActive('administration/groups') }">
+                <router-link to="/administration/groups"> Groups</router-link>
+              </li>
+              <li><div class="divider"></div></li>
+            </ul>
+          </div>
         </li>
       </ul>
     </li>
@@ -63,3 +76,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  li.active {
+    .collapsible-body {
+      display: block;
+    }
+  }
+</style>

@@ -2,6 +2,7 @@
 import Axios from 'axios';
 import { getParam, getSsoUrl, getReturnUri } from '../plugins/helpers';
 import config from '../config';
+import queryString from "query-string";
 
 const axios = Axios.create({
   baseURL: `${config['user-management'].url}/v1`,
@@ -73,6 +74,7 @@ export default {
     // localStorage.setItem('sso-login', 'false');
     localStorage.clear();
   },
+
   async getToken({ commit }, code) {
     try {
       const response = await axios.get('/auth/token', {
@@ -85,5 +87,14 @@ export default {
       commit('hasError', true);
       return err;
     }
+  },
+
+  async getUsers({ commit }, payload) {
+    const query = queryString.stringify(payload, { arrayFormat: 'index' });
+    return await axios.get('/users?' + query)
+      .then(response => {
+        commit('users', response.data.data);
+      })
+      .catch(error => commit('error', error));
   },
 };
