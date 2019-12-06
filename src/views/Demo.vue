@@ -1,6 +1,8 @@
 <template>
-  <div class="col s12 l11 offset-l1">
-    <Table v-bind:request="request" v-on:selectedRow="selectedRow"></Table>
+  <div class="col s12 l12">
+    <div class="data-table">
+      <Table v-bind:request="request" v-on:selectedRow="selectedRow"></Table>
+    </div>
 
     <Modal v-if="showModal" @close="showModal = false" @opened="initForm()" class="right-sheet">
       <template v-slot:header>Schedule a demo</template>
