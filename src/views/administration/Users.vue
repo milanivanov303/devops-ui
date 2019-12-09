@@ -45,16 +45,11 @@
             </div>
             Items per page
           </div>
+          
           <div class="col s12 m6 l6">
-            <ul class="pagination">
-              <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
-              <li class="waves-effect"><a href="#!">1</a></li>
-              <li class="waves-effect active"><a href="#!">2</a></li>
-              <li class="waves-effect"><a href="#!">3</a></li>
-              <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
-            </ul>
+            pagination goes here
           </div>
-        </div>
+        </div>  
 
         <div id="modal-user" class="modal right-sheet modal-fixed-footer">
           <div class="modal-content">
@@ -187,7 +182,7 @@ export default {
   },
   computed: {
     users() {
-      return this.$store.getters.users.slice(1, 10);
+      return this.$store.getters.users.slice(0, 10);
     }
   },
   methods: {
