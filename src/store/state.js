@@ -10,6 +10,8 @@ export default {
   loggingIn: false,
   loggingInSSO: false,
   users: [],
+  roles: [],
+  actions: [],
   hasError: false,
   error: '',
 };

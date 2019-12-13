@@ -42,8 +42,8 @@
               <li v-bind:class="{ active: isActive('administration/users') }">
                 <router-link to="/administration/users"> Users</router-link>
               </li>
-              <li v-bind:class="{ active: isActive('administration/groups') }">
-                <router-link to="/administration/groups"> Groups</router-link>
+              <li v-bind:class="{ active: isActive('administration/roles') }">
+                <router-link to="/administration/roles"> Roles</router-link>
               </li>
               <li><div class="divider"></div></li>
             </ul>

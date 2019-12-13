@@ -97,4 +97,39 @@ export default {
       })
       .catch(error => commit('error', error));
   },
+  async getRoles({ commit }, payload) {
+    const query = queryString.stringify(payload, { arrayFormat: 'index' });
+    return await axios.get('/roles?' + query)
+      .then(response => {
+        commit('roles', response.data.data);
+      })
+      .catch(error => commit('error', error));
+  },
+  async getActions({ commit }, payload) {
+    const query = queryString.stringify(payload, { arrayFormat: 'index' });
+    return await axios.get('/actions?' + query)
+      .then(response => {
+        commit('actions', response.data.data);
+      })
+      .catch(error => commit('error', error));
+  },
+
+  async createRole({ commit }, payload) {
+    return await axios.post('/roles', payload)
+      .then(response => {
+        commit('actions', response.data.data);
+      })
+      .catch(error => commit('error', error));
+  },
+
+  async updateRole({ commit }, payload) {
+    debugger;
+    return await axios.put(`/roles/${payload.id}`, payload)
+      .then(response => {
+        console.log(response.data)
+        //commit('actions', response.data.data);
+      })
+      .catch(error => commit('error', error));
+  },
+
 };

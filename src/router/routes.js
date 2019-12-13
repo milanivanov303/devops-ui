@@ -6,7 +6,7 @@ const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../vie
 const ExtranetBranch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
 const Demo = () => import(/* webpackChunkName: "demo" */ '../views/Demo.vue');
 const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
-const AdministrationGroups = () => import(/* webpackChunkName: "administration-groups" */ '../views/administration/Groups.vue');
+const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 
@@ -107,15 +107,15 @@ export default [
     component: AdministrationUsers,
   },
   {
-    path: '/administration/groups',
+    path: '/administration/roles',
     meta: {
       requiresAuth: true,
-      name: 'administration-groups',
+      name: 'administration-roles',
       transitionName: 'slide',
-      title: 'Groups',
-      breadcrumb: 'Groups',
+      title: 'Roles',
+      breadcrumb: 'Roles',
     },
-    component: AdministrationGroups,
+    component: AdministrationRoles,
   },
   {
     path: '*',

@@ -6,7 +6,7 @@
                     <input type="text" placeholder="Search" v-model="searchAvailable">
                     <a class="waves-effect waves-light btn-small left" @click="selectAvailable(filteredItems)">
                         <i class="material-icons left">add</i>
-                        Add all users
+                        Add all
                     </a>
                 </caption>
                 <tr>
@@ -32,7 +32,7 @@
                     <input type="text" placeholder="Search" v-model="searchSelected">
                     <a class="waves-effect waves-light btn-small left" @click="removeSelected(filteredSelectedItems)">
                         <i class="material-icons left">remove</i>
-                        Remove all users
+                        Remove all
                     </a>
                 </caption>
             <tr>
@@ -63,7 +63,7 @@ export default {
     computed: {
         filteredItems() {
             let availableItems = this.items.filter(item => {
-                return !this.selectedItems.includes(item);
+                return !this.selectedItems.find(i => i.id === item.id);
             });
 
             if (!this.searchAvailable) {
@@ -89,6 +89,12 @@ export default {
             selectedItems: [],
         };
     },
+    mounted() {
+        var elems = document.querySelectorAll('.tabs');
+        this.$M.Tabs.init(elems);
+        this.selectedItems = this.selected;
+
+    },
     methods: {
         selectItem(item) {
             this.selectedItems.push(item);
@@ -110,9 +116,6 @@ export default {
         },
     
     },
-    mounted() {
-        this.selectedItems = this.selected;
-    }
 }
 </script>
 
@@ -124,7 +127,7 @@ tbody {
 }
 
 tbody {
-  max-height: 250px;
+  max-height: 400px;
   overflow: auto;
 }
 </style>

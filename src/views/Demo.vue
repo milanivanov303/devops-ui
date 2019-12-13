@@ -1,7 +1,11 @@
 <template>
   <div class="col s12 l12">
     <div class="data-table">
-      <Table v-bind:request="request" v-on:selectedRow="selectedRow"></Table>
+     <Table v-bind:request="request"  @add="returnValue({})">
+          <template v-slot:buttons="{ data }">
+            <a @click="selectedRow(data)"><i class="material-icons right">attachment</i></a>
+          </template>
+        </Table>
     </div>
 
     <Modal v-if="showModal" @close="showModal = false" @opened="initForm()" class="right-sheet">
@@ -190,9 +194,11 @@ import {
 } from 'vuelidate/lib/validators';
 import Modal from '@/components/partials/Modal';
 import 'vue-datetime/dist/vue-datetime.css';
+import Table from '@/components/partials/Table';
 
 export default {
   components: {
+    Table,
     Modal,
     datetime: Datetime,
   },
@@ -216,7 +222,7 @@ export default {
           url: value => this.demoUrl(value),
         },
         add: true,
-        export: false,
+        export: true,
         action: true,
         searchable: true,
       },
@@ -287,6 +293,17 @@ export default {
     },
   },
   methods: {
+    returnValue(demo) {
+      this.showModal = true;
+      this.modalData.name = demoDetails.name;
+      this.modalData.email = demoDetails.email;
+      this.modalData.phone = demoDetails.phone;
+      this.modalData.company = demoDetails.company;
+      this.modalData.details = demoDetails.details;
+      this.modalData.country = demoDetails.country;
+      this.modalData.business = demoDetails.business;
+
+    },
     selectedBusiness(value) {
       this.$v.modalData.business.$touch();
       this.modalData.business = value.name;

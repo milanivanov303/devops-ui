@@ -31,6 +31,7 @@ export default {
         onOpenEnd: () => this.$emit('opened'),
         onCloseStart: () => this.$emit('close'),
         onCloseEnd: () => this.$emit('closed'),
+
       })
       .open();
   },

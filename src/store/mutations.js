@@ -22,4 +22,10 @@ export default {
   users(state, users) {
     state.users = users;
   },
+  roles(state, roles) {
+    state.roles = roles;
+  },
+  actions(state, actions) {
+    state.actions = actions;
+  },
 };
