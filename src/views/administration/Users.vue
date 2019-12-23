@@ -13,33 +13,33 @@
         <template v-slot:header>User information
         </template>
         <template v-slot:content>
-          <div class="col s12 l11 offset-l1"> 
+          <div class="col s12 l10 offset-l1"> 
             <div class="row">
-              <div class="col s12 m7 l10">
+              <div class="col s12">
                 <i class="material-icons">person</i>
                 <span id="info">{{currentUser.name}}</span>
               </div>
             </div>
             <div class="row">
-              <div class="col s12 m7 l10">
+              <div class="col s12">
                 <i class="material-icons">account_circle</i>
                 <span id="info">{{currentUser.username}}</span>
               </div>
             </div>
             <div class="row">
-              <div class="col s12 m7 l10">
+              <div class="col s12">
                 <i class="material-icons">mail</i>
                 <span id="info">{{currentUser.email}}</span>
               </div>
             </div>
             <div class="row">
-              <div class="col s12 m7 l10">
+              <div class="col s12">
                 <i class="material-icons">phone</i>
                 <span id="info">{{currentUser.phone}}</span>
               </div>
             </div>
             <div class="row">
-              <div class="col s12 m7 l10">
+              <div class="col s12">
                 <i class="material-icons">people</i>
                 <span id="info">{{currentUser.department.name}}</span>
               </div>
@@ -62,6 +62,7 @@
             class="btn waves-effect waves-light"
             type="submit"
             name="action"
+             @click="updateUserRoles()"
           >
             Save
           </button>
@@ -146,6 +147,12 @@ export default {
       await this.$store.dispatch('getRoles', payload).then(() => {
         loader.hide();
       });
+    },
+    updateUserRoles() {
+      this.$store.dispatch('updateUserRoles', this.currentUser).then(() => {
+        console.log('success !!!');
+      });
+      this.showModal = false;
     },
   },
   mounted() {

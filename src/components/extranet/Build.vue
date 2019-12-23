@@ -9,7 +9,7 @@
         <template v-slot:header>Create new build</template>
         <template v-slot:content>
           <template v-if="build.started === false">
-            <div  class="col s12 l11 offset-l1" key="form" >
+            <div  class="col s12 l10 offset-l1" key="form" >
               <div class="row">
                 <div class="col s12" >
                   <Autocomplete

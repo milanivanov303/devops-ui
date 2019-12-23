@@ -21,7 +21,7 @@
               data-target="action"><i class="material-icons left">description</i>
       </button>
     </div>
-    <table v-if="sorted.length" class="responsive">
+    <table v-if="sorted.length" class="responsive-table">
       <thead>
         <tr>
           <th v-for="(value, key) in columns"

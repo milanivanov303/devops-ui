@@ -113,23 +113,32 @@ export default {
       })
       .catch(error => commit('error', error));
   },
-
-  async createRole({ commit }, payload) {
-    return await axios.post('/roles', payload)
+  createRole({ commit }, payload) {
+    return axios.post('/roles', payload)
       .then(response => {
-        commit('actions', response.data.data);
+        commit('addRole', response.data.data);
       })
       .catch(error => commit('error', error));
   },
-
-  async updateRole({ commit }, payload) {
-    debugger;
-    return await axios.put(`/roles/${payload.id}`, payload)
+  updateRole({ commit }, payload) {
+    return axios.put(`/roles/${payload.id}`, payload)
       .then(response => {
-        console.log(response.data)
-        //commit('actions', response.data.data);
+        commit('updateRole', response.data.data);
       })
       .catch(error => commit('error', error));
   },
-
+  deleteRole({ commit }, id) {
+    return axios.delete(`/roles/${id}`)
+      .then(response => {
+        commit('deleteRole', id);
+      })
+      .catch(error => commit('error', error));
+  },
+  updateUserRoles({ commit }, payload) {
+    return axios.put(`/users/${payload.username}/${config.devops.code}/roles`, payload.roles)
+      .then(response => {
+        commit('updateUserRoles', response.data.data);
+      })
+      .catch(error => commit('error', error));
+  },
 };

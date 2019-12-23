@@ -35,5 +35,8 @@ export default {
       })
       .open();
   },
+  destroyed() {
+    this.$M.Modal.getInstance(this.$el).close();
+  }  
 };
 </script>

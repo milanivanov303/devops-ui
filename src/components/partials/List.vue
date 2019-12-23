@@ -35,20 +35,20 @@
                         Remove all
                     </a>
                 </caption>
-            <tr>
-                <th>Name</th>
-            </tr>
-            <tbody>
-                <tr v-for="(item, index) in filteredSelectedItems" :key="index">
-                    <td>
-                        {{  item.name }}
-                        <a href="#!" @click=" removeItem(item) ">
-                            <i class="material-icons tiny">do_not_disturb_on</i>
-                            <b> Remove</b>
-                        </a>
-                    </td>
+                <tr>
+                    <th>Name</th>
                 </tr>
-            </tbody>
+                <tbody>
+                    <tr v-for="(item, index) in filteredSelectedItems" :key="index">
+                        <td>
+                            {{  item.name }}
+                            <a href="#!" @click=" removeItem(item) ">
+                                <i class="material-icons tiny">do_not_disturb_on</i>
+                                <b> Remove</b>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div> 
     </div>
