@@ -1,6 +1,6 @@
 module.exports = {
   'user-management': {
-    url: process.env.VUE_APP_USER_MANAGEMENT_URL,
+    url: process.env.VUE_APP_USER_MANAGEMENT_API_URL,
     code: process.env.VUE_APP_USER_MANAGEMENT_API_CODE,
   },
   devops: {

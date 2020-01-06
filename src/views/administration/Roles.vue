@@ -1,57 +1,61 @@
 <template>
   <div class="row">
     <div class="col s12">
-      <div class="data-table"> 
-        <Table v-bind:request="request"  @add="createNew({})">
+      <div class="data-table">
+        <Table v-bind:request="request"  @add="openAddEditRoleModal({}, 'create')">
           <template v-slot:buttons="{ data }">
             <a @click="openRemoveRoleModal(data)"><i class="material-icons right">delete</i></a>
-            <a @click="selectData(data)"><i class="material-icons right">attachment</i></a>
+            <a @click="openAddEditRoleModal(data, 'update')"><i class="material-icons right">attachment</i></a>
           </template>
         </Table>
       </div>
 
-      <Modal v-if="showModal" @close="showModal = false" @opened="initModal()" class="right-sheet">
+      <Modal
+        v-if="showAddEditRoleModal"
+        @close="showAddEditRoleModal = false"
+        @opened="initAddEditRoleModal()"
+        class="right-sheet">
         <template v-slot:header>Create a new role
         </template>
         <template v-slot:content>
-          <form @submit.prevent="onSubmit" class="col s12 l10 offset-l1"> 
+          <form @submit.prevent="onSubmit" class="col s12 l10 offset-l1">
             <div class="row">
-              <div class="input-field col s12" :class="{invalid: $v.currentRole.name.$error}">
+              <div class="input-field col s12" :class="{invalid: $v.selectedRole.name.$error}">
                 <i class="material-icons prefix">group</i>
-                <input 
-                type="text" 
+                <input
+                type="text"
                 id="name"
-                v-model="currentRole.name"
-                @blur="$v.currentRole.name.$touch()">
-                <label :class="{active: currentRole.name}" for="name">Name</label>
+                v-model="selectedRole.name"
+                @blur="$v.selectedRole.name.$touch()">
+                <label :class="{active: selectedRole.name}" for="name">Name</label>
               </div>
               <div class="validator col s12 offset-l1 offset-m1">
-                <div class="red-text" v-if="$v.currentRole.name.$error">
-                  <p v-if="!$v.currentRole.name.required">Name field must not be empty.</p>
-                  <p v-if="!$v.currentRole.name.minLen">Name must contain at least 6 charaters.</p>
-                  <p v-if="!$v.currentRole.name.maxLen">Name must not be more than 255 charaters.</p>
+                <div class="red-text" v-if="$v.selectedRole.name.$error">
+                  <p v-if="!$v.selectedRole.name.required">Name field must not be empty.</p>
+                  <p v-if="!$v.selectedRole.name.minLen">Name must contain at least 6 charaters.</p>
+                  <p v-if="!$v.selectedRole.name.maxLen">Name must not be more than 255 charaters.</p>
                 </div>
-                <div class="green-text" v-if="!$v.currentRole.name.$invalid">
+                <div class="green-text" v-if="!$v.selectedRole.name.$invalid">
                   <p>Name accepted!</p>
                 </div>
               </div>
             </div>
             <div class="row">
-              <div class="input-field col s12" :class="{invalid: $v.currentRole.description.$error}">
+              <div class="input-field col s12" :class="{invalid: $v.selectedRole.description.$error}">
                 <i class="material-icons prefix">menu</i>
-                <input 
-                type="text" 
-                id="name"
-                v-model="currentRole.description"
-                @blur="$v.currentRole.description.$touch()">
-                <label :class="{active: currentRole.description}" for="name">Description</label>
+                <input
+                type="text"
+                id="description"
+                v-model="selectedRole.description"
+                @blur="$v.selectedRole.description.$touch()">
+                <label :class="{active: selectedRole.description}" for="description">Description</label>
               </div>
               <div class="validator col s12 offset-l1 offset-m1">
-                <div class="red-text" v-if="$v.currentRole.description.$error">
-                  <p v-if="!$v.currentRole.description.required">Description field must not be empty.</p>
-                  <p v-if="!$v.currentRole.description.minLen">Description must contain at least 6 charaters.</p>
+                <div class="red-text" v-if="$v.selectedRole.description.$error">
+                  <p v-if="!$v.selectedRole.description.required">Description field must not be empty.</p>
+                  <p v-if="!$v.selectedRole.description.minLen">Description must contain at least 6 charaters.</p>
                 </div>
-                <div class="green-text" v-if="!$v.currentRole.description.$invalid">
+                <div class="green-text" v-if="!$v.selectedRole.description.$invalid">
                   <p>Accepted!</p>
                 </div>
               </div>
@@ -59,10 +63,10 @@
             <div class="row">
                 <div class="col s12">
                   <label>
-                    <input 
-                    type="checkbox" 
+                    <input
+                    type="checkbox"
                     id="isAdmin_check"
-                    :checked="currentRole.is_admin"
+                    :checked="selectedRole.is_admin"
                     @change="toggleIsAdmin()"
                     />
                     <span>Admin</span>
@@ -71,21 +75,21 @@
             </div>
             <div class="row">
               <div class="col s12">
+
                 <ul class="tabs col s12">
                   <li class="tab col s6" ><a href="#users">Users</a></li>
-                  <li class="tab col s6" :class="{disabled: currentRole.is_admin}"><a href="#actions">Actions</a></li>
+                  <li class="tab col s6" :class="{disabled: selectedRole.is_admin}"><a href="#actions">Actions</a></li>
                 </ul>
                 <div id="users">
-                  <List :items="users" :selected="currentRole.users" v-model="currentRole.users"/>
+                  <List :items="users" :selected="selectedRole.users" v-model="selectedRole.users"/>
                 </div>
-                  
                 <div id="actions">
-                  <List :items="actions" :selected="currentRole.actions" v-model="currentRole.actions"/>                 
+                  <List :items="actions" :selected="selectedRole.actions" v-model="selectedRole.actions"/>
                 </div>
-                      
+
               </div>
-            </div> 
-          </form> 
+            </div>
+          </form>
         </template>
         <template v-slot:footer>
           <button
@@ -96,14 +100,13 @@
           >
             Save
           </button>
-          
         </template>
       </Modal>
 
-     <Modal v-if="showRemoveModal" @close="showRemoveModal = false" class="confirm">
+      <Modal v-if="showRemoveRoleModal" @close="showRemoveRoleModal = false" class="confirm">
         <template v-slot:content>
           <div v-if="removing" class="center" >
-            <Preloader class="big"></Preloader>
+            <Preloader class="big"/>
             <p>Removing role ...</p>
           </div>
           <div v-else-if="removed" class="center" >
@@ -135,21 +138,18 @@
 
 <script>
 
-import Modal from '@/components/partials/Modal';
-import Table from '@/components/partials/Table';
-import List from '@/components/partials/List';
-import Preloader from '@/components/partials/Preloader';
-
-import { required, email, numeric, minLength, maxLength } from 'vuelidate/lib/validators';
+  import config from "@/config";
+  import Modal from '@/components/partials/Modal';
+  import Table from '@/components/partials/Table';
+  import List from '@/components/partials/List';
+  import Preloader from '@/components/partials/Preloader';
+  import { required, minLength, maxLength } from 'vuelidate/lib/validators';
 
 export default {
   data() {
-    return { 
-      props: [],
-      showModal: false,
-      showRemoveModal: false,
-      currentRole: {},
-      action: '',
+    return {
+      showAddEditRoleModal: false,
+      showRemoveRoleModal: false,
       request: {
         data: 'roles',
         columns: {
@@ -161,17 +161,15 @@ export default {
         action: false,
         searchable: true,
       },
-      currentRole:{
-        name: '',
-        description: '',
-        is_admin: 0,
-        users: [],
-        actions:[],
-      },
+      action: null,
+      selectedRole:{},
+      removing: false,
+      removed: false,
+      error: null
     };
   },
   validations: {
-    currentRole: {
+    selectedRole: {
       name: {
         required,
         minLen: minLength(6),
@@ -202,46 +200,32 @@ export default {
     },
   },
   methods: {
-    selectData(role) {
-      this.showModal = true;
-      this.action = 'update';
-      this.currentRole = role;
+    openAddEditRoleModal(role, action) {
+      this.showAddEditRoleModal = true;
+      this.action = action;
+      this.selectedRole = Object.assign({}, role);
+      this.selectedRole.application = { code: config.devops.code };
     },
-    createNew (role) {
-        this.showModal = true;
-        this.action = 'create';
-        
-        this.currentRole = {
-          name: '',
-          description: '',
-          application: {
-            code: process.env.VUE_APP_DEVOPS_API_CODE
-          },
-          is_admin:0,
-          users: [],
-          actions: [],
-        };
-    },
-    openRemoveRoleModal(role){
-      this.showRemoveModal = true;
-      this.currentRole = role;
+    openRemoveRoleModal(role) {
+      this.showRemoveRoleModal = true;
+      this.selectedRole = role;
       this.removing = false;
       this.removed = false;
       this.error = null;
     },
-    initModal() {
+    initAddEditRoleModal() {
       var elems = document.querySelectorAll('.tabs');
       this.$M.Tabs.init(elems);
     },
     toggleIsAdmin() {
       if (isAdmin_check.checked) {
-        this.currentRole.is_admin = 1;
+        this.selectedRole.is_admin = 1;
         var elems = document.querySelectorAll('.tabs');
         var instance = M.Tabs.getInstance(elems[0]);
         instance.select('users');
       }
       else{
-        this.currentRole.is_admin = 0;
+        this.selectedRole.is_admin = 0;
       }
     },
     async getUsers() {
@@ -290,49 +274,40 @@ export default {
         return;
       }
 
-      this.$store.dispatch('createRole', this.currentRole).then(() => {
-        console.log('success !!!'); 
+      this.$store.dispatch('createRole', this.selectedRole).then(() => {
+        this.showAddEditRoleModal = false;
       });
-      this.showModal = false;   
     },
     updateRole() {
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
       }
-      this.$store.dispatch('updateRole', this.currentRole).then(() => {
-        console.log('success !!!');
+
+      const id = this.selectedRole.id;
+      const payload = this.selectedRole;
+
+      this.$store.dispatch('updateRole', { id, payload }).then(() => {
+        this.showAddEditRoleModal = false;
       });
-      this.showModal = false;
     },
-    deleteRole() {      
+    deleteRole() {
       this.removing = true;
-      this.$store.dispatch('deleteRole', this.currentRole.id)
-      .then(() => {
-        this.removed = true;
-        console.log('success !!!');
-      })
+      this.$store.dispatch('deleteRole', this.selectedRole.id)
+      .then(() => this.removed = true)
       .catch((error) => {
         if (error.response.status === 403) {
-          this.error = 'You do not have insufficient rights to remove this role';
-        } else {
-          this.error = error;
+          return this.error = 'You do not have insufficient rights to remove this role';
         }
+        this.error = error;
       })
-      .finally(() => { this.removing = false; });
-      this.showRemoveModal = false;
+      .finally(() => this.removing = false);
     },
   },
   mounted() {
     this.getUsers();
     this.getRoles();
     this.getActions();
-
-    var elems = document.querySelectorAll('select');
-    this.$M.FormSelect.init(elems);
-
-    var elems = document.querySelectorAll('.collapsible');
-    this.$M.Collapsible.init(elems);
   },
 };
 </script>

@@ -50,7 +50,7 @@
                     </tr>
                 </tbody>
             </table>
-        </div> 
+        </div>
     </div>
 </template>
 
@@ -92,7 +92,9 @@ export default {
     mounted() {
         var elems = document.querySelectorAll('.tabs');
         this.$M.Tabs.init(elems);
-        this.selectedItems = this.selected;
+        if (this.selected) {
+          this.selectedItems = this.selected;
+        }
 
     },
     methods: {
@@ -101,9 +103,9 @@ export default {
             this.$emit('input', this.selectedItems);
         },
         selectAvailable(filteredItems) {
-            this.selectedItems = this.selectedItems.concat(this.filteredItems); 
+            this.selectedItems = this.selectedItems.concat(this.filteredItems);
             this.$emit('input', this.selectedItems);
-            
+
         },
         removeItem(item) {
             const index = this.selectedItems.indexOf(item);
@@ -114,7 +116,7 @@ export default {
             this.selectedItems = this.selectedItems.filter(item => !this.filteredSelectedItems.includes(item));
             this.$emit('input', this.selectedItems);
         },
-    
+
     },
 }
 </script>

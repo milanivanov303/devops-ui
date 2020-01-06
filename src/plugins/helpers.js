@@ -4,6 +4,7 @@ export const getParam = (name) => {
   const url = new URL(window.location.toString());
   return url.searchParams.get(name);
 };
+
 export const getReturnUri = () => {
   const returnUri = getParam('return_uri');
   if (returnUri) {
@@ -15,11 +16,12 @@ export const getReturnUri = () => {
   }
   return '/';
 };
+
 export const getSsoUrl = () => {
   let redirectUrl = `${window.location.origin}/login`;
   const returnUri = getReturnUri();
   if (returnUri) {
     redirectUrl += `?return_uri=${returnUri}`;
   }
-  return `${config['user-management'].url}/login?redirect_url=${redirectUrl}`;
+  return `${config['user-management'].url}/../login?redirect_url=${redirectUrl}`;
 };

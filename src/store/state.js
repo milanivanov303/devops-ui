@@ -5,13 +5,12 @@ if (localStorage.getItem('user')) {
 }
 
 export default {
-  token: localStorage.getItem('token') || '',
   user,
   loggingIn: false,
   loggingInSSO: false,
   users: [],
   roles: [],
   actions: [],
-  hasError: false,
   error: '',
+  promises: {},
 };

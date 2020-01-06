@@ -1,12 +1,12 @@
 <template>
  <main>
-    <Loading v-if="loading"/>
+    <Loading v-if="loggingInSSO"/>
     <div v-else class="row">
       <div class="col s10 offset-s1 m8 offset-m2 l6 offset-l3 xl4 offset-xl4">
         <div class="card">
           <div class="card-content">
             <span class="card-title center">DevOps Management</span>
-            <Alert v-if="hasError" v-bind:msg="getError" />
+            <Alert v-if="error !== ''" v-bind:msg="error" />
             <div class="row">
               <div class="col s12 m8">
                 <div class="row">
@@ -29,16 +29,13 @@
                 <div class="row">
                   <div class="col s12 center">
                     <button
-                      v-if="!isLoggingIn"
+                      v-if="!loggingIn"
                       @click="login()"
                       class="btn waves-effect waves-light w-100"
                     >
                       Login
                     </button>
-                    <div
-                      v-if="isLoggingIn"
-                      class="preloader-wrapper small active"
-                    >
+                    <div v-if="loggingIn" class="preloader-wrapper small active">
                       <div class="spinner-layer spinner-blue-only">
                         <div class="circle-clipper left">
                           <div class="circle"></div>
@@ -54,13 +51,13 @@
                   </div>
                 </div>
               </div>
-              <div class="col s12 m4 center">                         
-                <a class="sso-btn" href="#" v-if="!isLoggingInSSO"
+              <div class="col s12 m4 center">
+                <a class="sso-btn" href="#" v-if="!loggingInSSO"
                   @click="loginSSO()">
                   <i class="large material-icons">person_pin</i>
                   </a>
                   <p>Quick login with SSO</p>
-                <div v-if="isLoggingInSSO" class="preloader-wrapper small active">
+                <div v-if="loggingInSSO" class="preloader-wrapper small active">
                   <div class="spinner-layer spinner-blue-only">
                     <div class="circle-clipper left">
                       <div class="circle"></div>
@@ -85,6 +82,8 @@
 <script>
 import Alert from '@/components/partials/Alert';
 import Loading from '@/components/layouts/Loading';
+import config from '../config';
+import {getParam, getSsoUrl} from "@/plugins/helpers";
 
 export default {
   components: {
@@ -96,40 +95,57 @@ export default {
       username: '',
       password: '',
       returnUri: '/',
-      loading: false,
+      loggingIn: false,
+      loggingInSSO: false,
+      error: '',
     };
   },
   created() {
     if (localStorage.getItem('sso-login') === 'true') {
-      this.loading = true;
-      setTimeout(() => {
-        this.$store.dispatch('loginSSO');
-      }, 1000);
+      this.loginSSO();
     }
-  },
-  computed: {
-    isLoggingIn() {
-      return this.$store.getters.isLoggingIn;
-    },
-    isLoggingInSSO() {
-      return this.$store.getters.isLoggingInSSO;
-    },
-    hasError() {
-      return this.$store.getters.hasError;
-    },
-    getError() {
-      return this.$store.getters.getError;
-    },
   },
   methods: {
     login() {
-      const { username, password } = this;
-      this.$store.dispatch('login', { username, password })
-        .then(() => this.$router.push(this.$route.query.return_uri))
-        .catch(err => err);
+      this.loggingIn = true;
+      this.error = '';
+
+      this.$store.dispatch('login', {
+        username: this.username,
+        password: this.password,
+        code: config.devops.code
+      })
+        .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
+        .catch(error => {
+          if (error.response.status === 401) {
+            return this.error = 'Incorrect username or password';
+          }
+          this.error = 'Could not login. Please contact phpid';
+        })
+        .finally(() => this.loggingIn = false);
     },
     loginSSO() {
-      this.$store.dispatch('loginSSO');
+      this.loggingInSSO = true;
+      this.error = '';
+
+      localStorage.setItem('sso-login', 'true');
+
+      const token = this.$route.query.token;
+      if (!token) {
+        return window.location.href = getSsoUrl();
+      }
+
+      // remove token param from URL and browser history
+      let query = Object.assign({}, this.$route.query);
+      delete query.token;
+      this.$router.replace({ query });
+
+      this.$store.dispatch('loginSSO', token)
+        .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
+        .catch(() => {
+          this.loggingInSSO = false;
+          this.error = 'Could not login with SSO, Please contact phpid';
+        });
     },
   },
 };

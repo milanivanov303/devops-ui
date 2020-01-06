@@ -1,8 +1,9 @@
-import { createDecipher } from "crypto";
-
 // https://vuex.vuejs.org/en/mutations.html
 
 export default {
+  promise(state, {name, promise}) {
+    state.promises[name] = promise;
+  },
   loggedOut(state) {
     state.user = '';
   },
@@ -45,7 +46,7 @@ export default {
   },
   deleteRole(state, id) {
     state.roles.splice(
-      state.roles.findIndex(role => role.id === id), 
+      state.roles.findIndex(role => role.id === id),
       1
     );
   },

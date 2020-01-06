@@ -3,7 +3,7 @@
     <span class="white-text">
       {{ msg }}
     </span>
-    <a href="#" class="alert-close right">
+    <a href="#" class="alert-close right" @click="close()">
       <i class="material-icons">close</i>
     </a>
   </div>
@@ -11,11 +11,13 @@
 
 <script>
 export default {
-  props: ['msg'],
-  mounted() {
-    document.getElementsByClassName('alert-close')[0].addEventListener('click', ({ target }) => {
-      target.closest('.alert').classList.add('hide');
-    });
+  props: [
+    'msg'
+  ],
+  methods: {
+    close() {
+      this.$el.classList.add('hide');
+    }
   },
 };
 </script>

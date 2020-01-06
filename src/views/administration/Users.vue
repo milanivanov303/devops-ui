@@ -13,7 +13,7 @@
         <template v-slot:header>User information
         </template>
         <template v-slot:content>
-          <div class="col s12 l10 offset-l1"> 
+          <div class="col s12 l10 offset-l1">
             <div class="row">
               <div class="col s12">
                 <i class="material-icons">person</i>
@@ -50,12 +50,12 @@
                   <li class="tab col s12"><a href="#roles">Roles</a></li>
                 </ul>
                 <div id="roles">
-                  <List :items="roles" :selected="currentUser.roles" v-model="currentUser.roles"/>                 
+                  <List :items="roles" :selected="currentUser.roles" v-model="currentUser.roles"/>
                 </div>
               </div>
-            </div>  
-            
-          </div>                       
+            </div>
+
+          </div>
         </template>
         <template v-slot:footer>
           <button
@@ -126,28 +126,17 @@ export default {
       var elems = document.querySelectorAll('.tabs');
       this.$M.Tabs.init(elems);
     },
-    async getUsers() {
+
+    getUsers() {
       const loader = this.$loading.show({ container: this.$el });
-
-      const payload = {
-        with: JSON.stringify(['department', 'roles']),
-      };
-
-      await this.$store.dispatch('getUsers', payload).then(() => {
-        loader.hide();
-      });
+      this.$store.dispatch('getUsers').then(() => loader.hide());
     },
-    async getRoles() {
+
+    getRoles() {
       const loader = this.$loading.show({ container: this.$el });
-
-      const payload = {
-        with: JSON.stringify(['users']),
-      };
-
-      await this.$store.dispatch('getRoles', payload).then(() => {
-        loader.hide();
-      });
+      this.$store.dispatch('getRoles').then(() => loader.hide());
     },
+
     updateUserRoles() {
       this.$store.dispatch('updateUserRoles', this.currentUser).then(() => {
         console.log('success !!!');
