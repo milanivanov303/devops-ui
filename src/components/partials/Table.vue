@@ -11,10 +11,10 @@
       </div>
     </div>
     <div class="col s12 m6 l6 right">
-      <button class="btn modal-triger right"
+      <button class="btn-floating modal-triger right"
               v-if="request.add === true"
               @click="$emit('add')"
-              data-target="action"><i class="material-icons left">add</i> Add new
+              data-target="action"><i class="material-icons left">add</i>
       </button>
       <button class="btn-floating waves-effect waves-light right"
               v-if="request.export === true"

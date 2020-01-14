@@ -24,7 +24,7 @@ export default {
     localStorage.setItem('token', token);
 
     const promise = Axios.get(
-      `${config['user-management'].url}/auth/identity`,
+      `${config['user-management'].url}/auth/identity?code=${config['devops'].code}`,
       {
         headers: { Authorization: `Bearer ${token}` }
       }
@@ -95,7 +95,20 @@ export default {
     }
 
     const promise = api.get('roles', {
-      with: JSON.stringify(['users']),
+      with: JSON.stringify(['users', 'actions']),
+      filters: JSON.stringify({
+        allOf: [
+          {
+            application: {
+              allOf: [
+                {
+                  code: config.devops.code
+                }
+              ]
+            }
+          }
+        ]
+      }),
     });
 
     commit('promise', {name, promise});
@@ -107,14 +120,28 @@ export default {
     return promise;
   },
 
-  getActions({ state, commit }, payload) {
+  getActions({ state, commit }) {
     const name = 'actions';
 
     if (state.promises[name]) {
       return state.promises[name];
     }
 
-    const promise = api.get('actions', payload);
+    const promise = api.get('actions', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            application: {
+              allOf: [
+                {
+                  code: config.devops.code
+                }
+              ]
+            }
+          }
+        ]
+      }),
+    });
 
     promise
       .then(response => {

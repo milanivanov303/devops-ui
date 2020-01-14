@@ -1,90 +1,81 @@
 <template>
   <div class="col s12 l12">
     <div class="data-table">
-     <Table v-bind:request="request"  @add="createNew({})">
+     <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
           <template v-slot:buttons="{ data }">
-            <a @click="selectData(data)"><i class="material-icons right">attachment</i></a>
+            <a v-if="$can(updateDemo) || $can(updateAnyDemo)" @click="openAddEditDemoModal(data, 'update')" href="#"><i class="material-icons right">edit</i></a>
           </template>
         </Table>
     </div>
 
-    <Modal v-if="showModal" @close="showModal = false" class="right-sheet">
+    <Modal v-if="showAddEditDemoModal" @close="closeAddEditDemoModal()" @opened="isOpen = true" class="right-sheet">
       <template v-slot:header>Schedule a demo</template>
       <template v-slot:content>
         <form class=" col s12 l10 offset-l1">
           <div class="row">
-            <div class="input-field col s12" :class="{invalid: $v.currentDemo.name.$error}">
+            <div class="input-field col s12" :class="{invalid: $v.selectedDemo.name.$error}">
               <i class="material-icons prefix">person</i>
               <input
                 type="text"
                 id="name"
-                @blur="$v.currentDemo.name.$touch()"
-                v-model="currentDemo.name">
-              <label :class="{active: currentDemo.name}" for="name">Name</label>
+                @blur="$v.selectedDemo.name.$touch()"
+                v-model="selectedDemo.name">
+              <label :class="{active: selectedDemo.name}" for="name">Name*</label>
             </div>
             <div class="validator col s12 offset-l1 offset-m1">
-              <div class="red-text" v-if="$v.currentDemo.name.$error">
-                <p v-if="!$v.currentDemo.name.required">Name field must not be empty.</p>
-                <p v-if="!$v.currentDemo.name.minLen">Name must contain at least 6 charaters.</p>
-              </div>
-              <div class="green-text" v-if="!$v.currentDemo.name.$invalid">
-                <p>Name accepted!</p>
+              <div class="red-text" v-if="$v.selectedDemo.name.$error">
+                <p v-if="!$v.selectedDemo.name.required">Name field must not be empty.</p>
+                <p v-if="!$v.selectedDemo.name.minLen">Name must contain at least 6 charaters.</p>
               </div>
             </div>
           </div>
           <div class="row">
-            <div class="input-field col s12 " :class="{invalid: $v.currentDemo.email.$error}">
+            <div class="input-field col s12 " :class="{invalid: $v.selectedDemo.email.$error}">
               <i class="material-icons prefix">mail</i>
               <input
                 type="email"
                 id="email"
-                @blur="$v.currentDemo.email.$touch()"
-                v-model="currentDemo.email">
-              <label :class="{active: currentDemo.email}" for="email">Mail</label>
+                @blur="$v.selectedDemo.email.$touch()"
+                v-model="selectedDemo.email">
+              <label :class="{active: selectedDemo.email}" for="email">Mail<abbr title="Required">*</abbr></label>
             </div>
             <div class="validator col s12 offset-l1 offset-m1">
-              <div class="red-text" v-if="$v.currentDemo.email.$error">
-                <p v-if="!$v.currentDemo.email.email">Please provide a valid email address.</p>
-                <p v-if="!$v.currentDemo.email.required">Email must not be empty.</p>
-              </div>
-              <div class="green-text" v-if="!$v.currentDemo.email.$invalid">
-                <p>Email accepted!</p>
+              <div class="red-text" v-if="$v.selectedDemo.email.$error">
+                <p v-if="!$v.selectedDemo.email.email">Please provide a valid email address.</p>
+                <p v-if="!$v.selectedDemo.email.required">Email must not be empty.</p>
               </div>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12"
-                 :class="{invalid: $v.currentDemo.company.$error}">
+                 :class="{invalid: $v.selectedDemo.company.$error}">
               <i class="material-icons prefix">business</i>
               <input
                 type="text"
                 id="company"
-                @blur="$v.currentDemo.company.$touch()"
-                v-model="currentDemo.company">
-              <label :class="{active: currentDemo.company}" for="company">Company</label>
+                @blur="$v.selectedDemo.company.$touch()"
+                v-model="selectedDemo.company">
+              <label :class="{active: selectedDemo.company}" for="company">Company<abbr title="Required">*</abbr></label>
             </div>
             <div class="validator col s12 offset-l1 offset-m1">
-              <div class="red-text" v-if="$v.currentDemo.company.$error">
-                <p v-if="!$v.currentDemo.company.required">Company field must not be empty.</p>
-              </div>
-              <div class="green-text" v-if="!$v.currentDemo.company.$invalid">
-                <p>Company name accepted!</p>
+              <div class="red-text" v-if="$v.selectedDemo.company.$error">
+                <p v-if="!$v.selectedDemo.company.required">Company field must not be empty.</p>
               </div>
             </div>
           </div>
           <div class="row">
-            <div class="input-field col s12" :class="{invalid: $v.currentDemo.phone.$error}">
+            <div class="input-field col s12" :class="{invalid: $v.selectedDemo.phone.$error}">
               <i class="material-icons prefix">call</i>
               <input
                 type="text"
                 id="phone"
-                @blur="$v.currentDemo.phone.$touch()"
-                v-model="currentDemo.phone">
-              <label :class="{active: currentDemo.phone}" for="phone">Phone (optional)</label>
+                @blur="$v.selectedDemo.phone.$touch()"
+                v-model="selectedDemo.phone">
+              <label :class="{active: selectedDemo.phone}" for="phone">Phone</label>
             </div>
             <div class="validator col s12 offset-l1 offset-m1">
-              <div class="red-text" v-if="$v.currentDemo.phone.$error">
-                <p v-if="!$v.currentDemo.phone.numeric">Phone field must contain only numbers.</p>
+              <div class="red-text" v-if="$v.selectedDemo.phone.$error">
+                <p v-if="!$v.selectedDemo.phone.numeric">Phone field must contain only numbers.</p>
               </div>
             </div>
           </div>
@@ -92,45 +83,51 @@
             <Select class="col s12"
                     v-if="isOpen === true"
                     :select="selectBusiness"
-                    @selectedVal="selectedBusiness"/>
-            <div class="validator col s12 m7 l4 offset-l1 offset-m1">
-              <div class="red-text" v-if="$v.currentDemo.business.error">
-                <p v-if="!$v.currentDemo.business.required">Business field must not be empty.</p>
-              </div>
-              <div class="green-text" v-if="!$v.currentDemo.business.$invalid">
-                <p>Business accepted!</p>
+                    @selectedVal="selectedBusiness"
+                    v-model="selectedBusiness"/>
+            <div class="validator col s12 offset-l1 offset-m1">
+              <div class="red-text" v-if="$v.selectedDemo.business.error">
+                <p v-if="!$v.selectedDemo.business.required">Business field must not be empty.</p>
               </div>
             </div>
           </div>
           <div class="row">
-            <div class="input-field col s12 m6 l6"
-                 :class="{invalid: $v.currentDemo.active_from.$error}">
+            <div class="input-field col s12 m6 l6" :class="{invalid: $v.selectedDemo.active_from.$error}">
               <i class="material-icons prefix">date_range</i>
               <datetime input-id="activeFrom"
                         input-class="datetime-input"
                         type="datetime"
-                        v-model="currentDemo.active_from"
+                        v-model="selectedDemo.active_from"
                         :min-datetime="dateNow"
-                        :max-datetime="currentDemo.active_to"
+                        :max-datetime="selectedDemo.active_to"
                         class="datetime-theme"
                         format="yyyy-MM-dd HH:mm:ss"
                         zone="Europe/Sofia"
                         :week-start="1"/>
-              <label :class="{active: currentDemo.active_from}" for="activeFrom">Active from</label>
+              <label :class="{active: selectedDemo.active_from}" for="activeFrom">Active from</label>
+              <div class="validator col s12 offset-l1 offset-m1">
+                <div class="red-text" v-if="$v.selectedDemo.active_from.$error">
+                  <p v-if="!$v.selectedDemo.active_from.required">Active from field must not be empty.</p>
+                </div>
+              </div>
             </div>
-            <div class="input-field col s12 m6 l6"
-                 :class="{invalid: $v.currentDemo.active_to.$error}">
+            <div class="input-field col s12 m6 l6" :class="{invalid: $v.selectedDemo.active_to.$error}">
               <i class="material-icons prefix">date_range</i>
               <datetime input-id="activeTo"
                         input-class="datetime-input"
                         type="datetime"
-                        v-model="currentDemo.active_to"
+                        v-model="selectedDemo.active_to"
                         class="datetime-theme"
                         format="yyyy-MM-dd HH:mm:ss"
                         zone="Europe/Sofia"
                         :min-datetime="endDateCheck()"
                         :week-start="1"/>
-              <label :class="{active: currentDemo.active_to}" for="activeTo">Active to</label>
+              <label :class="{active: selectedDemo.active_to}" for="activeTo">Active to</label> 
+              <div class="validator col s12 offset-l1 offset-m1">
+                <div class="red-text" v-if="$v.selectedDemo.active_to.$error">
+                  <p v-if="!$v.selectedDemo.active_to.required">Active to field must not be empty.</p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">
@@ -138,9 +135,9 @@
               <i class="material-icons prefix">mode_edit</i>
               <textarea id="details"
                         class="materialize-textarea"
-                        v-model.trim="currentDemo.details"></textarea>
-              <label :class="{active: currentDemo.details}"
-                     for="icon_prefix2">Details (optional)</label>
+                        v-model.trim="selectedDemo.details"></textarea>
+              <label :class="{active: selectedDemo.details}"
+                     for="icon_prefix2">Details</label>
             </div>
           </div>
           <div class="row">
@@ -151,8 +148,8 @@
                        :disabled="statusCheck"
                        type="radio"
                        value="approved"
-                       v-model="currentDemo.status"
-                       :checked="currentDemo.status === 'approved'" />
+                       v-model="selectedDemo.status"
+                       :checked="selectedDemo.status === 'approved'" />
                 <span>Approved</span>
               </label>
             </div>
@@ -163,7 +160,7 @@
                        :disabled="statusCheck"
                        type="radio"
                        value="rejected"
-                       v-model="currentDemo.status"/>
+                       v-model="selectedDemo.status"/>
                 <span>Rejected</span>
               </label>
             </div>
@@ -175,8 +172,8 @@
           class="btn waves-effect waves-light"
           type="submit"
           name="action"
-          @click="submit()"
-        >
+            @click="action === 'create' ? createDemo() : updateDemo()"
+          >
           Save
         </button>
       </template>
@@ -203,9 +200,9 @@ export default {
   },
   data() {
     return {
-      showModal: false,
+      showAddEditDemoModal: false,
       isOpen: false,
-      action: '',
+      
       demoId: '',
       dateNow: DateTime.local().toISO(),
       request: {
@@ -225,38 +222,40 @@ export default {
         action: true,
         searchable: true,
       },
-      currentDemo: {
-        name: '',
-        email: '',
-        phone: '',
-        company: '',
-        details: '',
-        country: 'Bulgaria',
-        business: '',
-        active_from: '',
-        active_to: '',
-        status: 'approved',
-      },
+      action: null,
+      selectedDemo: {},
       selectBusiness: {
         id: 'business_select',
         name: 'business',
         displayed: 'name',
         icon: 'business_center',
-        options: {
-          cfc: {
-            name: 'Commercial Finance - Classical',
+        options: [
+          {
+            name: 'Commercial finance',
           },
-          cfr: {
-            name: 'Commercial Finance - Reverse',
+          {
+            name: 'Debt Collection',
           },
-        },
+          {
+            name: 'Leasing'
+          },
+          {
+            name: 'Factoring',
+          },
+          {
+            name: 'Consumer finance',
+          },
+          {
+            name: 'Other',
+          },
+        ],
         label: 'Business area',
         selected: '',
       },
     };
   },
   validations: {
-    currentDemo: {
+    selectedDemo: {
       name: {
         required,
         minLen: minLength(6),
@@ -288,38 +287,25 @@ export default {
     // },
     statusCheck() {
       const statuses = ['requested', 'approved', 'rejected'];
-      return !statuses.includes(this.currentDemo.status);
+      return !statuses.includes(this.selectedDemo.status);
     },
   },
   methods: {
-    createNew(demo) {
-      this.showModal = true;
-      this.currentDemo = {
-        name: '',
-        email: '',
-        phone: '',
-        company: '',
-        details: '',
-        country: 'Bulgaria',
-        business: '',
-        status: 'approved',
-      };
+    openAddEditDemoModal(demo, action) {
+      this.showAddEditDemoModal = true;
+      this.action = action;
+      this.selectedDemo = Object.assign({}, {country: 'Bulgaria'}, demo);
     },
-    selectData(demo) {
-      this.showModal = true;
-      this.currentDemo = demo;
-      this.currentDemo.active_from = DateTime.fromSQL(demo.active_from).toISO()
-        || DateTime.local().toISO();
-      this.currentDemo.active_to = DateTime.fromSQL(demo.active_to).toISO()
-        || DateTime.local().plus({ days: 1 }).toISO();
-      this.currentDemo.status = demo.status;
+    closeAddEditDemoModal() {
+      this.showAddEditDemoModal = false;
+      this.$v.$reset();
     },
     selectedBusiness(value) {
-      this.$v.currentDemo.business.$touch();
-      this.currentDemo.business = value.name;
+      this.$v.selectedDemo.business.$touch();
+      this.selectedDemo.business = value.name;
     },
     endDateCheck() {
-      const minActiveTo = this.currentDemo.active_from || this.dateNow;
+      const minActiveTo = this.selectedDemo.active_from || this.dateNow;
       return minActiveTo;
     },
     close() {
@@ -338,29 +324,7 @@ export default {
       }
       return url;
     },
-    submit() {
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        return;
-      }
-      const payload = {
-        formData: this.currentDemo,
-        action: this.action,
-        demoId: this.demoId,
-      };
-      payload.formData.active_from = DateTime.fromISO(this.currentDemo.active_from)
-        .toFormat('yyyy-MM-dd HH:mm:ss');
-      payload.formData.active_to = DateTime.fromISO(this.modalData.active_to)
-        .toFormat('yyyy-MM-dd HH:mm:ss');
-
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        return;
-      }
-      this.$store.dispatch('demo/submitDemo', payload);
-      this.close();
-    },
-    async prepareData() {
+    async getDemos() {
       const loader = this.$loading.show({ container: this.$el });
       const payload = {
         orders: JSON.stringify({ id: 'desc' }),
@@ -369,12 +333,70 @@ export default {
         loader.hide();
       });
       if (this.$route.params.id) {
-        this.selectedRow(this.$route.params);
+        this.createDemo(this.$route.params);
       }
     },
+    createDemo() {      
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        return;
+      }
+
+      const payload = {
+        formData: this.selectedDemo,
+        action: this.action,
+        demoId: this.demoId,
+      };
+      payload.formData.active_from = DateTime.fromISO(this.selectedDemo.active_from)
+        .toFormat('yyyy-MM-dd HH:mm:ss');
+      payload.formData.active_to = DateTime.fromISO(this.selectedDemo.active_to)
+        .toFormat('yyyy-MM-dd HH:mm:ss');
+
+      this.$store.dispatch('demo/createDemo', payload)
+      .then(() => {
+        this.showAddEditDemoModal = false;
+        this.$M.toast({html: 'The demo has been created!', classes: 'toast-seccess'});
+      })
+      .catch((error) => {
+        if (error.response.status === 422) {
+          return this.error = 'Unprocessable Entity';
+        }
+        this.error = error;
+      })
+    },
+    updateDemo() {
+     this.$v.$touch();
+      if (this.$v.$invalid) {
+        return;
+      }
+      const id = this.selectedDemo.id;
+      const payload = this.selectedDemo;
+      delete payload.id;
+      delete payload.code;
+      // const payload = {
+      //   formData: this.selectedDemo,
+      // };
+      payload.active_from = DateTime.fromISO(this.selectedDemo.active_from)
+        .toFormat('yyyy-MM-dd HH:mm:ss');
+      payload.active_to = DateTime.fromISO(this.selectedDemo.active_to)
+        .toFormat('yyyy-MM-dd HH:mm:ss');
+
+      
+      this.$store.dispatch('demo/updateDemo', { id, payload })
+      .then(() => {
+        this.showAddEditDemoModal = false;
+        this.$M.toast({html: 'The demo has been updated!', classes: 'toast-seccess'})
+      })
+      .catch((error) => {
+        if (error.response.status === 422) {
+          return this.error = 'Unprocessable Entity';
+        }
+        this.error = error;
+      });
+    }
   },
   mounted() {
-    this.prepareData();
+    this.getDemos();
   },
 };
 </script>

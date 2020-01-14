@@ -4,21 +4,24 @@
       <div class="data-table">
         <Table v-bind:request="request"  @add="openAddEditRoleModal({}, 'create')">
           <template v-slot:buttons="{ data }">
-            <a @click="openRemoveRoleModal(data)"><i class="material-icons right">delete</i></a>
-            <a @click="openAddEditRoleModal(data, 'update')"><i class="material-icons right">attachment</i></a>
+            <a v-if="$can(updateRole) || $can(updateAnyRole)" @click="openRemoveRoleModal(data)" href="#"><i class="material-icons right">delete</i></a>
+            <a v-if="$can(deleteRole) || $can(deleteanyRole)" @click="openAddEditRoleModal(data, 'update')" href="#"><i class="material-icons right">edit</i></a>
           </template>
         </Table>
       </div>
 
       <Modal
         v-if="showAddEditRoleModal"
-        @close="showAddEditRoleModal = false"
+        @close=" closeAddEditRoleModal()"
         @opened="initAddEditRoleModal()"
         class="right-sheet">
         <template v-slot:header>Create a new role
         </template>
         <template v-slot:content>
           <form @submit.prevent="onSubmit" class="col s12 l10 offset-l1">
+            <Alert 
+            v-if="error !== ''" 
+            v-bind:msg="error"/>
             <div class="row">
               <div class="input-field col s12" :class="{invalid: $v.selectedRole.name.$error}">
                 <i class="material-icons prefix">group</i>
@@ -26,7 +29,8 @@
                 type="text"
                 id="name"
                 v-model="selectedRole.name"
-                @blur="$v.selectedRole.name.$touch()">
+                @blur="$v.selectedRole.name.$touch()"
+                >
                 <label :class="{active: selectedRole.name}" for="name">Name</label>
               </div>
               <div class="validator col s12 offset-l1 offset-m1">
@@ -34,9 +38,6 @@
                   <p v-if="!$v.selectedRole.name.required">Name field must not be empty.</p>
                   <p v-if="!$v.selectedRole.name.minLen">Name must contain at least 6 charaters.</p>
                   <p v-if="!$v.selectedRole.name.maxLen">Name must not be more than 255 charaters.</p>
-                </div>
-                <div class="green-text" v-if="!$v.selectedRole.name.$invalid">
-                  <p>Name accepted!</p>
                 </div>
               </div>
             </div>
@@ -47,16 +48,14 @@
                 type="text"
                 id="description"
                 v-model="selectedRole.description"
-                @blur="$v.selectedRole.description.$touch()">
+                @blur="$v.selectedRole.description.$touch()"
+                >
                 <label :class="{active: selectedRole.description}" for="description">Description</label>
               </div>
               <div class="validator col s12 offset-l1 offset-m1">
                 <div class="red-text" v-if="$v.selectedRole.description.$error">
                   <p v-if="!$v.selectedRole.description.required">Description field must not be empty.</p>
                   <p v-if="!$v.selectedRole.description.minLen">Description must contain at least 6 charaters.</p>
-                </div>
-                <div class="green-text" v-if="!$v.selectedRole.description.$invalid">
-                  <p>Accepted!</p>
                 </div>
               </div>
             </div>
@@ -81,7 +80,7 @@
                   <li class="tab col s6" :class="{disabled: selectedRole.is_admin}"><a href="#actions">Actions</a></li>
                 </ul>
                 <div id="users">
-                  <List :items="users" :selected="selectedRole.users" v-model="selectedRole.users"/>
+                  <List :items="users" groupby="department.name" :selected="selectedRole.users" v-model="selectedRole.users"/>
                 </div>
                 <div id="actions">
                   <List :items="actions" :selected="selectedRole.actions" v-model="selectedRole.actions"/>
@@ -109,10 +108,10 @@
             <Preloader class="big"/>
             <p>Removing role ...</p>
           </div>
-          <div v-else-if="removed" class="center" >
+          <!-- <div v-else-if="removed" class="center" >
             <i class="material-icons large green-text">check_circle_outline</i>
             <p>Role was removed successfully</p>
-          </div>
+          </div> -->
           <div v-else-if="error" class="center">
             <i class="material-icons large red-text">error_outline</i>
             <p>{{ error }}</p>
@@ -139,13 +138,23 @@
 <script>
 
   import config from "@/config";
+  import Alert from '@/components/partials/Alert';
   import Modal from '@/components/partials/Modal';
   import Table from '@/components/partials/Table';
   import List from '@/components/partials/List';
+  import UserList from '@/components/partials/UserList';
   import Preloader from '@/components/partials/Preloader';
   import { required, minLength, maxLength } from 'vuelidate/lib/validators';
 
 export default {
+  components: {
+    Alert,
+    Modal,
+    Table,
+    List,
+    UserList,
+    Preloader,
+  },
   data() {
     return {
       showAddEditRoleModal: false,
@@ -155,6 +164,7 @@ export default {
         columns: {
           name: '',
           description: '',
+          is_admin: ''
         },
         add: true,
         export: false,
@@ -165,7 +175,7 @@ export default {
       selectedRole:{},
       removing: false,
       removed: false,
-      error: null
+      error: '',
     };
   },
   validations: {
@@ -182,12 +192,6 @@ export default {
       }
     },
   },
-  components: {
-    Modal,
-    Table,
-    List,
-    Preloader,
-  },
   computed: {
     users() {
       return this.$store.getters.users;
@@ -198,6 +202,9 @@ export default {
     actions () {
       return this.$store.getters.actions;
     },
+    // errorType () {
+    //   return this.$store.getters.error;
+    // }
   },
   methods: {
     openAddEditRoleModal(role, action) {
@@ -206,12 +213,16 @@ export default {
       this.selectedRole = Object.assign({}, role);
       this.selectedRole.application = { code: config.devops.code };
     },
+    closeAddEditRoleModal() {
+      this.showAddEditRoleModal = false;
+      this.$v.$reset();
+    },
     openRemoveRoleModal(role) {
       this.showRemoveRoleModal = true;
       this.selectedRole = role;
       this.removing = false;
       this.removed = false;
-      this.error = null;
+      this.error = '';
     },
     initAddEditRoleModal() {
       var elems = document.querySelectorAll('.tabs');
@@ -230,43 +241,15 @@ export default {
     },
     async getUsers() {
       const loader = this.$loading.show({ container: this.$el });
-
-      const payload = {
-        with: JSON.stringify(['department']),
-        orders: JSON.stringify({
-          "name": "asc"
-        }),
-      };
-
-      await this.$store.dispatch('getUsers', payload).then(() => {
-        loader.hide();
-      });
+      await this.$store.dispatch('getUsers').then(() => loader.hide());
     },
     async getRoles() {
       const loader = this.$loading.show({ container: this.$el });
-
-      const payload = {
-        with: JSON.stringify(['actions', 'users']),
-        orders: JSON.stringify({
-          "name": "asc"
-        }),
-      };
-
-      await this.$store.dispatch('getRoles', payload).then(() => {
-        loader.hide();
-      });
+      await this.$store.dispatch('getRoles').then(() => loader.hide());
     },
     async getActions() {
       const loader = this.$loading.show({ container: this.$el });
-
-      const payload = {
-        with: JSON.stringify([]),
-
-      };
-
-      await this.$store.dispatch('getActions', payload).then(() => {
-        loader.hide();
-      });
+      await this.$store.dispatch('getActions').then(() => loader.hide());
     },
     createRole() {
       this.$v.$touch();
@@ -274,8 +257,16 @@ export default {
         return;
       }
 
-      this.$store.dispatch('createRole', this.selectedRole).then(() => {
+      this.$store.dispatch('createRole', this.selectedRole)
+      .then(() => {
         this.showAddEditRoleModal = false;
+        this.$M.toast({html: 'The role has been created!', classes: 'toast-seccess'});
+      })
+      .catch((error) => {
+        if (error.response.status === 422) {
+          return this.error = 'Unprocessable Entity: Object required';
+        }
+        this.error = error;
       });
     },
     updateRole() {
@@ -287,14 +278,26 @@ export default {
       const id = this.selectedRole.id;
       const payload = this.selectedRole;
 
-      this.$store.dispatch('updateRole', { id, payload }).then(() => {
+      this.$store.dispatch('updateRole', { id, payload })
+      .then(() => {
         this.showAddEditRoleModal = false;
+        this.$M.toast({html: 'The role has been updated!', classes: 'toast-seccess'})
+      })
+      .catch((error) => {
+        if (error.response.status === 422) {
+          return this.error = 'Unprocessable Entity: Object required';
+        }
+        this.error = error;
       });
     },
     deleteRole() {
       this.removing = true;
       this.$store.dispatch('deleteRole', this.selectedRole.id)
-      .then(() => this.removed = true)
+      .then(() => {
+        this.removed = true;
+        this.showRemoveRoleModal = false;
+        this.$M.toast({html: 'The role has been deleted!', classes: 'toast-seccess'})
+})
       .catch((error) => {
         if (error.response.status === 403) {
           return this.error = 'You do not have insufficient rights to remove this role';

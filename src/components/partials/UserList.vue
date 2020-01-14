@@ -9,20 +9,22 @@
                         Add all
                     </a>
                 </caption>
-                <tr>
-                    <th>Name</th>
-                </tr>
-                <tbody>
-                    <tr v-for="(item, index) in filteredItems" :key="index">
-                        <td>
-                            {{ item.name }}
-                            <a href="#!" @click="selectItem(item)">
-                                <i class="material-icons tiny">add_circle</i>
-                                <b> Add</b>
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
+                <div>
+                    <tbody v-for="(group, groupby) in groups" :key="groupby">
+                        <tr>
+                            <th>{{groupby}}</th>
+                        </tr>
+                        <tr v-for="(item, index) in group" :key="index">
+                            <td>
+                                {{ item.name }}
+                                <a href="#!" @click="selectItem(item)">
+                                    <i class="material-icons tiny">add_circle</i>
+                                    <b> Add</b>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </div>
             </table>
         </div>
 
@@ -41,7 +43,7 @@
                 <tbody>
                     <tr v-for="(item, index) in filteredSelectedItems" :key="index">
                         <td>
-                            {{  item.name }}
+                            {{ item.name }}
                             <a href="#!" @click=" removeItem(item) ">
                                 <i class="material-icons tiny">do_not_disturb_on</i>
                                 <b> Remove</b>
@@ -58,10 +60,30 @@
 export default {
     props: {
         items: Array,
-        selected: Array
+        selected: Array,
+        groupby: String
+
     },
     computed: {
+        groups() {
+            return this.groupBy(this.items, this.groupby);
+
+
+            // let result = this.groupBy(this.items, this.groupby);
+
+            // let availableItems = result.filter( => {
+            //     return !this.selectedItems.find(i => i.id === .id);
+            // });
+
+            // if (!this.searchAvailable) {
+            //     return availableItems;
+            // }
+
+            // const regexp = new RegExp(this.searchAvailable, 'i');
+            // return availableItems.filter(item => item.name.match(regexp));
+        },
         filteredItems() {
+            debugger;
             let availableItems = this.items.filter(item => {
                 return !this.selectedItems.find(i => i.id === item.id);
             });
@@ -72,6 +94,7 @@ export default {
 
             const regexp = new RegExp(this.searchAvailable, 'i');
             return availableItems.filter(item => item.name.match(regexp));
+        
         },
         filteredSelectedItems() {
             if (!this.searchSelected) {
@@ -98,6 +121,30 @@ export default {
 
     },
     methods: {
+        groupBy(array, groupBy) {
+            
+            const result = {}
+            array.forEach(item => {
+                let groupKey = item;
+                groupBy.split('.').forEach((key) => {
+                    if (groupKey[key]) {
+                        groupKey = groupKey[key];
+                    }
+                });
+
+                if(!result[groupKey]) {
+                    result[groupKey] = []
+                }
+                result[groupKey].push(item)                
+            });
+// debugger;
+//             const availableItems = result.filter(item => {
+//                 return !this.selectedItems.find(i => i.id === item.id);
+//             });
+            
+//             return availableItems;
+            return result;
+        },
 
         selectItem(item) {
             this.selectedItems.push(item);

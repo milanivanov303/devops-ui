@@ -1,4 +1,5 @@
 // https://vuex.vuejs.org/en/mutations.html
+import Vue from 'vue';
 
 export default {
   promise(state, {name, promise}) {
@@ -34,7 +35,7 @@ export default {
   addRole(state, role) {
     const { roles } = state;
     roles.push(role);
-    Vue.set(state, 'roles', role);
+    Vue.set(state, 'roles', roles);
   },
   updateRole(state, role) {
     state.roles.map((r) => {

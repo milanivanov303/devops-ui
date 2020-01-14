@@ -32,7 +32,7 @@
             <i class="material-icons">event</i> Demo
           </router-link>
         </li>
-        <li v-bind:class="{ active: isActive('administration') }">
+        <li v-bind:class="{ active: isActive('administration') }" v-if="$can('isAdministators')">
           <a class="collapsible-header">
             <i class="material-icons">settings</i> Administration
             <i class="material-icons right">arrow_drop_down</i>

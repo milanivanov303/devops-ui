@@ -4,7 +4,7 @@
       <div class="data-table">
         <Table v-bind:request="request">
           <template v-slot:buttons="{ data }">
-              <a @click="selectedRow(data)"><i class="material-icons right">attachment</i></a>
+              <a @click="selectedRow(data)" href="#"><i class="material-icons right">edit</i></a>
           </template>
         </Table>
       </div>
