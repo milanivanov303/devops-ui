@@ -28,7 +28,7 @@
         </td>
         <td>
           <button 
-            v-bind:class="{ hidden: !$can('extranet.remove-builds') }"
+            v-bind:class="{ hidden: (!$can('extranet.remove-builds')  && !($store.getters.user.username === container.Labels.username)) }"
             class="btn-small red"
             title="Remove build"
             @click="openRemoveBuildModal(container)"
