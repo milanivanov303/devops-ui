@@ -9,26 +9,36 @@
                         Add all
                     </a>
                 </caption>
-                <div>
-                    <tbody v-for="(group, groupby) in groups" :key="groupby">
-                        <tr>
-                            <th>{{groupby}}</th>
-                        </tr>
-                        <tr v-for="(item, index) in group" :key="index">
-                            <td>
-                                {{ item.name }}
-                                <a href="#!" @click="selectItem(item)">
-                                    <i class="material-icons tiny">add_circle</i>
-                                    <b> Add</b>
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
+                
+                <div v-if="groupBy" class="userlist">
+                    <ul  v-for="(items, group) in getGroupedBy(filteredItems)" :key="group">
+                        <h6>{{group}}</h6>
+                        <li v-for="(item, index) in items" :key="index">
+                            {{ item.name }}
+                            <a href="#!" @click="selectItem(item)">
+                                <i class="material-icons tiny">add_circle</i>
+                                <b> Add</b>
+                            </a>
+                            <div class="divider"></div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div v-else class="userlist">
+                    <ul v-for="(item, index) in filteredItems" :key="index">
+                        <li>
+                            {{ item.name }}
+                            <a href="#!" @click="selectItem(item)">
+                                <i class="material-icons tiny">add_circle</i>
+                                <b> Add</b>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </table>
         </div>
 
-        <div class="col s12 l6 right">
+        <div class="col s12 l6 right" >
             <table class="responsive">
                 <caption>
                     <input type="text" placeholder="Search" v-model="searchSelected">
@@ -37,20 +47,32 @@
                         Remove all
                     </a>
                 </caption>
-                <tr>
-                    <th>Name</th>
-                </tr>
-                <tbody>
-                    <tr v-for="(item, index) in filteredSelectedItems" :key="index">
-                        <td>
+                
+                <div v-if="groupBy" class="userlist">
+                    <ul  v-for="(items, group) in getGroupedBy(filteredSelectedItems)" :key="group">
+                        <h6>{{group}}</h6>
+                        <li v-for="(item, index) in items" :key="index">
                             {{ item.name }}
-                            <a href="#!" @click=" removeItem(item) ">
+                            <a href="#!" @click="removeItem(item)">
                                 <i class="material-icons tiny">do_not_disturb_on</i>
                                 <b> Remove</b>
                             </a>
-                        </td>
-                    </tr>
-                </tbody>
+                            <div class="divider"></div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div v-else class="userlist">
+                    <ul v-for="(item, index) in filteredSelectedItems" :key="index">
+                        <li>
+                            {{ item.name }}
+                            <a href="#!" @click="removeItem(item)">
+                                <i class="material-icons tiny">do_not_disturb_on</i>
+                                <b> Remove</b>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </table>
         </div>
     </div>
@@ -61,29 +83,10 @@ export default {
     props: {
         items: Array,
         selected: Array,
-        groupby: String
-
+        groupBy: String
     },
     computed: {
-        groups() {
-            return this.groupBy(this.items, this.groupby);
-
-
-            // let result = this.groupBy(this.items, this.groupby);
-
-            // let availableItems = result.filter( => {
-            //     return !this.selectedItems.find(i => i.id === .id);
-            // });
-
-            // if (!this.searchAvailable) {
-            //     return availableItems;
-            // }
-
-            // const regexp = new RegExp(this.searchAvailable, 'i');
-            // return availableItems.filter(item => item.name.match(regexp));
-        },
         filteredItems() {
-            debugger;
             let availableItems = this.items.filter(item => {
                 return !this.selectedItems.find(i => i.id === item.id);
             });
@@ -93,7 +96,17 @@ export default {
             }
 
             const regexp = new RegExp(this.searchAvailable, 'i');
-            return availableItems.filter(item => item.name.match(regexp));
+            return availableItems.filter(item => {
+                if (item.name.match(regexp)) {
+                    return true;
+                }
+
+                if (this.getProperty(item, this.groupBy).match(regexp)) {
+                    return true;
+                }
+
+                return false;
+            });
         
         },
         filteredSelectedItems() {
@@ -102,7 +115,17 @@ export default {
             }
 
             const regexp = new RegExp(this.searchSelected, 'i');
-            return this.selectedItems.filter(item => item.name.match(regexp));
+            return this.selectedItems.filter(item => {
+                if (item.name.match(regexp)) {
+                    return true;
+                }
+
+                if (this.getProperty(item, this.groupBy).match(regexp)) {
+                    return true;
+                }
+
+                return false;
+            });
         }
     },
     data(){
@@ -116,36 +139,37 @@ export default {
         var elems = document.querySelectorAll('.tabs');
         this.$M.Tabs.init(elems);
         if (this.selected) {
-          this.selectedItems = this.selected;
+            this.selectedItems = this.items.filter(item => {
+                return this.selected.find(i => i.id === item.id);
+            });
         }
 
     },
     methods: {
-        groupBy(array, groupBy) {
-            
-            const result = {}
-            array.forEach(item => {
-                let groupKey = item;
-                groupBy.split('.').forEach((key) => {
-                    if (groupKey[key]) {
-                        groupKey = groupKey[key];
-                    }
-                });
+        getGroupedBy(items) {
+            let groupedBy = {};
 
-                if(!result[groupKey]) {
-                    result[groupKey] = []
+            items.forEach(item => {
+                const group = this.getProperty(item, this.groupBy);
+
+                if(!groupedBy[group]) {
+                    groupedBy[group] = []
                 }
-                result[groupKey].push(item)                
+                groupedBy[group].push(item)                
             });
-// debugger;
-//             const availableItems = result.filter(item => {
-//                 return !this.selectedItems.find(i => i.id === item.id);
-//             });
-            
-//             return availableItems;
-            return result;
-        },
 
+            return groupedBy;
+        },
+        getProperty(item, property) {
+            let value = item;
+            property.split('.').forEach((key) => {
+                if (value[key]) {
+                    value = value[key];
+                }
+            });
+
+            return value;
+        },
         selectItem(item) {
             this.selectedItems.push(item);
             this.$emit('input', this.selectedItems);
@@ -172,12 +196,16 @@ export default {
 <style scoped>
 
 thead,
-tbody {
+.userlist {
   display: block;
 }
 
-tbody {
+.userlist {
   max-height: 400px;
   overflow: auto;
 }
+li {
+    height: 40px;
+}
+
 </style>

@@ -27,7 +27,8 @@
           </a>
         </td>
         <td>
-          <button
+          <button 
+            v-bind:class="{ hidden: !$can('extranet.remove-builds') }"
             class="btn-small red"
             title="Remove build"
             @click="openRemoveBuildModal(container)"

@@ -76,6 +76,13 @@ export default {
 
     const promise = api.get('users', {
       with: JSON.stringify(['department', 'roles']),
+      filters: JSON.stringify({
+        allOf: [
+          {
+            status: 1
+          }
+        ]
+      })
     });
 
     commit('promise', {name, promise});
@@ -95,7 +102,7 @@ export default {
     }
 
     const promise = api.get('roles', {
-      with: JSON.stringify(['users', 'actions']),
+      with: JSON.stringify(['', 'users', 'actions']),
       filters: JSON.stringify({
         allOf: [
           {
@@ -177,4 +184,12 @@ export default {
       .catch(error => commit('error', error));
     return promise;
   },
+
+  updateUserRoles({ commit }, payload) { 	
+    const promise = api.put(`users/${payload.username}/${config.devops.code}/roles`, payload.roles);	
+      promise 
+      .then(response => commit('updateUserRoles', response.data.data))
+      .catch(error => commit('error', error));
+    return promise;
+  }
 };

@@ -1,7 +1,10 @@
 <template>
   <div class="row">
     <div class="col s12" >
-      <button class="btn" @click="open()">
+      <button 
+        v-bind:class="{ hidden: !$can('extranet.create-builds') }"
+        class="btn" 
+        @click="open()">
         <i class="material-icons left">add</i> New build
       </button>
 

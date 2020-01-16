@@ -41,9 +41,9 @@
       <tbody>
         <tr v-for="(data, key) in sorted"
             v-bind:key="key">
-          <td v-for="(value, key) in columns"
-              v-html="filterData(data[value], request.columns[value])"
-              v-bind:key="key">{{data[value]}}
+          <td v-for="(column, key) in columns"
+              v-html="filterData(data, column)"
+              v-bind:key="key">{{data[column]}}
           </td>
           <td>
             <slot name="buttons" :data="data"></slot>
@@ -123,13 +123,15 @@ export default {
       this.currentUser = key;
     },
     filterData(data, column) {
-      if (typeof column === 'function') {
-        return column(data);
+      const value = this.request.columns[column];
+
+      if (typeof value === 'function') {
+        return value(data);
       }
-      if (typeof data === 'object' && data !== null) {
-        return data[column];
+      if (typeof data[column] === 'object' && data[column] !== null) {
+        return data[column][value];
       }
-      return data;
+      return data[column];
     },
     sort(val) {
       this.colKey = val;
@@ -215,7 +217,8 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
       }
-      .first, .last {
+      // .first, 
+      .last {
         width: 10%;
       }
     }

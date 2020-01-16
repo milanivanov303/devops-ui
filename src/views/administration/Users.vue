@@ -17,31 +17,31 @@
             <div class="row">
               <div class="col s12">
                 <i class="material-icons">person</i>
-                <span id="info">{{currentUser.name}}</span>
+                <span id="info">{{selectedUser.name}}</span>
               </div>
             </div>
             <div class="row">
               <div class="col s12">
                 <i class="material-icons">account_circle</i>
-                <span id="info">{{currentUser.username}}</span>
+                <span id="info">{{selectedUser .username}}</span>
               </div>
             </div>
             <div class="row">
               <div class="col s12">
                 <i class="material-icons">mail</i>
-                <span id="info">{{currentUser.email}}</span>
+                <span id="info">{{selectedUser.email}}</span>
               </div>
             </div>
             <div class="row">
               <div class="col s12">
                 <i class="material-icons">phone</i>
-                <span id="info">{{currentUser.phone}}</span>
+                <span id="info">{{selectedUser.phone}}</span>
               </div>
             </div>
             <div class="row">
               <div class="col s12">
                 <i class="material-icons">people</i>
-                <span id="info">{{currentUser.department.name}}</span>
+                <span id="info">{{selectedUser.department.name}}</span>
               </div>
             </div>
             <div class="row">
@@ -50,7 +50,7 @@
                   <li class="tab col s12"><a href="#roles">Roles</a></li>
                 </ul>
                 <div id="roles">
-                  <List :items="roles" :selected="currentUser.roles" v-model="currentUser.roles"/>
+                  <List :items="roles" :selected="selectedUser.roles" v-model="selectedUser.roles"/>
                 </div>
               </div>
             </div>
@@ -83,7 +83,7 @@ export default {
     return {
       value: 10,
       showModal: false,
-      currentUser: {},
+      selectedUser: {},
       user: {
         roles: [],
       },
@@ -119,7 +119,7 @@ export default {
   methods: {
     selectedRow (user) {
       this.showModal = true;
-      this.currentUser = user;
+      this.selectedUser = user;
     },
 
     initModal() {
@@ -138,10 +138,21 @@ export default {
     },
 
     updateUserRoles() {
-      this.$store.dispatch('updateUserRoles', this.currentUser).then(() => {
-        console.log('success !!!');
-      });
-      this.showModal = false;
+      
+      // const id = this.selectedUser.id;
+      const payload = this.selectedUser;    
+
+      this.$store.dispatch('updateUserRoles', payload )
+      .then(() => {
+        this.showModal = false;
+        this.$M.toast({html: 'The user has been updated!', classes: 'toast-seccess'})
+      })
+      .catch((error) => {
+        if (error.response.status === 422) {
+          return this.error = 'Unprocessable Entity';
+        }
+        this.error = error;
+      });    
     },
   },
   mounted() {

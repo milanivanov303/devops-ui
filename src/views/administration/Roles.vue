@@ -80,7 +80,7 @@
                   <li class="tab col s6" :class="{disabled: selectedRole.is_admin}"><a href="#actions">Actions</a></li>
                 </ul>
                 <div id="users">
-                  <List :items="users" groupby="department.name" :selected="selectedRole.users" v-model="selectedRole.users"/>
+                  <UserList :items="users" :selected="selectedRole.users" groupBy="department.name" v-model="selectedRole.users"/>
                 </div>
                 <div id="actions">
                   <List :items="actions" :selected="selectedRole.actions" v-model="selectedRole.actions"/>
@@ -164,7 +164,8 @@ export default {
         columns: {
           name: '',
           description: '',
-          is_admin: ''
+          userCounter: (role) => role.users.length,
+          is_admin: (role) => role.is_admin === 1 ? '<i class="material-icons">check</i>' : '' 
         },
         add: true,
         export: false,
@@ -274,7 +275,6 @@ export default {
       if (this.$v.$invalid) {
         return;
       }
-
       const id = this.selectedRole.id;
       const payload = this.selectedRole;
 
@@ -297,7 +297,7 @@ export default {
         this.removed = true;
         this.showRemoveRoleModal = false;
         this.$M.toast({html: 'The role has been deleted!', classes: 'toast-seccess'})
-})
+      })
       .catch((error) => {
         if (error.response.status === 403) {
           return this.error = 'You do not have insufficient rights to remove this role';
