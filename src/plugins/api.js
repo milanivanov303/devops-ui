@@ -14,7 +14,7 @@ class Api {
   }
 
   requestInterceptor(config) {
-    const token = sessionStorage.getItem(`token.${this.code}`);
+    const token = localStorage.getItem(`token.${this.code}`);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -24,7 +24,7 @@ class Api {
   errorInterceptor(error) {
     if (error.response.status === 401) {
       return store.dispatch('getToken', this.code).then(response => {
-        sessionStorage.setItem(`token.${this.code}`, response.data.token);
+        localStorage.setItem(`token.${this.code}`, response.data.token);
         error.config.headers.Authorization = `Bearer ${response.data.token}`;
         return Axios.create().request(error.config);
       });
