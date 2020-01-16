@@ -4,8 +4,8 @@
       <div class="data-table">
         <Table v-bind:request="request"  @add="openAddEditRoleModal({}, 'create')">
           <template v-slot:buttons="{ data }">
-            <a v-if="$can(updateRole) || $can(updateAnyRole)" @click="openRemoveRoleModal(data)" href="#"><i class="material-icons right">delete</i></a>
-            <a v-if="$can(deleteRole) || $can(deleteanyRole)" @click="openAddEditRoleModal(data, 'update')" href="#"><i class="material-icons right">edit</i></a>
+            <a @click="openRemoveRoleModal(data)" href="#"><i class="material-icons right">delete</i></a>
+            <a @click="openAddEditRoleModal(data, 'update')" href="#"><i class="material-icons right">edit</i></a>
           </template>
         </Table>
       </div>
