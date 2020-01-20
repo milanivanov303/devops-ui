@@ -29,6 +29,7 @@
                 <div class="row">
                   <div class="col s12 center">
                     <button
+                    id="login-btn"
                       v-if="!loggingIn"
                       @click="login()"
                       class="btn waves-effect waves-light w-100"
@@ -147,6 +148,15 @@ export default {
           this.error = 'Could not login with SSO, Please contact phpid';
         });
     },
+  },
+  mounted() {
+    var input = document.getElementById("username-input");
+    input.addEventListener("keyup", function(event) {
+      if (event.keyCode === 13) {
+      event.preventDefault();
+      document.getElementById("login-btn").click();
+      }
+    }); 
   },
 };
 </script>

@@ -94,6 +94,18 @@ export default {
     return promise;
   },
 
+  getUser({ state, commit }) {
+    const promise = api.get(`auth/identity?code=${config['devops'].code}`);
+
+    promise
+      .then(response => {
+        commit('user', response.data);
+        //localStorage.setItem('user', JSON.stringify(response.data));
+      });
+
+    return promise;
+  },
+
   getRoles({ state, commit }) {
     const name = 'roles';
 

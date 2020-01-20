@@ -59,7 +59,7 @@
                 </div>
               </div>
             </div>
-            <div class="row">
+            <div class="row" v-if="$can('isAdministrators')">
                 <div class="col s12">
                   <label>
                     <input
@@ -76,8 +76,8 @@
               <div class="col s12">
 
                 <ul class="tabs col s12">
-                  <li class="tab col s6" ><a href="#users">Users</a></li>
-                  <li class="tab col s6" :class="{disabled: selectedRole.is_admin}"><a href="#actions">Actions</a></li>
+                  <li class="tab col s6"><a href="#users">Users</a></li>
+                  <li class="tab col s6" :class="{disabled: (selectedRole.is_admin)}"><a href="#actions">Actions</a></li>
                 </ul>
                 <div id="users">
                   <UserList :items="users" :selected="selectedRole.users" groupBy="department.name" v-model="selectedRole.users"/>

@@ -81,7 +81,11 @@
           </template>
         </template>
         <template v-slot:footer>
-          <button v-if="!build.started" class="waves-effect btn" @click="start()">
+          <button 
+            id="start-btn"
+            v-if="!build.started" 
+            class="waves-effect btn" 
+            @click="start()">
             <i class="material-icons left">play_arrow</i> Start
           </button>
         </template>
