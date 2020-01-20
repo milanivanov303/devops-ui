@@ -100,7 +100,7 @@ export default {
     promise
       .then(response => {
         commit('user', response.data);
-        //localStorage.setItem('user', JSON.stringify(response.data));
+        localStorage.setItem('user', JSON.stringify(response.data));
       });
 
     return promise;

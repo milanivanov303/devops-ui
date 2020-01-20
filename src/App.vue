@@ -32,12 +32,9 @@ export default {
       }
       return route.meta.title;
     },
-    async getUser() {
-      await this.$store.dispatch('getUser');
-    },
   },
   mounted() {
-    this.getUser();
+    this.$store.dispatch('getUser');
   }
 };
 </script>
