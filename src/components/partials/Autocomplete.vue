@@ -44,7 +44,7 @@ export default {
         return '';
       }
       return this.value[this.getValueKey()] || this.value;
-    }
+    },
   },
   methods: {
     getInputId() {

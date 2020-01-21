@@ -4,8 +4,12 @@
       <div class="data-table">
         <Table v-bind:request="request"  @add="openAddEditRoleModal({}, 'create')">
           <template v-slot:buttons="{ data }">
-            <a @click="openRemoveRoleModal(data)" href="#"><i class="material-icons right">delete</i></a>
-            <a @click="openAddEditRoleModal(data, 'update')" href="#"><i class="material-icons right">edit</i></a>
+            <a @click="openRemoveRoleModal(data)" href="#">
+              <i class="material-icons right">delete</i>
+            </a>
+            <a @click="openAddEditRoleModal(data, 'update')" href="#">
+              <i class="material-icons right">edit</i>
+            </a>
           </template>
         </Table>
       </div>
@@ -15,12 +19,18 @@
         @close=" closeAddEditRoleModal()"
         @opened="initAddEditRoleModal()"
         class="right-sheet">
-        <template v-slot:header>Create a new role
+        <template v-slot:header>
+          <div v-if="action === 'create'">
+            Create a new role
+          </div>
+          <div v-else>
+            Update role {{selectedRole.name}}
+          </div>
         </template>
         <template v-slot:content>
           <form @submit.prevent="onSubmit" class="col s12 l10 offset-l1">
-            <Alert 
-            v-if="error !== ''" 
+            <Alert
+            v-if="error !== ''"
             v-bind:msg="error"/>
             <div class="row">
               <div class="input-field col s12" :class="{invalid: $v.selectedRole.name.$error}">
@@ -31,18 +41,28 @@
                 v-model="selectedRole.name"
                 @blur="$v.selectedRole.name.$touch()"
                 >
-                <label :class="{active: selectedRole.name}" for="name">Name</label>
+                <label
+                  :class="{active: selectedRole.name}"
+                  for="name">Name
+                </label>
               </div>
               <div class="validator col s12 offset-l1 offset-m1">
                 <div class="red-text" v-if="$v.selectedRole.name.$error">
-                  <p v-if="!$v.selectedRole.name.required">Name field must not be empty.</p>
-                  <p v-if="!$v.selectedRole.name.minLen">Name must contain at least 6 charaters.</p>
-                  <p v-if="!$v.selectedRole.name.maxLen">Name must not be more than 255 charaters.</p>
+                  <p v-if="!$v.selectedRole.name.required">
+                    Name field must not be empty.
+                  </p>
+                  <p v-if="!$v.selectedRole.name.minLen">
+                    Name must contain at least 6 charaters.
+                  </p>
+                  <p v-if="!$v.selectedRole.name.maxLen">
+                    Name must not be more than 255 charaters.
+                  </p>
                 </div>
               </div>
             </div>
             <div class="row">
-              <div class="input-field col s12" :class="{invalid: $v.selectedRole.description.$error}">
+              <div class="input-field col s12"
+                   :class="{invalid: $v.selectedRole.description.$error}">
                 <i class="material-icons prefix">menu</i>
                 <input
                 type="text"
@@ -50,12 +70,19 @@
                 v-model="selectedRole.description"
                 @blur="$v.selectedRole.description.$touch()"
                 >
-                <label :class="{active: selectedRole.description}" for="description">Description</label>
+                <label
+                  :class="{active: selectedRole.description}"
+                  for="description">Description
+                </label>
               </div>
               <div class="validator col s12 offset-l1 offset-m1">
                 <div class="red-text" v-if="$v.selectedRole.description.$error">
-                  <p v-if="!$v.selectedRole.description.required">Description field must not be empty.</p>
-                  <p v-if="!$v.selectedRole.description.minLen">Description must contain at least 6 charaters.</p>
+                  <p v-if="!$v.selectedRole.description.required">
+                    Description field must not be empty.
+                  </p>
+                  <p v-if="!$v.selectedRole.description.minLen">
+                    Description must contain at least 6 charaters.
+                  </p>
                 </div>
               </div>
             </div>
@@ -76,14 +103,26 @@
               <div class="col s12">
 
                 <ul class="tabs col s12">
-                  <li class="tab col s6"><a href="#users">Users</a></li>
-                  <li class="tab col s6" :class="{disabled: (selectedRole.is_admin)}"><a href="#actions">Actions</a></li>
+                  <li class="tab col s6">
+                    <a href="#users">Users</a>
+                  </li>
+                  <li class="tab col s6"
+                      :class="{disabled: (selectedRole.is_admin)}">
+                        <a href="#actions">Actions</a>
+                  </li>
                 </ul>
                 <div id="users">
-                  <UserList :items="users" :selected="selectedRole.users" groupBy="department.name" v-model="selectedRole.users"/>
+                  <List
+                    :items="users"
+                    :selected="selectedRole.users"
+                    groupBy="department.name"
+                    v-model="selectedRole.users"/>
                 </div>
                 <div id="actions">
-                  <List :items="actions" :selected="selectedRole.actions" v-model="selectedRole.actions"/>
+                  <List
+                    :items="actions"
+                    :selected="selectedRole.actions"
+                    v-model="selectedRole.actions"/>
                 </div>
 
               </div>
@@ -137,14 +176,13 @@
 
 <script>
 
-  import config from "@/config";
-  import Alert from '@/components/partials/Alert';
-  import Modal from '@/components/partials/Modal';
-  import Table from '@/components/partials/Table';
-  import List from '@/components/partials/List';
-  import UserList from '@/components/partials/UserList';
-  import Preloader from '@/components/partials/Preloader';
-  import { required, minLength, maxLength } from 'vuelidate/lib/validators';
+import { required, minLength, maxLength } from 'vuelidate/lib/validators';
+import config from '@/config';
+import Alert from '@/components/partials/Alert';
+import Modal from '@/components/partials/Modal';
+import Table from '@/components/partials/Table';
+import List from '@/components/partials/List';
+import Preloader from '@/components/partials/Preloader';
 
 export default {
   components: {
@@ -152,7 +190,6 @@ export default {
     Modal,
     Table,
     List,
-    UserList,
     Preloader,
   },
   data() {
@@ -160,12 +197,12 @@ export default {
       showAddEditRoleModal: false,
       showRemoveRoleModal: false,
       request: {
-        data: 'roles',
+        data: 'um/roles',
         columns: {
           name: '',
           description: '',
-          userCounter: (role) => role.users.length,
-          is_admin: (role) => role.is_admin === 1 ? '<i class="material-icons">check</i>' : '' 
+          userCounter: role => role.users.length,
+          is_admin: role => (role.is_admin === 1 ? '<i class="material-icons">check</i>' : ''),
         },
         add: true,
         export: false,
@@ -173,7 +210,7 @@ export default {
         searchable: true,
       },
       action: null,
-      selectedRole:{},
+      selectedRole: {},
       removing: false,
       removed: false,
       error: '',
@@ -190,18 +227,18 @@ export default {
       description: {
         required,
         minLen: minLength(6),
-      }
+      },
     },
   },
   computed: {
     users() {
-      return this.$store.getters.users;
+      return this.$store.state.um.users;
     },
     roles() {
-      return this.$store.getters.roles;
+      return this.$store.state.um.roles;
     },
-    actions () {
-      return this.$store.getters.actions;
+    actions() {
+      return this.$store.state.um.actions;
     },
     // errorType () {
     //   return this.$store.getters.error;
@@ -226,31 +263,31 @@ export default {
       this.error = '';
     },
     initAddEditRoleModal() {
-      var elems = document.querySelectorAll('.tabs');
+      const elems = document.querySelectorAll('.tabs');
       this.$M.Tabs.init(elems);
     },
     toggleIsAdmin() {
-      if (isAdmin_check.checked) {
+      const isAdmin = document.getElementById('isAdmin_check');
+      if (isAdmin.checked) {
         this.selectedRole.is_admin = 1;
-        var elems = document.querySelectorAll('.tabs');
-        var instance = M.Tabs.getInstance(elems[0]);
+        const elems = document.querySelectorAll('.tabs');
+        const instance = this.$M.Tabs.getInstance(elems[0]);
         instance.select('users');
-      }
-      else{
+      } else {
         this.selectedRole.is_admin = 0;
       }
     },
     async getUsers() {
       const loader = this.$loading.show({ container: this.$el });
-      await this.$store.dispatch('getUsers').then(() => loader.hide());
+      await this.$store.dispatch('um/getUsers').then(() => loader.hide());
     },
     async getRoles() {
       const loader = this.$loading.show({ container: this.$el });
-      await this.$store.dispatch('getRoles').then(() => loader.hide());
+      await this.$store.dispatch('um/getRoles').then(() => loader.hide());
     },
     async getActions() {
       const loader = this.$loading.show({ container: this.$el });
-      await this.$store.dispatch('getActions').then(() => loader.hide());
+      await this.$store.dispatch('um/getActions').then(() => loader.hide());
     },
     createRole() {
       this.$v.$touch();
@@ -258,53 +295,48 @@ export default {
         return;
       }
 
-      this.$store.dispatch('createRole', this.selectedRole)
-      .then(() => {
-        this.showAddEditRoleModal = false;
-        this.$M.toast({html: 'The role has been created!', classes: 'toast-seccess'});
-      })
-      .catch((error) => {
-        if (error.response.status === 422) {
-          return this.error = 'Unprocessable Entity: Object required';
-        }
-        this.error = error;
-      });
+      this.$store.dispatch('um/createRole', this.selectedRole)
+        .then(() => {
+          this.showAddEditRoleModal = false;
+          this.$M.toast({ html: 'The role has been created!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          this.error = error;
+          return error;
+        });
     },
     updateRole() {
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
       }
-      const id = this.selectedRole.id;
+      const { id } = this.selectedRole;
       const payload = this.selectedRole;
 
-      this.$store.dispatch('updateRole', { id, payload })
-      .then(() => {
-        this.showAddEditRoleModal = false;
-        this.$M.toast({html: 'The role has been updated!', classes: 'toast-seccess'})
-      })
-      .catch((error) => {
-        if (error.response.status === 422) {
-          return this.error = 'Unprocessable Entity: Object required';
-        }
-        this.error = error;
-      });
+      this.$store.dispatch('um/updateRole', { id, payload })
+        .then(() => {
+          this.showAddEditRoleModal = false;
+          this.$M.toast({ html: 'The role has been updated!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          this.error = error;
+          return error;
+        });
     },
     deleteRole() {
       this.removing = true;
-      this.$store.dispatch('deleteRole', this.selectedRole.id)
-      .then(() => {
-        this.removed = true;
-        this.showRemoveRoleModal = false;
-        this.$M.toast({html: 'The role has been deleted!', classes: 'toast-seccess'})
-      })
-      .catch((error) => {
-        if (error.response.status === 403) {
-          return this.error = 'You do not have insufficient rights to remove this role';
-        }
-        this.error = error;
-      })
-      .finally(() => this.removing = false);
+      this.$store.dispatch('um/deleteRole', this.selectedRole.id)
+        .then(() => {
+          this.removed = true;
+          this.showRemoveRoleModal = false;
+          this.$M.toast({ html: 'The role has been deleted!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          if (error.response.status === 403) {
+            this.error = 'You do not have insufficient rights to remove this role';
+          }
+        })
+        .finally(this.removing = false);
     },
   },
   mounted() {

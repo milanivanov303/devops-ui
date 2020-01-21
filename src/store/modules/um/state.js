@@ -6,8 +6,9 @@ if (localStorage.getItem('user')) {
 
 export default {
   user,
-  loggingIn: false,
-  loggingInSSO: false,
+  users: [],
+  roles: [],
+  actions: [],
   error: '',
   promises: {},
 };

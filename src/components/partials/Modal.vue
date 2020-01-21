@@ -37,6 +37,6 @@ export default {
   },
   destroyed() {
     this.$M.Modal.getInstance(this.$el).close();
-  }  
+  },
 };
 </script>

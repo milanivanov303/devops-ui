@@ -88,7 +88,7 @@ export default {
         roles: [],
       },
       request: {
-        data: 'users',
+        data: 'um/users',
         columns: {
           name: '',
           username: '',
@@ -110,61 +110,58 @@ export default {
   },
   computed: {
     users() {
-      return this.$store.getters.users;
+      return this.$store.state.um.users;
     },
     roles() {
-      return this.$store.getters.roles;
+      return this.$store.state.um.roles;
     },
   },
   methods: {
-    selectedRow (user) {
+    selectedRow(user) {
       this.showModal = true;
       this.selectedUser = user;
     },
 
     initModal() {
-      var elems = document.querySelectorAll('.tabs');
+      const elems = document.querySelectorAll('.tabs');
       this.$M.Tabs.init(elems);
     },
 
     getUsers() {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('getUsers').then(() => loader.hide());
+      this.$store.dispatch('um/getUsers').then(() => loader.hide());
     },
 
     getRoles() {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('getRoles').then(() => loader.hide());
+      this.$store.dispatch('um/getRoles').then(() => loader.hide());
     },
 
     updateUserRoles() {
-      
       // const id = this.selectedUser.id;
-      const payload = this.selectedUser;    
+      const payload = this.selectedUser;
 
-      this.$store.dispatch('updateUserRoles', payload )
-      .then(() => {
-        this.showModal = false;
-        this.$M.toast({html: 'The user has been updated!', classes: 'toast-seccess'})
-      })
-      .catch((error) => {
-        if (error.response.status === 422) {
-          return this.error = 'Unprocessable Entity';
-        }
-        this.error = error;
-      });    
+      this.$store.dispatch('updateUserRoles', payload)
+        .then(() => {
+          this.showModal = false;
+          this.$M.toast({ html: 'The user has been updated!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          this.error = error;
+          return error;
+        });
     },
   },
   mounted() {
     this.getUsers();
     this.getRoles();
 
-    var elems = document.querySelectorAll('.modal');
-    this.$M.Modal.init(elems);
-    var elems = document.querySelectorAll('.tabs');
+    const elem = document.querySelectorAll('.modal');
+    this.$M.Modal.init(elem);
+    const elems = document.querySelectorAll('.tabs');
     this.$M.Tabs.init(elems);
-    var elems = document.querySelectorAll('select');
-    this.$M.FormSelect.init(elems);
+    const element = document.querySelectorAll('select');
+    this.$M.FormSelect.init(element);
   },
 };
 </script>

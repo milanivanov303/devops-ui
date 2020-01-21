@@ -117,8 +117,8 @@ export default {
     },
   },
   methods: {
-   
-    getUser (key) {
+
+    getUser(key) {
       this.showModal = true;
       this.currentUser = key;
     },
@@ -197,9 +197,9 @@ export default {
     },
   },
   mounted() {
-    var elems = document.querySelectorAll('select');
+    const elems = document.querySelectorAll('select');
     this.$M.FormSelect.init(elems);
-  }
+  },
 };
 </script>
 
@@ -217,7 +217,7 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
       }
-      // .first, 
+      // .first,
       .last {
         width: 10%;
       }

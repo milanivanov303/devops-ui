@@ -1,7 +1,7 @@
 import store from '@/store';
 
-export default function can (action) {
-  const user = store.getters.user;
+export default function can(action) {
+  const { user } = store.getters;
 
   if (typeof user.permissions === 'undefined') {
     return false;
@@ -16,4 +16,4 @@ export default function can (action) {
   }
 
   return false;
-};
+}

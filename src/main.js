@@ -11,15 +11,14 @@ import DefaultLayout from './components/layouts/Default';
 import LoginLayout from './components/layouts/Login';
 
 import './config';
-import './plugins/auth';
+import can from './plugins/auth';
 import 'vue-loading-overlay/dist/vue-loading.css';
+
 
 Vue.use(Loading);
 Vue.use(vuePartials);
 Vue.use(Vuelidate);
 Vue.prototype.$M = M;
-
-import can from '@/plugins/auth';
 Vue.prototype.$can = can;
 
 Vue.component('default-layout', DefaultLayout);

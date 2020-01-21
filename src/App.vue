@@ -34,8 +34,8 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch('getUser');
-  }
+    this.$store.dispatch('um/getUser');
+  },
 };
 </script>
 

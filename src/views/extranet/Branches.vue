@@ -77,8 +77,7 @@ export default {
   mounted() {
     this.getBranches();
     this.getContainers();
-    document.querySelector('.selected-branch').scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
-
+    document.querySelector('.selected-branch').scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
   },
   watch: {
     search(value) {

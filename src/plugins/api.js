@@ -23,7 +23,7 @@ class Api {
 
   errorInterceptor(error) {
     if (error.response.status === 401) {
-      return store.dispatch('getToken', this.code).then(response => {
+      return store.dispatch('getToken', this.code).then((response) => {
         localStorage.setItem(`token.${this.code}`, response.data.token);
         error.config.headers.Authorization = `Bearer ${response.data.token}`;
         return Axios.create().request(error.config);
@@ -33,7 +33,7 @@ class Api {
   }
 
   get(uri, options = {}, config = {}) {
-    let query = queryString.stringify(options, {arrayFormat: 'index'});
+    let query = queryString.stringify(options, { arrayFormat: 'index' });
     if (query) {
       query = `?${query}`;
     }

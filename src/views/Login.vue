@@ -84,7 +84,7 @@
 import Alert from '@/components/partials/Alert';
 import Loading from '@/components/layouts/Loading';
 import config from '../config';
-import {getParam, getSsoUrl} from "@/plugins/helpers";
+import { getSsoUrl } from '@/plugins/helpers';
 
 export default {
   components: {
@@ -114,16 +114,17 @@ export default {
       this.$store.dispatch('login', {
         username: this.username,
         password: this.password,
-        code: config.devops.code
+        code: config.devops.code,
       })
         .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
-            return this.error = 'Incorrect username or password';
+            this.error = 'Incorrect username or password';
+          } else {
+            this.error = 'Could not login. Please contact phpid';
           }
-          this.error = 'Could not login. Please contact phpid';
         })
-        .finally(() => this.loggingIn = false);
+        .finally(this.loggingIn = false);
     },
     loginSSO() {
       this.loggingInSSO = true;
@@ -131,13 +132,14 @@ export default {
 
       localStorage.setItem('sso-login', 'true');
 
-      const token = this.$route.query.token;
+      const { token } = this.$route.query;
       if (!token) {
-        return window.location.href = getSsoUrl();
+        window.location.href = getSsoUrl();
+        return;
       }
 
       // remove token param from URL and browser history
-      let query = Object.assign({}, this.$route.query);
+      const query = Object.assign({}, this.$route.query);
       delete query.token;
       this.$router.replace({ query });
 
@@ -150,13 +152,13 @@ export default {
     },
   },
   mounted() {
-    var input = document.getElementById("username-input");
-    input.addEventListener("keyup", function(event) {
+    const input = document.getElementById('username-input');
+    input.addEventListener('keyup', (event) => {
       if (event.keyCode === 13) {
-      event.preventDefault();
-      document.getElementById("login-btn").click();
+        event.preventDefault();
+        document.getElementById('login-btn').click();
       }
-    }); 
+    });
   },
 };
 </script>

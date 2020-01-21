@@ -1,9 +1,9 @@
 <template>
   <div class="row">
     <div class="col s12" >
-      <button 
+      <button
         v-if="$can('extranet.create-builds')"
-        class="btn" 
+        class="btn"
         @click="open()">
         <i class="material-icons left">add</i> New build
       </button>
@@ -81,10 +81,10 @@
           </template>
         </template>
         <template v-slot:footer>
-          <button 
+          <button
             id="start-btn"
-            v-if="!build.started" 
-            class="waves-effect btn" 
+            v-if="!build.started"
+            class="waves-effect btn"
             @click="start()">
             <i class="material-icons left">play_arrow</i> Start
           </button>
@@ -173,18 +173,18 @@ export default {
             {
               instance_type_id: {
                 value: ['DEV', 'VAL'],
-                operator: 'in'
-              }
+                operator: 'in',
+              },
             },
             {
               owner: {
                 allOf: [
                   {
-                    key: "codix"
-                  }
-                ]
-              }
-            }
+                    key: 'codix',
+                  },
+                ],
+              },
+            },
           ],
         }),
         orders: JSON.stringify({

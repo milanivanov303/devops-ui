@@ -3,13 +3,27 @@
     <div class="data-table">
      <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
           <template v-slot:buttons="{ data }">
-            <a v-if="$can(updateDemo) || $can(updateAnyDemo)" @click="openAddEditDemoModal(data, 'update')" href="#"><i class="material-icons right">edit</i></a>
+            <a v-if="$can(updateDemo) || $can(updateAnyDemo)"
+               @click="openAddEditDemoModal(data, 'update')"
+               href="#">
+              <i class="material-icons right">edit</i>
+            </a>
           </template>
         </Table>
     </div>
 
-    <Modal v-if="showAddEditDemoModal" @close="closeAddEditDemoModal()" @opened="isOpen = true" class="right-sheet">
-      <template v-slot:header>Schedule a demo</template>
+    <Modal v-if="showAddEditDemoModal"
+           @close="closeAddEditDemoModal()"
+           @opened="isOpen = true"
+           class="right-sheet">
+      <template v-slot:header>
+        <div v-if="action === 'create'">
+          Schedule a demo
+        </div>
+        <div v-else>
+          Update demo {{selectedDemo.name}}
+        </div>
+      </template>
       <template v-slot:content>
         <form class=" col s12 l10 offset-l1">
           <div class="row">
@@ -37,7 +51,9 @@
                 id="email"
                 @blur="$v.selectedDemo.email.$touch()"
                 v-model="selectedDemo.email">
-              <label :class="{active: selectedDemo.email}" for="email">Mail<abbr title="Required">*</abbr></label>
+              <label :class="{active: selectedDemo.email}"
+                     for="email">Mail*
+              </label>
             </div>
             <div class="validator col s12 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.selectedDemo.email.$error">
@@ -55,7 +71,9 @@
                 id="company"
                 @blur="$v.selectedDemo.company.$touch()"
                 v-model="selectedDemo.company">
-              <label :class="{active: selectedDemo.company}" for="company">Company<abbr title="Required">*</abbr></label>
+              <label :class="{active: selectedDemo.company}"
+                     for="company">Company*
+              </label>
             </div>
             <div class="validator col s12 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.selectedDemo.company.$error">
@@ -92,7 +110,8 @@
             </div>
           </div>
           <div class="row">
-            <div class="input-field col s12 m6 l6" :class="{invalid: $v.selectedDemo.active_from.$error}">
+            <div class="input-field col s12 m6 l6"
+                 :class="{invalid: $v.selectedDemo.active_from.$error}">
               <i class="material-icons prefix">date_range</i>
               <datetime input-id="activeFrom"
                         input-class="datetime-input"
@@ -104,14 +123,19 @@
                         format="yyyy-MM-dd HH:mm:ss"
                         zone="Europe/Sofia"
                         :week-start="1"/>
-              <label :class="{active: selectedDemo.active_from}" for="activeFrom">Active from</label>
+              <label :class="{active: selectedDemo.active_from}"
+                     for="activeFrom">Active from*
+              </label>
               <div class="validator col s12 offset-l1 offset-m1">
                 <div class="red-text" v-if="$v.selectedDemo.active_from.$error">
-                  <p v-if="!$v.selectedDemo.active_from.required">Active from field must not be empty.</p>
+                  <p v-if="!$v.selectedDemo.active_from.required">
+                    Active from field must not be empty.
+                  </p>
                 </div>
               </div>
             </div>
-            <div class="input-field col s12 m6 l6" :class="{invalid: $v.selectedDemo.active_to.$error}">
+            <div class="input-field col s12 m6 l6"
+                 :class="{invalid: $v.selectedDemo.active_to.$error}">
               <i class="material-icons prefix">date_range</i>
               <datetime input-id="activeTo"
                         input-class="datetime-input"
@@ -122,10 +146,14 @@
                         zone="Europe/Sofia"
                         :min-datetime="endDateCheck()"
                         :week-start="1"/>
-              <label :class="{active: selectedDemo.active_to}" for="activeTo">Active to</label> 
+              <label :class="{active: selectedDemo.active_to}"
+                     for="activeTo">Active to*
+              </label>
               <div class="validator col s12 offset-l1 offset-m1">
                 <div class="red-text" v-if="$v.selectedDemo.active_to.$error">
-                  <p v-if="!$v.selectedDemo.active_to.required">Active to field must not be empty.</p>
+                  <p v-if="!$v.selectedDemo.active_to.required">
+                    Active to field must not be empty.
+                  </p>
                 </div>
               </div>
             </div>
@@ -202,7 +230,7 @@ export default {
     return {
       showAddEditDemoModal: false,
       isOpen: false,
-      
+
       demoId: '',
       dateNow: DateTime.local().toISO(),
       request: {
@@ -237,7 +265,7 @@ export default {
             name: 'Debt Collection',
           },
           {
-            name: 'Leasing'
+            name: 'Leasing',
           },
           {
             name: 'Factoring',
@@ -294,7 +322,7 @@ export default {
     openAddEditDemoModal(demo, action) {
       this.showAddEditDemoModal = true;
       this.action = action;
-      this.selectedDemo = Object.assign({}, {country: 'Bulgaria'}, demo);
+      this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, demo);
     },
     closeAddEditDemoModal() {
       this.showAddEditDemoModal = false;
@@ -336,7 +364,7 @@ export default {
         this.createDemo(this.$route.params);
       }
     },
-    createDemo() {      
+    createDemo() {
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
@@ -353,23 +381,21 @@ export default {
         .toFormat('yyyy-MM-dd HH:mm:ss');
 
       this.$store.dispatch('demo/createDemo', payload)
-      .then(() => {
-        this.showAddEditDemoModal = false;
-        this.$M.toast({html: 'The demo has been created!', classes: 'toast-seccess'});
-      })
-      .catch((error) => {
-        if (error.response.status === 422) {
-          return this.error = 'Unprocessable Entity';
-        }
-        this.error = error;
-      })
+        .then(() => {
+          this.showAddEditDemoModal = false;
+          this.$M.toast({ html: 'The demo has been created!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          this.error = error;
+          return error;
+        });
     },
     updateDemo() {
-     this.$v.$touch();
+      this.$v.$touch();
       if (this.$v.$invalid) {
         return;
       }
-      const id = this.selectedDemo.id;
+      const { id } = this.selectedDemo;
       const payload = this.selectedDemo;
       delete payload.id;
       delete payload.code;
@@ -381,19 +407,17 @@ export default {
       payload.active_to = DateTime.fromISO(this.selectedDemo.active_to)
         .toFormat('yyyy-MM-dd HH:mm:ss');
 
-      
+
       this.$store.dispatch('demo/updateDemo', { id, payload })
-      .then(() => {
-        this.showAddEditDemoModal = false;
-        this.$M.toast({html: 'The demo has been updated!', classes: 'toast-seccess'})
-      })
-      .catch((error) => {
-        if (error.response.status === 422) {
-          return this.error = 'Unprocessable Entity';
-        }
-        this.error = error;
-      });
-    }
+        .then(() => {
+          this.showAddEditDemoModal = false;
+          this.$M.toast({ html: 'The demo has been updated!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          this.error = error;
+          return error;
+        });
+    },
   },
   mounted() {
     this.getDemos();

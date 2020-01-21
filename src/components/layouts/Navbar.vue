@@ -31,7 +31,8 @@
 export default {
   computed: {
     user() {
-      return this.$store.getters.user;
+      // return this.$store.getters.user;
+      return {};
     },
   },
   methods: {
@@ -45,7 +46,7 @@ export default {
   mounted() {
     this.$M.Dropdown.init(this.$refs['profile-dropdown'], {
       constrainWidth: false,
-      coverTrigger: false
+      coverTrigger: false,
     });
   },
 };

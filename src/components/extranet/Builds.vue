@@ -27,8 +27,9 @@
           </a>
         </td>
         <td>
-          <button 
-            v-if="($can('extranet.remove-builds') || ($store.getters.user.username === container.Labels.username))"
+          <button
+            v-if="($can('extranet.remove-builds') ||
+            ($store.getters.user.username === container.Labels.username))"
             class="btn-small red"
             title="Remove build"
             @click="openRemoveBuildModal(container)"

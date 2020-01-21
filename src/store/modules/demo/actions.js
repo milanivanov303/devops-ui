@@ -20,7 +20,7 @@ export default {
       commit('error', error);
     }
   },
-  updateDemo({ commit }, {id, payload }) {
+  updateDemo({ commit }, { id, payload }) {
     debugger;
     const promise = api.put(`demos/${id}`, payload);
     promise

@@ -12,12 +12,12 @@
 <script>
 export default {
   props: [
-    'msg'
+    'msg',
   ],
   methods: {
     close() {
       this.$el.classList.add('hide');
-    }
+    },
   },
 };
 </script>
