@@ -54,7 +54,7 @@ export default {
   computed: {
     userContainers() {
       return this.$store.getters['extranet/getContainersByUser'](
-        this.$store.getters.user.username,
+        this.$auth.getUser().username,
       );
     },
     containersGroupedByBranch() {

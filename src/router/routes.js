@@ -1,4 +1,4 @@
-import store from '../store';
+import auth from '@/plugins/auth';
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
 const ExtranetDashboard = () => import(/* webpackChunkName: "extranet-dashboard" */ '../views/extranet/Dashboard.vue');
@@ -21,7 +21,7 @@ export default [
     component: Login,
     // redirect if already signed in
     beforeEnter: (to, from, next) => {
-      if (store.getters.user) {
+      if (auth.getUser()) {
         next('/dashbaord');
       } else {
         next();

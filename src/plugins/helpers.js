@@ -5,6 +5,12 @@ export const getParam = (name) => {
   return url.searchParams.get(name);
 };
 
+export const deleteParam = (name) => {
+  const url = new URL(window.location.toString());
+  url.searchParams.delete(name);
+  window.history.replaceState(window.history.state, "", url.toString())
+};
+
 export const getReturnUri = () => {
   const returnUri = getParam('return_uri');
   if (returnUri) {

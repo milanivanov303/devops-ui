@@ -3,27 +3,13 @@
     <div class="data-table">
      <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
           <template v-slot:buttons="{ data }">
-            <a v-if="$can(updateDemo) || $can(updateAnyDemo)"
-               @click="openAddEditDemoModal(data, 'update')"
-               href="#">
-              <i class="material-icons right">edit</i>
-            </a>
+            <a v-if="$auth.can(updateDemo) || $auth.can(updateAnyDemo)" @click="openAddEditDemoModal(data, 'update')" href="#"><i class="material-icons right">edit</i></a>
           </template>
         </Table>
     </div>
 
-    <Modal v-if="showAddEditDemoModal"
-           @close="closeAddEditDemoModal()"
-           @opened="isOpen = true"
-           class="right-sheet">
-      <template v-slot:header>
-        <div v-if="action === 'create'">
-          Schedule a demo
-        </div>
-        <div v-else>
-          Update demo {{selectedDemo.name}}
-        </div>
-      </template>
+    <Modal v-if="showAddEditDemoModal" @close="closeAddEditDemoModal()" @opened="isOpen = true" class="right-sheet">
+      <template v-slot:header>Schedule a demo</template>
       <template v-slot:content>
         <form class=" col s12 l10 offset-l1">
           <div class="row">
@@ -134,8 +120,7 @@
                 </div>
               </div>
             </div>
-            <div class="input-field col s12 m6 l6"
-                 :class="{invalid: $v.selectedDemo.active_to.$error}">
+            <div class="input-field col s12 m6 l6" :class="{invalid: $v.selectedDemo.active_to.$error}">
               <i class="material-icons prefix">date_range</i>
               <datetime input-id="activeTo"
                         input-class="datetime-input"

@@ -86,7 +86,7 @@
                 </div>
               </div>
             </div>
-            <div class="row" v-if="$can('isAdministrators')">
+            <div class="row" v-if="$auth.can('isAdministrators')">
                 <div class="col s12">
                   <label>
                     <input

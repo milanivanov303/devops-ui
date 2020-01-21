@@ -32,10 +32,7 @@ export default {
       }
       return route.meta.title;
     },
-  },
-  mounted() {
-    this.$store.dispatch('um/getUser');
-  },
+  }
 };
 </script>
 

@@ -10,7 +10,7 @@
 // Lib imports
 import Vue from 'vue';
 import Router from 'vue-router';
-import store from '../store';
+import auth from '@/plugins/auth';
 
 // Routes
 import paths from './routes';
@@ -36,7 +36,7 @@ const router = new Router({
 // Route guard
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!store.getters.user) {
+    if (!auth.getUser()) {
       return next(`/login?return_uri=${to.fullPath}`);
     }
   }

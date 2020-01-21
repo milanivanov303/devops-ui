@@ -9,48 +9,50 @@
             <Alert v-if="error !== ''" v-bind:msg="error" />
             <div class="row">
               <div class="col s12 m8">
-                <div class="row">
-                  <div class="input-field col s12">
-                    <i class="material-icons prefix">account_circle</i>
-                    <input type="text" id="username-input" v-model="username" />
-                    <label for="username-input">Username</label>
-                  </div>
+                <form>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <i class="material-icons prefix">account_circle</i>
+                      <input type="text" id="username-input" v-model="username" />
+                      <label for="username-input">Username</label>
+                    </div>
 
-                  <div class="input-field col s12">
-                    <i class="material-icons prefix">lock</i>
-                    <input
-                      type="password"
-                      id="password-input"
-                      v-model="password"
-                    />
-                    <label for="password-input">Password</label>
+                    <div class="input-field col s12">
+                      <i class="material-icons prefix">lock</i>
+                      <input
+                        type="password"
+                        id="password-input"
+                        v-model="password"
+                      />
+                      <label for="password-input">Password</label>
+                    </div>
                   </div>
-                </div>
-                <div class="row">
-                  <div class="col s12 center">
-                    <button
-                    id="login-btn"
-                      v-if="!loggingIn"
-                      @click="login()"
-                      class="btn waves-effect waves-light w-100"
-                    >
-                      Login
-                    </button>
-                    <div v-if="loggingIn" class="preloader-wrapper small active">
-                      <div class="spinner-layer spinner-blue-only">
-                        <div class="circle-clipper left">
+                  <div class="row">
+                    <div class="col s12 center">
+                      <button
+                      id="login-btn"
+                        v-if="!loggingIn"
+                        @click="login()"
+                        class="btn waves-effect waves-light w-100"
+                      >
+                        Login
+                      </button>
+                      <div v-if="loggingIn" class="preloader-wrapper small active">
+                        <div class="spinner-layer spinner-blue-only">
+                          <div class="circle-clipper left">
+                            <div class="circle"></div>
+                          </div>
+                          <div class="gap-patch">
+                            <div class="circle"></div>
+                          </div>
+                          <div class="circle-clipper right">
                           <div class="circle"></div>
-                        </div>
-                        <div class="gap-patch">
-                          <div class="circle"></div>
-                        </div>
-                        <div class="circle-clipper right">
-                        <div class="circle"></div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </form>
               </div>
               <div class="col s12 m4 center">
                 <a class="sso-btn" href="#" v-if="!loggingInSSO"
@@ -83,8 +85,7 @@
 <script>
 import Alert from '@/components/partials/Alert';
 import Loading from '@/components/layouts/Loading';
-import config from '../config';
-import { getSsoUrl } from '@/plugins/helpers';
+import config from '@/config';
 
 export default {
   components: {
@@ -101,49 +102,27 @@ export default {
       error: '',
     };
   },
-  created() {
-    if (localStorage.getItem('sso-login') === 'true') {
-      this.loginSSO();
-    }
-  },
   methods: {
     login() {
       this.loggingIn = true;
       this.error = '';
 
-      this.$store.dispatch('login', {
-        username: this.username,
-        password: this.password,
-        code: config.devops.code,
-      })
+      this.$auth.login(this.username, this.password, config.devops.code)
         .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
-        .catch((error) => {
+        .catch(error => {
           if (error.response.status === 401) {
             this.error = 'Incorrect username or password';
           } else {
             this.error = 'Could not login. Please contact phpid';
           }
         })
-        .finally(this.loggingIn = false);
+        .finally(() => this.loggingIn = false);
     },
     loginSSO() {
       this.loggingInSSO = true;
       this.error = '';
 
-      localStorage.setItem('sso-login', 'true');
-
-      const { token } = this.$route.query;
-      if (!token) {
-        window.location.href = getSsoUrl();
-        return;
-      }
-
-      // remove token param from URL and browser history
-      const query = Object.assign({}, this.$route.query);
-      delete query.token;
-      this.$router.replace({ query });
-
-      this.$store.dispatch('loginSSO', token)
+      this.$auth.loginSSO()
         .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
         .catch(() => {
           this.loggingInSSO = false;
@@ -152,13 +131,9 @@ export default {
     },
   },
   mounted() {
-    const input = document.getElementById('username-input');
-    input.addEventListener('keyup', (event) => {
-      if (event.keyCode === 13) {
-        event.preventDefault();
-        document.getElementById('login-btn').click();
-      }
-    });
+    if (this.$auth.loginWithSSO()) {
+      this.loginSSO();
+    }
   },
 };
 </script>

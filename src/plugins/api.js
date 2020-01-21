@@ -1,6 +1,6 @@
 import Axios from 'axios';
 import queryString from 'query-string';
-import store from '../store';
+import auth from '@/plugins/auth';
 
 class Api {
   constructor(url, code) {
@@ -23,10 +23,10 @@ class Api {
 
   errorInterceptor(error) {
     if (error.response.status === 401) {
-      return store.dispatch('getToken', this.code).then((response) => {
-        localStorage.setItem(`token.${this.code}`, response.data.token);
-        error.config.headers.Authorization = `Bearer ${response.data.token}`;
-        return Axios.create().request(error.config);
+      return auth.getApiToken(this.code).then(response => {
+          localStorage.setItem(`token.${this.code}`, response.data.token);
+          error.config.headers.Authorization = `Bearer ${response.data.token}`;
+          return Axios.create().request(error.config);
       });
     }
     return Promise.reject(error);

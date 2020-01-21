@@ -32,8 +32,7 @@
             <i class="material-icons">event</i> Demo
           </router-link>
         </li>
-        <li v-if="$can('can-manage-authorizations')"
-            v-bind:class="{ active: isActive('administration') }">
+        <li v-bind:class="{ active: isActive('administration') }" v-if="$auth.can('can-manage-authorizations')">
           <a class="collapsible-header">
             <i class="material-icons">settings</i> Administration
             <i class="material-icons right">arrow_drop_down</i>
