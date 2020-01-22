@@ -89,9 +89,9 @@ export default {
   },
   computed: {
     filteredItems() {
-      const availableItems = this.items.filter(item => {
-        return !this.selectedItems.find(i => i.id === item.id)
-      });
+      const availableItems = this.items.filter(
+        item => !this.selectedItems.find(i => i.id === item.id),
+      );
 
       if (!this.searchAvailable) {
         return availableItems;
@@ -182,9 +182,9 @@ export default {
       this.$emit('input', this.selectedItems);
     },
     removeSelected() {
-      this.selectedItems = this.selectedItems.filter(item => {
-        return !this.filteredSelectedItems.includes(item)
-      });
+      this.selectedItems = this.selectedItems.filter(
+        item => !this.filteredSelectedItems.includes(item),
+      );
       this.$emit('input', this.selectedItems);
     },
 

@@ -32,7 +32,7 @@ export default {
       }
       return route.meta.title;
     },
-  }
+  },
 };
 </script>
 

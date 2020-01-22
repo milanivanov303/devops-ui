@@ -1,12 +1,14 @@
-import Axios from "axios";
-import config from "@/config";
-import {getParam, deleteParam, getSsoUrl} from "@/plugins/helpers";
+/* eslint class-methods-use-this: "off" */
+
+import Axios from 'axios';
+import config from '@/config';
+import { getParam, deleteParam, getSsoUrl } from '@/plugins/helpers';
 import store from '@/store';
 
 class Auth {
   constructor() {
     this.axios = Axios.create({
-      baseURL: config['user-management'].url
+      baseURL: config['user-management'].url,
     });
     this.axios.interceptors.request.use(this.requestInterceptor.bind(this));
 
@@ -24,10 +26,10 @@ class Auth {
   }
 
   login(username, password, code = '') {
-    const promise = this.axios.post('auth/login', {username, password, code});
+    const promise = this.axios.post('auth/login', { username, password, code });
 
     promise
-      .then(response => {
+      .then((response) => {
         this.setUser(response.data.user);
         this.setToken(response.data.token);
       });
@@ -61,9 +63,8 @@ class Auth {
     localStorage.setItem('sso-login', 'false');
   }
 
-  getIdentity()
-  {
-    const promise = this.axios.get(`auth/identity?code=${config['devops'].code}`);
+  getIdentity() {
+    const promise = this.axios.get(`auth/identity?code=${config.devops.code}`);
     promise.then(response => this.setUser(response.data));
     return promise;
   }
@@ -77,9 +78,9 @@ class Auth {
 
     const promise = this.axios.get(`auth/token?code=${code}`);
 
-    store.commit('promise', {name, promise});
+    store.commit('promise', { name, promise });
 
-    promise.catch(() => commit('error', 'Could not get token'));
+    promise.catch(() => store.commit('error', 'Could not get token'));
 
     return promise;
   }

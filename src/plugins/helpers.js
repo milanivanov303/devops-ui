@@ -8,7 +8,7 @@ export const getParam = (name) => {
 export const deleteParam = (name) => {
   const url = new URL(window.location.toString());
   url.searchParams.delete(name);
-  window.history.replaceState(window.history.state, "", url.toString())
+  window.history.replaceState(window.history.state, '', url.toString());
 };
 
 export const getReturnUri = () => {

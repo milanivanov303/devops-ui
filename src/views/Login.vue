@@ -109,14 +109,16 @@ export default {
 
       this.$auth.login(this.username, this.password, config.devops.code)
         .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.error = 'Incorrect username or password';
           } else {
             this.error = 'Could not login. Please contact phpid';
           }
         })
-        .finally(() => this.loggingIn = false);
+        .finally(() => {
+          this.loggingIn = false;
+        });
     },
     loginSSO() {
       this.loggingInSSO = true;
