@@ -23,7 +23,7 @@ export default {
     id: String,
     label: String,
     icon: String,
-    value: String,
+    value: {},
     invalid: Boolean,
     items: {
       type: Array,

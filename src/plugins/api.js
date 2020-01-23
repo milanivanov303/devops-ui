@@ -14,17 +14,16 @@ class Api {
   }
 
   requestInterceptor(config) {
-    const token = localStorage.getItem(`token.${this.code}`);
-    if (token) {
+    auth.getApiToken(this.code).then((response) => {
+      const token = response.data ? response.data.token : response;
       config.headers.Authorization = `Bearer ${token}`;
-    }
+    });
     return config;
   }
 
   errorInterceptor(error) {
     if (error.response.status === 401) {
-      return auth.getApiToken(this.code).then((response) => {
-        localStorage.setItem(`token.${this.code}`, response.data.token);
+      return auth.getNewApiToken(this.code).then((response) => {
         error.config.headers.Authorization = `Bearer ${response.data.token}`;
         return Axios.create().request(error.config);
       });

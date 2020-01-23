@@ -107,7 +107,7 @@ export default {
       this.loggingIn = true;
       this.error = '';
 
-      this.$auth.login(this.username, this.password, config.devops.code)
+      this.$auth.login(this.username, this.password)
         .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
         .catch((error) => {
           if (error.response.status === 401) {

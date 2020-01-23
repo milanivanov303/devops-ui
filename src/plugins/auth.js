@@ -3,10 +3,13 @@
 import Axios from 'axios';
 import config from '@/config';
 import { getParam, deleteParam, getSsoUrl } from '@/plugins/helpers';
-import store from '@/store';
+import Storage from '@/plugins/storage';
 
 class Auth {
-  constructor() {
+  constructor(storage, code) {
+    this.storage = storage;
+    this.code = code;
+
     this.axios = Axios.create({
       baseURL: config['user-management'].url,
     });
@@ -18,35 +21,44 @@ class Auth {
   }
 
   requestInterceptor(config) {
-    const token = this.getToken();
+    const token = this.storage.get('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   }
 
-  login(username, password, code = '') {
-    const promise = this.axios.post('auth/login', { username, password, code });
+  sessionExpired() {
+    const lastActivity = this.storage.get('last-activity') || Date.now();
+
+    // update last activity
+    this.storage.set('last-activity', Date.now());
+
+    return (Date.now() - 1*60*1000) > lastActivity;
+  }
+
+  login(username, password) {
+    const promise = this.axios.post('auth/login', { username, password, code: this.code });
 
     promise
       .then((response) => {
-        this.setUser(response.data.user);
-        this.setToken(response.data.token);
+        this.storage.set('user', response.data.user);
+        this.storage.set('token', response.data.token);
       });
 
     return promise;
   }
 
   loginSSO() {
-    localStorage.setItem('sso-login', 'true');
+    this.storage.set('sso-login', true);
 
     const token = getParam('token');
     if (!token) {
-      window.location.href = getSsoUrl();
+      window.location.href = `${getSsoUrl()}&code=${this.code}`;
       return Promise.resolve();
     }
 
-    this.setToken(token);
+    this.storage.set('token', token);
 
     // remove token param from URL and browser history
     deleteParam('token');
@@ -55,50 +67,43 @@ class Auth {
   }
 
   loginWithSSO() {
-    return localStorage.getItem('sso-login') === 'true';
+    return this.storage.get('sso-login') === true;
   }
 
   logout() {
-    localStorage.clear();
-    localStorage.setItem('sso-login', 'false');
+    this.storage.removeAll();
+    this.storage.set('sso-login', false);
   }
 
   getIdentity() {
-    const promise = this.axios.get(`auth/identity?code=${config.devops.code}`);
-    promise.then(response => this.setUser(response.data));
+    const promise = this.axios.get(`auth/identity?code=${this.code}`);
+    promise.then(response => this.storage.set('user', response.data));
     return promise;
   }
 
   getApiToken(code) {
-    const name = `token.${code}`;
-
-    if (store.state.promises[name]) {
-      return store.state.promises[name];
+    const token = this.storage.get(`token.${code}`);
+    if (token) {
+      return Promise.resolve(token);
     }
 
+    return this.getNewApiToken(code);
+  }
+
+  getNewApiToken(code) {
     const promise = this.axios.get(`auth/token?code=${code}`);
-
-    store.commit('promise', { name, promise });
-
-    promise.catch(() => store.commit('error', 'Could not get token'));
-
+    promise.then((response) => this.storage.set(`token.${code}`, response.data.token));
     return promise;
   }
 
-  setToken(token) {
-    localStorage.setItem('token', token);
-  }
-
-  getToken() {
-    return localStorage.getItem('token');
-  }
-
-  setUser(user) {
-    localStorage.setItem('user', JSON.stringify(user));
-  }
-
   getUser() {
-    return JSON.parse(localStorage.getItem('user'));
+    if (this.sessionExpired()) {
+      const ssoLogin = this.storage.get('sso-login');
+      this.storage.removeAll();
+      this.storage.set('sso-login', ssoLogin);
+    }
+
+    return this.storage.get('user');
   }
 
   can(action) {
@@ -112,12 +117,10 @@ class Auth {
       return true;
     }
 
-    if (user.permissions.indexOf(action) !== -1) {
-      return true;
-    }
-
-    return false;
+    return user.permissions.indexOf(action) !== -1;
   }
 }
 
-export default new Auth();
+const auth = new Auth(new Storage("app_session"), config.devops.code);
+
+export default auth;
