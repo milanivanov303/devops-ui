@@ -391,7 +391,7 @@ p {
 
 .scroll{
     .card:hover{
-        background-color:$hover-color;
+        background-color:$hover-color !important;
         color: $link-color !important;
     }
 }

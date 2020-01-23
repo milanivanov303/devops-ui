@@ -72,7 +72,6 @@ export default {
         const selectedBranch = document.querySelector('.selected-branch');
         if (selectedBranch) {
           selectedBranch.scrollIntoView({
-            behavior: 'smooth',
             block: 'start',
             inline: 'nearest',
           });
