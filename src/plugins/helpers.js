@@ -29,5 +29,5 @@ export const getSsoUrl = () => {
   if (returnUri) {
     redirectUrl += `?return_uri=${returnUri}`;
   }
-  return `${config['user-management'].url}/../login?redirect_url=${redirectUrl}`;
+  return `${config.um.url}/../login?redirect_url=${redirectUrl}`;
 };

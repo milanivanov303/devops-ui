@@ -6,12 +6,13 @@ import { getParam, deleteParam, getSsoUrl } from '@/plugins/helpers';
 import Storage from '@/plugins/storage';
 
 class Auth {
-  constructor(storage, code) {
-    this.storage = storage;
-    this.code = code;
+  constructor() {
+    this.storage = new Storage(config.auth.session_name);
+    this.code = config.auth.code;
+    this.expire = this.getExpire(config.auth.session_expire);
 
     this.axios = Axios.create({
-      baseURL: config['user-management'].url,
+      baseURL: config.um.url,
     });
     this.axios.interceptors.request.use(this.requestInterceptor.bind(this));
 
@@ -34,7 +35,25 @@ class Auth {
     // update last activity
     this.storage.set('last-activity', Date.now());
 
-    return (Date.now() - 1*60*1000) > lastActivity;
+    return (Date.now() - this.expire) > lastActivity;
+  }
+
+  getExpire(expire) {
+    const expireInt = parseInt(expire, 10);
+
+    if (expire.match('hour')) {
+      return expireInt * 60 * 60 * 1000;
+    }
+
+    if (expire.match('minute')) {
+      return expireInt * 60 * 1000;
+    }
+
+    if (expire.match('seconds')) {
+      return expireInt * 1000;
+    }
+
+    return expireInt;
   }
 
   login(username, password) {
@@ -92,7 +111,7 @@ class Auth {
 
   getNewApiToken(code) {
     const promise = this.axios.get(`auth/token?code=${code}`);
-    promise.then((response) => this.storage.set(`token.${code}`, response.data.token));
+    promise.then(response => this.storage.set(`token.${code}`, response.data.token));
     return promise;
   }
 
@@ -121,6 +140,4 @@ class Auth {
   }
 }
 
-const auth = new Auth(new Storage("app_session"), config.devops.code);
-
-export default auth;
+export default new Auth();

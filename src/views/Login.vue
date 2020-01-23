@@ -85,7 +85,6 @@
 <script>
 import Alert from '@/components/partials/Alert';
 import Loading from '@/components/layouts/Loading';
-import config from '@/config';
 
 export default {
   components: {

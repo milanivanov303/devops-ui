@@ -1,7 +1,7 @@
-class Storage {
+/* eslint no-prototype-builtins: "off" */
 
-  constructor(name = "app_session")
-  {
+class Storage {
+  constructor(name) {
     this.name = name;
     this.data = this.loadData();
   }

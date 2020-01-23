@@ -2,7 +2,7 @@
 import Api from '../../../plugins/api';
 import config from '../../../config';
 
-const api = new Api(config['user-management'].url, config['user-management'].code);
+const api = new Api(config.um.url, config.um.code);
 
 export default {
   getUsers({ state, commit }) {
