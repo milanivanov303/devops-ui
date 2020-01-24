@@ -344,8 +344,8 @@ export default {
       let url;
       if (value) {
         url = `<a target="_blank"
-                  title="${value}"
-                  href='${value}'>
+                  title="${value.url}"
+                  href='${value.url}'>
                   <i class="material-icons">cast_connected</i>
                 </a>`;
       }

@@ -9,6 +9,7 @@ const AdministrationUsers = () => import(/* webpackChunkName: "administration-us
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
+const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
 
 export default [
   {
@@ -116,6 +117,13 @@ export default [
       breadcrumb: 'Roles',
     },
     component: AdministrationRoles,
+  },
+  {
+    path: '/logged-in-sso-user',
+    meta: {
+      requiresAuth: false,
+    },
+    component: LoggedInSSOUser,
   },
   {
     path: '*',

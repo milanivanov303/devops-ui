@@ -55,11 +55,22 @@
                 </form>
               </div>
               <div class="col s12 m4 center">
-                <a class="sso-btn" href="#" v-if="!loggingInSSO"
-                  @click="loginSSO()">
-                  <i class="large material-icons">person_pin</i>
+
+                <div v-if="ssoUser">
+                  <a class="sso-btn" href="#" @click="loginSSO()">
+                    <i class="large material-icons">person_pin</i>
                   </a>
+                  <p>Continue as <b>{{ ssoUser.name }}</b></p>
+                </div>
+
+                <div v-else>
+                  <a class="sso-btn" href="#" @click="loginSSO()">
+                    <i class="large material-icons">person_pin</i>
+                  </a>
+
                   <p>Quick login with SSO</p>
+                </div>
+
                 <div v-if="loggingInSSO" class="preloader-wrapper small active">
                   <div class="spinner-layer spinner-blue-only">
                     <div class="circle-clipper left">
@@ -99,6 +110,7 @@ export default {
       loggingIn: false,
       loggingInSSO: false,
       error: '',
+      ssoUser: null,
     };
   },
   methods: {
@@ -130,15 +142,33 @@ export default {
           this.error = 'Could not login with SSO, Please contact phpid';
         });
     },
+    getLoggedInSSOUser() {
+      var iframe = document.createElement('iframe');
+      iframe.setAttribute('src', '/logged-in-sso-user');
+      iframe.setAttribute('hidden', true);
+
+      iframe.onload = (e) => {
+        const name = e.target.contentDocument.getElementById('name').innerText;
+        const username = e.target.contentDocument.getElementById('username').innerText;
+
+        if (name && username) {
+          this.ssoUser = { name, username };
+        }
+      };
+
+      this.$el.appendChild(iframe);
+    },
   },
   mounted() {
     if (this.$auth.loginWithSSO()) {
       this.loginSSO();
     }
+
+    this.getLoggedInSSOUser();
   },
 };
 </script>
 
 <style lang="scss">
-@import "../assets/scss/login";
+  @import "../assets/scss/login";
 </style>
