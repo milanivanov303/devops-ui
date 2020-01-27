@@ -37,53 +37,26 @@
                       >
                         Login
                       </button>
-                      <div v-if="loggingIn" class="preloader-wrapper small active">
-                        <div class="spinner-layer spinner-blue-only">
-                          <div class="circle-clipper left">
-                            <div class="circle"></div>
-                          </div>
-                          <div class="gap-patch">
-                            <div class="circle"></div>
-                          </div>
-                          <div class="circle-clipper right">
-                          <div class="circle"></div>
-                          </div>
-                        </div>
-                      </div>
+                      <Preloader v-else class="small" />
                     </div>
                   </div>
                 </form>
               </div>
               <div class="col s12 m4 center">
-
                 <div v-if="ssoUser">
                   <a class="sso-btn" href="#" @click="loginSSO()">
                     <i class="large material-icons">person_pin</i>
                   </a>
                   <p>Continue as <b>{{ ssoUser.name }}</b></p>
                 </div>
-
                 <div v-else>
                   <a class="sso-btn" href="#" @click="loginSSO()">
                     <i class="large material-icons">person_pin</i>
                   </a>
-
                   <p>Quick login with SSO</p>
+                  <Preloader v-if="gettingSSOUser" class="small" />
                 </div>
-
-                <div v-if="loggingInSSO" class="preloader-wrapper small active">
-                  <div class="spinner-layer spinner-blue-only">
-                    <div class="circle-clipper left">
-                      <div class="circle"></div>
-                    </div>
-                    <div class="gap-patch">
-                      <div class="circle"></div>
-                    </div>
-                    <div class="circle-clipper right">
-                      <div class="circle"></div>
-                    </div>
-                  </div>
-                </div>
+                <Preloader v-if="loggingInSSO" class="preloader-wrapper small" />
               </div>
             </div>
           </div>
@@ -96,11 +69,13 @@
 <script>
 import Alert from '@/components/partials/Alert';
 import Loading from '@/components/layouts/Loading';
+import Preloader from '@/components/partials/Preloader';
 
 export default {
   components: {
     Alert,
     Loading,
+    Preloader,
   },
   data() {
     return {
@@ -109,6 +84,7 @@ export default {
       returnUri: '/',
       loggingIn: false,
       loggingInSSO: false,
+      gettingSSOUser: false,
       error: '',
       ssoUser: null,
     };
@@ -143,11 +119,16 @@ export default {
         });
     },
     getLoggedInSSOUser() {
+
+      this.gettingSSOUser = true;
+
       var iframe = document.createElement('iframe');
       iframe.setAttribute('src', '/logged-in-sso-user');
       iframe.setAttribute('hidden', true);
 
       iframe.onload = (e) => {
+        this.gettingSSOUser = false;
+
         const name = e.target.contentDocument.getElementById('name').innerText;
         const username = e.target.contentDocument.getElementById('username').innerText;
 
@@ -159,11 +140,12 @@ export default {
       this.$el.appendChild(iframe);
     },
   },
-  mounted() {
-    if (this.$auth.loginWithSSO()) {
+  created() {
+    if (this.$route.query.sso_login) {
       this.loginSSO();
     }
-
+  },
+  mounted() {
     this.getLoggedInSSOUser();
   },
 };

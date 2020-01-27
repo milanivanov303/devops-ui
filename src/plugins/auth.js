@@ -69,8 +69,6 @@ class Auth {
   }
 
   loginSSO() {
-    this.storage.set('sso-login', true);
-
     const token = getParam('token');
     if (!token) {
       window.location.href = `${getSsoUrl()}&code=${this.code}`;
@@ -85,13 +83,8 @@ class Auth {
     return this.getIdentity();
   }
 
-  loginWithSSO() {
-    return this.storage.get('sso-login') === true;
-  }
-
   logout() {
     this.storage.removeAll();
-    this.storage.set('sso-login', false);
   }
 
   getIdentity() {
@@ -117,9 +110,7 @@ class Auth {
 
   getUser() {
     if (this.sessionExpired()) {
-      const ssoLogin = this.storage.get('sso-login');
       this.storage.removeAll();
-      this.storage.set('sso-login', ssoLogin);
     }
 
     return this.storage.get('user');

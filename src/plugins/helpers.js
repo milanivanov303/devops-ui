@@ -27,7 +27,7 @@ export const getSsoUrl = () => {
   let redirectUrl = `${window.location.origin}/login`;
   const returnUri = getReturnUri();
   if (returnUri) {
-    redirectUrl += `?return_uri=${returnUri}`;
+    redirectUrl += `?sso_login=true&return_uri=${returnUri}`;
   }
   return `${config.um.url}/../login?redirect_url=${redirectUrl}`;
 };
