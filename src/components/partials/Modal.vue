@@ -31,8 +31,12 @@ export default {
         onOpenEnd: () => this.$emit('opened'),
         onCloseStart: () => this.$emit('close'),
         onCloseEnd: () => this.$emit('closed'),
+
       })
       .open();
+  },
+  destroyed() {
+    this.$M.Modal.getInstance(this.$el).close();
   },
 };
 </script>

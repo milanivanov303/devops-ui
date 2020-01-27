@@ -171,7 +171,7 @@ a.sidenav-trigger.top-nav {
 }
 
 
-.dropdown-content {   
+.dropdown-content {
     li > a > i {
         font-size: 22px;
         margin-right: 5px;
@@ -391,7 +391,7 @@ p {
 
 .scroll{
     .card:hover{
-        background-color:$hover-color;
+        background-color:$hover-color !important;
         color: $link-color !important;
     }
 }
@@ -412,8 +412,22 @@ button{
 .red{
     background-color: $wrong-color !important;
 }
-#profile-dropdown{
-    
-    
-
+.data-table{
+    margin-left: 30px;
+    margin-right: 30px;
 }
+.tabs{
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, .2);
+}
+caption{
+    margin-top: 20px;
+}
+.toast-seccess{
+    background-color: $hover-color;
+    color: $link-color;
+}
+
+.hidden {
+    display: none;
+}
+

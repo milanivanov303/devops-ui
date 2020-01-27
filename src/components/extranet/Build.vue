@@ -1,7 +1,10 @@
 <template>
   <div class="row">
     <div class="col s12" >
-      <button class="btn" @click="open()">
+      <button
+        v-if="$auth.can('extranet.create-builds')"
+        class="btn"
+        @click="open()">
         <i class="material-icons left">add</i> New build
       </button>
 
@@ -9,7 +12,7 @@
         <template v-slot:header>Create new build</template>
         <template v-slot:content>
           <template v-if="build.started === false">
-            <div  class="col s12 l11 offset-l1" key="form" >
+            <div  class="col s12 l10 offset-l1" key="form" >
               <div class="row">
                 <div class="col s12" >
                   <Autocomplete
@@ -78,7 +81,11 @@
           </template>
         </template>
         <template v-slot:footer>
-          <button v-if="!build.started" class="waves-effect btn" @click="start()">
+          <button
+            id="start-btn"
+            v-if="!build.started"
+            class="waves-effect btn"
+            @click="start()">
             <i class="material-icons left">play_arrow</i> Start
           </button>
         </template>
@@ -166,18 +173,18 @@ export default {
             {
               instance_type_id: {
                 value: ['DEV', 'VAL'],
-                operator: 'in'
-              }
+                operator: 'in',
+              },
             },
             {
               owner: {
                 allOf: [
                   {
-                    key: "codix"
-                  }
-                ]
-              }
-            }
+                    key: 'codix',
+                  },
+                ],
+              },
+            },
           ],
         }),
         orders: JSON.stringify({

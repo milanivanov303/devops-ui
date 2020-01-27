@@ -10,14 +10,15 @@ import store from './store';
 import DefaultLayout from './components/layouts/Default';
 import LoginLayout from './components/layouts/Login';
 
-import './config';
-import './plugins/auth';
+import '@/config';
+import auth from '@/plugins/auth';
 import 'vue-loading-overlay/dist/vue-loading.css';
 
 Vue.use(Loading);
 Vue.use(vuePartials);
 Vue.use(Vuelidate);
 Vue.prototype.$M = M;
+Vue.prototype.$auth = auth;
 
 Vue.component('default-layout', DefaultLayout);
 Vue.component('login-layout', LoginLayout);

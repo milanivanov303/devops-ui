@@ -1,6 +1,6 @@
 import Axios from 'axios';
 import queryString from 'query-string';
-import store from '../store';
+import auth from '@/plugins/auth';
 
 class Api {
   constructor(url, code) {
@@ -14,40 +14,41 @@ class Api {
   }
 
   requestInterceptor(config) {
-    const token = localStorage.getItem(`token.${this.code}`);
-    if (token) {
+    auth.getApiToken(this.code).then((response) => {
+      const token = response.data ? response.data.token : response;
       config.headers.Authorization = `Bearer ${token}`;
-    }
+    });
     return config;
   }
 
   errorInterceptor(error) {
     if (error.response.status === 401) {
-      return store.dispatch('getToken', this.code)
-        .then((token) => {
-          localStorage.setItem(`token.${this.code}`, token);
-          error.config.headers.Authorization = `Bearer ${token}`;
-          return Axios.create().request(error.config);
-        });
+      return auth.getNewApiToken(this.code).then((response) => {
+        error.config.headers.Authorization = `Bearer ${response.data.token}`;
+        return Axios.create().request(error.config);
+      });
     }
     return Promise.reject(error);
   }
 
-  get(uri, options) {
-    const query = queryString.stringify(options, { arrayFormat: 'index' });
-    return this.axios.get(`${this.url}/${uri}?${query}`);
+  get(uri, options = {}, config = {}) {
+    let query = queryString.stringify(options, { arrayFormat: 'index' });
+    if (query) {
+      query = `?${query}`;
+    }
+    return this.axios.get(`${this.url}/${uri}${query}`, config);
   }
 
-  put(uri, data) {
-    return this.axios.put(`${this.url}/${uri}`, data);
+  put(uri, data, config = {}) {
+    return this.axios.put(`${this.url}/${uri}`, data, config);
   }
 
-  post(uri, data) {
-    return this.axios.post(`${this.url}/${uri}`, data);
+  post(uri, data, config = {}) {
+    return this.axios.post(`${this.url}/${uri}`, data, config);
   }
 
-  delete(uri) {
-    return this.axios.delete(`${this.url}/${uri}`);
+  delete(uri, config = {}) {
+    return this.axios.delete(`${this.url}/${uri}`, config);
   }
 }
 

@@ -31,21 +31,19 @@
 export default {
   computed: {
     user() {
-      return this.$store.getters.user;
+      return this.$auth.getUser();
     },
   },
   methods: {
     logout() {
-      this.$store.dispatch('logout')
-        .then(() => {
-          this.$router.push('/login');
-        });
+      this.$auth.logout();
+      this.$router.push('/login');
     },
   },
   mounted() {
     this.$M.Dropdown.init(this.$refs['profile-dropdown'], {
       constrainWidth: false,
-      coverTrigger: false
+      coverTrigger: false,
     });
   },
 };

@@ -23,7 +23,7 @@ export default {
     id: String,
     label: String,
     icon: String,
-    value: String,
+    value: {},
     invalid: Boolean,
     items: {
       type: Array,
@@ -44,7 +44,7 @@ export default {
         return '';
       }
       return this.value[this.getValueKey()] || this.value;
-    }
+    },
   },
   methods: {
     getInputId() {

@@ -5,20 +5,28 @@ import config from '../../../config';
 const api = new Api(config.devops.url, config.devops.code);
 
 export default {
-  async submitDemo({ commit }, payload) {
+  async createDemo({ commit }, payload) {
     try {
       let response = '';
-      if (payload.action === 'update') {
-        response = await api.put(`demos/${payload.demoId}`, payload.formData);
-        commit('updateDemos', response.data.data);
-      }
-      if (payload.action === 'add_new') {
+      // if (payload.action === 'update') {
+      //   response = await api.put(`demos/${payload.demoId}`, payload.formData);
+      //   commit('updateDemos', response.data.data);
+      // }
+      if (payload.action === 'create') {
         response = await api.post('demos', payload.formData);
-        commit('addDemo', response.data.data);
+        commit('createDemo', response.data.data);
       }
     } catch (error) {
       commit('error', error);
     }
+  },
+  updateDemo({ commit }, { id, payload }) {
+    debugger;
+    const promise = api.put(`demos/${id}`, payload);
+    promise
+      .then(response => commit('updateDemo', response.data.data))
+      .catch(error => commit('error', error));
+    return promise;
   },
   async getDemos({ commit }, payload) {
     try {

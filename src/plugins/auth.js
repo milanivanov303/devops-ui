@@ -1,224 +1,134 @@
-// import Vue from 'vue';
-// import Axios from 'axios';
-// import store from '../store';
-// import router from '../router';
+/* eslint class-methods-use-this: "off" */
 
-// const axios = Axios.create();
-
-// axios.interceptors.request.use((config) => {
-//   config.withCredentials = true;
-
-//   const token = sessionStorage.getItem('token');
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-
-//   return config;
-// });
-
-// export default axios;
-/*
-const authStore = {
-  state: {
-    loggingIn: false,
-    loggingInSSO: false,
-    hasError: false,
-    error: '',
-    user,
-  },
-  getters: {
-    isLoggingIn(state) {
-      return state.loggingIn;
-    },
-    isLoggingInSSO(state) {
-      return state.loggingInSSO;
-    },
-    hasError(state) {
-      return state.hasError;
-    },
-    getError(state) {
-      return state.error;
-    },
-    user(state) {
-      return state.user;
-    },
-  },
-  mutations: {
-    loggingIn(state, loggingIn) {
-      state.loggingIn = loggingIn;
-    },
-    loggingInSSO(state, loggingInSSO) {
-      state.loggingInSSO = loggingInSSO;
-    },
-    hasError(state, hasError) {
-      state.hasError = hasError;
-    },
-    error(state, error) {
-      state.error = error;
-    },
-  },
-};
-
-// store.registerModule('auth', authStore);
-
-// const axiosAuth = axios.create();
-
-// axiosAuth.interceptors.request.use((config) => {
-//   config.withCredentials = true;
-
-//   const token = sessionStorage.getItem('token');
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-
-//   return config;
-// });
+import Axios from 'axios';
+import config from '@/config';
+import { getParam, deleteParam, getSsoUrl } from '@/plugins/helpers';
+import Storage from '@/plugins/storage';
 
 class Auth {
-  static install(Vue) {
-    const auth = {};
-    const ssoLogin = localStorage.getItem('sso-login') || 'true';
-    if (!auth.user() && ssoLogin === 'true') {
-      auth.loginSSO();
-    }
+  constructor() {
+    this.storage = new Storage(config.auth.session_name);
+    this.code = config.auth.code;
+    this.expire = this.getExpire(config.auth.session_expire);
 
-    Vue.auth = auth;
-    Object.defineProperties(Vue.prototype, {
-      auth: {
-        get() {
-          return auth;
-        },
-      },
-      $auth: {
-        get() {
-          return auth;
-        },
-      },
+    this.axios = Axios.create({
+      baseURL: config.um.url,
     });
-  }
+    this.axios.interceptors.request.use(this.requestInterceptor.bind(this));
 
-  static getParam(name) {
-    const url = new URL(window.location.toString());
-    return url.searchParams.get(name);
-  }
-
-  getReturnUri() {
-    const returnUri = this.getParam('return_uri');
-    if (returnUri) {
-      return returnUri;
+    if (this.getUser()) {
+      this.getIdentity();
     }
-
-    if (window.location.pathname !== '/login') {
-      return window.location.pathname + window.location.search;
-    }
-
-    return '/';
   }
 
-  getSsoUrl() {
-    let redirectUrl = `${window.location.origin}/login`;
-
-    const returnUri = this.getReturnUri();
-    if (returnUri) {
-      redirectUrl += `?return_uri=${returnUri}`;
-    }
-
-    return `${config['user-management'].url}/login?redirect_url=${redirectUrl}`;
-  }
-
-  async login(username, password) {
-    store.commit('loggingIn', true);
-    store.commit('hasError', false);
-
-    try {
-      const response = await axiosAuth.post(
-        `${config['user-management'].url}/v1/auth/login`,
-        { username, password },
-      );
-
-      sessionStorage.setItem('user', JSON.stringify(response.data));
-
-      router.push(this.getReturnUri());
-    } catch (error) {
-      store.commit('hasError', true);
-      store.commit('error', 'Incorrect username or password');
-    }
-
-    store.commit('loggingIn', false);
-  }
-
-  async loginSSO() {
-    store.commit('loggingInSSO', true);
-    store.commit('hasError', false);
-
-    localStorage.setItem('sso-login', 'true');
-
-    const token = this.getParam('token');
+  requestInterceptor(config) {
+    const token = this.storage.get('token');
     if (token) {
-      sessionStorage.setItem('token', token);
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  }
+
+  sessionExpired() {
+    const lastActivity = this.storage.get('last-activity') || Date.now();
+
+    // update last activity
+    this.storage.set('last-activity', Date.now());
+
+    return (Date.now() - this.expire) > lastActivity;
+  }
+
+  getExpire(expire) {
+    const expireInt = parseInt(expire, 10);
+
+    if (expire.match('hour')) {
+      return expireInt * 60 * 60 * 1000;
     }
 
+    if (expire.match('minute')) {
+      return expireInt * 60 * 1000;
+    }
+
+    if (expire.match('seconds')) {
+      return expireInt * 1000;
+    }
+
+    return expireInt;
+  }
+
+  login(username, password) {
+    const promise = this.axios.post('auth/login', { username, password, code: this.code });
+
+    promise
+      .then((response) => {
+        this.storage.set('user', response.data.user);
+        this.storage.set('token', response.data.token);
+      });
+
+    return promise;
+  }
+
+  loginSSO() {
+    const token = getParam('token');
     if (!token) {
-      window.location.href = this.getSsoUrl();
+      window.location.href = `${getSsoUrl()}&code=${this.code}`;
+      return Promise.resolve();
     }
 
-    try {
-      const response = await axiosAuth.get(
-        `${config['user-management'].url}/v1/auth/identity`,
-      );
+    this.storage.set('token', token);
 
-      sessionStorage.setItem('user', JSON.stringify(response.data));
+    // remove token param from URL and browser history
+    deleteParam('token');
 
-      router.push(this.getReturnUri());
-    } catch (error) {
-      store.commit('hasError', true);
-      store.commit(
-        'error',
-        'Could not login with SSO. Please try again later or use the login form',
-      );
-    }
-
-    return store.commit('loggingInSSO', false);
+    return this.getIdentity();
   }
 
-  static logout() {
-    localStorage.setItem('sso-login', 'false');
-    sessionStorage.clear();
-
-    router.push('/login');
+  logout() {
+    this.storage.removeAll();
   }
 
-  static user() {
-    const user = sessionStorage.getItem('user');
-    if (user) {
-      return JSON.parse(user);
-    }
-
-    return null;
+  getIdentity() {
+    const promise = this.axios.get(`auth/identity?code=${this.code}`);
+    promise.then(response => this.storage.set('user', response.data));
+    return promise;
   }
 
-  static async getToken(code) {
-    try {
-      const response = await axiosAuth.get(
-        `${config['user-management'].url}/v1/auth/token`,
-        {
-          params: {
-            code,
-          },
-        },
-      );
-
-      return response.data.token;
-    } catch (error) {
-      console.log(error);
-      return error;
+  getApiToken(code) {
+    const token = this.storage.get(`token.${code}`);
+    if (token) {
+      return Promise.resolve(token);
     }
+
+    return this.getNewApiToken(code);
+  }
+
+  getNewApiToken(code) {
+    const promise = this.axios.get(`auth/token?code=${code}`);
+    promise.then(response => this.storage.set(`token.${code}`, response.data.token));
+    return promise;
+  }
+
+  getUser() {
+    if (this.sessionExpired()) {
+      this.storage.removeAll();
+    }
+
+    return this.storage.get('user');
+  }
+
+  can(action) {
+    const user = this.getUser();
+
+    if (!user || typeof user.permissions === 'undefined') {
+      return false;
+    }
+
+    if (user.permissions === '*') {
+      return true;
+    }
+
+    return user.permissions.indexOf(action) !== -1;
   }
 }
 
-const auth = new Auth();
-
-Vue.use(auth);
-
-export default auth;
-*/
+export default new Auth();

@@ -7,17 +7,16 @@
     </div>
     <div class="row">
       <div :class="{'col s12 m6 l5 scroll': $route.meta.name === 'extranet-branch'}">
-        <div id="select-branch"
-          :class="{'col s12 m6 l4': $route.meta.name === 'extranet-branches'}"
-          :key="branch.name"
+        <Branch
           v-for="branch in filteredBranches"
-        >
-          <Branch
-            :branch="branch"
-            :count="getContainersCount(branch.name)"
-            :class="{'selected-branch': $route.path === `/extranet/branches/${branch.name}`}"
-          />
-        </div>
+          :key="branch.name"
+          :branch="branch"
+          :count="getContainersCount(branch.name)"
+          :class="{
+            'selected-branch': $route.path === `/extranet/branches/${branch.name}`,
+            'col s12 m6 l4': $route.meta.name === 'extranet-branches'
+          }"
+        />
       </div>
       <div v-if="$route.meta.name === 'extranet-branch'" class="col s12 m6 l7">
         <div class="card">
@@ -68,7 +67,16 @@ export default {
     },
     getBranches() {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('extranet/getBranches').then(() => loader.hide());
+      this.$store.dispatch('extranet/getBranches').then(() => {
+        loader.hide();
+        const selectedBranch = document.querySelector('.selected-branch');
+        if (selectedBranch) {
+          selectedBranch.scrollIntoView({
+            block: 'start',
+            inline: 'nearest',
+          });
+        }
+      });
     },
     getContainers() {
       this.$store.dispatch('extranet/getContainers');
@@ -77,8 +85,6 @@ export default {
   mounted() {
     this.getBranches();
     this.getContainers();
-    document.querySelector('.selected-branch').scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
-
   },
   watch: {
     search(value) {

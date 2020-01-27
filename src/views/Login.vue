@@ -1,78 +1,62 @@
 <template>
  <main>
-    <Loading v-if="loading"/>
+    <Loading v-if="loggingInSSO"/>
     <div v-else class="row">
       <div class="col s10 offset-s1 m8 offset-m2 l6 offset-l3 xl4 offset-xl4">
         <div class="card">
           <div class="card-content">
             <span class="card-title center">DevOps Management</span>
-            <Alert v-if="hasError" v-bind:msg="getError" />
+            <Alert v-if="error !== ''" v-bind:msg="error" />
             <div class="row">
               <div class="col s12 m8">
-                <div class="row">
-                  <div class="input-field col s12">
-                    <i class="material-icons prefix">account_circle</i>
-                    <input type="text" id="username-input" v-model="username" />
-                    <label for="username-input">Username</label>
-                  </div>
+                <form>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <i class="material-icons prefix">account_circle</i>
+                      <input type="text" id="username-input" v-model="username" />
+                      <label for="username-input">Username</label>
+                    </div>
 
-                  <div class="input-field col s12">
-                    <i class="material-icons prefix">lock</i>
-                    <input
-                      type="password"
-                      id="password-input"
-                      v-model="password"
-                    />
-                    <label for="password-input">Password</label>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col s12 center">
-                    <button
-                      v-if="!isLoggingIn"
-                      @click="login()"
-                      class="btn waves-effect waves-light w-100"
-                    >
-                      Login
-                    </button>
-                    <div
-                      v-if="isLoggingIn"
-                      class="preloader-wrapper small active"
-                    >
-                      <div class="spinner-layer spinner-blue-only">
-                        <div class="circle-clipper left">
-                          <div class="circle"></div>
-                        </div>
-                        <div class="gap-patch">
-                          <div class="circle"></div>
-                        </div>
-                        <div class="circle-clipper right">
-                        <div class="circle"></div>
-                        </div>
-                      </div>
+                    <div class="input-field col s12">
+                      <i class="material-icons prefix">lock</i>
+                      <input
+                        type="password"
+                        id="password-input"
+                        v-model="password"
+                      />
+                      <label for="password-input">Password</label>
                     </div>
                   </div>
-                </div>
+                  <div class="row">
+                    <div class="col s12 center">
+                      <button
+                      id="login-btn"
+                        v-if="!loggingIn"
+                        @click="login()"
+                        class="btn waves-effect waves-light w-100"
+                      >
+                        Login
+                      </button>
+                      <Preloader v-else class="small" />
+                    </div>
+                  </div>
+                </form>
               </div>
-              <div class="col s12 m4 center">                         
-                <a class="sso-btn" href="#" v-if="!isLoggingInSSO"
-                  @click="loginSSO()">
-                  <i class="large material-icons">person_pin</i>
+              <div class="col s12 m4 center">
+                <div v-if="ssoUser">
+                  <a class="sso-btn" href="#" @click="loginSSO()">
+                    <i class="large material-icons">person_pin</i>
+                  </a>
+                  <p>Continue as <b>{{ ssoUser.name }}</b></p>
+                </div>
+                <div v-else>
+                  <a class="sso-btn" href="#" @click="loginSSO()">
+                    <i class="large material-icons">person_pin</i>
                   </a>
                   <p>Quick login with SSO</p>
-                <div v-if="isLoggingInSSO" class="preloader-wrapper small active">
-                  <div class="spinner-layer spinner-blue-only">
-                    <div class="circle-clipper left">
-                      <div class="circle"></div>
-                    </div>
-                    <div class="gap-patch">
-                      <div class="circle"></div>
-                    </div>
-                    <div class="circle-clipper right">
-                      <div class="circle"></div>
-                    </div>
-                  </div>
+                  <Preloader v-if="gettingSSOUser" class="small" />
                 </div>
+                <Preloader v-if="loggingInSSO" class="preloader-wrapper small" />
               </div>
             </div>
           </div>
@@ -85,56 +69,88 @@
 <script>
 import Alert from '@/components/partials/Alert';
 import Loading from '@/components/layouts/Loading';
+import Preloader from '@/components/partials/Preloader';
 
 export default {
   components: {
     Alert,
     Loading,
+    Preloader,
   },
   data() {
     return {
       username: '',
       password: '',
       returnUri: '/',
-      loading: false,
+      loggingIn: false,
+      loggingInSSO: false,
+      gettingSSOUser: false,
+      error: '',
+      ssoUser: null,
     };
-  },
-  created() {
-    if (localStorage.getItem('sso-login') === 'true') {
-      this.loading = true;
-      setTimeout(() => {
-        this.$store.dispatch('loginSSO');
-      }, 1000);
-    }
-  },
-  computed: {
-    isLoggingIn() {
-      return this.$store.getters.isLoggingIn;
-    },
-    isLoggingInSSO() {
-      return this.$store.getters.isLoggingInSSO;
-    },
-    hasError() {
-      return this.$store.getters.hasError;
-    },
-    getError() {
-      return this.$store.getters.getError;
-    },
   },
   methods: {
     login() {
-      const { username, password } = this;
-      this.$store.dispatch('login', { username, password })
-        .then(() => this.$router.push(this.$route.query.return_uri))
-        .catch(err => err);
+      this.loggingIn = true;
+      this.error = '';
+
+      this.$auth.login(this.username, this.password)
+        .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
+        .catch((error) => {
+          if (error.response.status === 401) {
+            this.error = 'Incorrect username or password';
+          } else {
+            this.error = 'Could not login. Please contact phpid';
+          }
+        })
+        .finally(() => {
+          this.loggingIn = false;
+        });
     },
     loginSSO() {
-      this.$store.dispatch('loginSSO');
+      this.loggingInSSO = true;
+      this.error = '';
+
+      this.$auth.loginSSO()
+        .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
+        .catch(() => {
+          this.loggingInSSO = false;
+          this.error = 'Could not login with SSO, Please contact phpid';
+        });
     },
+    getLoggedInSSOUser() {
+
+      this.gettingSSOUser = true;
+
+      var iframe = document.createElement('iframe');
+      iframe.setAttribute('src', '/logged-in-sso-user');
+      iframe.setAttribute('hidden', true);
+
+      iframe.onload = (e) => {
+        this.gettingSSOUser = false;
+
+        const name = e.target.contentDocument.getElementById('name').innerText;
+        const username = e.target.contentDocument.getElementById('username').innerText;
+
+        if (name && username) {
+          this.ssoUser = { name, username };
+        }
+      };
+
+      this.$el.appendChild(iframe);
+    },
+  },
+  created() {
+    if (this.$route.query.sso_login) {
+      this.loginSSO();
+    }
+  },
+  mounted() {
+    this.getLoggedInSSOUser();
   },
 };
 </script>
 
 <style lang="scss">
-@import "../assets/scss/login";
+  @import "../assets/scss/login";
 </style>

@@ -1,11 +1,15 @@
-import store from '../store';
+import auth from '@/plugins/auth';
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
 const ExtranetDashboard = () => import(/* webpackChunkName: "extranet-dashboard" */ '../views/extranet/Dashboard.vue');
 const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
 const ExtranetBranch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
 const Demo = () => import(/* webpackChunkName: "demo" */ '../views/Demo.vue');
+const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
+const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
+
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
+const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
 
 export default [
   {
@@ -18,7 +22,7 @@ export default [
     component: Login,
     // redirect if already signed in
     beforeEnter: (to, from, next) => {
-      if (store.getters.user) {
+      if (auth.getUser()) {
         next('/dashbaord');
       } else {
         next();
@@ -91,6 +95,35 @@ export default [
       breadcrumb: 'Demo',
     },
     component: Demo,
+  },
+  {
+    path: '/administration/users',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-users',
+      transitionName: 'slide',
+      title: 'Users',
+      breadcrumb: 'Users',
+    },
+    component: AdministrationUsers,
+  },
+  {
+    path: '/administration/roles',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-roles',
+      transitionName: 'slide',
+      title: 'Roles',
+      breadcrumb: 'Roles',
+    },
+    component: AdministrationRoles,
+  },
+  {
+    path: '/logged-in-sso-user',
+    meta: {
+      requiresAuth: false,
+    },
+    component: LoggedInSSOUser,
   },
   {
     path: '*',

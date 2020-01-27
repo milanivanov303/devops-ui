@@ -3,7 +3,7 @@
     <div class="col s12 l6">
       <div class="card">
         <div class="card-content">
-          <span class="card-title">My Extranet Builds</span>
+          <span class="card-title">My Builds</span>
           <Builds :containers="userContainers" ></Builds>
         </div>
       </div>
@@ -11,7 +11,7 @@
     <div class="col s12 l6">
       <div class="card">
         <div class="card-content">
-          <span class="card-title">Extranet Builds By Branch</span>
+          <span class="card-title">Builds By Module</span>
           <table>
             <thead>
             <tr>
@@ -21,17 +21,22 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(container, index) in containersGroupedByBranch" :key="index">
-              <td>{{ index + 1 }}</td>
+            <tr>
+              <td>1</td>
               <td>
-                <router-link v-bind:to="'/extranet/branches/' + container.branch">
-                  {{ container.branch }}
-                </router-link>
+                <router-link to="/extranet">Extranet</router-link>
               </td>
-              <td>{{ container.builds }}</td>
+              <td>{{ extranetContainersCount }}</td>
             </tr>
-            <tr v-if="containersGroupedByBranch.length === 0">
-              <td colspan="3">There are no builds</td>
+            <tr>
+              <td>2</td>
+              <td>iMX BE</td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>iMX FE</td>
+              <td>N/A</td>
             </tr>
             </tbody>
           </table>
@@ -51,20 +56,18 @@ export default {
   computed: {
     userContainers() {
       return this.$store.getters['extranet/getContainersByUser'](
-        this.$store.getters.user.username,
+        this.$auth.getUser().username,
       );
     },
     containersGroupedByBranch() {
       return this.$store.getters['extranet/getContainersGroupedByBranch']();
     },
-  },
-  methods: {
-    getContainers() {
-      this.$store.dispatch('extranet/getContainers');
-    },
+    extranetContainersCount() {
+      return this.$store.state.extranet.containers.length;
+    }
   },
   mounted() {
-    this.getContainers();
+    this.$store.dispatch('extranet/getContainers');
   },
 };
 </script>

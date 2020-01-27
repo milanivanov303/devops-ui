@@ -5,7 +5,7 @@
         <div class="card-title">
             <span class="badge" v-if="count">{{ count }}</span>
             {{ branch.name }}
-          
+
         </div>
         <p>Hash: {{ branch.hash }}</p>
         <p>Version: {{ branch.version }}</p>
