@@ -1,26 +1,32 @@
 <template>
   <div class="col s12 l12">
     <div class="data-table">
-     <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
-          <template v-slot:buttons="{ data }">
-            <a
-              v-if="$auth.can(updateDemo) || $auth.can(updateAnyDemo)"
-              @click="openAddEditDemoModal(data, 'update')"
-              href="#"
-            >
-                <i class="material-icons right">edit</i>
+      <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
+        <template v-slot:buttons="{ data }">
+          <router-link v-bind:to="'/demo/' + encodeURIComponent(selectedDemo.id)">
+            <a v-if="$auth.can(updateDemo) || $auth.can(updateAnyDemo)"
+               @click="openAddEditDemoModal(data, 'update')"
+               href="#">
+               <i class="material-icons right">edit</i>
             </a>
-          </template>
-        </Table>
+          </router-link>
+        </template>
+      </Table>
     </div>
 
     <Modal
       v-if="showAddEditDemoModal"
       @close="closeAddEditDemoModal()"
       @opened="isOpen = true"
-      class="right-sheet"
-    >
-      <template v-slot:header>Schedule a demo</template>
+      class="right-sheet">
+      <template v-slot:header>
+        <div v-if="action === 'create'">
+          Schedule a demo
+        </div>
+        <div v-else>
+          Update {{selectedDemo.name}}
+        </div>
+      </template>
       <template v-slot:content>
         <form class=" col s12 l10 offset-l1">
           <div class="row">
@@ -98,8 +104,7 @@
             <Select class="col s12"
                     v-if="isOpen === true"
                     :select="selectBusiness"
-                    @selectedVal="selectedBusiness"
-                    v-model="selectedBusiness"/>
+                    @selectedVal="selectedBusiness"/>
             <div class="validator col s12 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.selectedDemo.business.error">
                 <p v-if="!$v.selectedDemo.business.required">Business field must not be empty.</p>
@@ -172,11 +177,10 @@
               <label for="status-aproved">
                 <input id="status-aproved"
                        class="with-gap"
-                       :disabled="statusCheck"
                        type="radio"
                        value="approved"
                        v-model="selectedDemo.status"
-                       :checked="selectedDemo.status === 'approved'" />
+                       :checked="(selectedDemo.status === 'approved' || selectedDemo.action === 'create')"/>
                 <span>Approved</span>
               </label>
             </div>
@@ -184,7 +188,6 @@
               <label for="status-rejected">
                 <input id="status-rejected"
                        class="with-gap"
-                       :disabled="statusCheck"
                        type="radio"
                        value="rejected"
                        v-model="selectedDemo.status"/>
@@ -218,6 +221,7 @@ import {
 import Modal from '@/components/partials/Modal';
 import 'vue-datetime/dist/vue-datetime.css';
 import Table from '@/components/partials/Table';
+
 
 export default {
   components: {
@@ -276,8 +280,8 @@ export default {
             name: 'Other',
           },
         ],
-        label: 'Business area',
-        selected: '',
+        label: 'Business area*',
+        selected: {},
       },
     };
   },
@@ -322,10 +326,18 @@ export default {
       this.showAddEditDemoModal = true;
       this.action = action;
       this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, demo);
+      this.selectBusiness.selected = {name: this.selectedDemo.business};
+      this.selectedDemo.active_from = DateTime.fromSQL(this.selectedDemo.active_from)
+        .toISO();
+      this.selectedDemo.active_to = DateTime.fromSQL(this.selectedDemo.active_to)
+        .toISO();
     },
     closeAddEditDemoModal() {
       this.showAddEditDemoModal = false;
       this.$v.$reset();
+       this.$router.push({
+        path: '/demo/',
+      });
     },
     selectedBusiness(value) {
       this.$v.selectedDemo.business.$touch();
@@ -358,10 +370,15 @@ export default {
       };
       await this.$store.dispatch('demo/getDemos', payload).then(() => {
         loader.hide();
+
+        if (this.$route.params.id) {
+          const demo = this.demos.find(demo => demo.id === this.$route.params.id);
+          if (demo) {
+            return this.openAddEditDemoModal(demo);
+          }
+          this.$M.toast({ html: 'This demo does not exist!'});
+        }
       });
-      if (this.$route.params.id) {
-        this.createDemo(this.$route.params);
-      }
     },
     createDemo() {
       this.$v.$touch();
@@ -398,6 +415,7 @@ export default {
       const payload = this.selectedDemo;
       delete payload.id;
       delete payload.code;
+      delete payload.status;
       // const payload = {
       //   formData: this.selectedDemo,
       // };

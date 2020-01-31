@@ -4,69 +4,74 @@
       <div class="data-table">
         <Table v-bind:request="request">
           <template v-slot:buttons="{ data }">
-              <a @click="selectedRow(data)" href="#"><i class="material-icons right">edit</i></a>
+            <router-link v-bind:to="'/administration/users/' + encodeURIComponent(selectedUser.username)">
+              <a @click="selectedRow(data)" href="#">
+                <i class="material-icons right">edit</i>
+              </a>
+            </router-link>
           </template>
         </Table>
       </div>
-
-      <Modal v-if="showModal" @close="showModal = false" @opened="initModal()" class="right-sheet">
-        <template v-slot:header>User information
-        </template>
-        <template v-slot:content>
-          <div class="col s12 l10 offset-l1">
-            <div class="row">
-              <div class="col s12">
-                <i class="material-icons">person</i>
-                <span id="info">{{selectedUser.name}}</span>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s12">
-                <i class="material-icons">account_circle</i>
-                <span id="info">{{selectedUser .username}}</span>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s12">
-                <i class="material-icons">mail</i>
-                <span id="info">{{selectedUser.email}}</span>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s12">
-                <i class="material-icons">phone</i>
-                <span id="info">{{selectedUser.phone}}</span>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s12">
-                <i class="material-icons">people</i>
-                <span id="info">{{selectedUser.department.name}}</span>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s12">
-                <ul class="tabs col s12">
-                  <li class="tab col s12"><a href="#roles">Roles</a></li>
-                </ul>
-                <div id="roles">
-                  <List :items="roles" :selected="selectedUser.roles" v-model="selectedUser.roles"/>
+      <Modal v-if="showModal" @close="closeModal()" @opened="initModal()" class="right-sheet">
+        
+          <template v-slot:header>User information
+          </template>
+          <template v-slot:content>
+            <div class="col s12 l10 offset-l1">
+              <div class="row">
+                <div class="col s12">
+                  <i class="material-icons">person</i>
+                  <span id="info">{{selectedUser.name}}</span>
                 </div>
               </div>
-            </div>
+              <div class="row">
+                <div class="col s12">
+                  <i class="material-icons">account_circle</i>
+                  <span id="info">{{selectedUser .username}}</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s12">
+                  <i class="material-icons">mail</i>
+                  <span id="info">{{selectedUser.email}}</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s12">
+                  <i class="material-icons">phone</i>
+                  <span id="info">{{selectedUser.phone}}</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s12">
+                  <i class="material-icons">people</i>
+                  <span id="info">{{selectedUser.department.name}}</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s12">
+                  <ul class="tabs col s12">
+                    <li class="tab col s12"><a href="#roles">Roles</a></li>
+                  </ul>
+                  <div id="roles">
+                    <List :items="roles" :selected="selectedUser.roles" v-model="selectedUser.roles"/>
+                  </div>
+                </div>
+              </div>
 
-          </div>
-        </template>
-        <template v-slot:footer>
-          <button
-            class="btn waves-effect waves-light"
-            type="submit"
-            name="action"
-             @click="updateUserRoles()"
-          >
-            Save
-          </button>
-        </template>
+            </div>
+          </template>
+          <template v-slot:footer>
+            <button
+              class="btn waves-effect waves-light"
+              type="submit"
+              name="action"
+              @click="updateUserRoles()"
+            >
+              Save
+            </button>
+          </template>
+        
       </Modal>
     </div>
   </div>
@@ -127,9 +132,26 @@ export default {
       this.$M.Tabs.init(elems);
     },
 
+    closeModal() {
+      this.showModal = false;
+      this.$router.push({
+        path: '/administration/users/',
+      });
+    },
+
     getUsers() {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('um/getUsers').then(() => loader.hide());
+      this.$store.dispatch('um/getUsers').then(() => {
+        loader.hide()
+
+        if (this.$route.params.username) {
+          const user = this.users.find(user => user.username === this.$route.params.username);
+          if (user) {
+            return this.selectedRow(user);
+          }
+          this.$M.toast({ html: 'This user does not exist!'});
+        }
+      });
     },
 
     getRoles() {
@@ -138,7 +160,6 @@ export default {
     },
 
     updateUserRoles() {
-      // const id = this.selectedUser.id;
       const payload = this.selectedUser;
 
       this.$store.dispatch('updateUserRoles', payload)

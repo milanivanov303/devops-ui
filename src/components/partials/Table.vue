@@ -1,7 +1,8 @@
 <template>
   <div>
-    <div class="row">
-      <div class="input-field col s12 m6 l6" v-if="sorted.length">
+    <div class="row"
+         :class="{hidden: (!sorted.length)}">
+      <div class="input-field col s12 m6 l6">
         <i class="material-icons prefix">search</i>
         <input type="text"
                v-if="request.searchable === true"
@@ -10,7 +11,8 @@
                placeholder="Search..">
       </div>
     </div>
-    <div class="col s12 m6 l6 right">
+    <div class="col s12 m6 l6 right"
+         :class="{hidden: (!sorted.length)}">
       <button class="btn-floating modal-triger right"
               v-if="request.add === true"
               @click="$emit('add')"
@@ -21,7 +23,7 @@
               data-target="action"><i class="material-icons left">description</i>
       </button>
     </div>
-    <table v-if="sorted.length" class="responsive-table">
+    <table class="responsive-table">
       <thead>
         <tr>
           <th v-for="(value, key) in columns"
@@ -38,6 +40,7 @@
           <th class="last"></th>
         </tr>
       </thead>
+     
       <tbody>
         <tr v-for="(data, key) in sorted"
             v-bind:key="key">
@@ -49,18 +52,19 @@
             <slot name="buttons" :data="data"></slot>
           </td>
         </tr>
+        <tr v-if="sorted.length === 0">
+          <td colspan="3">There are no items</td>
+        </tr>
       </tbody>
     </table>
     <div class="row">
-      <div class="col s12 m6 l6 right right-align">
-        <div class="input-field inline">
-          <select v-model="perPage">
-            <option value="3">3</option>
-            <option value="5">5</option>
-            <option value="10">10</option>
-          </select>
+      <div class="col s12 m6 l1 right right-align" id="perPage"> 
+        <div class="input-field" >
+          <Select class="col s12"
+                  :select="selectperPage"
+                  @selectedVal="selectedperPage"/>
+          <slot> Items per page:</slot>
         </div>
-        Items per page
       </div>
       <div class="col s12 m6 l6 left left-align">
         <paginate
@@ -83,10 +87,12 @@
 </template>
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
+import Select from '@/components/partials/Select';
 
 export default {
   components: {
     paginate: Paginate,
+    Select
   },
   data() {
     const sortOrders = {};
@@ -99,9 +105,29 @@ export default {
       sortColDir: 'asc',
       search: '',
       colKey: '',
-      perPage: 10,
       page: 1,
       lastPage: 0,
+      perPage: 10,
+      selectperPage: {
+        id: 'perPage_select',
+        name: 'perPage',
+        displayed: 'name',
+        options: [
+          {
+            name: 2,
+          },
+          {
+            name: 3,
+          },
+          {
+            name: 5,
+          },
+          {
+            name: 10,
+          },
+        ],
+        selected: {},
+      },
     };
   },
   props: {
@@ -117,7 +143,6 @@ export default {
     },
   },
   methods: {
-
     getUser(key) {
       this.showModal = true;
       this.currentUser = key;
@@ -138,10 +163,14 @@ export default {
       this.sortColDir = this.sortColDir === 'asc' ? 'desc' : 'asc';
       this.sortOrders[val] = this.sortOrders[val] * -1;
     },
+    selectedperPage(value) { 
+      this.perPage = value.name;
+    },
     selectedPage(page) {
       this.page = page;
     },
     setLastPage(data) {
+      this.selectperPage.selected = {name: this.perPage};
       this.lastPage = Math.ceil(data.length / this.perPage);
     },
     returnValue(data) {
@@ -196,36 +225,32 @@ export default {
       return data.slice(from, to);
     },
   },
-  mounted() {
-    const elems = document.querySelectorAll('select');
-    this.$M.FormSelect.init(elems);
-  },
 };
 </script>
 
 <style lang="scss" scoped>
-    .inline-icon {
-      vertical-align: bottom;
+  .inline-icon {
+    vertical-align: bottom;
+  }
+  table {
+    table-layout:fixed;
+    th {
+      white-space: nowrap;
+      cursor: pointer;
     }
-    table {
-      table-layout:fixed;
-      th {
-        white-space: nowrap;
-        cursor: pointer;
-      }
-      td {
-          overflow: hidden;
-          text-overflow: ellipsis;
-      }
-      // .first,
-      .last {
-        width: 10%;
-      }
+    td {
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    .btn-floating {
-      margin-right: 1rem;
+    // .first,
+    .last {
+      width: 10%;
     }
-    .input-field.inline {
+  }
+  .btn-floating {
+    margin-right: 1rem;
+  }
+  .input-field.inline {
     width: 40px;
-}
+  }
 </style>

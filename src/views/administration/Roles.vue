@@ -7,9 +7,11 @@
             <a @click="openRemoveRoleModal(data)" href="#">
               <i class="material-icons right">delete</i>
             </a>
-            <a @click="openAddEditRoleModal(data, 'update')" href="#">
-              <i class="material-icons right">edit</i>
-            </a>
+            <router-link v-bind:to="'/administration/roles/' + encodeURIComponent(selectedRole.id)">
+              <a @click="openAddEditRoleModal(data, 'update')" href="#">
+                <i class="material-icons right">edit</i>
+              </a>
+            </router-link>
           </template>
         </Table>
       </div>
@@ -254,6 +256,9 @@ export default {
     closeAddEditRoleModal() {
       this.showAddEditRoleModal = false;
       this.$v.$reset();
+      this.$router.push({
+        path: '/administration/roles/',
+      });
     },
     openRemoveRoleModal(role) {
       this.showRemoveRoleModal = true;
@@ -283,7 +288,17 @@ export default {
     },
     async getRoles() {
       const loader = this.$loading.show({ container: this.$el });
-      await this.$store.dispatch('um/getRoles').then(() => loader.hide());
+      await this.$store.dispatch('um/getRoles').then(() => {
+        loader.hide()
+
+        if (this.$route.params.id) {
+          const role = this.roles.find(role => role.id === this.$route.params.id);
+          if (role) {
+            return this.openAddEditRoleModal(role);
+          }
+          this.$M.toast({ html: 'This role does not exist!'});
+        }
+      });
     },
     async getActions() {
       const loader = this.$loading.show({ container: this.$el });

@@ -76,6 +76,21 @@ export default {
             inline: 'nearest',
           });
         }
+        
+        // const branchName = this.$route.params.branch;
+        // if (branchName) {
+        //   if (this.branches.includes(branchName)) {
+        //     const branch = this.branches.find(branch => container.branch === branchName);
+        //     this.selectedRow(user);
+        //   } 
+        //   else {
+        //     this.$router.push({
+        //       path: '/extranet/branches/',
+        //     })
+        //     this.$M.toast({ html: 'This branch does not exist!'});
+        //   }
+        // }
+
       });
     },
     getContainers() {

@@ -9,31 +9,31 @@
         </div>
       </div>
     </div>
-      <div class="col s12 l6">
+    <div class="col s12 l6">
       <div class="card">
         <div class="card-content">
           <span class="card-title">Extranet Builds By Branch</span>
           <table>
             <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Builds</th>
-            </tr>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Builds</th>
+              </tr>
             </thead>
             <tbody>
-            <tr v-for="(container, index) in containersGroupedByBranch" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>
-                <router-link v-bind:to="'/extranet/branches/' + container.branch">
-                  {{ container.branch }}
-                </router-link>
-              </td>
-              <td>{{ container.builds }}</td>
-            </tr>
-            <tr v-if="containersGroupedByBranch.length === 0">
-              <td colspan="3">There are no builds</td>
-            </tr>
+              <tr v-for="(container, index) in containersGroupedByBranch" :key="index">
+                <td>{{ index + 1 }}</td>
+                <td>
+                  <router-link v-bind:to="'/extranet/branches/' + encodeURIComponent(container.branch)">
+                    {{ container.branch }}
+                  </router-link>
+                </td>
+                <td>{{ container.builds }}</td>
+              </tr>
+              <tr v-if="containersGroupedByBranch.length === 0">
+                <td colspan="3">There are no builds</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -46,10 +46,13 @@
 
 <script>
 import Builds from '@/components/extranet/Builds';
+import Preloader from '@/components/partials/Preloader';
+
 
 export default {
   components: {
     Builds,
+    Preloader,
   },
   computed: {
     userContainers() {

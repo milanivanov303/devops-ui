@@ -9,7 +9,7 @@
             <option disabled value="">Choose your option</option>
             <option v-for="(option, key) in select.options"
                     v-bind:key="key"
-                    v-bind:value="option">{{ option.name }}</option>
+                    v-bind:value="option">{{ option[select.displayed] }}</option>
         </select>
         <label>{{ select.label }}</label>
     </div>
@@ -36,9 +36,15 @@ export default {
   mounted() {
     this.$M.FormSelect.init(this.$refs['custom-select'], {});
   },
+  updated() {
+    this.$M.FormSelect.init(this.$refs['custom-select'], {});
+  },
 };
 </script>
 
 <style scoped>
 
 </style>
+
+
+

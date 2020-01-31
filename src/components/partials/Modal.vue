@@ -6,22 +6,23 @@
           <h4 class="left">
             <slot name="header"></slot>
           </h4>
-          <a href="#!" class="modal-close waves-effect waves-green btn-flat right">
-            <i class="material-icons">close</i>
-          </a>
+            <a class="modal-close waves-effect waves-green btn-flat right">
+              <i class="material-icons">close</i>
+            </a>
         </div>
       </div >
       <slot name="content"></slot>
     </div>
     <div class="modal-footer">
       <slot name="footer"></slot>
-      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+      <a class="modal-close waves-effect waves-green btn-flat">Close</a>
     </div>
   </div>
 </template>
 
 <script>
 export default {
+  
   mounted() {
     this.$M.Modal
       .init(this.$el, {
@@ -31,7 +32,6 @@ export default {
         onOpenEnd: () => this.$emit('opened'),
         onCloseStart: () => this.$emit('close'),
         onCloseEnd: () => this.$emit('closed'),
-
       })
       .open();
   },
