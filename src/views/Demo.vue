@@ -3,9 +3,6 @@
     <div class="data-table">
       <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
         <template v-slot:buttons="{ data }">
-          <a @click="openRemoveDemoModal(data)">
-            <i class="material-icons right">delete</i>
-          </a>
           <a v-if="$auth.can(updateDemo) || $auth.can(updateAnyDemo)"
               @click="openAddEditDemoModal(data, 'update')">
               <i class="material-icons right">edit</i>
@@ -211,32 +208,6 @@
         </button>
       </template>
     </Modal>
-
-    <Modal v-if="showRemoveDemoModal" @close="showRemoveDemoModal = false" class="confirm">
-        <template v-slot:content>
-          <div v-if="removing" class="center" >
-            <Preloader class="big"/>
-            <p>Removing demo ...</p>
-          </div>
-          <div v-else-if="error" class="center">
-            <i class="material-icons large red-text">error_outline</i>
-            <p>{{ error }}</p>
-          </div>
-          <div v-else>
-            Are you sure you what to remove this demo?
-          </div>
-        </template>
-        <template v-slot:footer>
-          <button
-            v-if="!removing && !removed"
-            class="waves-effect btn red"
-            @click="deleteDemo()"
-          >
-            <i class="material-icons left">delete</i> Remove
-          </button>
-        </template>
-      </Modal>
-
   </div>
 </template>
 <script>
@@ -249,19 +220,16 @@ import {
 import Modal from '@/components/partials/Modal';
 import 'vue-datetime/dist/vue-datetime.css';
 import Table from '@/components/partials/Table';
-import Preloader from '@/components/partials/Preloader';
 
 export default {
   components: {
     Table,
     Modal,
     datetime: Datetime,
-    Preloader,
   },
   data() {
     return {
       showAddEditDemoModal: false,
-      showRemoveDemoModal: false,
       isOpen: false,
 
       demoId: '',
@@ -313,9 +281,6 @@ export default {
         label: 'Business area*',
         selected: {},
       },
-      removing: false,
-      removed: false,
-      error: '',
     };
   },
   validations: {
@@ -376,13 +341,7 @@ export default {
         path: '/demo/',
       });
     },
-    openRemoveDemoModal(demo) {
-      this.showRemoveDemoModal = true;
-      this.selectedDemo = demo;
-      this.removing = false;
-      this.removed = false;
-      this.error = '';
-    },
+
     selectedBusiness(value) {
       this.$v.selectedDemo.business.$touch();
       this.selectedDemo.business = value.name;
@@ -469,21 +428,7 @@ export default {
           return error;
         });
     },
-    deleteDemo() {
-      this.removing = true;
-      this.$store.dispatch('demo/deleteDemo', this.selectedDemo.id)
-        .then(() => {
-          this.removed = true;
-          this.showRemoveDemoModal = false;
-          this.$M.toast({ html: 'The role has been deleted!', classes: 'toast-seccess' });
-        })
-        .catch((error) => {
-          if (error.response.status === 403) {
-            this.error = 'You do not have insufficient rights to remove this role';
-          }
-        })
-        .finally(this.removing = false);
-    },
+
     showElement() {
       if (this.$route.params.id) {
         const demo = this.$store.state.demo.demos.find(demo => demo.id === parseInt(this.$route.params.id));

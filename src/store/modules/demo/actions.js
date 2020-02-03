@@ -27,13 +27,6 @@ export default {
       .catch(error => commit('error', error));
     return promise;
   },
-  deleteDemo({ commit }, id) {
-    const promise = api.delete(`demos/${id}`);
-    promise
-      .then(() => commit('deleteDemo', id))
-      .catch(error => commit('error', error));
-    return promise;
-  },
   async getDemos({ commit }, payload) {
     try {
       const response = await api.get('demos', payload);

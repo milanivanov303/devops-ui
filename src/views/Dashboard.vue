@@ -60,13 +60,11 @@ export default {
   },
   computed: {
     userContainers() {
-      this.loaded = true;
       return this.$store.getters['extranet/getContainersByUser'](
         this.$auth.getUser().username,
       );
     },
     containersGroupedByBranch() {
-      
       return this.$store.getters['extranet/getContainersGroupedByBranch']();
     },
     extranetContainersCount() {
