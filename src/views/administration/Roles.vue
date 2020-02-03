@@ -4,14 +4,12 @@
       <div class="data-table">
         <Table v-bind:request="request"  @add="openAddEditRoleModal({}, 'create')">
           <template v-slot:buttons="{ data }">
-            <a @click="openRemoveRoleModal(data)" href="#">
+            <a @click="openRemoveRoleModal(data)">
               <i class="material-icons right">delete</i>
             </a>
-            <router-link v-bind:to="'/administration/roles/' + encodeURIComponent(selectedRole.id)">
-              <a @click="openAddEditRoleModal(data, 'update')" href="#">
-                <i class="material-icons right">edit</i>
-              </a>
-            </router-link>
+            <a @click="openAddEditRoleModal(data, 'update')">
+              <i class="material-icons right">edit</i>
+            </a>
           </template>
         </Table>
       </div>
@@ -252,6 +250,9 @@ export default {
       this.action = action;
       this.selectedRole = Object.assign({}, role);
       this.selectedRole.application = { code: config.devops.code };
+      this.$router.push({
+        path: '/administration/roles/' + encodeURIComponent(this.selectedRole.id),
+      });
     },
     closeAddEditRoleModal() {
       this.showAddEditRoleModal = false;
@@ -272,6 +273,7 @@ export default {
       this.$M.Tabs.init(elems);
     },
     toggleIsAdmin() {
+      debugger;
       const isAdmin = document.getElementById('isAdmin_check');
       if (isAdmin.checked) {
         this.selectedRole.is_admin = 1;
@@ -289,15 +291,8 @@ export default {
     async getRoles() {
       const loader = this.$loading.show({ container: this.$el });
       await this.$store.dispatch('um/getRoles').then(() => {
-        loader.hide()
-
-        if (this.$route.params.id) {
-          const role = this.roles.find(role => role.id === this.$route.params.id);
-          if (role) {
-            return this.openAddEditRoleModal(role);
-          }
-          this.$M.toast({ html: 'This role does not exist!'});
-        }
+        loader.hide();
+        this.showElement();
       });
     },
     async getActions() {
@@ -353,6 +348,15 @@ export default {
         })
         .finally(this.removing = false);
     },
+    showElement() {
+      if (this.$route.params.id) {
+        const role = this.roles.find(role => role.id === parseInt(this.$route.params.id));
+        if (role) {
+          return this.openAddEditRoleModal(role);
+        }
+        this.$M.toast({ html: 'This role does not exist!', classes: 'toast-fail' });
+      }
+    }
   },
   mounted() {
     this.getUsers();

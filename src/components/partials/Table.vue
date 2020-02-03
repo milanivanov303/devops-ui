@@ -1,7 +1,6 @@
 <template>
   <div>
-    <div class="row"
-         :class="{hidden: (!sorted.length)}">
+    <div class="row">
       <div class="input-field col s12 m6 l6">
         <i class="material-icons prefix">search</i>
         <input type="text"
@@ -11,8 +10,7 @@
                placeholder="Search..">
       </div>
     </div>
-    <div class="col s12 m6 l6 right"
-         :class="{hidden: (!sorted.length)}">
+    <div class="col s12 m6 l6 right">
       <button class="btn-floating modal-triger right"
               v-if="request.add === true"
               @click="$emit('add')"
@@ -61,8 +59,9 @@
       <div class="col s12 m6 l1 right right-align" id="perPage"> 
         <div class="input-field" >
           <Select class="col s12"
-                  :select="selectperPage"
-                  @selectedVal="selectedperPage"/>
+                  v-if="sorted.length"
+                  :select="selectPerPage"
+                  @selectedVal="selectedPerPage"/>
           <slot> Items per page:</slot>
         </div>
       </div>
@@ -108,7 +107,7 @@ export default {
       page: 1,
       lastPage: 0,
       perPage: 10,
-      selectperPage: {
+      selectPerPage: {
         id: 'perPage_select',
         name: 'perPage',
         displayed: 'name',
@@ -163,14 +162,14 @@ export default {
       this.sortColDir = this.sortColDir === 'asc' ? 'desc' : 'asc';
       this.sortOrders[val] = this.sortOrders[val] * -1;
     },
-    selectedperPage(value) { 
+    selectedPerPage(value) { 
       this.perPage = value.name;
     },
     selectedPage(page) {
       this.page = page;
     },
     setLastPage(data) {
-      this.selectperPage.selected = {name: this.perPage};
+      this.selectPerPage.selected = {name: this.perPage};
       this.lastPage = Math.ceil(data.length / this.perPage);
     },
     returnValue(data) {

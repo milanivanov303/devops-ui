@@ -21,4 +21,10 @@ export default {
       return state.demos;
     });
   },
+  deleteDemo(state, id) {
+    state.demos.splice(
+      state.demos.findIndex(demo => demo.id === id),
+      1,
+    );
+  },
 };

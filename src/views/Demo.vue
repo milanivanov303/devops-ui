@@ -3,13 +3,13 @@
     <div class="data-table">
       <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
         <template v-slot:buttons="{ data }">
-          <router-link v-bind:to="'/demo/' + encodeURIComponent(selectedDemo.id)">
-            <a v-if="$auth.can(updateDemo) || $auth.can(updateAnyDemo)"
-               @click="openAddEditDemoModal(data, 'update')"
-               href="#">
-               <i class="material-icons right">edit</i>
-            </a>
-          </router-link>
+          <a @click="openRemoveDemoModal(data)">
+            <i class="material-icons right">delete</i>
+          </a>
+          <a v-if="$auth.can(updateDemo) || $auth.can(updateAnyDemo)"
+              @click="openAddEditDemoModal(data, 'update')">
+              <i class="material-icons right">edit</i>
+          </a>
         </template>
       </Table>
     </div>
@@ -101,10 +101,12 @@
             </div>
           </div>
           <div class="row">
-            <Select class="col s12"
+            <Select id="select-business"
+                    class="col s12"
                     v-if="isOpen === true"
                     :select="selectBusiness"
-                    @selectedVal="selectedBusiness"/>
+                    @selectedVal="selectedBusiness"
+                    />
             <div class="validator col s12 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.selectedDemo.business.error">
                 <p v-if="!$v.selectedDemo.business.required">Business field must not be empty.</p>
@@ -139,7 +141,7 @@
             <div
               class="input-field col s12 m6 l6"
               :class="{invalid: $v.selectedDemo.active_to.$error}"
-            >
+              >
               <i class="material-icons prefix">date_range</i>
               <datetime input-id="activeTo"
                         input-class="datetime-input"
@@ -163,7 +165,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="input-field col s12">
+            <div class="input-field col s12 disabled">
               <i class="material-icons prefix">mode_edit</i>
               <textarea id="details"
                         class="materialize-textarea"
@@ -172,7 +174,7 @@
                      for="icon_prefix2">Details</label>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="selectedDemo.status === 'requested' || selectedDemo.status === 'approved' || selectedDemo.status === 'rejected'">
             <div class="col s6 m2 l2">
               <label for="status-aproved">
                 <input id="status-aproved"
@@ -180,7 +182,7 @@
                        type="radio"
                        value="approved"
                        v-model="selectedDemo.status"
-                       :checked="(selectedDemo.status === 'approved' || selectedDemo.action === 'create')"/>
+                       :checked="(selectedDemo.status === 'approved')"/>
                 <span>Approved</span>
               </label>
             </div>
@@ -190,7 +192,8 @@
                        class="with-gap"
                        type="radio"
                        value="rejected"
-                       v-model="selectedDemo.status"/>
+                       v-model="selectedDemo.status"
+                       :checked="(selectedDemo.status === 'rejected')"/>
                 <span>Rejected</span>
               </label>
             </div>
@@ -209,6 +212,31 @@
       </template>
     </Modal>
 
+    <Modal v-if="showRemoveDemoModal" @close="showRemoveDemoModal = false" class="confirm">
+        <template v-slot:content>
+          <div v-if="removing" class="center" >
+            <Preloader class="big"/>
+            <p>Removing demo ...</p>
+          </div>
+          <div v-else-if="error" class="center">
+            <i class="material-icons large red-text">error_outline</i>
+            <p>{{ error }}</p>
+          </div>
+          <div v-else>
+            Are you sure you what to remove this demo?
+          </div>
+        </template>
+        <template v-slot:footer>
+          <button
+            v-if="!removing && !removed"
+            class="waves-effect btn red"
+            @click="deleteDemo()"
+          >
+            <i class="material-icons left">delete</i> Remove
+          </button>
+        </template>
+      </Modal>
+
   </div>
 </template>
 <script>
@@ -221,17 +249,19 @@ import {
 import Modal from '@/components/partials/Modal';
 import 'vue-datetime/dist/vue-datetime.css';
 import Table from '@/components/partials/Table';
-
+import Preloader from '@/components/partials/Preloader';
 
 export default {
   components: {
     Table,
     Modal,
     datetime: Datetime,
+    Preloader,
   },
   data() {
     return {
       showAddEditDemoModal: false,
+      showRemoveDemoModal: false,
       isOpen: false,
 
       demoId: '',
@@ -283,6 +313,9 @@ export default {
         label: 'Business area*',
         selected: {},
       },
+      removing: false,
+      removed: false,
+      error: '',
     };
   },
   validations: {
@@ -325,19 +358,30 @@ export default {
     openAddEditDemoModal(demo, action) {
       this.showAddEditDemoModal = true;
       this.action = action;
-      this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, demo);
+      this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, {status: 'approved'}, demo);
       this.selectBusiness.selected = {name: this.selectedDemo.business};
       this.selectedDemo.active_from = DateTime.fromSQL(this.selectedDemo.active_from)
         .toISO();
       this.selectedDemo.active_to = DateTime.fromSQL(this.selectedDemo.active_to)
         .toISO();
+      this.$router.push({
+        path: '/demo/' + encodeURIComponent(this.selectedDemo.id),
+      });   
     },
+   
     closeAddEditDemoModal() {
       this.showAddEditDemoModal = false;
       this.$v.$reset();
        this.$router.push({
         path: '/demo/',
       });
+    },
+    openRemoveDemoModal(demo) {
+      this.showRemoveDemoModal = true;
+      this.selectedDemo = demo;
+      this.removing = false;
+      this.removed = false;
+      this.error = '';
     },
     selectedBusiness(value) {
       this.$v.selectedDemo.business.$touch();
@@ -370,14 +414,7 @@ export default {
       };
       await this.$store.dispatch('demo/getDemos', payload).then(() => {
         loader.hide();
-
-        if (this.$route.params.id) {
-          const demo = this.demos.find(demo => demo.id === this.$route.params.id);
-          if (demo) {
-            return this.openAddEditDemoModal(demo);
-          }
-          this.$M.toast({ html: 'This demo does not exist!'});
-        }
+        this.showElement();        
       });
     },
     createDemo() {
@@ -416,14 +453,11 @@ export default {
       delete payload.id;
       delete payload.code;
       delete payload.status;
-      // const payload = {
-      //   formData: this.selectedDemo,
-      // };
+      
       payload.active_from = DateTime.fromISO(this.selectedDemo.active_from)
         .toFormat('yyyy-MM-dd HH:mm:ss');
       payload.active_to = DateTime.fromISO(this.selectedDemo.active_to)
         .toFormat('yyyy-MM-dd HH:mm:ss');
-
 
       this.$store.dispatch('demo/updateDemo', { id, payload })
         .then(() => {
@@ -435,6 +469,30 @@ export default {
           return error;
         });
     },
+    deleteDemo() {
+      this.removing = true;
+      this.$store.dispatch('demo/deleteDemo', this.selectedDemo.id)
+        .then(() => {
+          this.removed = true;
+          this.showRemoveDemoModal = false;
+          this.$M.toast({ html: 'The role has been deleted!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          if (error.response.status === 403) {
+            this.error = 'You do not have insufficient rights to remove this role';
+          }
+        })
+        .finally(this.removing = false);
+    },
+    showElement() {
+      if (this.$route.params.id) {
+        const demo = this.$store.state.demo.demos.find(demo => demo.id === parseInt(this.$route.params.id));
+        if (demo) {
+          return this.openAddEditDemoModal(demo);
+        }
+        this.$M.toast({ html: 'This demo does not exist!', classes: 'toast-fail' });
+      }
+    }
   },
   mounted() {
     this.getDemos();

@@ -4,74 +4,71 @@
       <div class="data-table">
         <Table v-bind:request="request">
           <template v-slot:buttons="{ data }">
-            <router-link v-bind:to="'/administration/users/' + encodeURIComponent(selectedUser.username)">
-              <a @click="selectedRow(data)" href="#">
-                <i class="material-icons right">edit</i>
-              </a>
-            </router-link>
+            <a @click="selectedRow(data)">
+              <i class="material-icons right">edit</i>
+            </a>
           </template>
         </Table>
       </div>
       <Modal v-if="showModal" @close="closeModal()" @opened="initModal()" class="right-sheet">
-        
-          <template v-slot:header>User information
-          </template>
-          <template v-slot:content>
-            <div class="col s12 l10 offset-l1">
-              <div class="row">
-                <div class="col s12">
-                  <i class="material-icons">person</i>
-                  <span id="info">{{selectedUser.name}}</span>
-                </div>
+        <template v-slot:header>
+          User information
+        </template>
+        <template v-slot:content>
+          <div class="col s12 l10 offset-l1">
+            <div class="row">
+              <div class="col s12">
+                <i class="material-icons">person</i>
+                <span id="info">{{selectedUser.name}}</span>
               </div>
-              <div class="row">
-                <div class="col s12">
-                  <i class="material-icons">account_circle</i>
-                  <span id="info">{{selectedUser .username}}</span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12">
-                  <i class="material-icons">mail</i>
-                  <span id="info">{{selectedUser.email}}</span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12">
-                  <i class="material-icons">phone</i>
-                  <span id="info">{{selectedUser.phone}}</span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12">
-                  <i class="material-icons">people</i>
-                  <span id="info">{{selectedUser.department.name}}</span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12">
-                  <ul class="tabs col s12">
-                    <li class="tab col s12"><a href="#roles">Roles</a></li>
-                  </ul>
-                  <div id="roles">
-                    <List :items="roles" :selected="selectedUser.roles" v-model="selectedUser.roles"/>
-                  </div>
-                </div>
-              </div>
-
             </div>
-          </template>
-          <template v-slot:footer>
-            <button
-              class="btn waves-effect waves-light"
-              type="submit"
-              name="action"
-              @click="updateUserRoles()"
-            >
-              Save
-            </button>
-          </template>
-        
+            <div class="row">
+              <div class="col s12">
+                <i class="material-icons">account_circle</i>
+                <span id="info">{{selectedUser .username}}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <i class="material-icons">mail</i>
+                <span id="info">{{selectedUser.email}}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <i class="material-icons">phone</i>
+                <span id="info">{{selectedUser.phone}}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <i class="material-icons">people</i>
+                <span id="info">{{selectedUser.department.name}}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <ul class="tabs col s12">
+                  <li class="tab col s12"><a href="#roles">Roles</a></li>
+                </ul>
+                <div id="roles">
+                  <List :items="roles" :selected="selectedUser.roles" v-model="selectedUser.roles"/>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </template>
+        <template v-slot:footer>
+          <button
+            class="btn waves-effect waves-light"
+            type="submit"
+            name="action"
+            @click="updateUserRoles()"
+          >
+            Save
+          </button>
+        </template>
       </Modal>
     </div>
   </div>
@@ -81,7 +78,6 @@
 import Modal from '@/components/partials/Modal';
 import Table from '@/components/partials/Table';
 import List from '@/components/partials/List';
-
 
 export default {
   data() {
@@ -123,8 +119,11 @@ export default {
   },
   methods: {
     selectedRow(user) {
-      this.showModal = true;
       this.selectedUser = user;
+      this.showModal = true;
+      this.$router.push({
+        path: '/administration/users/' + encodeURIComponent(this.selectedUser.username),
+      });
     },
 
     initModal() {
@@ -142,15 +141,8 @@ export default {
     getUsers() {
       const loader = this.$loading.show({ container: this.$el });
       this.$store.dispatch('um/getUsers').then(() => {
-        loader.hide()
-
-        if (this.$route.params.username) {
-          const user = this.users.find(user => user.username === this.$route.params.username);
-          if (user) {
-            return this.selectedRow(user);
-          }
-          this.$M.toast({ html: 'This user does not exist!'});
-        }
+        loader.hide();
+        this.showElement();
       });
     },
 
@@ -171,6 +163,16 @@ export default {
           this.error = error;
           return error;
         });
+    },
+
+    showElement() { 
+      if (this.$route.params.username) {
+        const user = this.users.find(user => user.username === this.$route.params.username);
+        if (user) {
+          return this.selectedRow(user);
+        }
+        this.$M.toast({ html: 'This user does not exist!', classes: 'toast-fail' });
+      }
     },
   },
   mounted() {

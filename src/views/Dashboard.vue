@@ -49,7 +49,6 @@
 <script>
 import Builds from '@/components/extranet/Builds';
 
-
 export default {
   components: {
     Builds,
@@ -67,7 +66,7 @@ export default {
       );
     },
     containersGroupedByBranch() {
-      this.loaded = true;
+      
       return this.$store.getters['extranet/getContainersGroupedByBranch']();
     },
     extranetContainersCount() {
@@ -82,6 +81,7 @@ export default {
     this.$store.dispatch('extranet/getContainers')
     .then(() => {
       loader.hide();
+      this.loaded = true;
     });
   },
 };

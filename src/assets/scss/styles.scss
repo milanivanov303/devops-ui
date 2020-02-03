@@ -426,8 +426,10 @@ caption{
     background-color: $hover-color;
     color: $link-color;
 }
-
-.hidden {
-    visibility: hidden;
+.toast-fail{
+    background-color: $wrong-color;
+    color: white;
 }
-
+a{
+    cursor: pointer;
+}
