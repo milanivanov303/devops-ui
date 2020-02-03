@@ -16,7 +16,6 @@
                       <input type="text" id="username-input" v-model="username" />
                       <label for="username-input">Username</label>
                     </div>
-
                     <div class="input-field col s12">
                       <i class="material-icons prefix">lock</i>
                       <input
@@ -45,15 +44,14 @@
               <div class="col s12 m4 center">
                 <div v-if="ssoUser">
                   <a class="sso-btn" href="#" @click="loginSSO()">
-                    <i class="large material-icons">person_pin</i>
+                    <i class="large material-icons col s12">person_pin</i>
                   </a>
                   <p>Continue as <b>{{ ssoUser.name }}</b></p>
                 </div>
                 <div v-else>
                   <a class="sso-btn" href="#" @click="loginSSO()">
-                    <i class="large material-icons">person_pin</i>
+                    <i class="large material-icons col s12">person_pin</i>
                   </a>
-                  <p>Quick login with SSO</p>
                   <Preloader v-if="gettingSSOUser" class="small" />
                 </div>
                 <Preloader v-if="loggingInSSO" class="preloader-wrapper small" />

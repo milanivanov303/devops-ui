@@ -21,7 +21,6 @@ export default {
     }
   },
   updateDemo({ commit }, { id, payload }) {
-    debugger;
     const promise = api.put(`demos/${id}`, payload);
     promise
       .then(response => commit('updateDemo', response.data.data))

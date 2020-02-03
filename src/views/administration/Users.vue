@@ -4,13 +4,15 @@
       <div class="data-table">
         <Table v-bind:request="request">
           <template v-slot:buttons="{ data }">
-              <a @click="selectedRow(data)" href="#"><i class="material-icons right">edit</i></a>
+            <a @click="selectedRow(data)">
+              <i class="material-icons right">edit</i>
+            </a>
           </template>
         </Table>
       </div>
-
-      <Modal v-if="showModal" @close="showModal = false" @opened="initModal()" class="right-sheet">
-        <template v-slot:header>User information
+      <Modal v-if="showModal" @close="closeModal()" @opened="initModal()" class="right-sheet">
+        <template v-slot:header>
+          User information
         </template>
         <template v-slot:content>
           <div class="col s12 l10 offset-l1">
@@ -62,7 +64,7 @@
             class="btn waves-effect waves-light"
             type="submit"
             name="action"
-             @click="updateUserRoles()"
+            @click="updateUserRoles()"
           >
             Save
           </button>
@@ -76,7 +78,6 @@
 import Modal from '@/components/partials/Modal';
 import Table from '@/components/partials/Table';
 import List from '@/components/partials/List';
-
 
 export default {
   data() {
@@ -118,8 +119,11 @@ export default {
   },
   methods: {
     selectedRow(user) {
-      this.showModal = true;
       this.selectedUser = user;
+      this.showModal = true;
+      this.$router.push({
+        path: '/administration/users/' + encodeURIComponent(this.selectedUser.username),
+      });
     },
 
     initModal() {
@@ -127,9 +131,19 @@ export default {
       this.$M.Tabs.init(elems);
     },
 
+    closeModal() {
+      this.showModal = false;
+      this.$router.push({
+        path: '/administration/users/',
+      });
+    },
+
     getUsers() {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('um/getUsers').then(() => loader.hide());
+      this.$store.dispatch('um/getUsers').then(() => {
+        loader.hide();
+        this.showElement();
+      });
     },
 
     getRoles() {
@@ -138,7 +152,6 @@ export default {
     },
 
     updateUserRoles() {
-      // const id = this.selectedUser.id;
       const payload = this.selectedUser;
 
       this.$store.dispatch('updateUserRoles', payload)
@@ -150,6 +163,16 @@ export default {
           this.error = error;
           return error;
         });
+    },
+
+    showElement() { 
+      if (this.$route.params.username) {
+        const user = this.users.find(user => user.username === this.$route.params.username);
+        if (user) {
+          return this.selectedRow(user);
+        }
+        this.$M.toast({ html: 'This user does not exist!', classes: 'toast-fail' });
+      }
     },
   },
   mounted() {

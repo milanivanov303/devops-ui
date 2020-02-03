@@ -1,26 +1,29 @@
 <template>
   <div class="col s12 l12">
     <div class="data-table">
-     <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
-          <template v-slot:buttons="{ data }">
-            <a
-              v-if="$auth.can(updateDemo) || $auth.can(updateAnyDemo)"
-              @click="openAddEditDemoModal(data, 'update')"
-              href="#"
-            >
-                <i class="material-icons right">edit</i>
-            </a>
-          </template>
-        </Table>
+      <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
+        <template v-slot:buttons="{ data }">
+          <a v-if="$auth.can(updateDemo) || $auth.can(updateAnyDemo)"
+              @click="openAddEditDemoModal(data, 'update')">
+              <i class="material-icons right">edit</i>
+          </a>
+        </template>
+      </Table>
     </div>
 
     <Modal
       v-if="showAddEditDemoModal"
       @close="closeAddEditDemoModal()"
       @opened="isOpen = true"
-      class="right-sheet"
-    >
-      <template v-slot:header>Schedule a demo</template>
+      class="right-sheet">
+      <template v-slot:header>
+        <div v-if="action === 'create'">
+          Schedule a demo
+        </div>
+        <div v-else>
+          Update {{selectedDemo.name}}
+        </div>
+      </template>
       <template v-slot:content>
         <form class=" col s12 l10 offset-l1">
           <div class="row">
@@ -95,11 +98,12 @@
             </div>
           </div>
           <div class="row">
-            <Select class="col s12"
+            <Select id="select-business"
+                    class="col s12"
                     v-if="isOpen === true"
                     :select="selectBusiness"
                     @selectedVal="selectedBusiness"
-                    v-model="selectedBusiness"/>
+                    />
             <div class="validator col s12 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.selectedDemo.business.error">
                 <p v-if="!$v.selectedDemo.business.required">Business field must not be empty.</p>
@@ -134,7 +138,7 @@
             <div
               class="input-field col s12 m6 l6"
               :class="{invalid: $v.selectedDemo.active_to.$error}"
-            >
+              >
               <i class="material-icons prefix">date_range</i>
               <datetime input-id="activeTo"
                         input-class="datetime-input"
@@ -158,7 +162,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="input-field col s12">
+            <div class="input-field col s12 disabled">
               <i class="material-icons prefix">mode_edit</i>
               <textarea id="details"
                         class="materialize-textarea"
@@ -167,16 +171,15 @@
                      for="icon_prefix2">Details</label>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="selectedDemo.status === 'requested' || selectedDemo.status === 'approved' || selectedDemo.status === 'rejected'">
             <div class="col s6 m2 l2">
               <label for="status-aproved">
                 <input id="status-aproved"
                        class="with-gap"
-                       :disabled="statusCheck"
                        type="radio"
                        value="approved"
                        v-model="selectedDemo.status"
-                       :checked="selectedDemo.status === 'approved'" />
+                       :checked="(selectedDemo.status === 'approved')"/>
                 <span>Approved</span>
               </label>
             </div>
@@ -184,10 +187,10 @@
               <label for="status-rejected">
                 <input id="status-rejected"
                        class="with-gap"
-                       :disabled="statusCheck"
                        type="radio"
                        value="rejected"
-                       v-model="selectedDemo.status"/>
+                       v-model="selectedDemo.status"
+                       :checked="(selectedDemo.status === 'rejected')"/>
                 <span>Rejected</span>
               </label>
             </div>
@@ -205,7 +208,6 @@
         </button>
       </template>
     </Modal>
-
   </div>
 </template>
 <script>
@@ -276,8 +278,8 @@ export default {
             name: 'Other',
           },
         ],
-        label: 'Business area',
-        selected: '',
+        label: 'Business area*',
+        selected: {},
       },
     };
   },
@@ -321,12 +323,25 @@ export default {
     openAddEditDemoModal(demo, action) {
       this.showAddEditDemoModal = true;
       this.action = action;
-      this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, demo);
+      this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, {status: 'approved'}, demo);
+      this.selectBusiness.selected = {name: this.selectedDemo.business};
+      this.selectedDemo.active_from = DateTime.fromSQL(this.selectedDemo.active_from)
+        .toISO();
+      this.selectedDemo.active_to = DateTime.fromSQL(this.selectedDemo.active_to)
+        .toISO();
+      this.$router.push({
+        path: '/demo/' + encodeURIComponent(this.selectedDemo.id),
+      });   
     },
+   
     closeAddEditDemoModal() {
       this.showAddEditDemoModal = false;
       this.$v.$reset();
+       this.$router.push({
+        path: '/demo/',
+      });
     },
+
     selectedBusiness(value) {
       this.$v.selectedDemo.business.$touch();
       this.selectedDemo.business = value.name;
@@ -358,10 +373,8 @@ export default {
       };
       await this.$store.dispatch('demo/getDemos', payload).then(() => {
         loader.hide();
+        this.showElement();        
       });
-      if (this.$route.params.id) {
-        this.createDemo(this.$route.params);
-      }
     },
     createDemo() {
       this.$v.$touch();
@@ -398,14 +411,12 @@ export default {
       const payload = this.selectedDemo;
       delete payload.id;
       delete payload.code;
-      // const payload = {
-      //   formData: this.selectedDemo,
-      // };
+      delete payload.status;
+      
       payload.active_from = DateTime.fromISO(this.selectedDemo.active_from)
         .toFormat('yyyy-MM-dd HH:mm:ss');
       payload.active_to = DateTime.fromISO(this.selectedDemo.active_to)
         .toFormat('yyyy-MM-dd HH:mm:ss');
-
 
       this.$store.dispatch('demo/updateDemo', { id, payload })
         .then(() => {
@@ -417,6 +428,16 @@ export default {
           return error;
         });
     },
+
+    showElement() {
+      if (this.$route.params.id) {
+        const demo = this.$store.state.demo.demos.find(demo => demo.id === parseInt(this.$route.params.id));
+        if (demo) {
+          return this.openAddEditDemoModal(demo);
+        }
+        this.$M.toast({ html: 'This demo does not exist!', classes: 'toast-fail' });
+      }
+    }
   },
   mounted() {
     this.getDemos();

@@ -90,14 +90,16 @@ export default [
   {
     path: '/demo/:id?',
     meta: {
-      name: 'demo',
       requiresAuth: true,
+      name: 'demo',
+      transitionName: 'slide',
+      title: 'Demo',
       breadcrumb: 'Demo',
     },
     component: Demo,
   },
   {
-    path: '/administration/users',
+    path: '/administration/users/:username?',
     meta: {
       requiresAuth: true,
       name: 'administration-users',
@@ -108,7 +110,7 @@ export default [
     component: AdministrationUsers,
   },
   {
-    path: '/administration/roles',
+    path: '/administration/roles/:id?',
     meta: {
       requiresAuth: true,
       name: 'administration-roles',

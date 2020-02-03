@@ -20,24 +20,24 @@
               <th>Builds</th>
             </tr>
             </thead>
-            <tbody>
-            <tr>
-              <td>1</td>
-              <td>
-                <router-link to="/extranet">Extranet</router-link>
-              </td>
-              <td>{{ extranetContainersCount }}</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>iMX BE</td>
-              <td>N/A</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>iMX FE</td>
-              <td>N/A</td>
-            </tr>
+            <tbody v-if="loaded">
+              <tr>
+                <td>1</td>
+                <td>
+                  <router-link to="/extranet">Extranet</router-link>
+                </td>
+                <td>{{ extranetContainersCount }}</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>iMX BE</td>
+                <td>N/A</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>iMX FE</td>
+                <td>N/A</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -53,6 +53,11 @@ export default {
   components: {
     Builds,
   },
+  data() {
+    return {
+      loaded: false,
+    };
+  },
   computed: {
     userContainers() {
       return this.$store.getters['extranet/getContainersByUser'](
@@ -67,7 +72,15 @@ export default {
     }
   },
   mounted() {
-    this.$store.dispatch('extranet/getContainers');
+    const loader = this.$loading.show({ container: this.$el });
+    const payload = {
+      orders: JSON.stringify({ id: 'desc' }),
+    };
+    this.$store.dispatch('extranet/getContainers')
+    .then(() => {
+      loader.hide();
+      this.loaded = true;
+    });
   },
 };
 </script>

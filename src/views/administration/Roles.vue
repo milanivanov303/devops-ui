@@ -4,10 +4,10 @@
       <div class="data-table">
         <Table v-bind:request="request"  @add="openAddEditRoleModal({}, 'create')">
           <template v-slot:buttons="{ data }">
-            <a @click="openRemoveRoleModal(data)" href="#">
+            <a @click="openRemoveRoleModal(data)">
               <i class="material-icons right">delete</i>
             </a>
-            <a @click="openAddEditRoleModal(data, 'update')" href="#">
+            <a @click="openAddEditRoleModal(data, 'update')">
               <i class="material-icons right">edit</i>
             </a>
           </template>
@@ -250,10 +250,16 @@ export default {
       this.action = action;
       this.selectedRole = Object.assign({}, role);
       this.selectedRole.application = { code: config.devops.code };
+      this.$router.push({
+        path: '/administration/roles/' + encodeURIComponent(this.selectedRole.id),
+      });
     },
     closeAddEditRoleModal() {
       this.showAddEditRoleModal = false;
       this.$v.$reset();
+      this.$router.push({
+        path: '/administration/roles/',
+      });
     },
     openRemoveRoleModal(role) {
       this.showRemoveRoleModal = true;
@@ -267,6 +273,7 @@ export default {
       this.$M.Tabs.init(elems);
     },
     toggleIsAdmin() {
+      debugger;
       const isAdmin = document.getElementById('isAdmin_check');
       if (isAdmin.checked) {
         this.selectedRole.is_admin = 1;
@@ -283,7 +290,10 @@ export default {
     },
     async getRoles() {
       const loader = this.$loading.show({ container: this.$el });
-      await this.$store.dispatch('um/getRoles').then(() => loader.hide());
+      await this.$store.dispatch('um/getRoles').then(() => {
+        loader.hide();
+        this.showElement();
+      });
     },
     async getActions() {
       const loader = this.$loading.show({ container: this.$el });
@@ -338,6 +348,15 @@ export default {
         })
         .finally(this.removing = false);
     },
+    showElement() {
+      if (this.$route.params.id) {
+        const role = this.roles.find(role => role.id === parseInt(this.$route.params.id));
+        if (role) {
+          return this.openAddEditRoleModal(role);
+        }
+        this.$M.toast({ html: 'This role does not exist!', classes: 'toast-fail' });
+      }
+    }
   },
   mounted() {
     this.getUsers();
