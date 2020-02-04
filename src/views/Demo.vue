@@ -171,7 +171,10 @@
                      for="icon_prefix2">Details</label>
             </div>
           </div>
-          <div class="row" v-if="selectedDemo.status === 'requested' || selectedDemo.status === 'approved' || selectedDemo.status === 'rejected'">
+          <div class="row"
+               v-if="selectedDemo.status === 'requested' ||
+               selectedDemo.status === 'approved' ||
+               selectedDemo.status === 'rejected'">
             <div class="col s6 m2 l2">
               <label for="status-aproved">
                 <input id="status-aproved"
@@ -323,21 +326,21 @@ export default {
     openAddEditDemoModal(demo, action) {
       this.showAddEditDemoModal = true;
       this.action = action;
-      this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, {status: 'approved'}, demo);
-      this.selectBusiness.selected = {name: this.selectedDemo.business};
+      this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, { status: 'approved' }, demo);
+      this.selectBusiness.selected = { name: this.selectedDemo.business };
       this.selectedDemo.active_from = DateTime.fromSQL(this.selectedDemo.active_from)
         .toISO();
       this.selectedDemo.active_to = DateTime.fromSQL(this.selectedDemo.active_to)
         .toISO();
       this.$router.push({
-        path: '/demo/' + encodeURIComponent(this.selectedDemo.id),
-      });   
+        path: `/demo/${encodeURIComponent(this.selectedDemo.id)}`,
+      });
     },
-   
+
     closeAddEditDemoModal() {
       this.showAddEditDemoModal = false;
       this.$v.$reset();
-       this.$router.push({
+      this.$router.push({
         path: '/demo/',
       });
     },
@@ -373,7 +376,7 @@ export default {
       };
       await this.$store.dispatch('demo/getDemos', payload).then(() => {
         loader.hide();
-        this.showElement();        
+        this.showElement();
       });
     },
     createDemo() {
@@ -412,7 +415,7 @@ export default {
       delete payload.id;
       delete payload.code;
       delete payload.status;
-      
+
       payload.active_from = DateTime.fromISO(this.selectedDemo.active_from)
         .toFormat('yyyy-MM-dd HH:mm:ss');
       payload.active_to = DateTime.fromISO(this.selectedDemo.active_to)
@@ -431,13 +434,19 @@ export default {
 
     showElement() {
       if (this.$route.params.id) {
-        const demo = this.$store.state.demo.demos.find(demo => demo.id === parseInt(this.$route.params.id));
+        const demo = this.$store.state.demo.demos.find((demo) => {
+          if (demo.id === parseInt(this.$route.params.id, 10)) {
+            return true;
+          }
+          return true;
+        });
         if (demo) {
           return this.openAddEditDemoModal(demo);
         }
         this.$M.toast({ html: 'This demo does not exist!', classes: 'toast-fail' });
       }
-    }
+      return false;
+    },
   },
   mounted() {
     this.getDemos();

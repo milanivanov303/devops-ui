@@ -69,18 +69,15 @@ export default {
     },
     extranetContainersCount() {
       return this.$store.state.extranet.containers.length;
-    }
+    },
   },
   mounted() {
     const loader = this.$loading.show({ container: this.$el });
-    const payload = {
-      orders: JSON.stringify({ id: 'desc' }),
-    };
     this.$store.dispatch('extranet/getContainers')
-    .then(() => {
-      loader.hide();
-      this.loaded = true;
-    });
+      .then(() => {
+        loader.hide();
+        this.loaded = true;
+      });
   },
 };
 </script>

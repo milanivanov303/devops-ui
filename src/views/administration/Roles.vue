@@ -251,7 +251,7 @@ export default {
       this.selectedRole = Object.assign({}, role);
       this.selectedRole.application = { code: config.devops.code };
       this.$router.push({
-        path: '/administration/roles/' + encodeURIComponent(this.selectedRole.id),
+        path: `/administration/roles/${encodeURIComponent(this.selectedRole.id)}`,
       });
     },
     closeAddEditRoleModal() {
@@ -350,13 +350,15 @@ export default {
     },
     showElement() {
       if (this.$route.params.id) {
-        const role = this.roles.find(role => role.id === parseInt(this.$route.params.id));
+        const role = this.roles.find(role => role.id === parseInt(this.$route.params.id, 10));
+
         if (role) {
           return this.openAddEditRoleModal(role);
         }
         this.$M.toast({ html: 'This role does not exist!', classes: 'toast-fail' });
       }
-    }
+      return false;
+    },
   },
   mounted() {
     this.getUsers();

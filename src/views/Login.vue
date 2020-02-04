@@ -117,10 +117,9 @@ export default {
         });
     },
     getLoggedInSSOUser() {
-
       this.gettingSSOUser = true;
 
-      var iframe = document.createElement('iframe');
+      const iframe = document.createElement('iframe');
       iframe.setAttribute('src', '/logged-in-sso-user');
       iframe.setAttribute('hidden', true);
 

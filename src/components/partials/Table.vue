@@ -38,7 +38,7 @@
           <th class="last"></th>
         </tr>
       </thead>
-     
+
       <tbody>
         <tr v-for="(data, key) in sorted"
             v-bind:key="key">
@@ -56,7 +56,7 @@
       </tbody>
     </table>
     <div class="row">
-      <div class="col s12 m6 l1 right right-align" id="perPage"> 
+      <div class="col s12 m6 l1 right right-align" id="perPage">
         <div class="input-field" >
           <Select class="col s12"
                   v-if="sorted.length"
@@ -91,7 +91,7 @@ import Select from '@/components/partials/Select';
 export default {
   components: {
     paginate: Paginate,
-    Select
+    Select,
   },
   data() {
     const sortOrders = {};
@@ -113,13 +113,10 @@ export default {
         displayed: 'name',
         options: [
           {
-            name: 2,
-          },
-          {
-            name: 3,
-          },
-          {
             name: 5,
+          },
+          {
+            name: 7,
           },
           {
             name: 10,
@@ -162,14 +159,14 @@ export default {
       this.sortColDir = this.sortColDir === 'asc' ? 'desc' : 'asc';
       this.sortOrders[val] = this.sortOrders[val] * -1;
     },
-    selectedPerPage(value) { 
+    selectedPerPage(value) {
       this.perPage = value.name;
     },
     selectedPage(page) {
       this.page = page;
     },
     setLastPage(data) {
-      this.selectPerPage.selected = {name: this.perPage};
+      this.selectPerPage.selected = { name: this.perPage };
       this.lastPage = Math.ceil(data.length / this.perPage);
     },
     returnValue(data) {

@@ -22,7 +22,7 @@
 
 <script>
 export default {
-  
+
   mounted() {
     this.$M.Modal
       .init(this.$el, {

@@ -122,7 +122,7 @@ export default {
       this.selectedUser = user;
       this.showModal = true;
       this.$router.push({
-        path: '/administration/users/' + encodeURIComponent(this.selectedUser.username),
+        path: `/administration/users/${encodeURIComponent(this.selectedUser.username)}`,
       });
     },
 
@@ -165,7 +165,7 @@ export default {
         });
     },
 
-    showElement() { 
+    showElement() {
       if (this.$route.params.username) {
         const user = this.users.find(user => user.username === this.$route.params.username);
         if (user) {
@@ -173,6 +173,7 @@ export default {
         }
         this.$M.toast({ html: 'This user does not exist!', classes: 'toast-fail' });
       }
+      return false;
     },
   },
   mounted() {
