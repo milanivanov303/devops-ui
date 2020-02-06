@@ -98,9 +98,6 @@
 <script>
 
 import { required } from 'vuelidate/lib/validators';
-import Modal from '@/components/partials/Modal';
-import Autocomplete from '@/components/partials/Autocomplete';
-import Progress from '@/components/partials/Progress';
 import client from '@/plugins/ws';
 
 
@@ -124,11 +121,7 @@ function initialState() {
 }
 
 export default {
-  components: {
-    Modal,
-    Autocomplete,
-    Progress,
-  },
+
   data() {
     return initialState();
   },

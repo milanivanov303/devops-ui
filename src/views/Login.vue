@@ -65,15 +65,11 @@
 </template>
 
 <script>
-import Alert from '@/components/partials/Alert';
-import Loading from '@/components/layouts/Loading';
-import Preloader from '@/components/partials/Preloader';
+import Loading from '../components/layouts/Loading';
 
 export default {
   components: {
-    Alert,
     Loading,
-    Preloader,
   },
   data() {
     return {

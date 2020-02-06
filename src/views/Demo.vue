@@ -220,16 +220,13 @@ import { DateTime } from 'luxon';
 import {
   required, email, numeric, minLength,
 } from 'vuelidate/lib/validators';
-import Modal from '@/components/partials/Modal';
 import 'vue-datetime/dist/vue-datetime.css';
-import Table from '@/components/partials/Table';
 
 export default {
   components: {
-    Table,
-    Modal,
     datetime: Datetime,
   },
+
   data() {
     return {
       showAddEditDemoModal: false,

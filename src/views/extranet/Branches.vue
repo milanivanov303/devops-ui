@@ -33,11 +33,9 @@
 
 <script>
 import Branch from '@/components/extranet/Branch';
-import TextInput from '@/components/partials/TextInput';
 
 export default {
   components: {
-    TextInput,
     Branch,
   },
   data() {
