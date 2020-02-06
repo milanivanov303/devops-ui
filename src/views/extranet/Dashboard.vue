@@ -25,7 +25,8 @@
               <tr v-for="(container, index) in containersGroupedByBranch" :key="index">
                 <td>{{ index + 1 }}</td>
                 <td>
-                  <router-link v-bind:to="'/extranet/branches/' + encodeURIComponent(container.branch)">
+                  <router-link
+                    v-bind:to="'/extranet/branches/' + encodeURIComponent(container.branch)">
                     {{ container.branch }}
                   </router-link>
                 </td>
@@ -46,13 +47,10 @@
 
 <script>
 import Builds from '@/components/extranet/Builds';
-import Preloader from '@/components/partials/Preloader';
-
 
 export default {
   components: {
     Builds,
-    Preloader,
   },
   computed: {
     userContainers() {

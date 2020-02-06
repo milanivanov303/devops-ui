@@ -65,15 +65,11 @@
 </template>
 
 <script>
-import Alert from '@/components/partials/Alert';
-import Loading from '@/components/layouts/Loading';
-import Preloader from '@/components/partials/Preloader';
+import Loading from '../components/layouts/Loading';
 
 export default {
   components: {
-    Alert,
     Loading,
-    Preloader,
   },
   data() {
     return {
@@ -117,10 +113,9 @@ export default {
         });
     },
     getLoggedInSSOUser() {
-
       this.gettingSSOUser = true;
 
-      var iframe = document.createElement('iframe');
+      const iframe = document.createElement('iframe');
       iframe.setAttribute('src', '/logged-in-sso-user');
       iframe.setAttribute('hidden', true);
 

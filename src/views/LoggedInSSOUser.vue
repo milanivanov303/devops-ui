@@ -7,8 +7,8 @@
 
 <script>
 
-import {getParam} from "@/plugins/helpers";
-import config from "@/config";
+import { getParam } from '@/plugins/helpers';
+import config from '@/config';
 
 export default {
   computed: {
@@ -17,7 +17,7 @@ export default {
     },
     username() {
       return getParam('username');
-    }
+    },
   },
   mounted() {
     if (!window.location.search) {

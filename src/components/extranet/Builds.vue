@@ -78,14 +78,8 @@
 </template>
 
 <script>
-import Modal from '@/components/partials/Modal';
-import Preloader from '@/components/partials/Preloader';
 
 export default {
-  components: {
-    Modal,
-    Preloader,
-  },
   props: {
     containers: {
       type: Array,
