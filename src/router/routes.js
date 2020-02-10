@@ -4,6 +4,9 @@ const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Das
 const ExtranetDashboard = () => import(/* webpackChunkName: "extranet-dashboard" */ '../views/extranet/Dashboard.vue');
 const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
 const ExtranetBranch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
+const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
+const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
+const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
 const Demo = () => import(/* webpackChunkName: "demo" */ '../views/Demo.vue');
 const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
@@ -82,6 +85,50 @@ export default [
               breadcrumb: params => params.branch,
             },
             component: ExtranetBranch,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/imx-fe',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-fe',
+      transitionName: 'slide',
+      title: 'iMX-FE Dashboard',
+    },
+    component: ImxFeDashboard,
+    children: [
+      {
+        path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+          name: 'imx-fe-dashboard',
+          transitionName: 'slide',
+          title: 'iMX-FE Dashboard',
+        },
+        component: ImxFeDashboard,
+      },
+      {
+        path: 'branches',
+        meta: {
+          requiresAuth: true,
+          name: 'imx-fe-branches',
+          transitionName: 'slide',
+          title: 'iMX-FE Branches',
+        },
+        component: ImxFeBranches,
+        children: [
+          {
+            path: ':branch',
+            meta: {
+              name: 'imx-fe-branch',
+              requiresAuth: true,
+              transitionName: 'slide',
+              title: params => params.branch,
+            },
+            component: ImxFeBranch,
           },
         ],
       },

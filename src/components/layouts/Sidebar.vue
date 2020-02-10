@@ -5,19 +5,19 @@
     </li>
     <li>
       <ul class="collapsible collapsible-accordion">
-        <li v-bind:class="{ active: isActive('dashboard') }">
+        <li :class="{ active: isActive('dashboard') }">
           <router-link to="/dashboard">
             <i class="material-icons">web</i> Dashboard
           </router-link>
         </li>
-        <li v-bind:class="{ active: isActive('extranet') }">
+        <li :class="{ active: isActive('extranet') }">
           <a class="collapsible-header">
             <i class="material-icons">laptop_chromebook</i> Extranet
             <i class="material-icons right">arrow_drop_down</i>
           </a>
           <div class="collapsible-body">
             <ul>
-              <li v-bind:class="{ active: isActive('extranet/dashboard') }">
+              <li :class="{ active: isActive('extranet/dashboard') }">
                 <router-link to="/extranet/dashboard"> Dashboard</router-link>
               </li>
               <li v-bind:class="{ active: isActive('extranet/branches') }">
@@ -27,14 +27,31 @@
             </ul>
           </div>
         </li>
-        <li v-bind:class="{ active: isActive('demo') }">
+        <li :class="{ active: isActive('imx-fe') }">
+          <a class="collapsible-header">
+            <i class="material-icons">devices</i> iMX FE
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li :class="{ active: isActive('imx-fe/dashboard') }">
+                <router-link to="/imx-fe/dashboard"> Dashboard</router-link>
+              </li>
+              <li :class="{ active: isActive('imx-fe/branches') }">
+                <router-link to="/imx-fe/branches"> Branches</router-link>
+              </li>
+              <li><div class="divider"></div></li>
+            </ul>
+          </div>
+        </li>
+        <li :class="{ active: isActive('demo') }">
           <router-link to="/demo">
             <i class="material-icons">event</i> Demo
           </router-link>
         </li>
         <li
           v-if="$auth.can('can-manage-authorizations')"
-          v-bind:class="{ active: isActive('administration') }"
+          :class="{ active: isActive('administration') }"
         >
           <a class="collapsible-header">
             <i class="material-icons">settings</i> Administration
@@ -42,10 +59,10 @@
           </a>
           <div class="collapsible-body">
             <ul>
-              <li v-bind:class="{ active: isActive('administration/users') }">
+              <li :class="{ active: isActive('administration/users') }">
                 <router-link to="/administration/users"> Users</router-link>
               </li>
-              <li v-bind:class="{ active: isActive('administration/roles') }">
+              <li :class="{ active: isActive('administration/roles') }">
                 <router-link to="/administration/roles"> Roles</router-link>
               </li>
               <li><div class="divider"></div></li>
