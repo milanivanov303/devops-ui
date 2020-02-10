@@ -7,11 +7,11 @@ const client = Stomp.over(ws);
 client.connect(
   config.ws.username,
   config.ws.password,
-  () => {},
-  () => {},
+  () => { console.log('connected'); },
+  (error) => { console.log('error', error); },
   config.ws.vhost,
 );
 
-client.debug = () => {};
+//client.debug = () => {};
 
 export default client;
