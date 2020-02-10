@@ -119,10 +119,10 @@ export default {
       this.showModal = true;
     },
     start() {
-      //this.$v.$touch();
-      //if (this.$v.$invalid) {
-      //  return;
-      //}
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        return;
+      }
 
       this.build.started = true;
       this.build.summary = 'Build will start shortly ...';
