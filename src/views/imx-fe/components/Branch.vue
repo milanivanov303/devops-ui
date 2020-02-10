@@ -5,7 +5,6 @@
         <div class="card-title">
             <span class="badge" v-if="count">{{ count }}</span>
             {{ branch }}
-
         </div>
       </div>
     </div>
@@ -15,8 +14,8 @@
 <script>
 export default {
   props: {
-    branch: '',
-    count: null
+    branch: null,
+    count: null,
   },
   methods: {
     getRoute(branch) {

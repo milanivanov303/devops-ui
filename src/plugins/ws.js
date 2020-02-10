@@ -12,6 +12,6 @@ client.connect(
   config.ws.vhost,
 );
 
-//client.debug = () => {};
+// client.debug = () => {};
 
 export default client;
