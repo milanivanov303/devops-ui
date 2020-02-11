@@ -155,37 +155,11 @@ export default {
   methods: {
     getClients() {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('extranet/getClients').then(() => loader.hide());
+      this.$store.dispatch('extranet/getClients').finally(() => loader.hide());
     },
     getInstances() {
       const loader = this.$loading.show({ container: this.$el });
-
-      const payload = {
-        filters: JSON.stringify({
-          allOf: [
-            {
-              instance_type_id: {
-                value: ['DEV', 'VAL'],
-                operator: 'in',
-              },
-            },
-            {
-              owner: {
-                allOf: [
-                  {
-                    key: 'codix',
-                  },
-                ],
-              },
-            },
-          ],
-        }),
-        orders: JSON.stringify({
-          name: 'asc',
-        }),
-      };
-
-      this.$store.dispatch('mmpi/getInstances', payload).then(() => loader.hide());
+      this.$store.dispatch('mmpi/getInstances').finally(() => loader.hide());
     },
     open() {
       this.form = initialState().form;
