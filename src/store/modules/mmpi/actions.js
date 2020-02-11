@@ -5,7 +5,7 @@ import config from '../../../config';
 const api = new Api(config.mmpi.url, config.mmpi.code);
 
 export default {
-  getInstances({ commit, state }) {
+  getInstances({ commit }) {
     const name = 'instances';
 
     if (this.state.promises[name]) {
@@ -17,7 +17,7 @@ export default {
         allOf: [
           {
             environment_type: {
-              allOf: [ { type: 'IMX' } ],
+              allOf: [{ type: 'IMX' }],
             },
           },
           {
@@ -28,7 +28,7 @@ export default {
           },
           {
             owner: {
-              allOf: [ { key: 'codix' } ],
+              allOf: [{ key: 'codix' }],
             },
           },
         ],
@@ -38,10 +38,10 @@ export default {
       }),
     });
 
-    commit('promise', { name, promise }, {root: true});
+    commit('promise', { name, promise }, { root: true });
 
     promise
-      .then((response) => commit('instances', response.data.data))
+      .then(response => commit('instances', response.data.data))
       .catch(() => commit('error', 'Could not get instances list'));
 
     return promise;

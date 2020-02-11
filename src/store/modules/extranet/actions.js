@@ -14,10 +14,10 @@ export default {
 
     const promise = api.get('extranet/clients');
 
-    commit('promise', { name, promise }, {root: true});
+    commit('promise', { name, promise }, { root: true });
 
     promise
-      .then((response) => commit('clients', response.data))
+      .then(response => commit('clients', response.data))
       .catch(() => commit('error', 'Could not get clients list'));
 
     return promise;
@@ -32,10 +32,10 @@ export default {
 
     const promise = api.get('extranet/branches');
 
-    commit('promise', { name, promise }, {root: true});
+    commit('promise', { name, promise }, { root: true });
 
     promise
-      .then((response) => commit('branches', response.data))
+      .then(response => commit('branches', response.data))
       .catch(() => commit('error', 'Could not get branches list'));
 
     return promise;
@@ -50,7 +50,7 @@ export default {
 
     const promise = api.get('extranet/containers');
 
-    commit('promise', { name, promise }, {root: true});
+    commit('promise', { name, promise }, { root: true });
 
     promise
       .then((response) => {
@@ -64,12 +64,12 @@ export default {
 
   startBuild({ commit }, payload) {
     const promise = api.post('extranet/build', payload);
-    promise.catch((error) => commit('error', error));
+    promise.catch(error => commit('error', error));
     return promise;
   },
   removeBuild({ commit }, id) {
     const promise = api.delete(`extranet/build/${id}`);
-    promise.catch((error) => commit('error', error));
+    promise.catch(error => commit('error', error));
     return promise;
   },
 };

@@ -15,12 +15,20 @@
             <div  class="col s12 l10 offset-l1" key="form" >
               <div class="row">
                 <div class="col s12" >
-                  <TextInput label="Client" icon="people" v-model="form.client" :invalid="$v.form.client.$error"/>
+                  <TextInput
+                    label="Client"
+                    icon="people"
+                    v-model="form.client"
+                    :invalid="$v.form.client.$error"/>
                 </div>
               </div>
               <div class="row">
                 <div class="col s12" >
-                  <TextInput label="Endpoint" icon="link" v-model="form.endpoint" :invalid="$v.form.endpoint.$error"/>
+                  <TextInput
+                    label="Endpoint"
+                    icon="link"
+                    v-model="form.endpoint"
+                    :invalid="$v.form.endpoint.$error"/>
                 </div>
               </div>
             </div>

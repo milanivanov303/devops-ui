@@ -71,8 +71,8 @@ export default {
           if (selectedBranch) {
             selectedBranch.scrollIntoView({ block: 'start', inline: 'nearest' });
           }
-      })
-      .finally(() => loader.hide());
+        })
+        .finally(() => loader.hide());
     },
     getContainers() {
       this.$store.dispatch('imx_fe/getContainers');
