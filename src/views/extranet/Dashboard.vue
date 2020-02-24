@@ -40,6 +40,16 @@
         </div>
       </div>
     </div>
+    <div class="col s12 l6" v-if="loadedBuilds">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Extranet builds by branch</span>
+                <StatsChart :chart-data="dataCollectionBranches" :options="options"></StatsChart>
+                <span class="card-title"><br><br>Extranet builds by user</span>
+                <StatsChart :chart-data="dataCollectionUsers" :options="options"></StatsChart>
+            </div>
+        </div>
+    </div>
     </div>
     <router-view v-else :key="$route.path"/>
   </div>
@@ -47,12 +57,80 @@
 
 <script>
 import Builds from '@/components/extranet/Builds';
+import StatsChart from '../../components/StatsChart.js';
 
 export default {
   components: {
     Builds,
+    StatsChart,
   },
+  data() {
+    return {
+      loadedBuilds: false,
+    };
+  },  
   computed: {
+    dataCollectionBranches() {
+        const builds = this.buildsGroupedByBranch();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const currentDate = new Date();
+
+        const dataCollection = {         
+          labels: Object.keys(builds),
+          datasets: [
+            {
+              label: monthNames[currentDate.getMonth()],
+              data: Object.values(builds),
+              backgroundColor: [],
+            }
+          ],
+        };
+        
+        try{
+          dataCollection.datasets[0].data.forEach((data) => {
+            dataCollection.datasets[0].backgroundColor.push("#4da6ff");
+          });       
+        } catch(error) { console.log("Could not get colour for table") }
+
+        return dataCollection;
+    },
+    dataCollectionUsers() {
+        const builds = this.buildsGroupedByUser();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const currentDate = new Date();
+
+        const dataCollection = {
+          labels: Object.keys(builds),
+          datasets: [
+            {
+              label: monthNames[currentDate.getMonth()],
+              data: Object.values(builds),
+              backgroundColor: ["#dd99ff"],
+            }
+          ],
+        };
+
+        try{
+          dataCollection.datasets[0].data.forEach((data) => {
+            dataCollection.datasets[0].backgroundColor.push(this.getRandomColour());
+          });       
+        } catch(error) { console.log("Could not get random colours for table") }
+
+        return dataCollection;
+    },
+    options() {
+        let optionsCollection = {         
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        };
+
+        return optionsCollection;
+    },
     userContainers() {
       return this.$store.getters['extranet/getContainersByUser'](
         this.$auth.getUser().username,
@@ -66,9 +144,41 @@ export default {
     getContainers() {
       this.$store.dispatch('extranet/getContainers');
     },
+    buildsGroupedByBranch() {
+      let builds = {};
+
+      this.$store.getters['extranet/getCurrentMonthBuildsGroupedByBranch']().forEach((groupedBuild) => {
+        builds[groupedBuild.branch] = groupedBuild.builds;             
+      });
+      
+      return builds;
+    },
+    buildsGroupedByUser() {
+      let builds = {};
+
+      this.$store.getters['extranet/getCurrentMonthBuildsGroupedByUser']().forEach((groupedBuild) => {
+        builds[groupedBuild.user] = groupedBuild.builds;             
+      });
+      
+      return builds;
+    },
+    getRandomColour() {
+        var letters = '0123456789ABCDEF'.split('');
+        var colour = '#';
+        for (var i = 0; i < 6; i++ ) {
+            colour += letters[Math.floor(Math.random() * 16)];
+        }
+        return colour;
+    },
+    async prepareData() {
+        await this.getContainers();
+        await this.$store.dispatch('extranet/getBuilds').then(() => {
+            this.loadedBuilds = true;
+        });
+    },
   },
   mounted() {
-    this.getContainers();
+    this.prepareData();
   },
 };
 </script>

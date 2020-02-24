@@ -13,6 +13,9 @@ export default {
   clients(state, clients) {
     state.clients = clients;
   },
+  builds(state, builds) {
+    state.builds = builds;
+  },
   error(state, error) {
     state.error = error;
   },
