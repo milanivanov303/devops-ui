@@ -50,6 +50,16 @@
                   />
                 </div>
               </div>
+              <div class="row">
+                <div class="col s12" >
+                  <Autocomplete
+                    label="Fe branch"
+                    icon="dynamic_feed"
+                    :items="febranches"
+                    v-model="form.fe_branch"
+                  />
+                </div>
+              </div>
             </div>
           </template>
           <template v-else>
@@ -108,6 +118,7 @@ function initialState() {
       client: null,
       javaVersion: 8,
       instance: null,
+      fe_branch: null,
     },
     build: {
       started: false,
@@ -135,6 +146,14 @@ export default {
     instances() {
       return this.$store.state.mmpi.instances;
     },
+    febranches() {
+      const febranches = [];
+      this.$store.state.imx_fe.branches.forEach((febranch) => {
+        febranches.push({ name: febranch });
+      });
+
+      return febranches;
+    },
   },
   validations: {
     form: {
@@ -161,6 +180,9 @@ export default {
       const loader = this.$loading.show({ container: this.$el });
       this.$store.dispatch('mmpi/getInstances').finally(() => loader.hide());
     },
+    getFebranches() {
+      this.$store.dispatch('imx_fe/getBranches');  
+    },
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
@@ -184,6 +206,7 @@ export default {
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
+        fe_branch: this.form.fe_branch,
       };
 
       this.$store.dispatch('extranet/startBuild', payload)
@@ -238,6 +261,7 @@ export default {
   mounted() {
     this.getClients();
     this.getInstances();
+    this.getFebranches();
   },
 };
 </script>
