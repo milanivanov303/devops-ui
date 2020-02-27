@@ -146,13 +146,8 @@ export default {
     instances() {
       return this.$store.state.mmpi.instances;
     },
-    febranches() {
-      const febranches = [];
-      this.$store.state.imx_fe.branches.forEach((febranch) => {
-        febranches.push({ name: febranch });
-      });
-
-      return febranches;
+    febranches() {  
+      return this.$store.state.extranet.fe_branches; 
     },
   },
   validations: {
@@ -181,7 +176,7 @@ export default {
       this.$store.dispatch('mmpi/getInstances').finally(() => loader.hide());
     },
     getFebranches() {
-      this.$store.dispatch('imx_fe/getBranches');  
+      this.$store.dispatch('extranet/getFebranches');  
     },
     open() {
       this.form = initialState().form;
