@@ -61,6 +61,24 @@ export default {
 
     return promise;
   },
+  
+  getFebranches({ commit }) {
+    const name = 'extranet_fe-branches';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('extranet/fe-branches');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('fe_branches', response.data))
+      .catch(() => commit('error', 'Could not get branches list'));
+
+    return promise;
+  },
 
   startBuild({ commit }, payload) {
     const promise = api.post('extranet/build', payload);
