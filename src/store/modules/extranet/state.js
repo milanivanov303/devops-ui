@@ -4,7 +4,7 @@ export default {
   branches: [],
   containers: [],
   clients: [],
-  fe_branches: [],
+  feBranches: [],
   host: '',
   error: '',
 };

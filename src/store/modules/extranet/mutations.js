@@ -13,8 +13,8 @@ export default {
   clients(state, clients) {
     state.clients = clients;
   },
-  fe_branches(state, fe_branches) {
-    state.fe_branches = fe_branches;
+  feBranches(state, feBranches) {
+    state.feBranches = feBranches;
   },
   error(state, error) {
     state.error = error;
