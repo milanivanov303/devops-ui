@@ -55,8 +55,8 @@
                   <Autocomplete
                     label="Fe branch"
                     icon="dynamic_feed"
-                    :items="febranches"
-                    v-model="form.fe_branch"
+                    :items="feBranches"
+                    v-model="form.feBranch"
                   />
                 </div>
               </div>
@@ -146,8 +146,8 @@ export default {
     instances() {
       return this.$store.state.mmpi.instances;
     },
-    febranches() {  
-      return this.$store.state.extranet.fe_branches; 
+    feBranches() {  
+      return this.$store.state.extranet.feBranches; 
     },
   },
   validations: {
@@ -201,7 +201,7 @@ export default {
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-        fe_branch: this.form.fe_branch,
+        fe_branch: this.form.feBranch,
       };
 
       this.$store.dispatch('extranet/startBuild', payload)
