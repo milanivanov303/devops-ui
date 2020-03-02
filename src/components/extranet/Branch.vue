@@ -2,7 +2,7 @@
   <router-link v-bind:to="getRoute(branch)" class="collection-item">
     <div class="card">
       <div class="card-content">
-        <div class="card-title">
+        <div class="card-title truncate">
             <span class="badge" v-if="count">{{ count }}</span>
             {{ branch.name }}
 

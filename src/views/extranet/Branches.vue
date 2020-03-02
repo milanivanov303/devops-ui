@@ -6,17 +6,58 @@
       </div>
     </div>
     <div class="row">
-      <div :class="{'col s12 m6 l5 scroll': $route.meta.name === 'extranet-branch'}">
+      <div v-if="$route.meta.name !== 'extranet-branch'">
         <Branch
-          v-for="branch in filteredBranches"
+          v-for="branch in sorted"
           :key="branch.name"
           :branch="branch"
           :count="getContainersCount(branch.name)"
           :class="{
             'selected-branch': $route.path === `/extranet/branches/${branch.name}`,
-            'col s12 m6 l4': $route.meta.name === 'extranet-branches'
+            'col s12 m6 l4': $route.meta.name === 'extranet-branches',            
           }"
         />
+        <div class="row">
+          <div class="col s12 m6 l2 right" id="perPage">
+            <div class="input-field col s12 l4 right">
+                <Select class="col s12"
+                        v-if="sorted.length"
+                        :select="selectPerPage"
+                        @selectedVal="selectedPerPage"/>
+            </div>
+            <p v-if="sorted.length" class="col s12 l8 right right-align">Items per page:</p>
+          </div>
+          <div class="col s12 m6 l6">
+            <paginate
+            v-if="sorted.length"
+            v-model="page"
+            :page-count="lastPage"
+            :click-handler="selectedPage"
+            :prev-class="'material-icons'"
+            :prev-text="'chevron_left'"
+            :next-class="'material-icons'"
+            :next-text="'chevron_right'"
+            :container-class="'pagination'"
+            :page-class="'waves-effect'"
+            :disabled-class="'disabled'"
+            :active-class="'active'">
+            </paginate>
+          </div>
+        </div>
+      </div>
+      <div v-else>
+        <div :class="{'col s12 m6 l5 scroll': $route.meta.name === 'extranet-branch'}">
+          <Branch
+            v-for="branch in filteredBranches"
+            :key="branch.name"
+            :branch="branch"
+            :count="getContainersCount(branch.name)"
+            :class="{
+              'selected-branch': $route.path === `/extranet/branches/${branch.name}`,
+              'col s12 m6 l4': $route.meta.name === 'extranet-branches',            
+            }"
+          />
+        </div>
       </div>
       <div v-if="$route.meta.name === 'extranet-branch'" class="col s12 m6 l7">
         <div class="card">
@@ -33,14 +74,40 @@
 
 <script>
 import Branch from '@/components/extranet/Branch';
+import Paginate from 'vuejs-paginate/src/components/Paginate';
+
 
 export default {
   components: {
     Branch,
+    paginate: Paginate,
   },
   data() {
     return {
       search: this.$route.query.search,
+      page: 1,
+      perPage: 12,
+      lastPage: 0,
+      selectPerPage: {
+        id: 'perPage_select',
+        name: 'perPage',
+        displayed: 'name',
+        options: [
+        {
+            name: 6,
+        },
+        {
+            name: 9,
+        },
+        {
+            name: 12,
+        },
+          {
+            name: 15,
+        },
+        ],
+        selected: { name: 12},
+      },
     };
   },
   computed: {
@@ -58,8 +125,25 @@ export default {
     containers() {
       return this.$store.state.extranet.containers;
     },
+    sorted() {
+      const from = (this.page * this.perPage) - this.perPage;
+      const to = (this.page * this.perPage);
+      let data = this.filteredBranches;
+      this.setLastPage(data);
+      return data.slice(from, to);
+    },
   },
   methods: {
+    selectedPerPage(value) {
+      this.perPage = value.name;
+    },
+    selectedPage(page) {
+      this.page = page;
+    },
+    setLastPage(data) {
+      this.selectPerPage.selected = { name: this.perPage };
+      this.lastPage = Math.ceil(data.length / this.perPage);
+    },
     getContainersCount(branch) {
       return this.$store.getters['extranet/getContainersByBranch'](branch).length;
     },
