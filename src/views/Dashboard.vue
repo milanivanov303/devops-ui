@@ -47,9 +47,9 @@
         <div class="card">
             <div class="card-content">
                 <span class="card-title">Number of builds by module</span>
-                <StatsChart :chart-data="dataCollectionModules" :options="options"></StatsChart>
+                <BarChart :chart-data="dataCollectionModules" :options="options"></BarChart>
                 <span class="card-title"><br><br>Number of builds by user</span>
-                <StatsChart :chart-data="dataCollectionUsers" :options="options"></StatsChart>
+                <BarChart :chart-data="dataCollectionUsers" :options="options"></BarChart>
             </div>
         </div>
     </div>
@@ -58,12 +58,12 @@
 
 <script>
 import Builds from '@/components/extranet/Builds';
-import StatsChart from '../components/StatsChart.js';
+import BarChart from '../components/BarChart.js';
 
 export default {
   components: {
     Builds,
-    StatsChart,
+    BarChart,
   },
   data() {
     return {

@@ -44,9 +44,9 @@
         <div class="card">
             <div class="card-content">
                 <span class="card-title">Extranet builds by branch</span>
-                <StatsChart :chart-data="dataCollectionBranches" :options="options"></StatsChart>
+                <BarChart :chart-data="dataCollectionBranches" :options="options"></BarChart>
                 <span class="card-title"><br><br>Extranet builds by user</span>
-                <StatsChart :chart-data="dataCollectionUsers" :options="options"></StatsChart>
+                <BarChart :chart-data="dataCollectionUsers" :options="options"></BarChart>
             </div>
         </div>
     </div>
@@ -57,12 +57,12 @@
 
 <script>
 import Builds from '@/components/extranet/Builds';
-import StatsChart from '../../components/StatsChart.js';
+import BarChart from '../../components/BarChart.js';
 
 export default {
   components: {
     Builds,
-    StatsChart,
+    BarChart,
   },
   data() {
     return {
@@ -147,7 +147,7 @@ export default {
     buildsGroupedByBranch() {
       let builds = {};
 
-      this.$store.getters['extranet/getCurrentMonthBuildsGroupedByBranch']().forEach((groupedBuild) => {
+      this.$store.getters['builds/getCurrentMonthBuildsGroupedByBranch']('extranet').forEach((groupedBuild) => {
         builds[groupedBuild.branch] = groupedBuild.builds;             
       });
       
@@ -156,7 +156,7 @@ export default {
     buildsGroupedByUser() {
       let builds = {};
 
-      this.$store.getters['extranet/getCurrentMonthBuildsGroupedByUser']().forEach((groupedBuild) => {
+      this.$store.getters['builds/getCurrentMonthBuildsGroupedByUser']('extranet').forEach((groupedBuild) => {
         builds[groupedBuild.user] = groupedBuild.builds;             
       });
       
@@ -172,7 +172,7 @@ export default {
     },
     async prepareData() {
         await this.getContainers();
-        await this.$store.dispatch('extranet/getBuilds').then(() => {
+        await this.$store.dispatch('builds/getBuilds').then(() => {
             this.loadedBuilds = true;
         });
     },

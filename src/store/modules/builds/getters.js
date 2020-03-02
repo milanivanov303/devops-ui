@@ -22,30 +22,10 @@ export default {
 
     return builds.sort((a, b) => b.builds - a.builds);
   },
-  getCurrentMonthBuilds: state => () => {
-    let builds = state.builds;
-    let monthBuilds = [];
-    let currentDate = new Date();
-
-    builds.forEach((build) => {
-      let buildDate = new Date(build.created_on * 1000);
-      if(currentDate.getYear() === buildDate.getYear() && currentDate.getMonth() === buildDate.getMonth() ) {
-        monthBuilds.push(build); 
-      }            
-    });
-
-    return monthBuilds;
-  },
   getCurrentMonthBuildsGroupedByModule: state => () => {
-    let allBuilds = state.builds;
-    let monthBuilds = [];
     let currentDate = new Date();
-
-    allBuilds.forEach((allBuild) => {
-      let buildDate = new Date(allBuild.created_on * 1000);
-      if(currentDate.getYear() === buildDate.getYear() && currentDate.getMonth() === buildDate.getMonth() ) {
-        monthBuilds.push(allBuild); 
-      }            
+    let monthBuilds = state.builds.filter(build => { 
+        return currentDate.getYear() === new Date(build.created_on * 1000).getYear() && currentDate.getMonth() === new Date(build.created_on * 1000).getMonth();          
     });
 
     const modules = {};
@@ -60,16 +40,13 @@ export default {
 
     return builds.sort((a, b) => b.build - a.build);
   },
-  getCurrentMonthBuildsGroupedByUser: state => () => {
-    let allBuilds = state.builds;
-    let monthBuilds = [];
+  getCurrentMonthBuildsGroupedByUser: state => module => {
     let currentDate = new Date();
-
-    allBuilds.forEach((allBuild) => {
-      let buildDate = new Date(allBuild.created_on * 1000);
-      if(currentDate.getYear() === buildDate.getYear() && currentDate.getMonth() === buildDate.getMonth() ) {
-        monthBuilds.push(allBuild); 
-      }            
+    let monthBuilds = state.builds.filter(build => {
+        if( typeof module !== 'undefined' && (module === 'extranet' || module === 'imx-fe') ) {
+          return currentDate.getYear() === new Date(build.created_on * 1000).getYear() && currentDate.getMonth() === new Date(build.created_on * 1000).getMonth() && build.module === module;
+        }
+        return currentDate.getYear() === new Date(build.created_on * 1000).getYear() && currentDate.getMonth() === new Date(build.created_on * 1000).getMonth();
     });
 
     const users = {};
@@ -82,6 +59,24 @@ export default {
       builds.push({ user, builds: users[user] });
     });
 
+    return builds.sort((a, b) => b.build - a.build);
+  },
+  getCurrentMonthBuildsGroupedByBranch: state => module => {   
+    let currentDate = new Date();
+    let monthBuilds = state.builds.filter(build => { 
+      return currentDate.getYear() === new Date(build.created_on * 1000).getYear() && currentDate.getMonth() === new Date(build.created_on * 1000).getMonth() && build.module === module; 
+    });
+    
+    const branches = {};
+    monthBuilds.forEach((monthBuild) => {
+      branches[monthBuild.details.branch] = (branches[monthBuild.details.branch] + 1) || 1;
+    });
+    
+    const builds = [];
+    Object.keys(branches).forEach((branch) => {
+      builds.push({ branch, builds: branches[branch] });
+    });
+    
     return builds.sort((a, b) => b.build - a.build);
   },
   

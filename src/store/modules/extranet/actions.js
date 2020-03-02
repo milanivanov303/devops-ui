@@ -61,25 +61,6 @@ export default {
 
     return promise;
   },
-  getBuilds({ commit }) {
-        const name = 'extranet_builds';
-
-        if (this.state.promises[name]) {
-          return this.state.promises[name];
-        }
-
-        const promise = api.get('builds');
-
-        commit('promise', { name, promise }, { root: true });
-
-        promise
-          .then((response) => {
-            commit('builds', response.data.data);
-            commit('host', response.data.meta.host);
-          })
-          .catch(() => commit('error', 'Could not get builds list'));
-        return promise;
-    },
    
   startBuild({ commit }, payload) {
     const promise = api.post('extranet/build', payload);
