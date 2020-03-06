@@ -1,22 +1,10 @@
 // https://vuex.vuejs.org/en/mutations.html
 
 export default {
-  loggedOut(state) {
-    state.user = '';
-  },
-  loggingIn(state, loggingIn) {
-    state.loggingIn = loggingIn;
-  },
-  loggingInSSO(state, loggingInSSO) {
-    state.loggingInSSO = loggingInSSO;
-  },
-  hasError(state, hasError) {
-    state.hasError = hasError;
+  promise(state, { name, promise }) {
+    state.promises[name] = promise;
   },
   error(state, error) {
     state.error = error;
-  },
-  user(state, user) {
-    state.user = user;
   },
 };

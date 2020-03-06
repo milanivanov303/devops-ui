@@ -1,10 +1,5 @@
 <template>
   <div class="container center vw">
-    <div id="logo-container" class="brand-logo">
-        <img class="responsive-img"
-             src="../../assets/images/dev-ops-management.png"
-             alt="DevOps Management" />
-    </div>
     <div class="preloader-wrapper big active">
         <div class="spinner-layer spinner-blue">
         <div class="circle-clipper left">
@@ -70,5 +65,8 @@
     width: 50%;
     height: 50%;
     margin: auto;
+}
+.white-text {
+    font-size: 20px;
 }
 </style>

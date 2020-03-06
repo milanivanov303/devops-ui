@@ -4,7 +4,7 @@
       <a href="#" data-target="nav-mobile" class="sidenav-trigger">
         <i class="material-icons">menu</i>
       </a>
-      <ul class="right hide-on-med-and-down" v-if="user">
+      <ul class="right" v-if="user">
         <li class="logged-user">
           <i class="material-icons left">account_circle</i>
           {{ user.name }}
@@ -26,23 +26,25 @@
   </nav>
 </template>
 
-<script>
+<script lang="js">
+
 export default {
   computed: {
     user() {
-      return this.$store.getters.user;
+      return this.$auth.getUser();
     },
   },
   methods: {
     logout() {
-      this.$store.dispatch('logout')
-        .then(() => {
-          this.$router.push('/login');
-        });
+      this.$auth.logout();
+      this.$router.push('/login');
     },
   },
   mounted() {
-    M.Dropdown.init(this.$refs['profile-dropdown']);
+    this.$M.Dropdown.init(this.$refs['profile-dropdown'], {
+      constrainWidth: false,
+      coverTrigger: false,
+    });
   },
 };
 </script>

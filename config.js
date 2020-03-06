@@ -1,14 +1,25 @@
 module.exports = {
-  'user-management': {
-    url: process.env.VUE_APP_USER_MANAGEMENT_URL,
+  auth: {
+    code: process.env.VUE_APP_DEVOPS_API_CODE,
+    session_expire: process.env.VUE_APP_AUTH_SESSION_EXPIRE,
+    session_name: process.env.VUE_APP_AUTH_SESSION_NAME,
+  },
+  um: {
+    url: process.env.VUE_APP_USER_MANAGEMENT_API_URL,
+    code: process.env.VUE_APP_USER_MANAGEMENT_API_CODE,
   },
   devops: {
     url: process.env.VUE_APP_DEVOPS_API_URL,
     code: process.env.VUE_APP_DEVOPS_API_CODE,
   },
-  extranet: {
-    docker: {
-      image: process.env.VUE_APP_EXTRANET_IMAGE,
-    },
+  mmpi: {
+    url: process.env.VUE_APP_MMPI_API_URL,
+    code: process.env.VUE_APP_MMPI_API_CODE,
+  },
+  ws: {
+    url: process.env.VUE_APP_WS_URL,
+    username: process.env.VUE_APP_WS_USERNAME,
+    password: process.env.VUE_APP_WS_PASSWORD,
+    vhost: process.env.VUE_APP_WS_VHOST,
   },
 };

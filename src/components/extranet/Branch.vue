@@ -1,23 +1,32 @@
 <template>
-  <div class="col s6 m6 l4">
+  <router-link v-bind:to="getRoute(branch)" class="collection-item">
     <div class="card">
       <div class="card-content">
-        <span class="card-title">
-          <router-link v-bind:to="'/extranet/branches/' + branch.name">
+        <div class="card-title">
+            <span class="badge" v-if="count">{{ count }}</span>
             {{ branch.name }}
-          </router-link>
-        </span>
+
+        </div>
         <p>Hash: {{ branch.hash }}</p>
         <p>Version: {{ branch.version }}</p>
       </div>
     </div>
-  </div>
+  </router-link>
 </template>
 
 <script>
 export default {
   props: {
     branch: {},
+    count: {},
+  },
+  methods: {
+    getRoute(branch) {
+      return {
+        path: `/extranet/branches/${branch.name}`,
+        query: this.$route.query,
+      };
+    },
   },
 };
 </script>

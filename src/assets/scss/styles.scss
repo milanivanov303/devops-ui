@@ -43,13 +43,19 @@
         }
 
         .footer-copyright {
-            a {
-                line-height: 25px;
-                i.left {
-                    margin-right: 5px;
-                }
+            img{
+                width: 100px;
             }
         }
+    }
+}
+
+.logo{
+    padding-top: 15px;
+    text-align: center;
+    img{
+        width: 90%;
+        
     }
 }
 
@@ -62,29 +68,87 @@ nav {
 
 .sidenav {
     background-color: $sidenav-bg-color;
+    box-shadow: 10px 0px 10px rgba(0, 0, 0, .2);
+    
+    li {
+        a {
+            color: white;
+            font-size: 12px;
+            padding: 0 16px;
+            & > i.material-icons {
+                color:white;
+            }
 
-    .logo {
-        padding: 20px 0 40px;
-        text-align: center;
+            &:hover {
+                background-color: lighten(color("codix", lighten-1), 5%);
+                color: $link-color;
+                i.material-icons {
+                    color: $link-color;
+                }
+            }
+        }
     }
 
     li.active {
-        background: lighten($sidenav-bg-color, 4%);
+        background-color: $light-color;
+        box-shadow: 0px 10px 15px rgba(0, 0, 0, .4);
+        a {
+            color: $link-color;
+            & > i.material-icons {
+                color: $link-color;
+            }
+        }
+        a:hover{
+            color: $link-color;
+            i{
+                color: $link-color;
+            }
+        }
+        li {
+            a {
+                color: white;
+                i {
+                    color:white;
+                }
+            }
+        }
+        li:hover{
+            a {
+                color: $link-color !important;
+            }
+        }
+        li.active {
+           a {
+                color: $link-color;
+            }
+            li{
+                a{
+                    color: white;
+                }
+            }
+
+        }
+    }
+    
+    .collapsible-header:hover {
+        background-color: lighten(color("codix", lighten-1), 5%);
+    }
+    .collapsible-body {
+        background-color: lighten($sidenav-bg-color, 15%);
+        
+        li.active{
+            a{
+                background-color: $light-color;
+                color: white;
+            }
+        }
     }
 
-    li > a {
-        color: white;
-        font-size: 12px;
-        & > i.material-icons {
-            color: white;
-        }
-
-        &:hover {
-            background-color: lighten($sidenav-bg-color, 4%);
-        }
-    }
-    .dropdown-content {
-        background-color: $sidenav-bg-color;
+    .divider {
+        margin:0;
+        height:8px;
+        border-bottom:1px solid #003A52;
+        background-color: transparent;
     }
 }
 a.sidenav-trigger.top-nav {
@@ -99,16 +163,19 @@ a.sidenav-trigger.top-nav {
 }
 
 .card {
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, .2);
     .card-title {
         font-size: 20px;
         font-weight: 400;
     }
 }
 
-.dropdown-content {    
+
+.dropdown-content {
     li > a > i {
         font-size: 22px;
         margin-right: 5px;
+        padding: 0px;
     }
 }
 
@@ -131,17 +198,17 @@ h3 {
 
     &.error {
         @extend .red;
-        @extend .lighten-2;
+        @extend .lighten-1;
     }
 
     &.success {
         @extend .green;
-        @extend .lighten-2;
+        @extend .lighten-1;
     }
 
     &.info {
         @extend .blue;
-        @extend .lighten-2;
+        @extend .lighten-1;
     }
 }
 
@@ -249,8 +316,120 @@ p {
 }
 
 .input-field.invalid {
-  color: red;
+  color: $wrong-color;
+  margin: 0px;
 }
 .input-field.invalid input {
-  background-color: #ffc9aa;
+  border-bottom-color: $wrong-color;
+}
+.input-field {
+    margin:0px;
+}
+.validator {
+    font-weight: bold;
+    margin: 0px;
+    p{
+        margin: 0px;
+    }
+}
+
+.modal.right-sheet {
+    margin: 0;
+    width: 50%;
+    left: 50%;
+    right: 0 !important;
+    min-height: 100%;
+    height: auto;
+    top: 0% !important;
+    transition: transform cubic-bezier(0.22, 0.61, 0.36, 1) .2s;
+    will-change: transform;
+    transform: translate(100%, 0) scale(1) !important;
+    opacity: 1 !important;
+
+    @media #{$small-and-down} {
+      width: 90%;
+      left: 0;
+    }
+}
+  
+.modal.right-sheet.open {
+    transition: transform cubic-bezier(0.22, 0.61, 0.36, 1) .35s .25s;
+}
+  
+.modal.right-sheet.open:not([style*="display: none"]):not([style*="opacity: 0;"]) {
+    transform: translate(0, 0%) !important;
+}
+
+.modal.confirm {
+    width: 30%;
+    height: 30%;
+}
+
+.datetime-theme {
+    .vdatetime-popup__header,
+    .vdatetime-calendar__month__day--selected > span > span,
+    .vdatetime-calendar__month__day--selected:hover > span > span {
+        background: $sidenav-bg-color;
+    }
+    .vdatetime-year-picker__item--selected,
+    .vdatetime-time-picker__item--selected,
+    .vdatetime-popup__actions__button {
+        color: $sidenav-bg-color;
+    }
+}
+.datetime-input {
+    max-width: calc(100% - 3rem) !important;
+    float: right !important;
+}
+
+
+#select-branch {
+    :hover {
+        background-color: $hover-color;
+    }
+}
+
+.scroll{
+    .card:hover{
+        background-color:$hover-color !important;
+        color: $link-color !important;
+    }
+}
+a.collection-item.router-link-exact-active.router-link-active.selected-branch {
+    .card{
+            background-color: lighten($color: $sidenav-bg-color, $amount: 10%);
+            color: white;
+        }
+    }
+button{
+    background-color: color("codix", base);
+}
+.validator{
+    .red-text{
+        color: $wrong-color !important;
+    }
+}
+.red{
+    background-color: $wrong-color !important;
+}
+.data-table{
+    margin-left: 30px;
+    margin-right: 30px;
+}
+.tabs{
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, .2);
+}
+caption{
+    margin-top: 20px;
+}
+.toast-seccess{
+    background-color: $hover-color;
+    color: $link-color;
+}
+.toast-fail{
+    background-color: $wrong-color;
+    color: white;
+}
+a{
+    cursor: pointer;
 }

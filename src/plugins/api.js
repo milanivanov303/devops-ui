@@ -1,56 +1,54 @@
 import Axios from 'axios';
 import queryString from 'query-string';
-import store from '../store';
-
-const axios = Axios.create();
-
-axios.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem(`token.${axios.prototype.code}`);
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
-
-axios.interceptors.response.use(null, (error) => {
-  if (error.response.status === 401) {
-    return store.dispatch('getToken', axios.prototype.code)
-      .then((token) => {
-        sessionStorage.setItem(`token.${axios.prototype.code}`, token);
-        error.config.headers.Authorization = `Bearer ${token}`;
-        return axios.request(error.config);
-      });
-  }
-  return Promise.reject(error);
-});
+import auth from '@/plugins/auth';
 
 class Api {
   constructor(url, code) {
     this.url = url;
     this.code = code;
-    axios.prototype.code = code;
+
+    this.axios = Axios.create();
+
+    this.axios.interceptors.request.use(this.requestInterceptor.bind(this));
+    this.axios.interceptors.response.use(null, this.errorInterceptor.bind(this));
   }
 
-  async get(uri, options) {
-    try {
-      const query = queryString.stringify(options, { arrayFormat: 'index' });
-      const response = await axios.get(`${this.url}/${uri}?${query}`);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
+  requestInterceptor(config) {
+    auth.getApiToken(this.code).then((response) => {
+      const token = response.data ? response.data.token : response;
+      config.headers.Authorization = `Bearer ${token}`;
+    });
+    return config;
   }
 
-  async post(uri, data) {
-    try {
-      const response = await axios.post(`${this.url}/${uri}`, data);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error;
+  errorInterceptor(error) {
+    if (error.response.status === 401) {
+      return auth.getNewApiToken(this.code).then((response) => {
+        error.config.headers.Authorization = `Bearer ${response.data.token}`;
+        return Axios.create().request(error.config);
+      });
     }
+    return Promise.reject(error);
+  }
+
+  get(uri, options = {}, config = {}) {
+    let query = queryString.stringify(options, { arrayFormat: 'index' });
+    if (query) {
+      query = `?${query}`;
+    }
+    return this.axios.get(`${this.url}/${uri}${query}`, config);
+  }
+
+  put(uri, data, config = {}) {
+    return this.axios.put(`${this.url}/${uri}`, data, config);
+  }
+
+  post(uri, data, config = {}) {
+    return this.axios.post(`${this.url}/${uri}`, data, config);
+  }
+
+  delete(uri, config = {}) {
+    return this.axios.delete(`${this.url}/${uri}`, config);
   }
 }
 

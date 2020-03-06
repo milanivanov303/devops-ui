@@ -1,18 +1,13 @@
 @import "../../../node_modules/materialize-css/sass/components/color-variables";
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600&display=swap');
 
 // Codix colors
 // ==========================================================================
 $codix: (
-        "base":       #1C364E,
-        "lighten-5":  #234361,
-        "lighten-4":  #21405d,
-        "lighten-3":  #203e59,
-        "lighten-2":  #e0e0e0,
-        "lighten-1":  #1d3952,
-        "darken-1":   #1b334a,
-        "darken-2":   #193146,
-        "darken-3":   #182e43,
-        "darken-4":   #172c3f,
+        "base":       #29A19C,
+        "lighten-1":  #A3F7BF,
+        "darken-1":   #393E46,
+        "darken-2":   #222831,
         "running":    color("green", "base"),
         "exited":     color("red", "base"),
         "paused":     color("yellow", "base")
@@ -22,8 +17,8 @@ $colors: map_merge($colors, ("codix": $codix));
 // 0. General
 // ==========================================================================
 
-$main-text-color: #73879C !default;
-$main-font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
+$main-text-color:  color("codix", darken-2) !default;
+$main-font-family: 'Montserrat', sans-serif;
 $main-font-size: 13px;
 $main-font-weight: 400;
 $main-line-height: 1.471;
@@ -35,8 +30,12 @@ $login-bg-image: "/assets/images/login_background.png";
 // ==========================================================================
 
 $primary-color: color("codix", "base") !default;
-$secondary-color: lighten($primary-color, 20%) !default;
-$link-color: lighten($primary-color, 10%) !default;
+$secondary-color: $primary-color !default;
+$link-color: color("codix", darken-2) !default;
+$button-color:  color("codix", base) !default;
+$wrong-color: #C40147;
+$light-color:  color("codix", lighten-1) !default;
+$hover-color: lighten(color("codix", lighten-1), 10%);
 
 // 4. Cards
 // ==========================================================================
@@ -64,5 +63,6 @@ $navbar-border-color: #D9DEE4 !default;
 // 14. Side Navigation
 // ==========================================================================
 $sidenav-width: 250px !default;
-$sidenav-bg-color: $primary-color !default;
+$sidenav-bg-color: color("codix", darken-2) !default;
+$sidenav-link:white
 

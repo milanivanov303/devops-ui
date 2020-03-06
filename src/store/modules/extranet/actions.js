@@ -5,64 +5,89 @@ import config from '../../../config';
 const api = new Api(config.devops.url, config.devops.code);
 
 export default {
-  getClients({ commit }, payload) {
-    return api.get('extranet/clients', payload)
-      .catch((err) => {
-        commit('err', err);
-      });
+  getClients({ commit }) {
+    const name = 'extranet_clients';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('extranet/clients');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('clients', response.data))
+      .catch(() => commit('error', 'Could not get clients list'));
+
+    return promise;
   },
-  getBranches({ commit }, payload) {
-    return api.get('extranet/branches', payload)
-      .catch((err) => {
-        commit('err', err);
-      });
+
+  getBranches({ commit }) {
+    const name = 'extranet_branches';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('extranet/branches');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('branches', response.data))
+      .catch(() => commit('error', 'Could not get branches list'));
+
+    return promise;
   },
+
+  getContainers({ commit }) {
+    const name = 'extranet_containers';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('extranet/containers');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => {
+        commit('containers', response.data.data);
+        commit('host', response.data.meta.host);
+      })
+      .catch(() => commit('error', 'Could not get containers list'));
+
+    return promise;
+  },
+  
+  getFebranches({ commit }) {
+    const name = 'extranet_feBranches';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('extranet/fe-branches');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('feBranches', response.data))
+      .catch(() => commit('error', 'Could not get branches list'));
+
+    return promise;
+  },
+
   startBuild({ commit }, payload) {
-    return api.post('extranet/build/start', payload)
-      .catch((err) => {
-        commit('err', err);
-      });
+    const promise = api.post('extranet/build', payload);
+    promise.catch(error => commit('error', error));
+    return promise;
   },
-  checkBuild({ commit }, payload) {
-    return api.post('extranet/build/check', payload)
-      .catch((err) => {
-        commit('err', err);
-      });
-  },
-  deployBuild({ commit }, payload) {
-    return api.post('extranet/build/deploy', payload)
-      .catch((err) => {
-        commit('err', err);
-      });
-  },
-  deployedBuild({ commit }, payload) {
-    return api.get(`extranet/build/deployed-builds?host=${payload.host}&port=${payload.port}`)
-      .catch((err) => {
-        commit('err', err);
-      });
-  },
-  createContainer({ commit }, payload) {
-    return api.post(`docker/containers/${payload.container}`, payload.data)
-      .catch((err) => {
-        commit('err', err);
-      });
-  },
-  startContainer({ commit }, payload) {
-    return api.post(`docker/containers/start/${payload.container}`)
-      .catch((err) => {
-        commit('err', err);
-      });
-  },
-  stopContainer({ commit }, payload) {
-    return api.post(`docker/containers/stop/${payload.container}`)
-      .catch((err) => {
-        commit('err', err);
-      });
-  },
-  getContainer({ commit }, payload) {
-    return api.get(`docker/containers/${payload.container}`)
-      .catch((err) => {
-        commit('err', err);
-      });
+  removeBuild({ commit }, id) {
+    const promise = api.delete(`extranet/build/${id}`);
+    promise.catch(error => commit('error', error));
+    return promise;
   },
 };

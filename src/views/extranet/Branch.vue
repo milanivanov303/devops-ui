@@ -2,25 +2,30 @@
   <div class="extranet-branch">
     <div class="row" >
       <div class="col s12" >
-        <h4>Branch</h4>
-        <p>Name: {{ branch }}</p>
+        <h4>{{ branch }}</h4>
       </div>
     </div>
-
-    <Container v-bind:branch="branch"></Container>
+    <Builds :containers="containers"></Builds>
+    <br>
+    <Build />
   </div>
 </template>
 
 <script>
-import Container from '@/components/extranet/Container';
+import Build from '@/components/extranet/Build';
+import Builds from '@/components/extranet/Builds';
 
 export default {
   components: {
-    Container,
+    Build,
+    Builds,
   },
   computed: {
     branch() {
       return this.$route.params.branch;
+    },
+    containers() {
+      return this.$store.getters['extranet/getContainersByBranch'](this.branch);
     },
   },
 };
