@@ -22,15 +22,17 @@ export default {
 
     return builds.sort((a, b) => b.builds - a.builds);
   },
-  getCurrentMonthBuildsGroupedByModule: state => () => {
-    let currentDate = new Date();
-    let monthBuilds = state.builds.filter(build => { 
-        return currentDate.getYear() === new Date(build.created_on * 1000).getYear() && currentDate.getMonth() === new Date(build.created_on * 1000).getMonth();          
-    });
+  
+  getBuildsDateFilteredGroupedByModule: state => numberOfBuilds => {
+    let startDate = new Date(new Date().setTime(new Date().getTime() - (numberOfBuilds * 24 * 60 * 60 * 1000))).getTime();          
+    
+    let filterBuilds = state.builds.filter(build => {
+        return new Date(build.created_on * 1000).getYear() === new Date().getYear() && new Date(build.created_on * 1000).getTime() > startDate;               
+    });   
 
     const modules = {};
-    monthBuilds.forEach((monthBuild) => {
-      modules[monthBuild.module] = (modules[monthBuild.module] + 1) || 1;
+    filterBuilds.forEach((filterBuild) => {
+      modules[filterBuild.module] = (modules[filterBuild.module] + 1) || 1;
     });
 
     const builds = [];
@@ -40,18 +42,20 @@ export default {
 
     return builds.sort((a, b) => b.build - a.build);
   },
-  getCurrentMonthBuildsGroupedByUser: state => module => {
-    let currentDate = new Date();
-    let monthBuilds = state.builds.filter(build => {
+  
+  getBuildsDateFilteredGroupedByUser: state => (numberOfBuilds, module) => {
+    let startDate = new Date(new Date().setTime(new Date().getTime() - (numberOfBuilds * 24 * 60 * 60 * 1000))).getTime();          
+    
+    let filterBuilds = state.builds.filter(build => {           
         if( typeof module !== 'undefined' && (module === 'extranet' || module === 'imx-fe') ) {
-          return currentDate.getYear() === new Date(build.created_on * 1000).getYear() && currentDate.getMonth() === new Date(build.created_on * 1000).getMonth() && build.module === module;
+          return new Date(build.created_on * 1000).getYear() === new Date().getYear() && new Date(build.created_on * 1000).getTime() > startDate && build.module === module;
         }
-        return currentDate.getYear() === new Date(build.created_on * 1000).getYear() && currentDate.getMonth() === new Date(build.created_on * 1000).getMonth();
-    });
+        return new Date(build.created_on * 1000).getYear() === new Date().getYear() && new Date(build.created_on * 1000).getTime() > startDate;
+    });      
 
     const users = {};
-    monthBuilds.forEach((monthBuild) => {
-      users[monthBuild.details.created_by] = (users[monthBuild.details.created_by] + 1) || 1;
+    filterBuilds.forEach((filterBuild) => {
+      users[filterBuild.details.created_by] = (users[filterBuild.details.created_by] + 1) || 1;
     });
 
     const builds = [];
@@ -61,15 +65,20 @@ export default {
 
     return builds.sort((a, b) => b.build - a.build);
   },
-  getCurrentMonthBuildsGroupedByBranch: state => module => {   
-    let currentDate = new Date();
-    let monthBuilds = state.builds.filter(build => { 
-      return currentDate.getYear() === new Date(build.created_on * 1000).getYear() && currentDate.getMonth() === new Date(build.created_on * 1000).getMonth() && build.module === module; 
-    });
+  
+  getBuildsDateFilteredGroupedByBranch: state => (numberOfBuilds, module) => {
+    let startDate = new Date(new Date().setTime(new Date().getTime() - (numberOfBuilds * 24 * 60 * 60 * 1000))).getTime();          
     
+    let filterBuilds = state.builds.filter(build => {           
+        if( typeof module !== 'undefined' && (module === 'extranet' || module === 'imx-fe') ) {
+          return new Date(build.created_on * 1000).getYear() === new Date().getYear() && new Date(build.created_on * 1000).getTime() > startDate && build.module === module;
+        }
+        return new Date(build.created_on * 1000).getYear() === new Date().getYear() && new Date(build.created_on * 1000).getTime() > startDate;
+    });      
+
     const branches = {};
-    monthBuilds.forEach((monthBuild) => {
-      branches[monthBuild.details.branch] = (branches[monthBuild.details.branch] + 1) || 1;
+    filterBuilds.forEach((filterBuild) => {
+      branches[filterBuild.details.branch] = (branches[filterBuild.details.branch] + 1) || 1;
     });
     
     const builds = [];

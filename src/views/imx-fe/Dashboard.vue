@@ -1,7 +1,7 @@
 <template>
   <div class="imx-fe">
     <div v-if="$route.meta.name === 'imx-fe'" class="row">
-      <div class="col s12 l6">
+      <div class="col s12 20">
       <div class="card">
         <div class="card-content">
           <span class="card-title">My iMX FE Builds</span>
@@ -9,43 +9,47 @@
         </div>
       </div>
     </div>
-      <div class="col s12 l6">
-      <div class="card">
-        <div class="card-content">
-          <span class="card-title">iMX FE Builds By Branch</span>
-          <table>
-            <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Builds</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="(container, index) in containersGroupedByBranch" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>
-                <router-link :to="'/imx-fe/branches/' + encodeURIComponent(container.branch)">
-                  {{ container.branch }}
-                </router-link>
-              </td>
-              <td>{{ container.builds }}</td>
-            </tr>
-            <tr v-if="containersGroupedByBranch.length === 0">
-              <td colspan="3">There are no builds</td>
-            </tr>
-            </tbody>
-          </table>
+    <div class="col s12 l6" v-if="loadedBuilds">
+        <div class="card">
+            <div class="card-content">
+                <div class="row">
+                    <div class="col s12 l4 right">
+                        <div class="input-field">
+                            <Select class="col s12"
+                                :select="selectStartDate"
+                                @selectedVal="selectedStartDateBranches"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="charts col s12 l11">
+                        <span class="card-title">iMX FE builds by branch</span>
+                        <BarChart :chart-data="dataCollectionBranches" :options="options"></BarChart>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
     <div class="col s12 l6" v-if="loadedBuilds">
         <div class="card">
             <div class="card-content">
-                <span class="card-title">iMX FE builds by branch</span>
-                <BarChart :chart-data="dataCollectionBranches" :options="options"></BarChart>
-                <span class="card-title"><br><br>iMX FE builds by user</span>
-                <BarChart :chart-data="dataCollectionUsers" :options="options"></BarChart>
+                <div class="row">
+                    <div class="col s12 l4 right">
+                        <div class="input-field">
+                            <Select class="col s12"
+                                :select="selectStartDate"
+                                @selectedVal="selectedStartDateUsers"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="charts col s12 l11">
+                        <span class="card-title">iMX FE builds by user</span>
+                        <BarChart :chart-data="dataCollectionUsers" :options="options"></BarChart>
+                    </div>
+                </div>    
             </div>
         </div>
     </div>
@@ -66,6 +70,32 @@ export default {
   data() {
     return {
       loadedBuilds: false,
+      numberOfDaysBranches: 30,
+      numberOfDaysUsers: 30,
+      selectStartDate: {
+        id: 'startDate_select',
+        name: 'startDate',
+        displayed: 'name',
+        icon: "today",
+        options: [
+            {
+              name: 'Last 24 hours',
+              value: 1
+            },
+            {
+              name: 'Last 7 days',
+              value: 7
+            },
+            {
+              name: 'Last 30 days',
+              value: 30
+            },
+          ],
+          selected: {
+            name: 'Last 30 days',
+            value: 30
+          },
+        },
     };
   }, 
   computed: {
@@ -74,19 +104,14 @@ export default {
         this.$auth.getUser().username,
       );
     },
-    containersGroupedByBranch() {
-      return this.$store.getters['imx_fe/getContainersGroupedByBranch']();
-    },
     dataCollectionBranches() {
         let builds = this.buildsGroupedByBranch();
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const currentDate = new Date();
 
         const dataCollection = {         
           labels: Object.keys(builds),
           datasets: [
             {
-              label: monthNames[currentDate.getMonth()],
+              label: "BUILDS",
               data: Object.values(builds),
               backgroundColor: [],
             }
@@ -103,14 +128,12 @@ export default {
     },
     dataCollectionUsers() {
         const builds = this.buildsGroupedByUser();
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const currentDate = new Date();
 
         const dataCollection = {
           labels: Object.keys(builds),
           datasets: [
             {
-              label: monthNames[currentDate.getMonth()],
+              label: "BUILDS",
               data: Object.values(builds),
               backgroundColor: ["#dd99ff"],
             }
@@ -146,7 +169,7 @@ export default {
     buildsGroupedByBranch() {
       let builds = {};
 
-      this.$store.getters['builds/getCurrentMonthBuildsGroupedByBranch']('imx-fe').forEach((groupedBuild) => {
+      this.$store.getters['builds/getBuildsDateFilteredGroupedByBranch'](this.numberOfDaysBranches, 'imx-fe').forEach((groupedBuild) => {
         builds[groupedBuild.branch] = groupedBuild.builds;             
       });
       
@@ -155,7 +178,7 @@ export default {
     buildsGroupedByUser() {
       let builds = {};
 
-      this.$store.getters['builds/getCurrentMonthBuildsGroupedByUser']('imx-fe').forEach((groupedBuild) => {
+      this.$store.getters['builds/getBuildsDateFilteredGroupedByUser'](this.numberOfDaysUsers, 'imx-fe').forEach((groupedBuild) => {
         builds[groupedBuild.user] = groupedBuild.builds;             
       });
       
@@ -168,6 +191,14 @@ export default {
             colour += letters[Math.floor(Math.random() * 16)];
         }
         return colour;
+    },
+    selectedStartDateBranches(value) {
+        this.numberOfDaysBranches = value.value;
+        this.buildsGroupedByBranch();
+    },
+    selectedStartDateUsers(value) {
+        this.numberOfDaysUsers = value.value;
+        this.buildsGroupedByUser();
     },
     async prepareData() {
         await this.getContainers();
