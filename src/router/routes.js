@@ -34,10 +34,11 @@ export default [
   },
   {
     path: '/dashboard',
-    meta: {
+    meta: { 
+      requiresAuth: true,
       alias: '/dashboard',
       name: 'dashboard',
-      requiresAuth: true,
+      title: 'Extranet Dashboard',
       breadcrumb: 'Dashboard',
     },
     component: Dashboard,
