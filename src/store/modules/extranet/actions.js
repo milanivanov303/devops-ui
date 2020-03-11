@@ -37,17 +37,17 @@ export default {
     }
   },
   startBuild({ commit }, payload) {
-    try {
-      return api.post('extranet/build', payload);
-    } catch (err) {
-      return commit('error', err);
-    }
+    const promise = api.post('extranet/build', payload);
+    promise
+      .then(response => commit('startBuild', response.data.data))
+      .catch(error => commit('error', error));
+    return promise; 
   },
   removeBuild({ commit }, id) {
-    try {
-      return api.delete(`extranet/build/${id}`);
-    } catch (err) {
-      return commit('error', err);
-    }
+    const promise = api.delete(`extranet/build/${id}`);
+    promise
+      .then(() => commit('removeBuild', id))
+      .catch(error => commit('error', error));
+    return promise; 
   },
 };
