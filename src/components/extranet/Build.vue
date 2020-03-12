@@ -146,8 +146,8 @@ export default {
     instances() {
       return this.$store.state.mmpi.instances;
     },
-    feBranches() {  
-      return this.$store.state.extranet.feBranches; 
+    feBranches() {
+      return this.$store.state.extranet.feBranches;
     },
   },
   validations: {
@@ -176,7 +176,7 @@ export default {
       this.$store.dispatch('mmpi/getInstances').finally(() => loader.hide());
     },
     getFebranches() {
-      this.$store.dispatch('extranet/getFebranches');  
+      this.$store.dispatch('extranet/getFebranches');
     },
     open() {
       this.form = initialState().form;

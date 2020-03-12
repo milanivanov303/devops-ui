@@ -24,8 +24,8 @@
                 </div>
                 <div class="row">
                     <div class="charts col s12 l11">
-                        <span class="card-title">Extranet builds by branch</span>
-                        <BarChart :chart-data="dataCollectionBranches" :options="options"></BarChart>
+                      <span class="card-title">Extranet builds by branch</span>
+                      <BarChart :chart-data="dataCollectionBranches" :options="options"></BarChart>
                     </div>
                 </div>
             </div>
@@ -49,7 +49,7 @@
                         <span class="card-title">Extranet builds by user</span>
                         <BarChart :chart-data="dataCollectionUsers" :options="options"></BarChart>
                     </div>
-                </div>    
+                </div>
             </div>
         </div>
     </div>
@@ -60,7 +60,7 @@
 
 <script>
 import Builds from '@/components/extranet/Builds';
-import BarChart from '../../components/BarChart.js';
+import BarChart from '../../components/BarChart';
 
 export default {
   components: {
@@ -76,85 +76,85 @@ export default {
         id: 'startDate_select',
         name: 'startDate',
         displayed: 'name',
-        icon: "today",
+        icon: 'today',
         options: [
-            {
-              name: 'Last 24 hours',
-              value: 1
-            },
-            {
-              name: 'Last 7 days',
-              value: 7
-            },
-            {
-              name: 'Last 30 days',
-              value: 30
-            },
-          ],
-          selected: {
-            name: 'Last 30 days',
-            value: 30
+          {
+            name: 'Last 24 hours',
+            value: 1,
           },
+          {
+            name: 'Last 7 days',
+            value: 7,
+          },
+          {
+            name: 'Last 30 days',
+            value: 30,
+          },
+        ],
+        selected: {
+          name: 'Last 30 days',
+          value: 30,
         },
+      },
     };
-  },  
+  },
   computed: {
     dataCollectionBranches() {
-        const builds = this.buildsGroupedByBranch();
+      const builds = this.buildsGroupedByBranch();
 
-        const dataCollection = {         
-          labels: Object.keys(builds),
-          datasets: [
-            {
-              label: "BUILDS",
-              data: Object.values(builds),
-              backgroundColor: [],
-            }
-          ],
-        };
-        
-        try{
-          dataCollection.datasets[0].data.forEach((data) => {
-            dataCollection.datasets[0].backgroundColor.push("#4da6ff");
-          });       
-        } catch(error) { console.log("Could not get colour for table") }
+      const dataCollection = {
+        labels: Object.keys(builds),
+        datasets: [
+          {
+            label: 'BUILDS',
+            data: Object.values(builds),
+            backgroundColor: [],
+          },
+        ],
+      };
 
-        return dataCollection;
+      try {
+        dataCollection.datasets[0].data.forEach(() => {
+          dataCollection.datasets[0].backgroundColor.push('#4da6ff');
+        });
+      } catch (error) { console.log('Could not get colour for table'); }
+
+      return dataCollection;
     },
     dataCollectionUsers() {
-        const builds = this.buildsGroupedByUser();
+      const builds = this.buildsGroupedByUser();
 
-        const dataCollection = {
-          labels: Object.keys(builds),
-          datasets: [
-            {
-              label: "BUILDS",
-              data: Object.values(builds),
-              backgroundColor: ["#dd99ff"],
-            }
-          ],
-        };
+      const dataCollection = {
+        labels: Object.keys(builds),
+        datasets: [
+          {
+            label: 'BUILDS',
+            data: Object.values(builds),
+            backgroundColor: ['#dd99ff'],
+          },
+        ],
+      };
 
-        try{
-          dataCollection.datasets[0].data.forEach((data) => {
-            dataCollection.datasets[0].backgroundColor.push(this.getRandomColour());
-          });       
-        } catch(error) { console.log("Could not get random colours for table") }
+      try {
+        dataCollection.datasets[0].data.forEach(() => {
+          dataCollection.datasets[0].backgroundColor.push(this.getRandomColour());
+        });
+      } catch (error) { console.log('Could not get random colours for table'); }
 
-        return dataCollection;
+      return dataCollection;
     },
     options() {
-        let optionsCollection = {         
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        };
+      const optionsCollection = {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+            },
+          }],
+        },
+      };
 
-        return optionsCollection;
+      return optionsCollection;
     },
     userContainers() {
       return this.$store.getters['extranet/getContainersByUser'](
@@ -167,44 +167,44 @@ export default {
       this.$store.dispatch('extranet/getContainers');
     },
     buildsGroupedByBranch() {
-      let builds = {};
+      const builds = {};
 
       this.$store.getters['builds/getBuildsDateFilteredGroupedByBranch'](this.numberOfDaysBranches, 'extranet').forEach((groupedBuild) => {
-        builds[groupedBuild.branch] = groupedBuild.builds;             
+        builds[groupedBuild.branch] = groupedBuild.builds;
       });
-      
+
       return builds;
     },
     buildsGroupedByUser() {
-      let builds = {};
+      const builds = {};
 
       this.$store.getters['builds/getBuildsDateFilteredGroupedByUser'](this.numberOfDaysUsers, 'extranet').forEach((groupedBuild) => {
-        builds[groupedBuild.user] = groupedBuild.builds;             
+        builds[groupedBuild.user] = groupedBuild.builds;
       });
-      
+
       return builds;
     },
     getRandomColour() {
-        var letters = '0123456789ABCDEF'.split('');
-        var colour = '#';
-        for (var i = 0; i < 6; i++ ) {
-            colour += letters[Math.floor(Math.random() * 16)];
-        }
-        return colour;
+      const letters = '0123456789ABCDEF'.split('');
+      let colour = '#';
+      for (let i = 0; i < 6; i += 1) {
+        colour += letters[Math.floor(Math.random() * 16)];
+      }
+      return colour;
     },
     selectedStartDateBranches(value) {
-        this.numberOfDaysBranches = value.value;
-        this.buildsGroupedByBranch();
+      this.numberOfDaysBranches = value.value;
+      this.buildsGroupedByBranch();
     },
     selectedStartDateUsers(value) {
-        this.numberOfDaysUsers = value.value;
-        this.buildsGroupedByUser();
+      this.numberOfDaysUsers = value.value;
+      this.buildsGroupedByUser();
     },
     async prepareData() {
-        await this.getContainers();
-        await this.$store.dispatch('builds/getBuilds').then(() => {
-            this.loadedBuilds = true;
-        });
+      await this.getContainers();
+      await this.$store.dispatch('builds/getBuilds').then(() => {
+        this.loadedBuilds = true;
+      });
     },
   },
   mounted() {

@@ -61,7 +61,7 @@ export default {
 
     return promise;
   },
-  
+
   getFebranches({ commit }) {
     const name = 'extranet_feBranches';
 

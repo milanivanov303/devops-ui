@@ -1,7 +1,7 @@
 <template>
 <div>
   <div class="row">
-    <div class="col s12 l6" v-if="loadedBuilds">
+    <div class="col s12 l6" v-if="loadedModuleBuilds">
         <div class="card">
             <div class="card-content">
                 <div class="row">
@@ -23,7 +23,7 @@
             </div>
         </div>
     </div>
-    <div class="col s12 l6" v-if="loadedBuilds">
+    <div class="col s12 l6" v-if="loadedUsersBuilds">
         <div class="card">
             <div class="card-content">
                 <div class="row">
@@ -50,153 +50,177 @@
 </template>
 
 <script>
-import Builds from '@/components/extranet/Builds';
-import BarChart from '../components/BarChart.js';
+import BarChart from '../components/BarChart';
 
 export default {
   components: {
-    Builds,
     BarChart,
   },
   data() {
     return {
-      loadedBuilds: false,
-      numberOfDaysModule: 30,
-      numberOfDaysUsers: 30,
+      startDateModule: new Date(new Date().setTime(new Date().getTime() - (30 * 24 * 60 * 60 * 1000))),
+      startDateUsers: new Date(new Date().setTime(new Date().getTime() - (30 * 24 * 60 * 60 * 1000))),
+      endDate: new Date(),
+      loadedModuleBuilds: false,
+      loadedUsersBuilds: false,
       selectStartDate: {
         id: 'startDate_select',
         name: 'startDate',
         displayed: 'name',
-        icon: "today",
+        icon: 'today',
         options: [
-            {
-              name: 'Last 24 hours',
-              value: 1
-            },
-            {
-              name: 'Last 7 days',
-              value: 7
-            },
-            {
-              name: 'Last 30 days',
-              value: 30
-            },
-          ],
-          selected: {
-            name: 'Last 30 days',
-            value: 30
+          {
+            name: 'Last 24 hours',
+            value: 1,
           },
+          {
+            name: 'Last 7 days',
+            value: 7,
+          },
+          {
+            name: 'Last 30 days',
+            value: 30,
+          },
+        ],
+        selected: {
+          name: 'Last 30 days',
+          value: 30,
         },
+      },
     };
   },
   computed: {
     dataCollectionModules() {
-        let builds = this.buildsGroupedByModule();
-        let imxfeBuilds = builds["imx-fe"];
-        let imxbeBuilds = builds["imx-be"];
+      const builds = this.buildsGroupedByModule();
+      const imxfeBuilds = builds['imx-fe'];
+      const imxbeBuilds = builds['imx-be'];
 
-        let dataCollection = {         
-          labels: ["Extranet", "iMX BE", "iMX FE"],
-          datasets: [
-            {
-              label: "BUILDS",
-              data: [(builds.extranet == undefined ? 0 : builds.extranet), (imxbeBuilds == undefined ? 0 : imxbeBuilds), (imxfeBuilds == undefined ? 0 : imxfeBuilds)],
-              backgroundColor: [],
-            }
-          ],
- 
-        };
+      const dataCollection = {
+        labels: ['Extranet', 'iMX BE', 'iMX FE'],
+        datasets: [
+          {
+            label: 'BUILDS',
+            data: [
+              (builds.extranet === undefined ? 0 : builds.extranet),
+              (imxbeBuilds === undefined ? 0 : imxbeBuilds),
+              (imxfeBuilds === undefined ? 0 : imxfeBuilds),
+            ],
+            backgroundColor: [],
+          },
+        ],
 
-        try{
-          dataCollection.datasets[0].data.forEach((data) => {
-            dataCollection.datasets[0].backgroundColor.push("#4da6ff");
-          });       
-        } catch(error) { console.log("Could not get colour for table") }
+      };
 
-        return dataCollection;
+      try {
+        dataCollection.datasets[0].data.forEach(() => {
+          dataCollection.datasets[0].backgroundColor.push('#4da6ff');
+        });
+      } catch (error) { console.log('Could not get colour for table'); }
+
+      return dataCollection;
     },
     dataCollectionUsers() {
-        let builds = this.buildsGroupedByUser();
+      const builds = this.buildsGroupedByUser();
 
-        let dataCollection = {
-          labels: Object.keys(builds),
-          datasets: [
-            {
-              label: "BUILDS",
-              data: Object.values(builds),
-              backgroundColor: [],
-            }
-          ],
- 
-        };
-        
-        try{
-          dataCollection.datasets[0].data.forEach((data) => {
-            dataCollection.datasets[0].backgroundColor.push(this.getRandomColour());
-          });       
-        } catch(error) { console.log("Could not get random colours for table") }
-        
-        return dataCollection;
+      const dataCollection = {
+        labels: Object.keys(builds),
+        datasets: [
+          {
+            label: 'BUILDS',
+            data: Object.values(builds),
+            backgroundColor: [],
+          },
+        ],
+
+      };
+
+      try {
+        dataCollection.datasets[0].data.forEach(() => {
+          dataCollection.datasets[0].backgroundColor.push(this.getRandomColour());
+        });
+      } catch (error) { console.log('Could not get random colours for table'); }
+
+      return dataCollection;
     },
     options() {
-        let optionsCollection = {         
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        };
+      const optionsCollection = {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+            },
+          }],
+        },
+      };
 
-        return optionsCollection;
+      return optionsCollection;
     },
   },
   methods: {
     buildsGroupedByModule() {
-      let builds = {};
+      const builds = {};
 
-      this.$store.getters['builds/getBuildsDateFilteredGroupedByModule'](this.numberOfDaysModule).forEach((groupedBuild) => {
-        builds[groupedBuild.module] = groupedBuild.builds;             
+      this.$store.getters['builds/getBuildsGroupedByModule']().forEach((groupedBuild) => {
+        builds[groupedBuild.module] = groupedBuild.builds;
       });
 
       return builds;
     },
     buildsGroupedByUser() {
-      let builds = {};
+      const builds = {};
 
-      this.$store.getters['builds/getBuildsDateFilteredGroupedByUser'](this.numberOfDaysUsers).forEach((groupedBuild) => {
-        builds[groupedBuild.user] = groupedBuild.builds;             
+      this.$store.getters['builds/getBuildsGroupedByUser']().forEach((groupedBuild) => {
+        builds[groupedBuild.user] = groupedBuild.builds;
       });
-       
+
       return builds;
     },
     getRandomColour() {
-        var letters = '0123456789ABCDEF'.split('');
-        var colour = '#';
-        for (var i = 0; i < 6; i++ ) {
-            colour += letters[Math.floor(Math.random() * 16)];
-        }
-        return colour;
+      const letters = '0123456789ABCDEF'.split('');
+      let colour = '#';
+      for (let i = 0; i < 6; i += 1) {
+        colour += letters[Math.floor(Math.random() * 16)];
+      }
+      return colour;
     },
     selectedStartDateModule(value) {
-        this.numberOfDaysModule = value.value;
-        this.buildsGroupedByModule();
+
+    const selectedEndDate = value.value * 24 * 60 * 60 * 1000;
+    this.startDateModule = new Date(new Date().setTime(new Date().getTime() - selectedEndDate));
+    this.getChartData();
+
+
+      //const selectedEndDate = value.value * 24 * 60 * 60 * 1000;
+     // this.startDateModule = new Date(new Date().setTime(new Date().getTime() - selectedEndDate));
+     // const startDate = Math.round(new Date(this.startDateModule).getTime() / 1000);
+      //const loader = this.$loading.show({ container: this.$el });
+     // this.$store.dispatch('builds/getModuleBuildsForPeriod', {startDate}).then(() => this.buildsGroupedByModule());
+      //this.buildsGroupedByModule();
     },
     selectedStartDateUsers(value) {
-        this.numberOfDaysUsers = value.value;
-        this.buildsGroupedByUser();
+      const selectedEndDate = value.value * 24 * 60 * 60 * 1000;
+      this.startDateUsers = new Date(new Date().setTime(new Date().getTime() - selectedEndDate));
+      this.getChartData();
+      //const startDate = Math.round(new Date(this.startDateUsers).getTime() / 1000);    
+      //const loader = this.$loading.show({ container: this.$el });
+      //this.$store.dispatch('builds/getUsersBuildsForPeriod', {startDate}).then(() => loader.hide());
+    },
+    getChartData() {
+     
+      let startDateModule = Math.round(new Date(this.startDateModule).getTime() / 1000);
+      const loader = this.$loading.show({ container: this.$el });
+      this.$store.dispatch('builds/getModuleBuildsForPeriod', {startDateModule}).then(() => loader.hide());
+
+      let startDateUsers = Math.round(new Date(this.startDateUsers).getTime() / 1000);
+      this.$store.dispatch('builds/getUsersBuildsForPeriod', {startDateUsers}).then(() => loader.hide());
     },
     async prepareData() {
-        const loader = this.$loading.show({ container: this.$el });
-        await this.$store.dispatch('builds/getBuilds').then(() => {
-            loader.hide();
-            this.loadedBuilds = true;
-        });
+      this.getChartData();
+      
     },
-  },  
-  mounted() {    
-      this.prepareData();
+  },
+  mounted() {
+    this.prepareData();
   },
 };
 </script>

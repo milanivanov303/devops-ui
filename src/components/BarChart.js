@@ -1,19 +1,19 @@
-import { mixins, Bar} from 'vue-chartjs';
+import { mixins, Bar } from 'vue-chartjs';
 
 export default {
-  extends: Bar, 
+  extends: Bar,
   mixins: [mixins.reactiveProp],
   props: {
     chartData: {
-        type: Object,
-        default: null
+      type: Object,
+      default: null,
     },
     options: {
-        type: Object,
-        default: null
-    }
+      type: Object,
+      default: null,
+    },
   },
-  mounted () {
+  mounted() {
     this.renderChart(this.chartData, this.options);
-  }
+  },
 };
