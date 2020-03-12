@@ -82,12 +82,16 @@ export default {
 
   startBuild({ commit }, payload) {
     const promise = api.post('extranet/build', payload);
-    promise.catch(error => commit('error', error));
-    return promise;
+    promise
+      .then(response => commit('startBuild', response.data.data))
+      .catch(error => commit('error', error));
+    return promise; 
   },
   removeBuild({ commit }, id) {
     const promise = api.delete(`extranet/build/${id}`);
-    promise.catch(error => commit('error', error));
-    return promise;
+    promise
+      .then(() => commit('removeBuild', id))
+      .catch(error => commit('error', error));
+    return promise; 
   },
 };
