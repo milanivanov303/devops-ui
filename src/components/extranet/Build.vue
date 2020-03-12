@@ -12,7 +12,7 @@
         <template v-slot:header>Create new build</template>
         <template v-slot:content>
           <template v-if="build.started === false">
-            <div  class="col s12 l10 offset-l1" key="form" >
+            <div  class="col s12" key="form" >
               <div class="row">
                 <div class="col s12" >
                   <Autocomplete
@@ -146,8 +146,8 @@ export default {
     instances() {
       return this.$store.state.mmpi.instances;
     },
-    feBranches() {  
-      return this.$store.state.extranet.feBranches; 
+    feBranches() {
+      return this.$store.state.extranet.feBranches;
     },
   },
   validations: {
@@ -176,7 +176,7 @@ export default {
       this.$store.dispatch('mmpi/getInstances').finally(() => loader.hide());
     },
     getFebranches() {
-      this.$store.dispatch('extranet/getFebranches');  
+      this.$store.dispatch('extranet/getFebranches');
     },
     open() {
       this.form = initialState().form;

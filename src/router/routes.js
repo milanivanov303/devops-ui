@@ -36,7 +36,7 @@ export default [
   },
   {
     path: '/dashboard',
-    meta: { 
+    meta: {
       requiresAuth: true,
       alias: '/dashboard',
       name: 'dashboard',

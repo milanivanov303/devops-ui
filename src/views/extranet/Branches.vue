@@ -14,7 +14,7 @@
           :count="getContainersCount(branch.name)"
           :class="{
             'selected-branch': $route.path === `/extranet/branches/${branch.name}`,
-            'col s12 m6 l4': $route.meta.name === 'extranet-branches',            
+            'col s12 m6 l4': $route.meta.name === 'extranet-branches',
           }"
         />
         <div class="row">
@@ -54,7 +54,7 @@
             :count="getContainersCount(branch.name)"
             :class="{
               'selected-branch': $route.path === `/extranet/branches/${branch.name}`,
-              'col s12 m6 l4': $route.meta.name === 'extranet-branches',            
+              'col s12 m6 l4': $route.meta.name === 'extranet-branches',
             }"
           />
         </div>
@@ -73,8 +73,8 @@
 </template>
 
 <script>
-import Branch from '@/components/extranet/Branch';
 import Paginate from 'vuejs-paginate/src/components/Paginate';
+import Branch from '@/components/extranet/Branch';
 
 
 export default {
@@ -93,20 +93,20 @@ export default {
         name: 'perPage',
         displayed: 'name',
         options: [
-        {
+          {
             name: 6,
-        },
-        {
+          },
+          {
             name: 9,
-        },
-        {
+          },
+          {
             name: 12,
-        },
+          },
           {
             name: 15,
-        },
+          },
         ],
-        selected: { name: 12},
+        selected: { name: 12 },
       },
     };
   },
@@ -128,7 +128,7 @@ export default {
     sorted() {
       const from = (this.page * this.perPage) - this.perPage;
       const to = (this.page * this.perPage);
-      let data = this.filteredBranches;
+      const data = this.filteredBranches;
       this.setLastPage(data);
       return data.slice(from, to);
     },

@@ -71,8 +71,8 @@
 </template>
 
 <script>
-import Branch from '@/views/imx-fe/components/Branch';
 import Paginate from 'vuejs-paginate/src/components/Paginate';
+import Branch from '@/views/imx-fe/components/Branch';
 
 
 export default {
@@ -92,20 +92,20 @@ export default {
         name: 'perPage',
         displayed: 'name',
         options: [
-        {
+          {
             name: 6,
-        },
-        {
+          },
+          {
             name: 9,
-        },
-        {
+          },
+          {
             name: 12,
-        },
+          },
           {
             name: 15,
-        },
+          },
         ],
-        selected: { name: 12},
+        selected: { name: 12 },
       },
     };
   },
@@ -127,7 +127,7 @@ export default {
     sorted() {
       const from = (this.page * this.perPage) - this.perPage;
       const to = (this.page * this.perPage);
-      let data = this.filteredBranches;
+      const data = this.filteredBranches;
       this.setLastPage(data);
       return data.slice(from, to);
     },
