@@ -107,7 +107,7 @@ export default [
         path: 'dashboard',
         meta: {
           requiresAuth: true,
-          name: 'imx-fe-dashboard',
+          name: 'imx-fe',
           transitionName: 'slide',
           title: 'iMX-FE Dashboard',
         },

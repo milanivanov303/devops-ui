@@ -148,16 +148,14 @@ export default {
     },
     getBranches() {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('imx_fe/getBranches').then(() => {
-        loader.hide();
-        const selectedBranch = document.querySelector('.selected-branch');
-        if (selectedBranch) {
-          selectedBranch.scrollIntoView({
-            block: 'start',
-            inline: 'nearest',
-          });
-        }
-      });
+      this.$store.dispatch('imx_fe/getBranches')
+        .then(() => {
+          const selectedBranch = document.querySelector('.selected-branch');
+          if (selectedBranch) {
+            selectedBranch.scrollIntoView({ block: 'start', inline: 'nearest' });
+          }
+        })
+        .finally(() => loader.hide());
     },
     getContainers() {
       this.$store.dispatch('imx_fe/getContainers');

@@ -1,6 +1,6 @@
 <template>
   <div class="imx-fe">
-    <div v-if="$route.meta.name === 'imx-fe-dashboard'" class="row">
+    <div v-if="$route.meta.name === 'imx-fe'" class="row">
       <div class="col s12 l6">
         <div class="card">
           <div class="card-content">
@@ -25,7 +25,7 @@
               <tr v-for="(container, index) in containersGroupedByBranch" :key="index">
                 <td>{{ index + 1 }}</td>
                 <td>
-                  <router-link v-bind:to="'/imx-fe/branches/' + encodeURIComponent(container.branch)">
+                  <router-link :to="'/imx-fe/branches/' + encodeURIComponent(container.branch)">
                     {{ container.branch }}
                   </router-link>
                 </td>

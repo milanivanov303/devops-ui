@@ -50,6 +50,16 @@
                   />
                 </div>
               </div>
+              <div class="row">
+                <div class="col s12" >
+                  <Autocomplete
+                    label="Fe branch"
+                    icon="dynamic_feed"
+                    :items="feBranches"
+                    v-model="form.feBranch"
+                  />
+                </div>
+              </div>
             </div>
           </template>
           <template v-else>
@@ -108,6 +118,7 @@ function initialState() {
       client: null,
       javaVersion: 8,
       instance: null,
+      fe_branch: null,
     },
     build: {
       started: false,
@@ -135,6 +146,9 @@ export default {
     instances() {
       return this.$store.state.mmpi.instances;
     },
+    feBranches() {  
+      return this.$store.state.extranet.feBranches; 
+    },
   },
   validations: {
     form: {
@@ -155,37 +169,14 @@ export default {
   methods: {
     getClients() {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('extranet/getClients').then(() => loader.hide());
+      this.$store.dispatch('extranet/getClients').finally(() => loader.hide());
     },
     getInstances() {
       const loader = this.$loading.show({ container: this.$el });
-
-      const payload = {
-        filters: JSON.stringify({
-          allOf: [
-            {
-              instance_type_id: {
-                value: ['DEV', 'VAL'],
-                operator: 'in',
-              },
-            },
-            {
-              owner: {
-                allOf: [
-                  {
-                    key: 'codix',
-                  },
-                ],
-              },
-            },
-          ],
-        }),
-        orders: JSON.stringify({
-          name: 'asc',
-        }),
-      };
-
-      this.$store.dispatch('mmpi/getInstances', payload).then(() => loader.hide());
+      this.$store.dispatch('mmpi/getInstances').finally(() => loader.hide());
+    },
+    getFebranches() {
+      this.$store.dispatch('extranet/getFebranches');  
     },
     open() {
       this.form = initialState().form;
@@ -210,6 +201,7 @@ export default {
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
+        fe_branch: this.form.feBranch,
       };
 
       this.$store.dispatch('extranet/startBuild', payload)
@@ -264,6 +256,7 @@ export default {
   mounted() {
     this.getClients();
     this.getInstances();
+    this.getFebranches();
   },
 };
 </script>
