@@ -22,53 +22,12 @@ export default {
 
     return builds.sort((a, b) => b.builds - a.builds);
   },
-  
-  getBuildsGroupedByUser: state => () => {
-    const users = {};
-    state.usersBuilds.forEach((build) => {
-      users[build.user] = (users[build.user] + 1) || 1;
-    });
 
-    const builds = [];
-    Object.keys(users).forEach((user) => {
-      builds.push({ user, builds: users[user] });
-    });
-
-    return builds.sort((a, b) => b.builds - a.builds);
-  },
-  getBuildsDateFilteredGroupedByModule: state => (numberOfBuilds) => {
-    const startDate = new Date(
-      new Date().setTime(new Date().getTime() - (numberOfBuilds * 24 * 60 * 60 * 1000)),
-    ).getTime();
-
-    const filterBuilds = state.builds.filter(
-      build => new Date(build.created_on * 1000).getTime() > startDate,
-    );
-
-    const modules = {};
-    filterBuilds.forEach((filterBuild) => {
-      modules[filterBuild.module] = (modules[filterBuild.module] + 1) || 1;
-    });
-
-    const builds = [];
-    Object.keys(modules).forEach((module) => {
-      builds.push({ module, builds: modules[module] });
-    });
-
-    return builds.sort((a, b) => b.build - a.build);
-  },
-
-  getBuildsDateFilteredGroupedByUser: state => (numberOfBuilds, module) => {
-    const startDate = new Date(
-      new Date().setTime(new Date().getTime() - (numberOfBuilds * 24 * 60 * 60 * 1000)),
-    ).getTime();
-
-    const filterBuilds = state.builds.filter((build) => {
-      if (typeof module !== 'undefined' && (module === 'extranet' || module === 'imx-fe')) {
-        return new Date(build.created_on * 1000).getTime() > startDate && build.module === module;
-      }
-      return new Date(build.created_on * 1000).getTime() > startDate;
-    });
+  getBuildsGroupedByUser: state => (module) => {
+    let filterBuilds = state.usersBuilds;
+    if (typeof module !== 'undefined' && (module === 'extranet' || module === 'imx-fe')) {
+      filterBuilds = state.usersBuilds.filter(build => build.module === module);
+    }
 
     const users = {};
     filterBuilds.forEach((filterBuild) => {
@@ -80,20 +39,14 @@ export default {
       builds.push({ user, builds: users[user] });
     });
 
-    return builds.sort((a, b) => b.build - a.build);
+    return builds.sort((a, b) => b.builds - a.builds);
   },
 
-  getBuildsDateFilteredGroupedByBranch: state => (numberOfBuilds, module) => {
-    const startDate = new Date(
-      new Date().setTime(new Date().getTime() - (numberOfBuilds * 24 * 60 * 60 * 1000)),
-    ).getTime();
-
-    const filterBuilds = state.builds.filter((build) => {
-      if (typeof module !== 'undefined' && (module === 'extranet' || module === 'imx-fe')) {
-        return new Date(build.created_on * 1000).getTime() > startDate && build.module === module;
-      }
-      return new Date(build.created_on * 1000).getTime() > startDate;
-    });
+  getBuildsGroupedByBranch: state => (module) => {
+    let filterBuilds = state.branchBuilds;
+    if (typeof module !== 'undefined' && (module === 'extranet' || module === 'imx-fe')) {
+      filterBuilds = state.branchBuilds.filter(build => build.module === module);
+    }
 
     const branches = {};
     filterBuilds.forEach((filterBuild) => {
@@ -105,7 +58,7 @@ export default {
       builds.push({ branch, builds: branches[branch] });
     });
 
-    return builds.sort((a, b) => b.build - a.build);
+    return builds.sort((a, b) => b.builds - a.builds);
   },
 
   getError: state => state.error,

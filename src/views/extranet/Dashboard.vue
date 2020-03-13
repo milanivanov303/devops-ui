@@ -9,7 +9,7 @@
         </div>
       </div>
     </div>
-    <div class="col s12 l6" v-if="loadedBuilds">
+    <div class="col s12 l6" v-if="loadedBranchBuilds">
         <div class="card">
             <div class="card-content">
                 <div class="row">
@@ -17,7 +17,7 @@
                         <div class="input-field">
                             <Select class="col s12"
                                 :select="selectStartDate"
-                                @selectedVal="selectedStartDateBranches"
+                                @selectedVal="selectedStartDateBranch"
                             />
                         </div>
                     </div>
@@ -31,7 +31,7 @@
             </div>
         </div>
     </div>
-    <div class="col s12 l6" v-if="loadedBuilds">
+    <div class="col s12 l6" v-if="loadedUsersBuilds">
         <div class="card">
             <div class="card-content">
                 <div class="row">
@@ -69,9 +69,14 @@ export default {
   },
   data() {
     return {
-      loadedBuilds: false,
-      numberOfDaysBranches: 30,
-      numberOfDaysUsers: 30,
+      startDateBranch: new Date(
+        new Date().setTime(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)),
+      ),
+      startDateUsers: new Date(
+        new Date().setTime(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)),
+      ),
+      loadedBranchBuilds: false,
+      loadedUsersBuilds: false,
       selectStartDate: {
         id: 'startDate_select',
         name: 'startDate',
@@ -169,7 +174,7 @@ export default {
     buildsGroupedByBranch() {
       const builds = {};
 
-      this.$store.getters['builds/getBuildsDateFilteredGroupedByBranch'](this.numberOfDaysBranches, 'extranet').forEach((groupedBuild) => {
+      this.$store.getters['builds/getBuildsGroupedByBranch']('extranet').forEach((groupedBuild) => {
         builds[groupedBuild.branch] = groupedBuild.builds;
       });
 
@@ -178,7 +183,7 @@ export default {
     buildsGroupedByUser() {
       const builds = {};
 
-      this.$store.getters['builds/getBuildsDateFilteredGroupedByUser'](this.numberOfDaysUsers, 'extranet').forEach((groupedBuild) => {
+      this.$store.getters['builds/getBuildsGroupedByUser']('extranet').forEach((groupedBuild) => {
         builds[groupedBuild.user] = groupedBuild.builds;
       });
 
@@ -192,18 +197,31 @@ export default {
       }
       return colour;
     },
-    selectedStartDateBranches(value) {
-      this.numberOfDaysBranches = value.value;
-      this.buildsGroupedByBranch();
+    selectedStartDateBranch(value) {
+      const newDate = new Date(
+        new Date().setTime(new Date().getTime() - (value.value * 24 * 60 * 60 * 1000)),
+      );
+      const startDateBranch = Math.round(new Date(newDate).getTime() / 1000);
+      this.$store.dispatch('builds/getBranchBuildsForPeriod', { startDateBranch }).then(() => {});
     },
     selectedStartDateUsers(value) {
-      this.numberOfDaysUsers = value.value;
-      this.buildsGroupedByUser();
+      const newDate = new Date(
+        new Date().setTime(new Date().getTime() - (value.value * 24 * 60 * 60 * 1000)),
+      );
+      const startDateUsers = Math.round(new Date(newDate).getTime() / 1000);
+      this.$store.dispatch('builds/getUsersBuildsForPeriod', { startDateUsers }).then(() => {});
     },
     async prepareData() {
       await this.getContainers();
-      await this.$store.dispatch('builds/getBuilds').then(() => {
-        this.loadedBuilds = true;
+
+      const startDateBranch = Math.round(new Date(this.startDateBranch).getTime() / 1000);
+      await this.$store.dispatch('builds/getBranchBuildsForPeriod', { startDateBranch }).then(() => {
+        this.loadedBranchBuilds = true;
+      });
+
+      const startDateUsers = Math.round(new Date(this.startDateUsers).getTime() / 1000);
+      await this.$store.dispatch('builds/getUsersBuildsForPeriod', { startDateUsers }).then(() => {
+        this.loadedUsersBuilds = true;
       });
     },
   },

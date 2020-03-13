@@ -1,7 +1,7 @@
 <template>
 <div>
   <div class="row">
-    <div class="col s12 l6" v-if="loadedModuleBuilds">
+    <div class="col s12 l6" v-if="loadedBuildsModule">
         <div class="card">
             <div class="card-content">
                 <div class="row">
@@ -23,7 +23,7 @@
             </div>
         </div>
     </div>
-    <div class="col s12 l6" v-if="loadedUsersBuilds">
+    <div class="col s12 l6" v-if="loadedBuildsUsers">
         <div class="card">
             <div class="card-content">
                 <div class="row">
@@ -58,11 +58,14 @@ export default {
   },
   data() {
     return {
-      startDateModule: new Date(new Date().setTime(new Date().getTime() - (30 * 24 * 60 * 60 * 1000))),
-      startDateUsers: new Date(new Date().setTime(new Date().getTime() - (30 * 24 * 60 * 60 * 1000))),
-      endDate: new Date(),
-      loadedModuleBuilds: false,
-      loadedUsersBuilds: false,
+      startDateModule: new Date(
+        new Date().setTime(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)),
+      ),
+      startDateUsers: new Date(
+        new Date().setTime(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)),
+      ),
+      loadedBuildsModule: false,
+      loadedBuildsUsers: false,
       selectStartDate: {
         id: 'startDate_select',
         name: 'startDate',
@@ -184,39 +187,32 @@ export default {
       return colour;
     },
     selectedStartDateModule(value) {
-
-    const selectedEndDate = value.value * 24 * 60 * 60 * 1000;
-    this.startDateModule = new Date(new Date().setTime(new Date().getTime() - selectedEndDate));
-    this.getChartData();
-
-
-      //const selectedEndDate = value.value * 24 * 60 * 60 * 1000;
-     // this.startDateModule = new Date(new Date().setTime(new Date().getTime() - selectedEndDate));
-     // const startDate = Math.round(new Date(this.startDateModule).getTime() / 1000);
-      //const loader = this.$loading.show({ container: this.$el });
-     // this.$store.dispatch('builds/getModuleBuildsForPeriod', {startDate}).then(() => this.buildsGroupedByModule());
-      //this.buildsGroupedByModule();
+      const newDate = new Date(
+        new Date().setTime(new Date().getTime() - (value.value * 24 * 60 * 60 * 1000)),
+      );
+      const startDateModule = Math.round(new Date(newDate).getTime() / 1000);
+      this.$store.dispatch('builds/getModuleBuildsForPeriod', { startDateModule }).then(() => {});
     },
     selectedStartDateUsers(value) {
-      const selectedEndDate = value.value * 24 * 60 * 60 * 1000;
-      this.startDateUsers = new Date(new Date().setTime(new Date().getTime() - selectedEndDate));
-      this.getChartData();
-      //const startDate = Math.round(new Date(this.startDateUsers).getTime() / 1000);    
-      //const loader = this.$loading.show({ container: this.$el });
-      //this.$store.dispatch('builds/getUsersBuildsForPeriod', {startDate}).then(() => loader.hide());
-    },
-    getChartData() {
-     
-      let startDateModule = Math.round(new Date(this.startDateModule).getTime() / 1000);
-      const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('builds/getModuleBuildsForPeriod', {startDateModule}).then(() => loader.hide());
-
-      let startDateUsers = Math.round(new Date(this.startDateUsers).getTime() / 1000);
-      this.$store.dispatch('builds/getUsersBuildsForPeriod', {startDateUsers}).then(() => loader.hide());
+      const newDate = new Date(
+        new Date().setTime(new Date().getTime() - (value.value * 24 * 60 * 60 * 1000)),
+      );
+      const startDateUsers = Math.round(new Date(newDate).getTime() / 1000);
+      this.$store.dispatch('builds/getUsersBuildsForPeriod', { startDateUsers }).then(() => {});
     },
     async prepareData() {
-      this.getChartData();
-      
+      const loader = this.$loading.show({ container: this.$el });
+
+      const startDateModule = Math.round(new Date(this.startDateModule).getTime() / 1000);
+      await this.$store.dispatch('builds/getModuleBuildsForPeriod', { startDateModule }).then(() => {
+        loader.hide();
+        this.loadedBuildsModule = true;
+      });
+
+      const startDateUsers = Math.round(new Date(this.startDateUsers).getTime() / 1000);
+      await this.$store.dispatch('builds/getUsersBuildsForPeriod', { startDateUsers }).then(() => {
+        this.loadedBuildsUsers = true;
+      });
     },
   },
   mounted() {

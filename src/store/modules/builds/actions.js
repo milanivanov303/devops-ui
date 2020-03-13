@@ -28,21 +28,17 @@ export default {
   getModuleBuildsForPeriod({ commit }, { startDateModule }) {
     const name = 'period_moduleBuilds';
 
-  //  if (this.state.promises[name]) {//?
-  //    return this.state.promises[name];
-  //  }
-
     const payload = {
-        filters: JSON.stringify({
-            allOf: [
-              {
-                created_on: {
-                  operator: '>',
-                  value: startDateModule
-                }
-              }
-            ]
-        })
+      filters: JSON.stringify({
+        allOf: [
+          {
+            created_on: {
+              operator: '>',
+              value: startDateModule,
+            },
+          },
+        ],
+      }),
     };
 
     const promise = api.get('builds', payload);
@@ -55,28 +51,24 @@ export default {
         commit('host', response.data.meta.host);
       })
       .catch(() => commit('error', 'Could not get builds list'));
- 
+
     return promise;
   },
-  
+
   getUsersBuildsForPeriod({ commit }, { startDateUsers }) {
     const name = 'period_usersBuilds';
 
-  //  if (this.state.promises[name]) {//?
-  //    return this.state.promises[name];
-  //  }
-
     const payload = {
-        filters: JSON.stringify({
-            allOf: [
-              {
-                created_on: {
-                  operator: '>',
-                  value: startDateUsers
-                }
-              }
-            ]
-        })
+      filters: JSON.stringify({
+        allOf: [
+          {
+            created_on: {
+              operator: '>',
+              value: startDateUsers,
+            },
+          },
+        ],
+      }),
     };
 
     const promise = api.get('builds', payload);
@@ -89,7 +81,37 @@ export default {
         commit('host', response.data.meta.host);
       })
       .catch(() => commit('error', 'Could not get builds list'));
-   
+
+    return promise;
+  },
+
+  getBranchBuildsForPeriod({ commit }, { startDateBranch }) {
+    const name = 'period_branchBuilds';
+
+    const payload = {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            created_on: {
+              operator: '>',
+              value: startDateBranch,
+            },
+          },
+        ],
+      }),
+    };
+
+    const promise = api.get('builds', payload);
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => {
+        commit('branchBuilds', response.data.data);
+        commit('host', response.data.meta.host);
+      })
+      .catch(() => commit('error', 'Could not get builds list'));
+
     return promise;
   },
 

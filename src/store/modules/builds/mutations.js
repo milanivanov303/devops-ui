@@ -11,6 +11,9 @@ export default {
   usersBuilds(state, usersBuilds) {
     state.usersBuilds = usersBuilds;
   },
+  branchBuilds(state, branchBuilds) {
+    state.branchBuilds = branchBuilds;
+  },
   error(state, error) {
     state.error = error;
   },
