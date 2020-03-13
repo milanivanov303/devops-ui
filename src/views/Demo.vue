@@ -217,7 +217,9 @@
 
 import { Datetime } from 'vue-datetime';
 import { DateTime } from 'luxon';
-import { required, email, numeric, minLength } from 'vuelidate/lib/validators';
+import {
+  required, email, numeric, minLength,
+} from 'vuelidate/lib/validators';
 import 'vue-datetime/dist/vue-datetime.css';
 
 export default {

@@ -19,14 +19,4 @@ export default {
   error(state, error) {
     state.error = error;
   },
-  startBuild(state, build) {
-    builds.push(build);
-    Vue.set(state, 'builds', builds);
-  },
-  removeBuild(state, id) {
-    state.builds.splice(
-      state.builds.findIndex((build) => build.id === id),
-      1,
-    );
-  },
 };
