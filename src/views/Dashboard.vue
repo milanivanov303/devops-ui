@@ -24,7 +24,7 @@
               <tr>
                 <td>1</td>
                 <td>
-                  <router-link to="/extranet">Extranet</router-link>
+                  <router-link to="/extranet/dashboard">Extranet</router-link>
                 </td>
                 <td>{{ extranetContainersCount }}</td>
               </tr>
@@ -35,8 +35,10 @@
               </tr>
               <tr>
                 <td>3</td>
-                <td>iMX FE</td>
-                <td>N/A</td>
+                <td>
+                  <router-link to="/imx-fe/dashboard">iMX FE</router-link>
+                </td>
+                <td>{{ imx_feContainersCount }}</td>
               </tr>
             </tbody>
           </table>
@@ -69,6 +71,9 @@ export default {
     },
     extranetContainersCount() {
       return this.$store.state.extranet.containers.length;
+    },
+    imx_feContainersCount() {
+      return this.$store.state.imx_fe.containers.length;
     },
   },
   mounted() {

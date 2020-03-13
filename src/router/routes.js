@@ -10,6 +10,8 @@ const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-
 const Demo = () => import(/* webpackChunkName: "demo" */ '../views/Demo.vue');
 const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
+const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions.vue');
+
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
@@ -35,9 +37,10 @@ export default [
   {
     path: '/dashboard',
     meta: {
+      requiresAuth: true,
       alias: '/dashboard',
       name: 'dashboard',
-      requiresAuth: true,
+      title: 'Extranet Dashboard',
       breadcrumb: 'Dashboard',
     },
     component: Dashboard,
@@ -166,6 +169,17 @@ export default [
       breadcrumb: 'Roles',
     },
     component: AdministrationRoles,
+  },
+  {
+    path: '/administration/actions/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-actions',
+      transitionName: 'slide',
+      title: 'Actions',
+      breadcrumb: 'Actions',
+    },
+    component: AdministrationActions,
   },
   {
     path: '/logged-in-sso-user',
