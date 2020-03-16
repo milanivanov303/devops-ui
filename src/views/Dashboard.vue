@@ -58,12 +58,7 @@ export default {
   },
   data() {
     return {
-      startDateModule: new Date(
-        new Date().setTime(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)),
-      ),
-      startDateUsers: new Date(
-        new Date().setTime(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)),
-      ),
+      startDate: 30,
       loadedBuildsModule: false,
       loadedBuildsUsers: false,
       selectStartDate: {
@@ -186,31 +181,40 @@ export default {
       }
       return colour;
     },
-    selectedStartDateModule(value) {
+    getStartDate(value) {
       const newDate = new Date(
-        new Date().setTime(new Date().getTime() - (value.value * 24 * 60 * 60 * 1000)),
+        new Date().setTime(new Date().getTime() - (value * 24 * 60 * 60 * 1000)),
       );
-      const startDateModule = Math.round(new Date(newDate).getTime() / 1000);
-      this.$store.dispatch('builds/getModuleBuildsForPeriod', { startDateModule }).then(() => {});
+
+      return Math.round(new Date(newDate).getTime() / 1000);
+    },
+    selectedStartDateModule(value) {
+      this.$store.dispatch(
+        'builds/getBuildsForPeriod',
+        { startDate: this.getStartDate(value.value), stateName: 'moduleBuilds' },
+      );
     },
     selectedStartDateUsers(value) {
-      const newDate = new Date(
-        new Date().setTime(new Date().getTime() - (value.value * 24 * 60 * 60 * 1000)),
+      this.$store.dispatch(
+        'builds/getBuildsForPeriod',
+        { startDate: this.getStartDate(value.value), stateName: 'usersBuilds' },
       );
-      const startDateUsers = Math.round(new Date(newDate).getTime() / 1000);
-      this.$store.dispatch('builds/getUsersBuildsForPeriod', { startDateUsers }).then(() => {});
     },
     async prepareData() {
       const loader = this.$loading.show({ container: this.$el });
 
-      const startDateModule = Math.round(new Date(this.startDateModule).getTime() / 1000);
-      await this.$store.dispatch('builds/getModuleBuildsForPeriod', { startDateModule }).then(() => {
+      await this.$store.dispatch(
+        'builds/getBuildsForPeriod',
+        { startDate: this.getStartDate(this.startDate), stateName: 'moduleBuilds' },
+      ).then(() => {
         loader.hide();
         this.loadedBuildsModule = true;
       });
 
-      const startDateUsers = Math.round(new Date(this.startDateUsers).getTime() / 1000);
-      await this.$store.dispatch('builds/getUsersBuildsForPeriod', { startDateUsers }).then(() => {
+      await this.$store.dispatch(
+        'builds/getBuildsForPeriod',
+        { startDate: this.getStartDate(this.startDate), stateName: 'usersBuilds' },
+      ).then(() => {
         this.loadedBuildsUsers = true;
       });
     },

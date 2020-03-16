@@ -25,16 +25,14 @@ export default {
     return promise;
   },
 
-  getModuleBuildsForPeriod({ commit }, { startDateModule }) {
-    const name = 'period_moduleBuilds';
-
+  getBuildsForPeriod({ commit }, { startDate, stateName }) {
     const payload = {
       filters: JSON.stringify({
         allOf: [
           {
             created_on: {
               operator: '>',
-              value: startDateModule,
+              value: startDate,
             },
           },
         ],
@@ -43,71 +41,9 @@ export default {
 
     const promise = api.get('builds', payload);
 
-    commit('promise', { name, promise }, { root: true });
-
     promise
       .then((response) => {
-        commit('moduleBuilds', response.data.data);
-        commit('host', response.data.meta.host);
-      })
-      .catch(() => commit('error', 'Could not get builds list'));
-
-    return promise;
-  },
-
-  getUsersBuildsForPeriod({ commit }, { startDateUsers }) {
-    const name = 'period_usersBuilds';
-
-    const payload = {
-      filters: JSON.stringify({
-        allOf: [
-          {
-            created_on: {
-              operator: '>',
-              value: startDateUsers,
-            },
-          },
-        ],
-      }),
-    };
-
-    const promise = api.get('builds', payload);
-
-    commit('promise', { name, promise }, { root: true });
-
-    promise
-      .then((response) => {
-        commit('usersBuilds', response.data.data);
-        commit('host', response.data.meta.host);
-      })
-      .catch(() => commit('error', 'Could not get builds list'));
-
-    return promise;
-  },
-
-  getBranchBuildsForPeriod({ commit }, { startDateBranch }) {
-    const name = 'period_branchBuilds';
-
-    const payload = {
-      filters: JSON.stringify({
-        allOf: [
-          {
-            created_on: {
-              operator: '>',
-              value: startDateBranch,
-            },
-          },
-        ],
-      }),
-    };
-
-    const promise = api.get('builds', payload);
-
-    commit('promise', { name, promise }, { root: true });
-
-    promise
-      .then((response) => {
-        commit('branchBuilds', response.data.data);
+        commit(stateName, response.data.data);
         commit('host', response.data.meta.host);
       })
       .catch(() => commit('error', 'Could not get builds list'));
