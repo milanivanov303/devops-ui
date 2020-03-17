@@ -65,6 +65,9 @@
               <li :class="{ active: isActive('administration/roles') }">
                 <router-link to="/administration/roles"> Roles</router-link>
               </li>
+              <li :class="{ active: isActive('administration/actions') }">
+                <router-link to="/administration/actions"> Actions</router-link>
+              </li>
               <li><div class="divider"></div></li>
             </ul>
           </div>

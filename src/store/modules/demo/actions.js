@@ -8,10 +8,6 @@ export default {
   async createDemo({ commit }, payload) {
     try {
       let response = '';
-      // if (payload.action === 'update') {
-      //   response = await api.put(`demos/${payload.demoId}`, payload.formData);
-      //   commit('updateDemos', response.data.data);
-      // }
       if (payload.action === 'create') {
         response = await api.post('demos', payload.formData);
         commit('createDemo', response.data.data);

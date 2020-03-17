@@ -1,63 +1,109 @@
 <template>
-<div>
   <div class="row">
-    <div class="col s12 l6" v-if="loadedBuildsModule">
-        <div class="card">
-            <div class="card-content">
-                <div class="row">
-                    <div class="col s12 l4 right">
-                        <div class="input-field">
-                            <Select class="col s12"
-                                :select="selectStartDate"
-                                @selectedVal="selectedStartDateModule"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="charts col s12 l11">
-                        <span class="card-title">Number of builds by module</span>
-                        <BarChart :chart-data="dataCollectionModules" :options="options"></BarChart>
-                    </div>
-                </div>
-            </div>
+    <div class="col s12 l6">
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title">My Builds</span>
+          <Builds :containers="userContainers" ></Builds>
         </div>
+      </div>
+    </div>
+    <div class="col s12 l6">
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title">Builds By Module</span>
+          <table>
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Builds</th>
+            </tr>
+            </thead>
+            <tbody v-if="loaded">
+              <tr>
+                <td>1</td>
+                <td>
+                  <router-link to="/extranet/dashboard">Extranet</router-link>
+                </td>
+                <td>{{ extranetContainersCount }}</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>iMX BE</td>
+                <td>N/A</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>
+                  <router-link to="/imx-fe/dashboard">iMX FE</router-link>
+                </td>
+                <td>{{ imxFeContainersCount }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col s12 l6" v-if="loadedBuildsModule">
+      <div class="card">
+        <div class="card-content">
+          <div class="row">
+            <div class="col s12 l4 right">
+              <div class="input-field">
+                <Select class="col s12"
+                  :select="selectStartDate"
+                  @selectedVal="selectedStartDateModule"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="charts col s12 l11">
+              <span class="card-title">Number of builds by module</span>
+              <BarChart :chart-data="dataCollectionModules" :options="options"></BarChart>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="col s12 l6" v-if="loadedBuildsUsers">
-        <div class="card">
-            <div class="card-content">
-                <div class="row">
-                    <div class="col s12 l4 right">
-                        <div class="input-field">
-                            <Select class="col s12"
-                                :select="selectStartDate"
-                                @selectedVal="selectedStartDateUsers"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="charts col s12 l11">
-                        <span class="card-title">Number of builds by user</span>
-                        <BarChart :chart-data="dataCollectionUsers" :options="options"></BarChart>
-                    </div>
-                </div>
+      <div class="card">
+        <div class="card-content">
+          <div class="row">
+            <div class="col s12 l4 right">
+              <div class="input-field">
+                <Select class="col s12"
+                  :select="selectStartDate"
+                  @selectedVal="selectedStartDateUsers"
+                />
+              </div>
             </div>
+          </div>
+          <div class="row">
+            <div class="charts col s12 l11">
+              <span class="card-title">Number of builds by user</span>
+              <BarChart :chart-data="dataCollectionUsers" :options="options"></BarChart>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
-import BarChart from '../components/BarChart';
+import Builds from '@/components/extranet/Builds';
+import BarChart from '@/components/BarChart';
 
 export default {
   components: {
+    Builds,
     BarChart,
   },
   data() {
     return {
+      loaded: false,
       startDate: 30,
       loadedBuildsModule: false,
       loadedBuildsUsers: false,
@@ -88,6 +134,20 @@ export default {
     };
   },
   computed: {
+    userContainers() {
+      return this.$store.getters['extranet/getContainersByUser'](
+        this.$auth.getUser().username,
+      );
+    },
+    containersGroupedByBranch() {
+      return this.$store.getters['extranet/getContainersGroupedByBranch']();
+    },
+    extranetContainersCount() {
+      return this.$store.state.extranet.containers.length;
+    },
+    imxFeContainersCount() {
+      return this.$store.state.imx_fe.containers.length;
+    },
     dataCollectionModules() {
       const builds = this.buildsGroupedByModule();
       const imxfeBuilds = builds['imx-fe'];

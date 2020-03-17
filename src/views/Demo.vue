@@ -373,7 +373,19 @@ export default {
       };
       await this.$store.dispatch('demo/getDemos', payload).then(() => {
         loader.hide();
-        this.showElement();
+        if (this.$route.params.id) {
+          const demo = this.$store.state.demo.demos.find((demo) => {
+            if (demo.id === parseInt(this.$route.params.id, 10)) {
+              return true;
+            }
+            return false;
+          });
+          if (demo) {
+            return this.openAddEditDemoModal(demo);
+          }
+          this.$M.toast({ html: 'This demo does not exist!', classes: 'toast-fail' });
+        }
+        return false;
       });
     },
     createDemo() {
@@ -427,22 +439,6 @@ export default {
           this.error = error;
           return error;
         });
-    },
-
-    showElement() {
-      if (this.$route.params.id) {
-        const demo = this.$store.state.demo.demos.find((demo) => {
-          if (demo.id === parseInt(this.$route.params.id, 10)) {
-            return true;
-          }
-          return true;
-        });
-        if (demo) {
-          return this.openAddEditDemoModal(demo);
-        }
-        this.$M.toast({ html: 'This demo does not exist!', classes: 'toast-fail' });
-      }
-      return false;
     },
   },
   mounted() {
