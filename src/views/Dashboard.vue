@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col s12 l6">
-      <div class="card">
+      <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My Builds</span>
           <Builds :containers="userContainers" ></Builds>
@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="col s12 l6">
-      <div class="card">
+      <div class="card" ref="builds_by_module">
         <div class="card-content">
           <span class="card-title">Builds By Module</span>
           <table>
@@ -20,7 +20,7 @@
               <th>Builds</th>
             </tr>
             </thead>
-            <tbody v-if="loaded">
+            <tbody>
               <tr>
                 <td>1</td>
                 <td>
@@ -30,11 +30,6 @@
               </tr>
               <tr>
                 <td>2</td>
-                <td>iMX BE</td>
-                <td>N/A</td>
-              </tr>
-              <tr>
-                <td>3</td>
                 <td>
                   <router-link to="/imx-fe/dashboard">iMX FE</router-link>
                 </td>
@@ -45,47 +40,29 @@
         </div>
       </div>
     </div>
-    <div class="col s12 l6" v-if="loadedBuildsModule">
-      <div class="card">
+    <div class="col s12 l6">
+      <div class="card" ref="stats_by_module">
         <div class="card-content">
-          <div class="row">
-            <div class="col s12 l4 right">
-              <div class="input-field">
-                <Select class="col s12"
-                  :select="selectStartDate"
-                  @selectedVal="selectedStartDateModule"
-                />
-              </div>
+          <span class="card-title">Number of builds by module</span>
+          <div class="col s12 l5 right">
+            <div class="input-field">
+              <Select class="col s12" :select="selectStartDate" @selectedVal="getModuleStatistics"/>
             </div>
           </div>
-          <div class="row">
-            <div class="charts col s12 l11">
-              <span class="card-title">Number of builds by module</span>
-              <BarChart :chart-data="dataCollectionModules" :options="options"></BarChart>
-            </div>
-          </div>
+          <BarChart :data="modulesChartData" :options="chartOptions"></BarChart>
         </div>
       </div>
     </div>
-    <div class="col s12 l6" v-if="loadedBuildsUsers">
-      <div class="card">
+    <div class="col s12 l6">
+      <div class="card" ref="stats_by_user">
         <div class="card-content">
-          <div class="row">
-            <div class="col s12 l4 right">
-              <div class="input-field">
-                <Select class="col s12"
-                  :select="selectStartDate"
-                  @selectedVal="selectedStartDateUsers"
-                />
-              </div>
+          <span class="card-title">Number of builds by user</span>
+          <div class="col s12 l5 right">
+            <div class="input-field">
+              <Select class="col s12" :select="selectStartDate" @selectedVal="getUserStatistics"/>
             </div>
           </div>
-          <div class="row">
-            <div class="charts col s12 l11">
-              <span class="card-title">Number of builds by user</span>
-              <BarChart :chart-data="dataCollectionUsers" :options="options"></BarChart>
-            </div>
-          </div>
+          <BarChart :data="usersChartData" :options="chartOptions"></BarChart>
         </div>
       </div>
     </div>
@@ -103,10 +80,7 @@ export default {
   },
   data() {
     return {
-      loaded: false,
       startDate: 30,
-      loadedBuildsModule: false,
-      loadedBuildsUsers: false,
       selectStartDate: {
         id: 'startDate_select',
         name: 'startDate',
@@ -131,6 +105,18 @@ export default {
           value: 30,
         },
       },
+      chartOptions: {
+        legend: {
+          display: false,
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+            },
+          }],
+        },
+      },
     };
   },
   computed: {
@@ -148,98 +134,66 @@ export default {
     imxFeContainersCount() {
       return this.$store.state.imx_fe.containers.length;
     },
-    dataCollectionModules() {
-      const builds = this.buildsGroupedByModule();
-      const imxfeBuilds = builds['imx-fe'];
-      const imxbeBuilds = builds['imx-be'];
+    modulesChartData() {
+      let builds = {};
+      this.$store.getters['builds/getBuildsGroupedByModule']().forEach((build) => {
+        builds[build.module] = build.builds;
+      });
 
-      const dataCollection = {
-        labels: ['Extranet', 'iMX BE', 'iMX FE'],
+      return {
+        labels: ['Extranet', 'iMX FE'],
         datasets: [
           {
-            label: 'BUILDS',
+            label: '',
             data: [
-              (builds.extranet === undefined ? 0 : builds.extranet),
-              (imxbeBuilds === undefined ? 0 : imxbeBuilds),
-              (imxfeBuilds === undefined ? 0 : imxfeBuilds),
+              builds.extranet || 0,
+              builds['imx-fe'] || 0 ,
             ],
-            backgroundColor: [],
           },
         ],
-
       };
-
-      try {
-        dataCollection.datasets[0].data.forEach(() => {
-          dataCollection.datasets[0].backgroundColor.push('#4da6ff');
-        });
-      } catch (error) { console.log('Could not get colour for table'); }
-
-      return dataCollection;
     },
-    dataCollectionUsers() {
-      const builds = this.buildsGroupedByUser();
+    usersChartData() {
+      let builds = {};
+      this.$store.getters['builds/getBuildsGroupedByUser']().forEach((build) => {
+        builds[build.user] = build.builds;
+      });
 
-      const dataCollection = {
+      return {
         labels: Object.keys(builds),
         datasets: [
           {
-            label: 'BUILDS',
-            data: Object.values(builds),
-            backgroundColor: [],
+            label: 'Builds',
+            data: Object.values(builds)
           },
         ],
 
       };
-
-      try {
-        dataCollection.datasets[0].data.forEach(() => {
-          dataCollection.datasets[0].backgroundColor.push(this.getRandomColour());
-        });
-      } catch (error) { console.log('Could not get random colours for table'); }
-
-      return dataCollection;
-    },
-    options() {
-      const optionsCollection = {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-            },
-          }],
-        },
-      };
-
-      return optionsCollection;
     },
   },
   methods: {
-    buildsGroupedByModule() {
-      const builds = {};
-
-      this.$store.getters['builds/getBuildsGroupedByModule']().forEach((groupedBuild) => {
-        builds[groupedBuild.module] = groupedBuild.builds;
-      });
-
-      return builds;
+    getContainers() {
+      const loader1 = this.$loading.show({ container: this.$refs.my_builds });
+      const loader2 = this.$loading.show({ container: this.$refs.builds_by_module });
+      this.$store.dispatch('extranet/getContainers')
+        .then(() => {
+          loader1.hide();
+          loader2.hide();
+        });
     },
-    buildsGroupedByUser() {
-      const builds = {};
-
-      this.$store.getters['builds/getBuildsGroupedByUser']().forEach((groupedBuild) => {
-        builds[groupedBuild.user] = groupedBuild.builds;
-      });
-
-      return builds;
+    getModuleStatistics(days = {}) {
+      const loader = this.$loading.show({container: this.$refs.stats_by_module});
+      this.$store.dispatch(
+        'builds/getBuildsForPeriod',
+        {startDate: this.getStartDate(days.value || this.startDate), stateName: 'moduleBuilds'},
+      ).then(() => loader.hide());
     },
-    getRandomColour() {
-      const letters = '0123456789ABCDEF'.split('');
-      let colour = '#';
-      for (let i = 0; i < 6; i += 1) {
-        colour += letters[Math.floor(Math.random() * 16)];
-      }
-      return colour;
+    getUserStatistics(days = {}) {
+      const loader = this.$loading.show({ container: this.$refs.stats_by_user });
+      this.$store.dispatch(
+        'builds/getBuildsForPeriod',
+        { startDate: this.getStartDate(days.value || this.startDate), stateName: 'usersBuilds' },
+      ).then(() => loader.hide());
     },
     getStartDate(value) {
       const newDate = new Date(
@@ -248,39 +202,11 @@ export default {
 
       return Math.round(new Date(newDate).getTime() / 1000);
     },
-    selectedStartDateModule(value) {
-      this.$store.dispatch(
-        'builds/getBuildsForPeriod',
-        { startDate: this.getStartDate(value.value), stateName: 'moduleBuilds' },
-      );
-    },
-    selectedStartDateUsers(value) {
-      this.$store.dispatch(
-        'builds/getBuildsForPeriod',
-        { startDate: this.getStartDate(value.value), stateName: 'usersBuilds' },
-      );
-    },
-    async prepareData() {
-      const loader = this.$loading.show({ container: this.$el });
-
-      await this.$store.dispatch(
-        'builds/getBuildsForPeriod',
-        { startDate: this.getStartDate(this.startDate), stateName: 'moduleBuilds' },
-      ).then(() => {
-        loader.hide();
-        this.loadedBuildsModule = true;
-      });
-
-      await this.$store.dispatch(
-        'builds/getBuildsForPeriod',
-        { startDate: this.getStartDate(this.startDate), stateName: 'usersBuilds' },
-      ).then(() => {
-        this.loadedBuildsUsers = true;
-      });
-    },
   },
   mounted() {
-    this.prepareData();
+    this.getContainers();
+    this.getModuleStatistics();
+    this.getUserStatistics();
   },
 };
 </script>
