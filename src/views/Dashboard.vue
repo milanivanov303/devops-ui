@@ -1,17 +1,18 @@
 <template>
-  <div class="row">
-    <div class="col s12 l6">
+  <div class="dashboard">
+    <div class="row">
+      <div class="col s12 l6">
       <div class="card" ref="my_builds">
         <div class="card-content">
-          <span class="card-title">My Builds</span>
+          <span class="card-title">My active builds</span>
           <Builds :containers="userContainers" ></Builds>
         </div>
       </div>
     </div>
-    <div class="col s12 l6">
+      <div class="col s12 l6">
       <div class="card" ref="builds_by_module">
         <div class="card-content">
-          <span class="card-title">Builds By Module</span>
+          <span class="card-title">Active builds by module</span>
           <table>
             <thead>
             <tr>
@@ -40,7 +41,9 @@
         </div>
       </div>
     </div>
-    <div class="col s12 l6">
+    </div>
+    <div class="row">
+      <div class="col s12 l6">
       <div class="card" ref="stats_by_module">
         <div class="card-content">
           <span class="card-title">Number of builds by module</span>
@@ -53,7 +56,7 @@
         </div>
       </div>
     </div>
-    <div class="col s12 l6">
+      <div class="col s12 l6">
       <div class="card" ref="stats_by_user">
         <div class="card-content">
           <span class="card-title">Number of builds by user</span>
@@ -65,6 +68,7 @@
           <BarChart :data="usersChartData" :options="chartOptions"></BarChart>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </template>
@@ -121,9 +125,15 @@ export default {
   },
   computed: {
     userContainers() {
-      return this.$store.getters['extranet/getContainersByUser'](
+      const extranetContainers = this.$store.getters['extranet/getContainersByUser'](
         this.$auth.getUser().username,
       );
+
+      const imxFeContainers = this.$store.getters['imx_fe/getContainersByUser'](
+        this.$auth.getUser().username,
+      );
+
+      return [].concat(extranetContainers, imxFeContainers);
     },
     containersGroupedByBranch() {
       return this.$store.getters['extranet/getContainersGroupedByBranch']();
@@ -135,39 +145,19 @@ export default {
       return this.$store.state.imx_fe.containers.length;
     },
     modulesChartData() {
-      let builds = {};
-      this.$store.getters['builds/getBuildsGroupedByModule']().forEach((build) => {
-        builds[build.module] = build.builds;
-      });
-
-      return {
-        labels: ['Extranet', 'iMX FE'],
-        datasets: [
-          {
-            label: '',
-            data: [
-              builds.extranet || 0,
-              builds['imx-fe'] || 0 ,
-            ],
-          },
-        ],
-      };
-    },
-    usersChartData() {
-      let builds = {};
-      this.$store.getters['builds/getBuildsGroupedByUser']().forEach((build) => {
-        builds[build.user] = build.builds;
-      });
+      const builds = this.$store.getters['builds/getByModule']('module-builds');
 
       return {
         labels: Object.keys(builds),
-        datasets: [
-          {
-            label: 'Builds',
-            data: Object.values(builds)
-          },
-        ],
+        datasets: [{  data: Object.values(builds) }],
+      };
+    },
+    usersChartData() {
+      const builds = this.$store.getters['builds/getByUser']('users-builds');
 
+      return {
+        labels: Object.keys(builds),
+        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) }],
       };
     },
   },
@@ -175,25 +165,33 @@ export default {
     getContainers() {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_module });
-      this.$store.dispatch('extranet/getContainers')
-        .then(() => {
-          loader1.hide();
-          loader2.hide();
-        });
+      const promise1 = this.$store.dispatch('extranet/getContainers');
+      const promise2 = this.$store.dispatch('imx_fe/getContainers');
+
+      Promise.all([promise1, promise2]).finally(() => {
+        loader1.hide();
+        loader2.hide();
+      });
     },
     getModuleStatistics(days = {}) {
       const loader = this.$loading.show({container: this.$refs.stats_by_module});
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
-        {startDate: this.getStartDate(days.value || this.startDate), stateName: 'moduleBuilds'},
-      ).then(() => loader.hide());
+        {
+          startDate: this.getStartDate(days.value || this.startDate),
+          stateName: 'module-builds'
+        },
+      ).finally(() => loader.hide());
     },
     getUserStatistics(days = {}) {
       const loader = this.$loading.show({ container: this.$refs.stats_by_user });
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
-        { startDate: this.getStartDate(days.value || this.startDate), stateName: 'usersBuilds' },
-      ).then(() => loader.hide());
+        {
+          startDate: this.getStartDate(days.value || this.startDate),
+          stateName: 'users-builds'
+        },
+      ).finally(() => loader.hide());
     },
     getStartDate(value) {
       const newDate = new Date(

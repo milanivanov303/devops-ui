@@ -1,18 +1,19 @@
 <template>
   <div class="extranet">
-    <div v-if="$route.meta.name === 'extranet'" class="row">
-      <div class="col s12 l6">
+    <div v-if="$route.meta.name === 'extranet'" >
+      <div class="row">
+        <div class="col s12 l6">
         <div class="card" ref="my_builds">
           <div class="card-content">
-            <span class="card-title">My Extranet Builds</span>
+            <span class="card-title">My active extranet builds</span>
             <Builds :containers="userContainers" ></Builds>
           </div>
         </div>
       </div>
-      <div class="col s12 l6">
+        <div class="col s12 l6">
         <div class="card" ref="builds_by_branch">
           <div class="card-content">
-            <span class="card-title">Extranet Builds By Branch</span>
+            <span class="card-title">Active extranet builds by branch</span>
             <table>
               <thead>
               <tr>
@@ -40,7 +41,9 @@
           </div>
         </div>
       </div>
-      <div class="col s12 l6">
+      </div>
+      <div class="row">
+        <div class="col s12 l6">
         <div class="card" ref="stats_by_branch">
             <div class="card-content">
               <span class="card-title">Extranet builds by branch</span>
@@ -53,7 +56,7 @@
             </div>
         </div>
       </div>
-      <div class="col s12 l6">
+        <div class="col s12 l6">
         <div class="card" ref="stats_by_user">
             <div class="card-content">
               <span class="card-title">Extranet builds by user</span>
@@ -65,6 +68,7 @@
               <BarChart :data="usersChartData" :options="chartOptions"></BarChart>
             </div>
         </div>
+      </div>
       </div>
     </div>
     <router-view v-else :key="$route.path"/>
@@ -131,35 +135,19 @@ export default {
       return this.$store.getters['extranet/getContainersGroupedByBranch']();
     },
     branchesChartData() {
-      let builds = {};
-      this.$store.getters['builds/getBuildsGroupedByBranch']('extranet').forEach((build) => {
-        builds[build.branch] = build.builds;
-      });
+      const builds = this.$store.getters['builds/getByBranch']('extranet-branch-builds', 'extranet');
 
       return {
         labels: Object.keys(builds),
-        datasets: [
-          {
-            label: 'Builds',
-            data: Object.values(builds),
-          },
-        ],
+        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) } ],
       };
     },
     usersChartData() {
-      let builds = {};
-      this.$store.getters['builds/getBuildsGroupedByUser']('extranet').forEach((build) => {
-        builds[build.user] = build.builds;
-      });
+      const builds = this.$store.getters['builds/getByUser']('extranet-users-builds', 'extranet');
 
       return {
         labels: Object.keys(builds),
-        datasets: [
-          {
-            label: 'Builds',
-            data: Object.values(builds)
-          },
-        ],
+        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) } ],
       };
     },
   },
@@ -176,14 +164,20 @@ export default {
       const loader = this.$loading.show({container: this.$refs.stats_by_branch});
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
-        {startDate: this.getStartDate(days.value || this.startDate), stateName: 'branchBuilds'},
+        {
+          startDate: this.getStartDate(days.value || this.startDate),
+          stateName: 'extranet-branch-builds'
+        },
       ).then(() => loader.hide());
     },
     getUserStatistics(days = {}) {
       const loader = this.$loading.show({ container: this.$refs.stats_by_user});
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
-        { startDate: this.getStartDate(days.value || this.startDate), stateName: 'usersBuilds' },
+        {
+          startDate: this.getStartDate(days.value || this.startDate),
+          stateName: 'extranet-users-builds'
+        },
       ).then(() => loader.hide());
     },
     getStartDate(value) {
