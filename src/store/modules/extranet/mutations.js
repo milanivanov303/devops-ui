@@ -16,6 +16,9 @@ export default {
   feBranches(state, feBranches) {
     state.feBranches = feBranches;
   },
+  builds(state, builds) {
+    state.builds = builds;
+  },
   error(state, error) {
     state.error = error;
   },

@@ -1,17 +1,18 @@
 <template>
-  <div class="row">
-    <div class="col s12 l6">
-      <div class="card">
+  <div class="dashboard">
+    <div class="row">
+      <div class="col s12 l6">
+      <div class="card" ref="my_builds">
         <div class="card-content">
-          <span class="card-title">My Builds</span>
+          <span class="card-title">My active builds</span>
           <Builds :containers="userContainers" ></Builds>
         </div>
       </div>
     </div>
-    <div class="col s12 l6">
-      <div class="card">
+      <div class="col s12 l6">
+      <div class="card" ref="builds_by_module">
         <div class="card-content">
-          <span class="card-title">Builds By Module</span>
+          <span class="card-title">Active builds by module</span>
           <table>
             <thead>
             <tr>
@@ -20,7 +21,7 @@
               <th>Builds</th>
             </tr>
             </thead>
-            <tbody v-if="loaded">
+            <tbody>
               <tr>
                 <td>1</td>
                 <td>
@@ -30,41 +31,109 @@
               </tr>
               <tr>
                 <td>2</td>
-                <td>iMX BE</td>
-                <td>N/A</td>
-              </tr>
-              <tr>
-                <td>3</td>
                 <td>
                   <router-link to="/imx-fe/dashboard">iMX FE</router-link>
                 </td>
-                <td>{{ imx_feContainersCount }}</td>
+                <td>{{ imxFeContainersCount }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
+    </div>
+    <div class="row">
+      <div class="col s12 l6">
+      <div class="card" ref="stats_by_module">
+        <div class="card-content">
+          <span class="card-title">Number of builds by module</span>
+          <div class="col s12 l5 right">
+            <div class="input-field">
+              <Select :select="selectStartDate" @selectedVal="getModuleStatistics"/>
+            </div>
+          </div>
+          <BarChart :data="modulesChartData" :options="chartOptions"></BarChart>
+        </div>
+      </div>
+    </div>
+      <div class="col s12 l6">
+      <div class="card" ref="stats_by_user">
+        <div class="card-content">
+          <span class="card-title">Number of builds by user</span>
+          <div class="col s12 l5 right">
+            <div class="input-field">
+              <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
+            </div>
+          </div>
+          <BarChart :data="usersChartData" :options="chartOptions"></BarChart>
+        </div>
+      </div>
+    </div>
+    </div>
   </div>
 </template>
 
 <script>
 import Builds from '@/components/extranet/Builds';
+import BarChart from '@/components/BarChart';
 
 export default {
   components: {
     Builds,
+    BarChart,
   },
   data() {
     return {
-      loaded: false,
+      startDate: 30,
+      selectStartDate: {
+        id: 'startDate_select',
+        name: 'startDate',
+        displayed: 'name',
+        icon: 'today',
+        options: [
+          {
+            name: 'Last 24 hours',
+            value: 1,
+          },
+          {
+            name: 'Last 7 days',
+            value: 7,
+          },
+          {
+            name: 'Last 30 days',
+            value: 30,
+          },
+        ],
+        selected: {
+          name: 'Last 30 days',
+          value: 30,
+        },
+      },
+      chartOptions: {
+        legend: {
+          display: false,
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+            },
+          }],
+        },
+      },
     };
   },
   computed: {
     userContainers() {
-      return this.$store.getters['extranet/getContainersByUser'](
+      const extranetContainers = this.$store.getters['extranet/getContainersByUser'](
         this.$auth.getUser().username,
       );
+
+      const imxFeContainers = this.$store.getters['imx_fe/getContainersByUser'](
+        this.$auth.getUser().username,
+      );
+
+      return [].concat(extranetContainers, imxFeContainers);
     },
     containersGroupedByBranch() {
       return this.$store.getters['extranet/getContainersGroupedByBranch']();
@@ -72,17 +141,70 @@ export default {
     extranetContainersCount() {
       return this.$store.state.extranet.containers.length;
     },
-    imx_feContainersCount() {
+    imxFeContainersCount() {
       return this.$store.state.imx_fe.containers.length;
+    },
+    modulesChartData() {
+      const builds = this.$store.getters['builds/getByModule']('module-builds');
+
+      return {
+        labels: Object.keys(builds),
+        datasets: [{ data: Object.values(builds) }],
+      };
+    },
+    usersChartData() {
+      const builds = this.$store.getters['builds/getByUser']('users-builds');
+
+      return {
+        labels: Object.keys(builds),
+        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) }],
+      };
+    },
+  },
+  methods: {
+    getContainers() {
+      const loader1 = this.$loading.show({ container: this.$refs.my_builds });
+      const loader2 = this.$loading.show({ container: this.$refs.builds_by_module });
+      const promise1 = this.$store.dispatch('extranet/getContainers');
+      const promise2 = this.$store.dispatch('imx_fe/getContainers');
+
+      Promise.all([promise1, promise2]).finally(() => {
+        loader1.hide();
+        loader2.hide();
+      });
+    },
+    getModuleStatistics(days = {}) {
+      const loader = this.$loading.show({ container: this.$refs.stats_by_module });
+      this.$store.dispatch(
+        'builds/getBuildsForPeriod',
+        {
+          startDate: this.getStartDate(days.value || this.startDate),
+          stateName: 'module-builds',
+        },
+      ).finally(() => loader.hide());
+    },
+    getUserStatistics(days = {}) {
+      const loader = this.$loading.show({ container: this.$refs.stats_by_user });
+      this.$store.dispatch(
+        'builds/getBuildsForPeriod',
+        {
+          startDate: this.getStartDate(days.value || this.startDate),
+          stateName: 'users-builds',
+        },
+      ).finally(() => loader.hide());
+    },
+    getStartDate(value) {
+      const newDate = new Date(
+        new Date().setTime(new Date().getTime() - (value * 24 * 60 * 60 * 1000)),
+      );
+
+      return Math.round(new Date(newDate).getTime() / 1000);
     },
   },
   mounted() {
-    const loader = this.$loading.show({ container: this.$el });
-    this.$store.dispatch('extranet/getContainers')
-      .then(() => {
-        loader.hide();
-        this.loaded = true;
-      });
+    this.getContainers();
+    this.getModuleStatistics();
+    this.getUserStatistics();
   },
 };
 </script>
