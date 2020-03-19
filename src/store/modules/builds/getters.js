@@ -11,7 +11,7 @@ export default {
         tally[build.module] = (tally[build.module] || 0) + 1;
         return tally;
       },
-      {}
+      {},
     );
   },
   getByUser: state => (stateName, module) => {
@@ -26,7 +26,7 @@ export default {
         }
         return tally;
       },
-      {}
+      {},
     );
   },
   getByBranch: state => (stateName, module) => {
@@ -41,7 +41,7 @@ export default {
         }
         return tally;
       },
-      {}
+      {},
     );
   },
 };

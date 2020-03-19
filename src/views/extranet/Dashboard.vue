@@ -49,7 +49,7 @@
               <span class="card-title">Extranet builds by branch</span>
               <div class="col s12 l4 right">
                 <div class="input-field">
-                  <Select class="col s12" :select="selectStartDate" @selectedVal="getBranchStatistics"/>
+                  <Select :select="selectStartDate" @selectedVal="getBranchStatistics"/>
                 </div>
               </div>
               <BarChart :data="branchesChartData" :options="chartOptions"></BarChart>
@@ -62,7 +62,7 @@
               <span class="card-title">Extranet builds by user</span>
               <div class="col s12 l4 right">
                 <div class="input-field">
-                  <Select class="col s12" :select="selectStartDate" @selectedVal="getUserStatistics"/>
+                  <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
                 </div>
               </div>
               <BarChart :data="usersChartData" :options="chartOptions"></BarChart>
@@ -139,7 +139,7 @@ export default {
 
       return {
         labels: Object.keys(builds),
-        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) } ],
+        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) }],
       };
     },
     usersChartData() {
@@ -147,7 +147,7 @@ export default {
 
       return {
         labels: Object.keys(builds),
-        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) } ],
+        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) }],
       };
     },
   },
@@ -161,22 +161,22 @@ export default {
       });
     },
     getBranchStatistics(days = {}) {
-      const loader = this.$loading.show({container: this.$refs.stats_by_branch});
+      const loader = this.$loading.show({ container: this.$refs.stats_by_branch });
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
         {
           startDate: this.getStartDate(days.value || this.startDate),
-          stateName: 'extranet-branch-builds'
+          stateName: 'extranet-branch-builds',
         },
       ).then(() => loader.hide());
     },
     getUserStatistics(days = {}) {
-      const loader = this.$loading.show({ container: this.$refs.stats_by_user});
+      const loader = this.$loading.show({ container: this.$refs.stats_by_user });
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
         {
           startDate: this.getStartDate(days.value || this.startDate),
-          stateName: 'extranet-users-builds'
+          stateName: 'extranet-users-builds',
         },
       ).then(() => loader.hide());
     },

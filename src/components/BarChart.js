@@ -1,7 +1,7 @@
 import { mixins, Bar } from 'vue-chartjs';
 
-function dataHandler () {
-  let colors = [];
+function dataHandler() {
+  const colors = [];
   this.data.datasets[0].data.forEach(() => {
     colors.push(this.generateRandomColor());
   });
@@ -17,7 +17,7 @@ export default {
     data: {
       type: Object,
       required: true,
-      default: () => {}
+      default: () => {},
     },
     options: {
       type: Object,

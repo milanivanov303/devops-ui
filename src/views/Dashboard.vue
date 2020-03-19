@@ -49,7 +49,7 @@
           <span class="card-title">Number of builds by module</span>
           <div class="col s12 l5 right">
             <div class="input-field">
-              <Select class="col s12" :select="selectStartDate" @selectedVal="getModuleStatistics"/>
+              <Select :select="selectStartDate" @selectedVal="getModuleStatistics"/>
             </div>
           </div>
           <BarChart :data="modulesChartData" :options="chartOptions"></BarChart>
@@ -62,7 +62,7 @@
           <span class="card-title">Number of builds by user</span>
           <div class="col s12 l5 right">
             <div class="input-field">
-              <Select class="col s12" :select="selectStartDate" @selectedVal="getUserStatistics"/>
+              <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
             </div>
           </div>
           <BarChart :data="usersChartData" :options="chartOptions"></BarChart>
@@ -149,7 +149,7 @@ export default {
 
       return {
         labels: Object.keys(builds),
-        datasets: [{  data: Object.values(builds) }],
+        datasets: [{ data: Object.values(builds) }],
       };
     },
     usersChartData() {
@@ -174,12 +174,12 @@ export default {
       });
     },
     getModuleStatistics(days = {}) {
-      const loader = this.$loading.show({container: this.$refs.stats_by_module});
+      const loader = this.$loading.show({ container: this.$refs.stats_by_module });
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
         {
           startDate: this.getStartDate(days.value || this.startDate),
-          stateName: 'module-builds'
+          stateName: 'module-builds',
         },
       ).finally(() => loader.hide());
     },
@@ -189,7 +189,7 @@ export default {
         'builds/getBuildsForPeriod',
         {
           startDate: this.getStartDate(days.value || this.startDate),
-          stateName: 'users-builds'
+          stateName: 'users-builds',
         },
       ).finally(() => loader.hide());
     },
