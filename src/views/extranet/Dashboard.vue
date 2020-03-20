@@ -1,8 +1,7 @@
 <template>
   <div class="extranet">
     <div v-if="$route.meta.name === 'extranet'" >
-      <div class="row">
-        <div class="col s12 l6">
+      <div class="col s12">
         <div class="card" ref="my_builds">
           <div class="card-content">
             <span class="card-title">My active extranet builds</span>
@@ -10,7 +9,7 @@
           </div>
         </div>
       </div>
-        <div class="col s12 l6">
+      <div class="col s12 l5">
         <div class="card" ref="builds_by_branch">
           <div class="card-content">
             <span class="card-title">Active extranet builds by branch</span>
@@ -41,13 +40,11 @@
           </div>
         </div>
       </div>
-      </div>
-      <div class="row">
-        <div class="col s12 l6">
+      <div class="col s12 l4">
         <div class="card" ref="stats_by_branch">
             <div class="card-content">
               <span class="card-title">Extranet builds by branch</span>
-              <div class="col s12 l4 right">
+              <div class="col s12 l6 right">
                 <div class="input-field">
                   <Select :select="selectStartDate" @selectedVal="getBranchStatistics"/>
                 </div>
@@ -56,11 +53,11 @@
             </div>
         </div>
       </div>
-        <div class="col s12 l6">
+      <div class="col s12 l3">
         <div class="card" ref="stats_by_user">
             <div class="card-content">
               <span class="card-title">Extranet builds by user</span>
-              <div class="col s12 l4 right">
+              <div class="col s12 l6 right">
                 <div class="input-field">
                   <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
                 </div>
@@ -68,7 +65,6 @@
               <BarChart :data="usersChartData" :options="chartOptions"></BarChart>
             </div>
         </div>
-      </div>
       </div>
     </div>
     <router-view v-else :key="$route.path"/>
