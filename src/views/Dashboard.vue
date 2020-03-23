@@ -1,15 +1,12 @@
 <template>
   <div class="dashboard">
-    <div class="row">
-      <div class="col s12 l6">
+    <div class="col s12 l8">
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My active builds</span>
           <Builds :containers="userContainers" ></Builds>
         </div>
       </div>
-    </div>
-      <div class="col s12 l6">
       <div class="card" ref="builds_by_module">
         <div class="card-content">
           <span class="card-title">Active builds by module</span>
@@ -41,34 +38,29 @@
         </div>
       </div>
     </div>
-    </div>
-    <div class="row">
-      <div class="col s12 l6">
-      <div class="card" ref="stats_by_module">
-        <div class="card-content">
-          <span class="card-title">Number of builds by module</span>
-          <div class="col s12 l5 right">
-            <div class="input-field">
-              <Select :select="selectStartDate" @selectedVal="getModuleStatistics"/>
-            </div>
-          </div>
-          <BarChart :data="modulesChartData" :options="chartOptions"></BarChart>
-        </div>
-      </div>
-    </div>
-      <div class="col s12 l6">
+    <div class="col s12 l4">
       <div class="card" ref="stats_by_user">
         <div class="card-content">
           <span class="card-title">Number of builds by user</span>
-          <div class="col s12 l5 right">
+          <div class="col s12 l6 right">
             <div class="input-field">
               <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
             </div>
           </div>
-          <BarChart :data="usersChartData" :options="chartOptions"></BarChart>
+          <BarChart :data="usersChartData" :options="chartOptions" :height="200"></BarChart>
         </div>
       </div>
-    </div>
+      <div class="card" ref="stats_by_module">
+        <div class="card-content">
+          <span class="card-title">Number of builds by module</span>
+          <div class="col s12 l6 right">
+            <div class="input-field">
+              <Select :select="selectStartDate" @selectedVal="getModuleStatistics"/>
+            </div>
+          </div>
+          <BarChart :data="modulesChartData" :options="chartOptions" :height="150"></BarChart>
+        </div>
+      </div>
     </div>
   </div>
 </template>

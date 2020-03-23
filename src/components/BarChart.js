@@ -23,6 +23,9 @@ export default {
       type: Object,
       default: null,
     },
+    height: {
+      type: Number,
+    }
   },
   methods: {
     generateRandomColor() {
