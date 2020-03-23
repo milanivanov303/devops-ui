@@ -1,37 +1,13 @@
 <template>
   <div class="dashboard">
-    <div class="col s12 l9">
+    <div class="col s12 l8">
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My active builds</span>
           <Builds :containers="userContainers" ></Builds>
         </div>
       </div>
-      <div class="card" ref="stats_by_user">
-        <div class="card-content">
-          <span class="card-title">Number of builds by user</span>
-          <div class="col s12 l4 right">
-            <div class="input-field">
-              <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
-            </div>
-          </div>
-          <BarChart :data="usersChartData" :options="chartOptions" :height="150"></BarChart>
-        </div>
-      </div>
-    </div>
-    <div class="col s12 l3">
-      <div class="card" ref="stats_by_module">
-        <div class="card-content">
-          <span class="card-title">Number of builds by module</span>
-          <div class="col s12 right">
-            <div class="input-field">
-              <Select :select="selectStartDate" @selectedVal="getModuleStatistics"/>
-            </div>
-          </div>
-          <BarChart :data="modulesChartData" :options="chartOptions" :height="400"></BarChart>
-        </div>
-      </div>
-       <div class="card" ref="builds_by_module">
+      <div class="card" ref="builds_by_module">
         <div class="card-content">
           <span class="card-title">Active builds by module</span>
           <table>
@@ -59,6 +35,30 @@
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+    <div class="col s12 l4">
+      <div class="card" ref="stats_by_user">
+        <div class="card-content">
+          <span class="card-title">Number of builds by user</span>
+          <div class="col s12 l6 right">
+            <div class="input-field">
+              <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
+            </div>
+          </div>
+          <BarChart :data="usersChartData" :options="chartOptions" :height="200"></BarChart>
+        </div>
+      </div>
+      <div class="card" ref="stats_by_module">
+        <div class="card-content">
+          <span class="card-title">Number of builds by module</span>
+          <div class="col s12 l6 right">
+            <div class="input-field">
+              <Select :select="selectStartDate" @selectedVal="getModuleStatistics"/>
+            </div>
+          </div>
+          <BarChart :data="modulesChartData" :options="chartOptions" :height="150"></BarChart>
         </div>
       </div>
     </div>
@@ -199,7 +199,4 @@ export default {
     this.getUserStatistics();
   },
 };
-</script> 
-
-<style scoped>
-</style>
+</script>

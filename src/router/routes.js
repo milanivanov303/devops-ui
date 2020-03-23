@@ -40,7 +40,7 @@ export default [
       requiresAuth: true,
       alias: '/dashboard',
       name: 'dashboard',
-      title: 'Extranet Dashboard',
+      title: 'Dashboard',
       breadcrumb: 'Dashboard',
     },
     component: Dashboard,
