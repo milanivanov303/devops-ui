@@ -49,7 +49,7 @@
                   <Select :select="selectStartDate" @selectedVal="getBranchStatistics"/>
                 </div>
               </div>
-              <BarChart :data="branchesChartData" :options="chartOptions"></BarChart>
+              <BarChart :data="branchesChartData" :options="chartOptions" :height="400"></BarChart>
             </div>
         </div>
       </div>
@@ -57,12 +57,12 @@
         <div class="card" ref="stats_by_user">
             <div class="card-content">
               <span class="card-title">Extranet builds by user</span>
-              <div class="col s12 l6 right">
+              <div class="col s12 l8 right">
                 <div class="input-field">
                   <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
                 </div>
               </div>
-              <BarChart :data="usersChartData" :options="chartOptions"></BarChart>
+              <BarChart :data="usersChartData" :options="chartOptions"  :height="400"></BarChart>
             </div>
         </div>
       </div>

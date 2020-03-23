@@ -48,7 +48,7 @@
                 <Select :select="selectStartDate" @selectedVal="getBranchStatistics"/>
               </div>
             </div>
-            <BarChart :data="branchesChartData" :options="chartOptions"></BarChart>
+            <BarChart :data="branchesChartData" :options="chartOptions" :height="400"></BarChart>
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@
                 <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
               </div>
             </div>
-            <BarChart :data="usersChartData" :options="chartOptions"></BarChart>
+            <BarChart :data="usersChartData" :options="chartOptions" :height="400"></BarChart>
           </div>
         </div>
       </div>

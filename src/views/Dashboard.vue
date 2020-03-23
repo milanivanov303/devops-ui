@@ -28,7 +28,7 @@
               <Select :select="selectStartDate" @selectedVal="getModuleStatistics"/>
             </div>
           </div>
-          <BarChart :data="modulesChartData" :options="chartOptions"></BarChart>
+          <BarChart :data="modulesChartData" :options="chartOptions" :height="400"></BarChart>
         </div>
       </div>
        <div class="card" ref="builds_by_module">
