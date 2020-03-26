@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard row">
     <div class="col s12 l8">
       <div class="card" ref="my_builds">
         <div class="card-content">
@@ -200,3 +200,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+  .card {
+    margin-bottom: 1.5rem;
+  }
+</style>

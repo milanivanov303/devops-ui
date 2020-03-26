@@ -4,6 +4,9 @@
       <a href="#" data-target="nav-mobile" class="sidenav-trigger">
         <i class="material-icons">menu</i>
       </a>
+      <div class="chip" v-if="instance !== 'prod'">
+        {{ instance }}
+      </div>
       <ul class="right" v-if="user">
         <li class="logged-user">
           <i class="material-icons left">account_circle</i>
@@ -33,6 +36,9 @@ export default {
     user() {
       return this.$auth.getUser();
     },
+    instance() {
+      return this.$config.instance;
+    }
   },
   methods: {
     logout() {
@@ -48,3 +54,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+.chip {
+  color: white;
+  background-color: #C40147;
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="extranet">
+  <div class="extranet row">
     <div v-if="$route.meta.name === 'extranet'" >
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
@@ -187,3 +187,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+  .card {
+    margin-bottom: 1.5rem;
+  }
+</style>

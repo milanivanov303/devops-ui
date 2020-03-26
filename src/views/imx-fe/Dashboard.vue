@@ -1,5 +1,5 @@
 <template>
-  <div class="imx-fe">
+  <div class="imx-fe row">
     <div v-if="$route.meta.name === 'imx-fe'">
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
@@ -186,3 +186,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+  .card {
+    margin-bottom: 1.5rem;
+  }
+</style>
