@@ -29,5 +29,5 @@ export const getSsoUrl = () => {
   if (returnUri) {
     redirectUrl += `?sso_login=true&return_uri=${returnUri}`;
   }
-  return `${config.um.url}/../login?redirect_url=${redirectUrl}`;
+  return `${config.um.url}/../login?redirect_url=${encodeURIComponent(redirectUrl)}`;
 };
