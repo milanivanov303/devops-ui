@@ -17,32 +17,30 @@
             'col s12 m6 l4': $route.meta.name === 'imx-fe-branches'
           }"
         />
-        <div class="row">
-          <div class="col s12 m6 l2 right" id="perPage">
-            <div class="input-field col s12 l4 right">
-                <Select class="col s12"
-                        v-if="sorted.length"
-                        :select="selectPerPage"
-                        @selectedVal="selectedPerPage"/>
-            </div>
-            <p v-if="sorted.length" class="col s12 l8 right right-align">Items per page:</p>
+        <div class="col s12 m6 l2 right" id="perPage">
+          <div class="input-field col s12 l4 right">
+              <Select class="col s12"
+                      v-if="sorted.length"
+                      :select="selectPerPage"
+                      @selectedVal="selectedPerPage"/>
           </div>
-          <div class="col s12 m6 l6">
-            <paginate
-            v-if="sorted.length"
-            v-model="page"
-            :page-count="lastPage"
-            :click-handler="selectedPage"
-            :prev-class="'material-icons'"
-            :prev-text="'chevron_left'"
-            :next-class="'material-icons'"
-            :next-text="'chevron_right'"
-            :container-class="'pagination'"
-            :page-class="'waves-effect'"
-            :disabled-class="'disabled'"
-            :active-class="'active'">
-            </paginate>
-          </div>
+          <p v-if="sorted.length" class="col s12 l8 right right-align">Items per page:</p>
+        </div>
+        <div class="col s12 m6 l6">
+          <paginate
+          v-if="sorted.length"
+          v-model="page"
+          :page-count="lastPage"
+          :click-handler="selectedPage"
+          :prev-class="'material-icons'"
+          :prev-text="'chevron_left'"
+          :next-class="'material-icons'"
+          :next-text="'chevron_right'"
+          :container-class="'pagination'"
+          :page-class="'waves-effect'"
+          :disabled-class="'disabled'"
+          :active-class="'active'">
+          </paginate>
         </div>
       </div>
       <div v-else class="col s12 m6 l5 scroll">

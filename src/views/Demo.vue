@@ -1,6 +1,6 @@
 <template>
   <div class="col s12 l12">
-    <div class="data-table">
+    <div class="data-table" ref="demos">
       <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
         <template v-slot:buttons="{ data }">
           <a v-if="$auth.can(updateDemo) || $auth.can(updateAnyDemo)"
@@ -321,6 +321,7 @@ export default {
   },
   methods: {
     openAddEditDemoModal(demo, action) {
+      debugger;
       this.showAddEditDemoModal = true;
       this.action = action;
       this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, { status: 'approved' }, demo);
@@ -329,9 +330,15 @@ export default {
         .toISO();
       this.selectedDemo.active_to = DateTime.fromSQL(this.selectedDemo.active_to)
         .toISO();
-      this.$router.push({
-        path: `/demo/${encodeURIComponent(this.selectedDemo.id)}`,
-      });
+      if (this.selectedDemo.id) {
+        this.$router.push({
+          path: `/demo/${encodeURIComponent(this.selectedDemo.id)}`,
+        });
+      } else {
+        this.$router.push({
+          path: `/demo/new`,
+        });
+      }
     },
 
     closeAddEditDemoModal() {
@@ -367,13 +374,17 @@ export default {
       return url;
     },
     async getDemos() {
-      const loader = this.$loading.show({ container: this.$el });
+      const loader = this.$loading.show({ container: this.$refs.demos });
       const payload = {
         orders: JSON.stringify({ id: 'desc' }),
       };
       await this.$store.dispatch('demo/getDemos', payload).then(() => {
         loader.hide();
         if (this.$route.params.id) {
+          if (this.$route.params.id === 'new') {
+            return this.openAddEditDemoModal( {}, 'create' );
+          }
+
           const demo = this.$store.state.demo.demos.find((demo) => {
             if (demo.id === parseInt(this.$route.params.id, 10)) {
               return true;

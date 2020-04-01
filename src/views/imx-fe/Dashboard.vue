@@ -1,5 +1,5 @@
 <template>
-  <div class="imx-fe row">
+  <div class="imx-fe">
     <div v-if="$route.meta.name === 'imx-fe'">
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
