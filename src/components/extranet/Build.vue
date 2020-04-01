@@ -8,8 +8,8 @@
         <i class="material-icons left">add</i> New build
       </button>
 
-      <Modal v-if="showModal" @close="showModal = false" @opened="initForm()" class="right-sheet">
-        <template v-slot:header>Create new build</template>
+      <Modal v-if="showModal" @close="close()" @opened="initForm()" class="right-sheet">
+        <template v-slot:header>Create new build // {{ branch }} </template>
         <template v-slot:content>
           <template v-if="build.started === false">
             <div  class="col s12" key="form" >
@@ -100,7 +100,6 @@
           </button>
         </template>
       </Modal>
-
     </div>
   </div>
 </template>
@@ -168,21 +167,35 @@ export default {
   },
   methods: {
     getClients() {
-      const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('extranet/getClients').finally(() => loader.hide());
+      this.$store.dispatch('extranet/getClients');
     },
     getInstances() {
-      const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('mmpi/getInstances').finally(() => loader.hide());
+      this.$store.dispatch('mmpi/getInstances');
     },
     getFebranches() {
       this.$store.dispatch('extranet/getFebranches');
+      if (this.$route.params.action === 'new') {
+        return this.open();
+      }
     },
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
+      this.showModal = true; 
 
-      this.showModal = true;
+      if (!this.$route.params.action) {
+        this.$router.push({
+          path: `${this.$route.params.branch}/new`,
+        });
+      }
+    },
+    close () {
+      // debugger;
+      this.showModal = false
+      this.$v.$reset();
+      // this.$router.push({
+      //   path: ' ',
+      // });
     },
     initForm() {
       this.$M.FormSelect.init(this.$refs['java-version']);

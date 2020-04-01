@@ -79,7 +79,7 @@ export default [
         component: ExtranetBranches,
         children: [
           {
-            path: ':branch',
+            path: ':branch/:action?',
             meta: {
               name: 'extranet-branch',
               requiresAuth: true,
@@ -124,7 +124,7 @@ export default [
         component: ImxFeBranches,
         children: [
           {
-            path: ':branch',
+            path: ':branch/:action?',
             meta: {
               name: 'imx-fe-branch',
               requiresAuth: true,
