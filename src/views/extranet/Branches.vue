@@ -11,13 +11,10 @@
       <div v-if="$route.meta.name !== 'extranet-branch'">
         <Branch
           v-for="branch in sorted"
+          class="col s12 m6 l4"
           :key="branch.name"
           :branch="branch"
           :count="getContainersCount(branch.name)"
-          :class="{
-            'selected-branch': $route.path === `/extranet/branches/${branch.name}`,
-            'col s12 m6 l4': $route.meta.name === 'extranet-branches',
-          }"
         />
         <div class="col s12 m6 l2 right" id="perPage">
           <div class="input-field col s12 l4 right">
@@ -46,25 +43,24 @@
         </div>
       </div>
       <div v-else>
-        <div :class="{'col s12 m6 l5 scroll': $route.meta.name === 'extranet-branch'}">
+        <div class="col s12 m6 l5 scroll">
           <Branch
             v-for="branch in filteredBranches"
             :key="branch.name"
             :branch="branch"
             :count="getContainersCount(branch.name)"
             :class="{
-              'selected-branch': $route.path === `/extranet/branches/${branch.name}`,
-              'col s12 m6 l4': $route.meta.name === 'extranet-branches',
+              'selected-branch': $route.path === `/extranet/branches/${branch.name}`
             }"
           />
         </div>
-      </div>
-      <div v-if="$route.meta.name === 'extranet-branch'" class="col s12 m6 l7">
-        <div class="card">
-          <div class="card-content">
-            <transition name="branch" mode="out-in">
-              <router-view :key="$route.path"/>
-            </transition>
+        <div v-if="$route.meta.name === 'extranet-branch'" class="col s12 m6 l7">
+          <div class="card">
+            <div class="card-content">
+              <transition name="branch" mode="out-in">
+                <router-view :key="$route.path"/>
+              </transition>
+            </div>
           </div>
         </div>
       </div>
@@ -122,9 +118,6 @@ export default {
       const regexp = new RegExp(this.search, 'i');
       return this.branches.filter(branch => branch.name.match(regexp));
     },
-    containers() {
-      return this.$store.state.extranet.containers;
-    },
     sorted() {
       const from = (this.page * this.perPage) - this.perPage;
       const to = (this.page * this.perPage);
@@ -148,25 +141,25 @@ export default {
       return this.$store.getters['extranet/getContainersByBranch'](branch).length;
     },
     getBranches() {
+      //goes twife from here
+      //the second time branch is undefined despite that there is selected branch
       const loader = this.$loading.show({ container: this.$el });
       this.$store.dispatch('extranet/getBranches').then(() => {
         loader.hide();
-        const selectedBranch = document.querySelector('.selected-branch');
-        if (selectedBranch) {
-          selectedBranch.scrollIntoView({
+        const branch = document.querySelector('.selected-branch');
+        if (branch) {
+          branch.scrollIntoView({
             block: 'start',
             inline: 'nearest',
           });
+          return this.getSelectedBranch(branch);
         }
+        this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
       });
-    },
-    getContainers() {
-      this.$store.dispatch('extranet/getContainers');
     },
   },
   mounted() {
     this.getBranches();
-    this.getContainers();
   },
   watch: {
     search(value) {

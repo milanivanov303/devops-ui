@@ -8,18 +8,27 @@
         <i class="material-icons left">add</i> New build
       </button>
 
-      <Modal v-if="showModal" @close="showModal = false" class="right-sheet">
-        <template v-slot:header>Create new build</template>
+      <Modal v-if="showModal" @close="close()" class="right-sheet">
+        <template v-slot:header>Create new build // {{ branch }}</template>
         <template v-slot:content>
           <template v-if="build.started === false">
-            <div  class="col s12" key="form" >
+            <div class="col s12 l11" key="form" >
               <div class="row">
                 <div class="col s12" >
                   <TextInput
                     label="Client"
                     icon="people"
-                    v-model="form.client"
-                    :invalid="$v.form.client.$error"/>
+                    v-model="form.client"  
+                    :invalid="$v.form.client.$error"
+                    @blur="$v.form.client.$touch()"
+                  />
+                </div>
+                <div class="validator col s11 offset-s1 ">
+                  <div class="red-text" v-if="$v.form.client.$error">
+                    <p v-if="!$v.form.client.required">
+                      Client field must not be empty.
+                    </p>
+                  </div>
                 </div>
               </div>
               <div class="row">
@@ -28,7 +37,16 @@
                     label="Endpoint"
                     icon="link"
                     v-model="form.endpoint"
-                    :invalid="$v.form.endpoint.$error"/>
+                    :invalid="$v.form.endpoint.$error"
+                    @blur="$v.form.endpoint.$touch()"
+                  />
+                </div>
+                <div class="validator col s11 offset-s1 ">
+                  <div class="red-text" v-if="$v.form.endpoint.$error">
+                    <p v-if="!$v.form.endpoint.required">
+                      Endpoint field must not be empty.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -121,11 +139,23 @@ export default {
   },
   methods: {
     open() {
+      //open Modal on the 2nd click
       this.form = initialState().form;
       this.build = initialState().build;
-
       this.showModal = true;
+
+      if (!this.$route.params.action) {
+        this.$router.push({
+          path: `${this.$route.params.branch}/new`,
+        });
+      }
+    
     },
+    close() {
+      this.$v.$reset();
+      this.showModal = false;
+    },
+
     start() {
       this.$v.$touch();
       if (this.$v.$invalid) {

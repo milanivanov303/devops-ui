@@ -8,14 +8,12 @@
     <div class="row">
       <div v-if="$route.meta.name !== 'imx-fe-branch'">
         <Branch
+          class="col s12 m6 l4"
           v-for="branch in sorted"
           :key="branch"
           :branch="branch"
           :count="getContainersCount(branch)"
-          :class="{
-            'selected-branch': $route.path === `/imx-fe/branches/${encodeURIComponent(branch)}`,
-            'col s12 m6 l4': $route.meta.name === 'imx-fe-branches'
-          }"
+
         />
         <div class="col s12 m6 l2 right" id="perPage">
           <div class="input-field col s12 l4 right">
@@ -43,24 +41,25 @@
           </paginate>
         </div>
       </div>
-      <div v-else class="col s12 m6 l5 scroll">
-        <Branch
-          v-for="branch in filteredBranches"
-          :key="branch"
-          :branch="branch"
-          :count="getContainersCount(branch)"
-          :class="{
-            'selected-branch': $route.path === `/imx-fe/branches/${encodeURIComponent(branch)}`,
-            'col s12 m6 l4': $route.meta.name === 'imx-fe-branches'
-          }"
-        />
-      </div>
-      <div v-if="$route.meta.name === 'imx-fe-branch'" class="col s12 m6 l7">
-        <div class="card">
-          <div class="card-content">
-            <transition name="branch" mode="out-in">
-              <router-view :key="$route.path"/>
-            </transition>
+      <div v-else>
+        <div class="col s12 m6 l5 scroll" ref="branches">
+          <Branch
+            v-for="branch in filteredBranches"
+            :key="branch"
+            :branch="branch"
+            :count="getContainersCount(branch)"
+            :class="{
+              'selected-branch': $route.path === `/imx-fe/branches/${encodeURIComponent(branch)}`
+            }"
+          />
+        </div>
+        <div class="col s12 m6 l7">
+          <div class="card">
+            <div class="card-content">
+              <transition name="branch" mode="out-in">
+                <router-view :key="$route.path"/>
+              </transition>
+            </div>
           </div>
         </div>
       </div>
@@ -145,7 +144,7 @@ export default {
       return this.$store.getters['imx_fe/getContainersByBranch'](branch).length;
     },
     getBranches() {
-      const loader = this.$loading.show({ container: this.$el });
+      const loader = this.$loading.show({ container: this.$refs.branches });
       this.$store.dispatch('imx_fe/getBranches')
         .then(() => {
           const selectedBranch = document.querySelector('.selected-branch');

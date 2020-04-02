@@ -12,7 +12,7 @@
         <template v-slot:header>Create new build // {{ branch }} </template>
         <template v-slot:content>
           <template v-if="build.started === false">
-            <div  class="col s12" key="form" >
+            <div  class="col s12 l11" key="form" >
               <div class="row">
                 <div class="col s12" >
                   <Autocomplete
@@ -23,6 +23,13 @@
                     :invalid="$v.form.client.$error"
                     @blur="$v.form.client.$touch()"
                   />
+                </div>
+                <div class="validator col s11 offset-s1">
+                  <div class="red-text" v-if="$v.form.client.$error">
+                    <p v-if="!$v.form.client.required">
+                      Client field must not be empty.
+                    </p>
+                  </div>
                 </div>
               </div>
               <div class="row">
@@ -39,7 +46,7 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col s12" >
+                <div class="col s12">
                   <Autocomplete
                     label="Instance"
                     icon="dynamic_feed"
@@ -48,6 +55,13 @@
                     :invalid="$v.form.instance.$error"
                     @blur="$v.form.instance.$touch()"
                   />
+                </div>
+                <div class="validator col s11 offset-s1">
+                  <div class="red-text" v-if="$v.form.instance.$error">
+                    <p v-if="!$v.form.instance.required">
+                      Instance field must not be empty.
+                    </p>
+                  </div>
                 </div>
               </div>
               <div class="row">
@@ -190,9 +204,9 @@ export default {
       }
     },
     close () {
-      // debugger;
       this.showModal = false
       this.$v.$reset();
+      
       // this.$router.push({
       //   path: ' ',
       // });
