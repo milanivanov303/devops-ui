@@ -181,9 +181,11 @@ export default {
     },
   },
   mounted() {
-    this.getContainers();
-    this.getBranchStatistics();
-    this.getUserStatistics();
+    if (this.$route.meta.name === 'extranet') {
+      this.getContainers();
+      this.getBranchStatistics();
+      this.getUserStatistics();
+    }
   },
 };
 </script>

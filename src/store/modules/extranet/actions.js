@@ -49,9 +49,19 @@ export default {
     promise.catch(error => commit('error', error));
     return promise;
   },
+
   removeBuild({ commit }, id) {
     const promise = api.delete(`extranet/build/${id}`);
     promise.catch(error => commit('error', error));
+    return promise;
+  },
+
+  getConfigurations({ commit }) {
+    const promise = api.get('extranet/configurations');
+
+    promise
+      .then(response => commit('configurations', response.data.data))
+      .catch(() => commit('error', 'Could not get configurations list'));
     return promise;
   },
 };

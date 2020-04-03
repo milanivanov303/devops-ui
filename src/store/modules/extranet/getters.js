@@ -9,6 +9,7 @@ export default {
       container.Labels.branch === branch
     ));
   },
+
   getContainersByUser: state => (username) => {
     if (!state.containers) {
       return [];
@@ -17,6 +18,7 @@ export default {
       container.Labels.username === username
     ));
   },
+
   getContainersGroupedByBranch: state => () => {
     const branches = {};
     state.containers.forEach((container) => {
@@ -30,6 +32,8 @@ export default {
 
     return containers.sort((a, b) => b.builds - a.builds);
   },
+
+  getConfigurations: state => state.configurations,
 
   getError: state => state.error,
 };

@@ -23,6 +23,9 @@
               <li v-bind:class="{ active: isActive('extranet/branches') }">
                 <router-link to="/extranet/branches"> Branches</router-link>
               </li>
+              <li :class="{ active: isActive('extranet/configurations') }">
+                <router-link to="/extranet/configurations"> Configurations</router-link>
+              </li>
               <li><div class="divider"></div></li>
             </ul>
           </div>
