@@ -3,11 +3,11 @@
     <div class="data-table">
       <Table v-bind:request="request"  @add="openAddEditModal('create')">
         <template v-slot:buttons="{ data }">
-          <a v-if="$auth.can('extranet.can-manage-configuration')"
+          <a v-if="$auth.can('extranet.manage-configuration')"
              @click="openDeleteModal(data)">
             <i class="material-icons right">delete</i>
           </a>
-          <a v-if="$auth.can('extranet.can-manage-configuration')"
+          <a v-if="$auth.can('extranet.manage-configuration')"
              @click="openAddEditModal('update', data)">
             <i class="material-icons right">edit</i>
           </a>
@@ -134,7 +134,7 @@
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.prefix.$error">
-              <p v-if="!$v.configuration.prefix.required">prefix field must not be empty.</p>
+              <p v-if="!$v.configuration.prefix.required">Prefix field must not be empty.</p>
             </div>
           </div>
         </div>
@@ -232,7 +232,7 @@
 </template>
 
 <script>
-import required from 'vuelidate/lib/validators';
+import { required } from 'vuelidate/lib/validators';
 import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
 
@@ -265,7 +265,7 @@ export default {
           jre: '',
           description: '',
         },
-        add: this.$auth.can('extranet.can-manage-configuration'),
+        add: this.$auth.can('extranet.manage-configuration'),
         export: false,
         action: true,
         searchable: true,
@@ -382,9 +382,9 @@ export default {
         );
       }
 
-      // this.$router.push({
-      //  path: `/extranet/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
-      // });
+      this.$router.push({
+        path: `/extranet/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
+      });
 
       this.showAddEditModal = true;
       this.action = action;
@@ -394,9 +394,9 @@ export default {
       this.showAddEditModal = false;
       this.$v.$reset();
 
-      // this.$router.push({
-      //  path: '/extranet/configurations',
-      // });
+      this.$router.push({
+        path: '/extranet/configurations',
+      });
     },
 
     save() {
@@ -416,7 +416,21 @@ export default {
       payload.prefix = this.configuration.prefix.package;
 
       this.$store.dispatch(`extranet/${this.action}Configuration`, payload)
-        .then(() => { this.showAddEditModal = false; });
+        .then(() => {
+          this.$M.toast({
+            html: `The configuration has been ${this.action}d!`,
+            classes: 'toast-seccess'
+          });
+          this.showAddEditModal = false;
+        })
+        .catch((error) => {
+          if (error.response.status === 403) {
+            this.$M.toast({
+              html: `You do not have insufficient rights to ${this.action} this configuration`,
+              classes: 'toast-fail'
+            });
+          }
+        });
     },
 
     openDeleteModal(configuration) {

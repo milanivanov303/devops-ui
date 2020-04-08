@@ -92,7 +92,7 @@ export default [
         ],
       },
       {
-        path: 'configurations',
+        path: 'configurations/:id?',
         meta: {
           requiresAuth: true,
           name: 'extranet-configurations',
@@ -101,7 +101,7 @@ export default [
           breadcrumb: 'Configurations',
         },
         component: ExtranetConfigurations,
-      },
+      }
     ],
   },
   {
