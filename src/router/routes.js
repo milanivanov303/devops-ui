@@ -101,7 +101,7 @@ export default [
           breadcrumb: 'Configurations',
         },
         component: ExtranetConfigurations,
-      }
+      },
     ],
   },
   {

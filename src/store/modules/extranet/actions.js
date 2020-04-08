@@ -64,4 +64,34 @@ export default {
       .catch(() => commit('error', 'Could not get configurations list'));
     return promise;
   },
+
+  createConfiguration({ commit }, payload) {
+    const promise = api.post('extranet/configurations', payload);
+
+    promise
+      .then(response => commit('createConfiguration', response.data.data))
+      .catch(() => commit('error', 'Could not create configuration', { root: true }));
+
+    return promise;
+  },
+
+  updateConfiguration({ commit }, payload) {
+    const promise = api.put(`extranet/configurations/${payload.id}`, payload);
+
+    promise
+      .then(response => commit('updateConfiguration', response.data.data))
+      .catch(() => commit('error', 'Could not update configuration', { root: true }));
+
+    return promise;
+  },
+
+  deleteConfiguration({ commit }, id) {
+    const promise = api.delete(`extranet/configurations/${id}`);
+
+    promise
+      .then(() => commit('deleteConfiguration', id))
+      .catch(() => commit('error', 'Could not delete configuration', { root: true }));
+
+    return promise;
+  },
 };

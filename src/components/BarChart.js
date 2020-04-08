@@ -25,7 +25,7 @@ export default {
     },
     height: {
       type: Number,
-    }
+    },
   },
   methods: {
     generateRandomColor() {
