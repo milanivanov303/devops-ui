@@ -175,28 +175,10 @@
                v-if="selectedDemo.status === 'requested' ||
                selectedDemo.status === 'approved' ||
                selectedDemo.status === 'rejected'">
-            <div class="col s6 m2 l2">
-              <label for="status-aproved">
-                <input id="status-aproved"
-                       class="with-gap"
-                       type="radio"
-                       value="approved"
-                       v-model="selectedDemo.status"
-                       :checked="(selectedDemo.status === 'approved')"/>
-                <span>Approved</span>
-              </label>
-            </div>
-            <div class="col s6 m2 l2">
-              <label for="status-rejected">
-                <input id="status-rejected"
-                       class="with-gap"
-                       type="radio"
-                       value="rejected"
-                       v-model="selectedDemo.status"
-                       :checked="(selectedDemo.status === 'rejected')"/>
-                <span>Rejected</span>
-              </label>
-            </div>
+              <Select id="select-status"
+                      class="col s12"
+                      :select="selectStatus"
+                      @selectedVal="selectedStatus"/>
           </div>
         </form>
       </template>
@@ -281,6 +263,24 @@ export default {
         label: 'Business area*',
         selected: {},
       },
+      selectStatus: {
+        id: 'status_select',
+        name: 'status',
+        displayed: 'name',
+        icon: 'timelapse',
+        options: [
+          {
+            name: 'Approved',
+            value: 'approved',
+          },
+           {
+            name: 'Rejected',
+            value: 'rejected',
+          },
+        ],
+        label: 'Status',
+        selected: {}
+      },
     };
   },
   validations: {
@@ -321,7 +321,6 @@ export default {
   },
   methods: {
     openAddEditDemoModal(demo, action) {
-      debugger;
       this.showAddEditDemoModal = true;
       this.action = action;
       this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, { status: 'approved' }, demo);
@@ -330,6 +329,11 @@ export default {
         .toISO();
       this.selectedDemo.active_to = DateTime.fromSQL(this.selectedDemo.active_to)
         .toISO();
+      const status = this.selectStatus.options
+        .find(status => status.value === this.selectedDemo.status);
+      if (status) {
+        this.selectStatus.selected = { name: status.name, value: status.value };
+      }
       if (this.selectedDemo.id) {
         this.$router.push({
           path: `/demo/${encodeURIComponent(this.selectedDemo.id)}`,
@@ -352,6 +356,10 @@ export default {
     selectedBusiness(value) {
       this.$v.selectedDemo.business.$touch();
       this.selectedDemo.business = value.name;
+    },
+    selectedStatus(value) {
+      this.$v.selectedDemo.status.$touch();
+      this.selectedDemo.status = value.value;
     },
     endDateCheck() {
       const minActiveTo = this.selectedDemo.active_from || this.dateNow;

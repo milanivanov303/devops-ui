@@ -43,7 +43,7 @@
         </div>
       </div>
       <div v-else>
-        <div class="col s12 m6 l5 scroll">
+        <div class="col s12 m6 l5 scroll" ref="branches">
           <Branch
             v-for="branch in filteredBranches"
             :key="branch.name"
@@ -54,7 +54,7 @@
             }"
           />
         </div>
-        <div v-if="$route.meta.name === 'extranet-branch'" class="col s12 m6 l7">
+        <div v-if="$route.meta.name === 'extranet-branch'" class="col s12 m6 l7" ref="selectedBranch">
           <div class="card">
             <div class="card-content">
               <transition name="branch" mode="out-in">
@@ -141,12 +141,19 @@ export default {
       return this.$store.getters['extranet/getContainersByBranch'](branch).length;
     },
     getBranches() {
-      //goes twife from here
+      //goes twice from here
       //the second time branch is undefined despite that there is selected branch
-      const loader = this.$loading.show({ container: this.$el });
+      const loader = this.$loading.show({ container: this.$refs.branches });
       this.$store.dispatch('extranet/getBranches').then(() => {
         loader.hide();
-        const branch = document.querySelector('.selected-branch');
+        if (this.$route.params.branch) {
+          const branch = this.$store.state.extranet.branches.find((branch) => {
+            if (branch.name === this.$route.params.branch) {
+              return true;
+            }
+            return false;
+          });
+        // const branch = document.querySelector('.selected-branch');
         if (branch) {
           branch.scrollIntoView({
             block: 'start',
@@ -155,6 +162,8 @@ export default {
           return this.getSelectedBranch(branch);
         }
         this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
+        }
+        return false;
       });
     },
   },

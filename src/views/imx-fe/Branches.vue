@@ -147,12 +147,31 @@ export default {
       const loader = this.$loading.show({ container: this.$refs.branches });
       this.$store.dispatch('imx_fe/getBranches')
         .then(() => {
-          const selectedBranch = document.querySelector('.selected-branch');
-          if (selectedBranch) {
-            selectedBranch.scrollIntoView({ block: 'start', inline: 'nearest' });
-          }
-        })
-        .finally(() => loader.hide());
+          // const selectedBranch = document.querySelector('.selected-branch');
+          // if (selectedBranch) {
+          //   selectedBranch.scrollIntoView({ block: 'start', inline: 'nearest' });
+          // }
+          loader.hide();
+          if (this.$route.params.branch) {
+          const branch = this.$store.state.imx_fe.branches.find((branch) => {
+            if (branch.name === this.$route.params.branch) {
+              return true;
+            }
+            return false;
+          });
+        // const branch = document.querySelector('.selected-branch');
+        if (branch) {
+          branch.scrollIntoView({
+            block: 'start',
+            inline: 'nearest',
+          });
+          return this.getSelectedBranch(branch);
+        }
+        this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
+        }
+        return false;
+        });
+        // .finally(() => loader.hide());
     },
     getContainers() {
       this.$store.dispatch('imx_fe/getContainers');
