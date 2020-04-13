@@ -31,6 +31,11 @@ export default {
               allOf: [{ key: 'codix' }],
             },
           },
+          {
+            status: {
+              allOf: [{ key: 'active' }],
+            },
+          },
         ],
       }),
       orders: JSON.stringify({
