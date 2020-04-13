@@ -138,32 +138,48 @@ export default {
       this.lastPage = Math.ceil(data.length / this.perPage);
     },
     getContainersCount(branch) {
+      //goes twice from here for each branch
       return this.$store.getters['extranet/getContainersByBranch'](branch).length;
     },
-    getBranches() {
-      //goes twice from here
-      //the second time branch is undefined despite that there is selected branch
+    // getContainers() {
+    //   const loader = this.$loading.show({ container: this.$el });
+    //   this.$store.dispatch('extranet/getContainers').then(() => {
+    //     loader.hide();
+    //   });
+    // },
+    async getBranches() {
+      //goes multiple from here
+      //if no branch is selected, it takes containers from dashboard
+      //if branch is selected, the first time the request failed, the second time branch is undefined
+     
+     //await this.getContainers();
       const loader = this.$loading.show({ container: this.$refs.branches });
       this.$store.dispatch('extranet/getBranches').then(() => {
         loader.hide();
-        if (this.$route.params.branch) {
-          const branch = this.$store.state.extranet.branches.find((branch) => {
-            if (branch.name === this.$route.params.branch) {
-              return true;
-            }
-            return false;
-          });
-        // const branch = document.querySelector('.selected-branch');
-        if (branch) {
+        const selectedBranch = document.querySelector('.selected-branch');
+        if (selectedBranch) {
           branch.scrollIntoView({
             block: 'start',
             inline: 'nearest',
           });
-          return this.getSelectedBranch(branch);
         }
-        this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
-        }
-        return false;
+        // if (this.$route.params.branch) {
+        //   const branch = this.$store.state.extranet.branches.find((branch) => {
+        //     if (branch.name === this.$route.params.branch) {
+        //       return true;
+        //     }
+        //     return false;
+        //   });
+        // if (branch) {
+        //   branch.scrollIntoView({
+        //     block: 'start',
+        //     inline: 'nearest',
+        //   });
+        //   return this.getSelectedBranch(branch);
+        // }
+        // this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
+        // }
+        // return false;
       });
     },
   },

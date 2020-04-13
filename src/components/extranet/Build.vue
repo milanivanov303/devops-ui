@@ -197,11 +197,11 @@ export default {
       this.build = initialState().build;
       this.showModal = true; 
 
-      if (!this.$route.params.action) {
-        this.$router.push({
-          path: `${this.$route.params.branch}/new`,
-        });
-      }
+      // if (!this.$route.params.action) {
+      //   this.$router.push({
+      //     path: `${this.$route.params.branch}/new`,
+      //   });
+      // }
     },
     close () {
       this.showModal = false
