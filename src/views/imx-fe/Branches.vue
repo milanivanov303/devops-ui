@@ -6,14 +6,13 @@
       </div>
     </div>
     <div class="row">
-      <div v-if="$route.meta.name !== 'imx-fe-branch'">
+      <div v-if="!checkBranch($route.params.branch)">
         <Branch
           class="col s12 m6 l4"
           v-for="branch in sorted"
           :key="branch"
           :branch="branch"
           :count="getContainersCount(branch)"
-
         />
         <div class="col s12 m6 l2 right" id="perPage">
           <div class="input-field col s12 l4 right">
@@ -143,34 +142,26 @@ export default {
     getContainersCount(branch) {
       return this.$store.getters['imx_fe/getContainersByBranch'](branch).length;
     },
+    checkBranch(selected) {
+      if (typeof selected !== 'undefined' && this.branches.length !== 0) {
+        const branch = this.branches.find((branch) => {
+          if (branch === selected) {
+            return true;
+          }
+          return false;
+        });
+
+        if (branch) {
+          return true;
+        }
+        this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
+      }
+      return false;
+    },
     getBranches() {
       const loader = this.$loading.show({ container: this.$refs.branches });
       this.$store.dispatch('imx_fe/getBranches')
         .then(() => {
-          // const selectedBranch = document.querySelector('.selected-branch');
-          // if (selectedBranch) {
-          //   selectedBranch.scrollIntoView({ block: 'start', inline: 'nearest' });
-          // }
-
-        // loader.hide();
-        //   if (this.$route.params.branch) {
-        //   const branch = this.$store.state.imx_fe.branches.find((branch) => {
-        //     if (branch.name === this.$route.params.branch) {
-        //       return true;
-        //     }
-        //     return false;
-        //   });
-        // // const branch = document.querySelector('.selected-branch');
-        // if (branch) {
-        //   branch.scrollIntoView({
-        //     block: 'start',
-        //     inline: 'nearest',
-        //   });
-        //   return this.getSelectedBranch(branch);
-        // }
-        // this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
-        // }
-        // return false;
           const branch = document.querySelector('.selected-branch');
           if (branch) {
             branch.scrollIntoView({

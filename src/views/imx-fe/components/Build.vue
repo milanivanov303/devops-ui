@@ -9,7 +9,7 @@
       </button>
 
       <Modal v-if="showModal" @close="close()" class="right-sheet">
-        <template v-slot:header>Create new build // {{ branch }}</template>
+        <template v-slot:header>{{ branch }} // Create new build <br></template>
         <template v-slot:content>
           <template v-if="build.started === false">
             <div class="col s12 l11" key="form" >
@@ -18,7 +18,7 @@
                   <TextInput
                     label="Client"
                     icon="people"
-                    v-model="form.client"  
+                    v-model="form.client"
                     :invalid="$v.form.client.$error"
                     @blur="$v.form.client.$touch()"
                   />
@@ -139,17 +139,9 @@ export default {
   },
   methods: {
     open() {
-      //open Modal on the 2nd click
       this.form = initialState().form;
       this.build = initialState().build;
       this.showModal = true;
-
-      // if (!this.$route.params.action) {
-      //   this.$router.push({
-      //     path: `${this.$route.params.branch}/new`,
-      //   });
-      // }
-    
     },
     close() {
       this.$v.$reset();

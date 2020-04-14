@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import Build from '@/components/extranet/Build';
-import Builds from '@/components/extranet/Builds';
+import Build from '@/views/extranet/components/Build';
+import Builds from '@/views/extranet/components/Builds';
 
 export default {
   components: {

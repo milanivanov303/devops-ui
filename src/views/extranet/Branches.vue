@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="row">
-      <div v-if="$route.meta.name !== 'extranet-branch'">
+      <div v-if="!checkBranch($route.params.branch)">
         <Branch
           v-for="branch in sorted"
           class="col s12 m6 l4"
@@ -54,7 +54,7 @@
             }"
           />
         </div>
-        <div v-if="$route.meta.name === 'extranet-branch'" class="col s12 m6 l7" ref="selectedBranch">
+        <div class="col s12 m6 l7" >
           <div class="card">
             <div class="card-content">
               <transition name="branch" mode="out-in">
@@ -70,7 +70,7 @@
 
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
-import Branch from '@/components/extranet/Branch';
+import Branch from '@/views/extranet/components/Branch';
 
 
 export default {
@@ -138,48 +138,35 @@ export default {
       this.lastPage = Math.ceil(data.length / this.perPage);
     },
     getContainersCount(branch) {
-      //goes twice from here for each branch
       return this.$store.getters['extranet/getContainersByBranch'](branch).length;
     },
-    // getContainers() {
-    //   const loader = this.$loading.show({ container: this.$el });
-    //   this.$store.dispatch('extranet/getContainers').then(() => {
-    //     loader.hide();
-    //   });
-    // },
-    async getBranches() {
-      //goes multiple from here
-      //if no branch is selected, it takes containers from dashboard
-      //if branch is selected, the first time the request failed, the second time branch is undefined
-     
-     //await this.getContainers();
+    checkBranch(selected) {
+      if (typeof selected !== 'undefined' && this.branches.length !== 0) {
+        const branch = this.branches.find((branch) => {
+          if (branch.name === selected) {
+            return true;
+          }
+          return false;
+        });
+
+        if (branch) {
+          return true;
+        }
+        this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
+      }
+      return false;
+    },
+    getBranches() {
       const loader = this.$loading.show({ container: this.$refs.branches });
       this.$store.dispatch('extranet/getBranches').then(() => {
         loader.hide();
-        const selectedBranch = document.querySelector('.selected-branch');
-        if (selectedBranch) {
+        const branch = document.querySelector('.selected-branch');
+        if (branch) {
           branch.scrollIntoView({
             block: 'start',
             inline: 'nearest',
           });
         }
-        // if (this.$route.params.branch) {
-        //   const branch = this.$store.state.extranet.branches.find((branch) => {
-        //     if (branch.name === this.$route.params.branch) {
-        //       return true;
-        //     }
-        //     return false;
-        //   });
-        // if (branch) {
-        //   branch.scrollIntoView({
-        //     block: 'start',
-        //     inline: 'nearest',
-        //   });
-        //   return this.getSelectedBranch(branch);
-        // }
-        // this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
-        // }
-        // return false;
       });
     },
   },

@@ -9,7 +9,7 @@
       </button>
 
       <Modal v-if="showModal" @close="close()" @opened="initForm()" class="right-sheet">
-        <template v-slot:header>Create new build // {{ branch }} </template>
+        <template v-slot:header>{{ branch }} // Create new build </template>
         <template v-slot:content>
           <template v-if="build.started === false">
             <div  class="col s12 l11" key="form" >
@@ -188,28 +188,15 @@ export default {
     },
     getFebranches() {
       this.$store.dispatch('extranet/getFebranches');
-      if (this.$route.params.action === 'new') {
-        return this.open();
-      }
     },
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
-      this.showModal = true; 
-
-      // if (!this.$route.params.action) {
-      //   this.$router.push({
-      //     path: `${this.$route.params.branch}/new`,
-      //   });
-      // }
+      this.showModal = true;
     },
-    close () {
-      this.showModal = false
+    close() {
+      this.showModal = false;
       this.$v.$reset();
-      
-      // this.$router.push({
-      //   path: ' ',
-      // });
     },
     initForm() {
       this.$M.FormSelect.init(this.$refs['java-version']);
