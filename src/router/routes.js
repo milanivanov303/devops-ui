@@ -67,29 +67,29 @@ export default [
         },
         component: ExtranetDashboard,
       },
+    ],
+  },
+  {
+    path: '/extranet/branches',
+    meta: {
+      requiresAuth: true,
+      name: 'extranet-branches',
+      transitionName: 'slide',
+      title: 'Extranet Branches',
+      breadcrumb: 'Branches',
+    },
+    component: ExtranetBranches,
+    children: [
       {
-        path: 'branches',
+        path: ':branch',
         meta: {
+          name: 'extranet-branch',
           requiresAuth: true,
-          name: 'extranet-branches',
           transitionName: 'slide',
-          title: 'Extranet Branches',
-          breadcrumb: 'Branches',
+          title: params => params.branch,
+          breadcrumb: params => params.branch,
         },
-        component: ExtranetBranches,
-        children: [
-          {
-            path: ':branch',
-            meta: {
-              name: 'extranet-branch',
-              requiresAuth: true,
-              transitionName: 'slide',
-              title: params => params.branch,
-              breadcrumb: params => params.branch,
-            },
-            component: ExtranetBranch,
-          },
-        ],
+        component: ExtranetBranch,
       },
     ],
   },
@@ -113,27 +113,27 @@ export default [
         },
         component: ImxFeDashboard,
       },
+    ],
+  },
+  {
+    path: '/imx-fe/branches',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-fe-branches',
+      transitionName: 'slide',
+      title: 'iMX-FE Branches',
+    },
+    component: ImxFeBranches,
+    children: [
       {
-        path: 'branches',
+        path: ':branch',
         meta: {
+          name: 'imx-fe-branch',
           requiresAuth: true,
-          name: 'imx-fe-branches',
           transitionName: 'slide',
-          title: 'iMX-FE Branches',
+          title: params => params.branch,
         },
-        component: ImxFeBranches,
-        children: [
-          {
-            path: ':branch',
-            meta: {
-              name: 'imx-fe-branch',
-              requiresAuth: true,
-              transitionName: 'slide',
-              title: params => params.branch,
-            },
-            component: ImxFeBranch,
-          },
-        ],
+        component: ImxFeBranch,
       },
     ],
   },
