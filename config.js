@@ -22,7 +22,5 @@ module.exports = {
     password: process.env.VUE_APP_WS_PASSWORD,
     vhost: process.env.VUE_APP_WS_VHOST,
   },
-  instance: {
-    name: process.env.VUE_APP_ENV_NAME,
-  },
+  instance: process.env.VUE_APP_ENV,
 };
