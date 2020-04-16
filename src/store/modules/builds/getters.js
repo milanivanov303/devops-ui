@@ -34,14 +34,27 @@ export default {
       return [];
     }
 
-    return state.builds[stateName].reduce(
-      (tally, build) => {
-        if (!module || build.module === module) {
-          tally[build.details.branch] = (tally[build.details.branch] || 0) + 1;
+    return state.builds[stateName].reduce( 	
+      (tally, build) => { 	
+        if (!module || build.module === module) { 	
+          tally[build.details.branch] = (tally[build.details.branch] || 0) + 1; 	
         }
-        return tally;
-      },
-      {},
+        return tally; 	
+      }, 	
+      {}, 	
     );
   },
+  
+  getForBranch: state => (stateName, branch) => {
+    if (!state.builds[stateName]) {
+      return [];
+    }
+	
+    return state.builds[stateName].filter((build) => {
+      if (build.details.branch === branch) {
+        return true;
+      }
+      return false;
+    });
+  }
 };

@@ -5,7 +5,7 @@
         <h4>{{ branch }}</h4>
       </div>
     </div>
-    <Builds :containers="containers"></Builds>
+    <Builds/>
     <br>
     <Build />
   </div>
@@ -23,9 +23,6 @@ export default {
   computed: {
     branch() {
       return this.$route.params.branch;
-    },
-    containers() {
-      return this.$store.getters['extranet/getContainersByBranch'](this.branch);
     },
   },
 };
