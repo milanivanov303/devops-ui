@@ -1,18 +1,30 @@
 <template>
   <div class="configurations">
     <div class="data-table">
-      <Table v-bind:request="request"  @add="openAddEditModal('create')">
-        <template v-slot:buttons="{ data }">
-          <a v-if="$auth.can('extranet.manage-configuration')"
-             @click="openDeleteModal(data)">
-            <i class="material-icons right">delete</i>
-          </a>
-          <a v-if="$auth.can('extranet.manage-configuration')"
-             @click="openAddEditModal('update', data)">
-            <i class="material-icons right">edit</i>
-          </a>
-        </template>
+
+      <Table
+        :data="configurations"
+        sort-by="project"
+        sort-dir="asc"
+        :export-btn="false"
+        :view-btn="false"
+        @add="openAddEditModal('create')"
+        @edit="(row) => openAddEditModal('update', row)"
+        @delete="openDeleteModal"
+      >
+        <Column show="project"/>
+        <Column show="type" label="App Type"/>
+        <Column show="version" label="App Version"></Column>
+        <Column show="delivery_chain"/>
+        <Column show="instance"/>
+        <Column show="branch"/>
+        <Column show="prefix"/>
+        <Column show="servlet_container"/>
+        <Column show="jdk"/>
+        <Column show="jre"/>
+        <Column show="description" label="Additional Info" width="20%"/>
       </Table>
+
     </div>
 
     <Modal v-if="showAddEditModal" @close="closeAddEditModal()" class="right-sheet">
@@ -236,10 +248,14 @@ import { required } from 'vuelidate/lib/validators';
 import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
 
+import { default as Table, Column } from '@/components/Table';
+
 export default {
   components: {
     Autocomplete,
     TextArea,
+    Table,
+    Column,
   },
   data() {
     return {
@@ -250,26 +266,6 @@ export default {
       removing: false,
       removed: false,
       error: '',
-      request: {
-        data: 'extranet/getConfigurations',
-        columns: {
-          project: '',
-          type: '',
-          version: '',
-          delivery_chain: '',
-          instance: '',
-          branch: '',
-          prefix: '',
-          servlet_container: '',
-          jdk: '',
-          jre: '',
-          description: '',
-        },
-        add: this.$auth.can('extranet.manage-configuration'),
-        export: false,
-        action: true,
-        searchable: true,
-      },
     };
   },
   computed: {
