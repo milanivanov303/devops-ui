@@ -46,6 +46,95 @@
       </tbody>
     </table>
 
+     <Modal v-if="showInfoModal" @close="showInfoModal = false" class="right-sheet">
+      <template v-slot:header>{{ container.Labels.build }}</template>
+        <template v-slot:content>
+          <div  class="col s12 l11">
+            <div class="row">
+              <div class="input-field col s12">
+                <i class="material-icons prefix">business</i>
+                <input
+                  class="readonly"
+                  type="text"
+                  id="branch"
+                  v-model="selectedBuild.branch">
+                <label :class="{active: selectedBuild.branch}" for="branch">Branch</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <i class="material-icons prefix">dynamic_feed</i>
+                <input
+                  class="readonly"
+                  type="text"
+                  id="instance"
+                  v-model="selectedBuild.instance">
+                <label :class="{active: selectedBuild.instance}" for="instance">Instance</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <i class="material-icons prefix">history</i>
+                <input
+                  class="readonly"
+                  type="text"
+                  id="java_version"
+                  v-model="selectedBuild.java_version">
+                <label :class="{active: selectedBuild.java_version}"
+                        for="java_version">Java Version</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <i class="material-icons prefix">event</i>
+                <input
+                  class="readonly"
+                  type="text"
+                  id="created_on"
+                  v-model="selectedBuild.created_on">
+                <label :class="{active: selectedBuild.created_on}" for="created_on">Created on</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <i class="material-icons prefix">person</i>
+                <input
+                  class="readonly"
+                  type="text"
+                  id="created_by"
+                  v-model="selectedBuild.created_by">
+                <label :class="{active: selectedBuild.created_by}" for="created_by">Created by</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12" >
+                 <table ref="builds">
+                  <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>IP</th>
+                    <th>Private Port</th>
+                    <th>Public Port</th>
+                    <th>Type</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr v-for="(port, index) in selectedBuild.ports" :key="index">
+                      <td>{{ index + 1 }}</td>
+                      <td>{{ port.IP }}</td>
+                      <td>{{ port.PrivatePort }}</td>
+                      <td>{{ port.PublicPort }}</td>
+                      <td>{{ port.Type }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </template>
+        <template v-slot:footer></template>
+    </Modal>
+
     <Modal v-if="showModal" @close="showModal = false" class="confirm">
       <template v-slot:content>
         <div v-if="removing" class="center" >
@@ -80,14 +169,10 @@
 <script>
 
 export default {
-  props: {
-    containers: {
-      type: Array,
-      required: true,
-    },
-  },
   data() {
     return {
+      selectedBuild: {},
+      showInfoModal: false,
       showModal: false,
       container: null,
       removing: false,
@@ -99,12 +184,50 @@ export default {
     host() {
       return this.$store.state.imx_fe.host;
     },
+    containers() {
+      return this.$store.getters['imx_fe/getContainersByBranch'](this.$route.params.branch);
+    },
+    builds() {
+      return this.$store.getters['builds/getForBranch']('branch-builds', this.$route.params.branch);
+    },
   },
   methods: {
+    getContainers() {
+      const loader = this.$loading.show({ container: this.$refs.builds });
+      this.$store.dispatch('imx_fe/getContainers').then(() => {
+        loader.hide();
+      });
+    },
+    getBuilds() {
+      this.$store.dispatch('builds/getBuilds', { stateName: 'branch-builds' });
+    },
+
     getDeployedBuildUrl(container) {
       const port = container.Ports.find(value => value.PrivatePort === 80).PublicPort;
       return `http://${this.host}:${port}`;
     },
+
+    openBuildInfoModal(container) {
+      this.showInfoModal = true;
+      this.container = container;
+      this.builds.find((build) => {
+        if (container.Labels.build === ''.concat(
+          build.details.branch, '.',
+          build.details.client.name, '.',
+          build.details.instance.name, '.',
+          build.details.java_version,
+        )) {
+          this.selectedBuild.created_by = container.Labels.username;
+          this.selectedBuild.created_on = new Date(container.Created * 1000).toLocaleString('en-GB', { timeZone: 'UTC' });
+          this.selectedBuild.branch = build.details.branch;
+          this.selectedBuild.instance = build.details.instance.name;
+          this.selectedBuild.java_version = build.details.java_version;
+          this.selectedBuild.ports = container.Ports;
+        }
+        return false;
+      });
+    },
+
     openRemoveBuildModal(container) {
       this.showModal = true;
       this.container = container;
@@ -129,5 +252,14 @@ export default {
         .finally(() => { this.removing = false; });
     },
   },
+  mounted() {
+    this.getContainers();
+    this.getBuilds();
+  },
 };
 </script>
+<style scoped>
+  .readonly {
+    pointer-events: none;
+  }
+</style>
