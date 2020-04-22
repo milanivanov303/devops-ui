@@ -273,13 +273,13 @@ export default {
             name: 'Approved',
             value: 'approved',
           },
-           {
+          {
             name: 'Rejected',
             value: 'rejected',
           },
         ],
         label: 'Status',
-        selected: {}
+        selected: {},
       },
     };
   },
@@ -340,7 +340,7 @@ export default {
         });
       } else {
         this.$router.push({
-          path: `/demo/new`,
+          path: '/demo/new',
         });
       }
     },
@@ -390,7 +390,7 @@ export default {
         loader.hide();
         if (this.$route.params.id) {
           if (this.$route.params.id === 'new') {
-            return this.openAddEditDemoModal( {}, 'create' );
+            return this.openAddEditDemoModal({}, 'create');
           }
 
           const demo = this.$store.state.demo.demos.find((demo) => {

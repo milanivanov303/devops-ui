@@ -11,7 +11,7 @@ import DefaultLayout from './components/layouts/Default';
 import LoginLayout from './components/layouts/Login';
 
 import '@/config';
-import auth from '@/plugins/auth';
+import auth from './plugins/auth';
 import Api from './plugins/api';
 import config from '../config';
 
