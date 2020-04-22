@@ -91,18 +91,18 @@ export default [
         },
         component: ExtranetBranch,
       },
-      {
-        path: 'configurations/:id?',
-        meta: {
-          requiresAuth: true,
-          name: 'extranet-configurations',
-          transitionName: 'slide',
-          title: 'Extranet Configurations',
-          breadcrumb: 'Configurations',
-        },
-        component: ExtranetConfigurations,
-      },
     ],
+  },
+  {
+    path: '/extranet/configurations/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'extranet-configurations',
+      transitionName: 'slide',
+      title: 'Extranet Configurations',
+      breadcrumb: 'Configurations',
+    },
+    component: ExtranetConfigurations,
   },
   {
     path: '/imx-fe',

@@ -325,16 +325,6 @@ export default {
     this.$M.Tooltip.init(this.$el.querySelectorAll('[data-tooltip]'));
   },
 };
-
-export const Column = {
-  props: {
-    show: { type: [String, Function] },
-    label: { type: [String, Function] },
-    info: { type: String },
-    sortable: { default: true, type: Boolean },
-    filterable: { default: true, type: Boolean },
-  },
-};
 </script>
 
 <style type="text/scss">

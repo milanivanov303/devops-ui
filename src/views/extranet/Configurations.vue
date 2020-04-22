@@ -250,7 +250,7 @@ import { required } from 'vuelidate/lib/validators';
 import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
 
-import { default as Table, Column } from '@/components/Table';
+import { Table, Column } from '@/components/table';
 
 export default {
   components: {
