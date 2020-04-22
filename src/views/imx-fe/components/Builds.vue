@@ -92,7 +92,9 @@
                   type="text"
                   id="created_on"
                   v-model="selectedBuild.created_on">
-                <label :class="{active: selectedBuild.created_on}" for="created_on">Created on</label>
+                <label :class="{active: selectedBuild.created_on}"
+                       for="created_on">Created on
+                </label>
               </div>
             </div>
             <div class="row">
@@ -103,7 +105,9 @@
                   type="text"
                   id="created_by"
                   v-model="selectedBuild.created_by">
-                <label :class="{active: selectedBuild.created_by}" for="created_by">Created by</label>
+                <label :class="{active: selectedBuild.created_by}"
+                       for="created_by">Created by
+                </label>
               </div>
             </div>
             <div class="row">
