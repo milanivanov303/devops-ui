@@ -38,7 +38,7 @@ export default {
     },
     instance() {
       return this.$config.instance.name;
-    }
+    },
   },
   methods: {
     logout() {

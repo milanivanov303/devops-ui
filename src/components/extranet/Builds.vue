@@ -265,7 +265,8 @@ export default {
           this.selectedBuild.branch = build.details.branch;
           this.selectedBuild.instance = build.details.instance.name;
           this.selectedBuild.java_version = build.details.java_version;
-          this.selectedBuild.ports = container.Ports.filter(port => port.PrivatePort === 22 || port.PrivatePort === 8591);
+          this.selectedBuild.ports = container.Ports
+            .filter(port => port.PrivatePort === 22 || port.PrivatePort === 8591);
           this.selectedBuild.host = this.host;
           this.selectedBuild.user = 'ex1';
           this.selectedBuild.pass = 'Sofphia';
@@ -306,7 +307,7 @@ export default {
 </script>
 <style scoped>
   input:read-only {
-    color: black !important; 
+    color: black !important;
     border-bottom: 1px solid #9e9e9e !important;
   }
   .tabs {
