@@ -442,7 +442,6 @@ export default {
       const payload = this.selectedDemo;
       delete payload.id;
       delete payload.code;
-      delete payload.status;
 
       payload.active_from = DateTime.fromISO(this.selectedDemo.active_from)
         .toFormat('yyyy-MM-dd HH:mm:ss');
