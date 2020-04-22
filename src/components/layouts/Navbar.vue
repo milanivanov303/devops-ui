@@ -4,7 +4,7 @@
       <a href="#" data-target="nav-mobile" class="sidenav-trigger">
         <i class="material-icons">menu</i>
       </a>
-      <div class="chip">
+      <div class="chip" v-if="instance !== 'prod'">
         {{ instance }}
       </div>
       <ul class="right" v-if="user">
@@ -37,8 +37,8 @@ export default {
       return this.$auth.getUser();
     },
     instance() {
-      return this.$config.instance.name;
-    },
+      return this.$config.instance;
+    }
   },
   methods: {
     logout() {

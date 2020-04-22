@@ -8,11 +8,11 @@
         <i class="material-icons left">add</i> New build
       </button>
 
-      <Modal v-if="showModal" @close="showModal = false" @opened="initForm()" class="right-sheet">
-        <template v-slot:header>Create new build</template>
+      <Modal v-if="showModal" @close="close()" @opened="initForm()" class="right-sheet">
+        <template v-slot:header>{{ branch }} // Create new build </template>
         <template v-slot:content>
           <template v-if="build.started === false">
-            <div  class="col s12" key="form" >
+            <div  class="col s12 l11" key="form" >
               <div class="row">
                 <div class="col s12" >
                   <Autocomplete
@@ -23,6 +23,13 @@
                     :invalid="$v.form.client.$error"
                     @blur="$v.form.client.$touch()"
                   />
+                </div>
+                <div class="validator col s11 offset-s1">
+                  <div class="red-text" v-if="$v.form.client.$error">
+                    <p v-if="!$v.form.client.required">
+                      Client field must not be empty.
+                    </p>
+                  </div>
                 </div>
               </div>
               <div class="row">
@@ -39,7 +46,7 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col s12" >
+                <div class="col s12">
                   <Autocomplete
                     label="Instance"
                     icon="dynamic_feed"
@@ -48,6 +55,13 @@
                     :invalid="$v.form.instance.$error"
                     @blur="$v.form.instance.$touch()"
                   />
+                </div>
+                <div class="validator col s11 offset-s1">
+                  <div class="red-text" v-if="$v.form.instance.$error">
+                    <p v-if="!$v.form.instance.required">
+                      Instance field must not be empty.
+                    </p>
+                  </div>
                 </div>
               </div>
               <div class="row">
@@ -100,7 +114,6 @@
           </button>
         </template>
       </Modal>
-
     </div>
   </div>
 </template>
@@ -168,12 +181,10 @@ export default {
   },
   methods: {
     getClients() {
-      const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('extranet/getClients').finally(() => loader.hide());
+      this.$store.dispatch('extranet/getClients');
     },
     getInstances() {
-      const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('mmpi/getInstances').finally(() => loader.hide());
+      this.$store.dispatch('mmpi/getInstances');
     },
     getFebranches() {
       this.$store.dispatch('extranet/getFebranches');
@@ -181,8 +192,11 @@ export default {
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
-
       this.showModal = true;
+    },
+    close() {
+      this.showModal = false;
+      this.$v.$reset();
     },
     initForm() {
       this.$M.FormSelect.init(this.$refs['java-version']);

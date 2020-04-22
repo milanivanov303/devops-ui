@@ -15,7 +15,7 @@ SCRIPT PARAMETERS
 fi
 
 # Try to load env configuration
-DOCKER_COMPOSE_FILE="docker-compose-${APP_ENV}.yml"
+DOCKER_COMPOSE_FILE="docker-compose-${VUE_APP_ENV}.yml"
 if [[ ! -f $DOCKER_COMPOSE_FILE ]]; then
     DOCKER_COMPOSE_FILE="docker-compose.yml"
 fi
@@ -37,7 +37,7 @@ printf "\n"
 
 if [[ ${EXIT_CODE} -eq 0 ]]; then
     printf "\n"
-    if [ ${APP_ENV} = "local" ]; then
+    if [ ${VUE_APP_ENV} = "local" ]; then
     echo "App running on ports: ${NODE_CONTAINER_HTTP_PORT} and ${NODE_CONTAINER_UI_PORT}"
     else
     echo "App running on ports: ${APACHE_CONTAINER_HTTP_PORT} and ${APACHE_CONTAINER_HTTPS_PORT}"

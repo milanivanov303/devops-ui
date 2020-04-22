@@ -1,6 +1,6 @@
 <template>
   <div>
-    <table>
+    <table ref="builds">
       <thead>
       <tr>
         <th>#</th>
