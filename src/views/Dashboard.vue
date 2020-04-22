@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import Builds from '@/components/extranet/Builds';
+import Builds from '@/views/extranet/components/Builds';
 import BarChart from '@/components/BarChart';
 
 export default {

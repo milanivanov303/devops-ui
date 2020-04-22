@@ -1,6 +1,6 @@
 <template>
   <div>
-    <table>
+    <table ref="builds">
       <thead>
       <tr>
         <th>#</th>
@@ -27,6 +27,11 @@
           </a>
         </td>
         <td>
+          <a @click="openBuildInfoModal(container)"          >
+            <i class="material-icons">description</i>
+          </a>
+        </td>
+        <td>
           <button
             v-if="
               $auth.can('extranet.remove-builds') ||
@@ -46,43 +51,42 @@
       </tbody>
     </table>
 
-     <Modal v-if="showInfoModal" @close="showInfoModal = false" class="right-sheet">
+    <Modal v-if="showInfoModal" @close="showInfoModal = false" class="right-sheet">
       <template v-slot:header>{{ container.Labels.build }}</template>
-        <template v-slot:content>
-          <div  class="col s12 l11">
-            <div class="row">
-              <div class="input-field col s12">
-                <i class="material-icons prefix">business</i>
-                <input
-                  class="readonly"
-                  type="text"
-                  id="branch"
-                  v-model="selectedBuild.branch">
-                <label :class="{active: selectedBuild.branch}" for="branch">Branch</label>
-              </div>
+      <template v-slot:content>
+        <div class="col s12 l11">
+          <div class="row">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">business</i>
+              <input
+                readonly
+                type="text"
+                id="branch"
+                v-model="selectedBuild.branch">
+              <label :class="{active: selectedBuild.branch}" for="branch">Branch</label>
             </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <i class="material-icons prefix">dynamic_feed</i>
-                <input
-                  class="readonly"
-                  type="text"
-                  id="instance"
-                  v-model="selectedBuild.instance">
-                <label :class="{active: selectedBuild.instance}" for="instance">Instance</label>
-              </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">dynamic_feed</i>
+              <input
+                readonly
+                type="text"
+                id="instance"
+                v-model="selectedBuild.instance">
+              <label :class="{active: selectedBuild.instance}" for="instance">Instance</label>
             </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <i class="material-icons prefix">history</i>
-                <input
-                  class="readonly"
-                  type="text"
-                  id="java_version"
-                  v-model="selectedBuild.java_version">
-                <label :class="{active: selectedBuild.java_version}"
-                        for="java_version">Java Version</label>
-              </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">history</i>
+              <input
+                readonly
+                type="text"
+                id="java_version"
+                v-model="selectedBuild.java_version">
+              <label :class="{active: selectedBuild.java_version}"
+                      for="java_version">Java Version</label>
             </div>
             <div class="row">
               <div class="input-field col s12">
@@ -110,33 +114,72 @@
                 </label>
               </div>
             </div>
-            <div class="row">
-              <div class="col s12" >
-                 <table ref="builds">
-                  <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>IP</th>
-                    <th>Private Port</th>
-                    <th>Public Port</th>
-                    <th>Type</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr v-for="(port, index) in selectedBuild.ports" :key="index">
-                      <td>{{ index + 1 }}</td>
-                      <td>{{ port.IP }}</td>
-                      <td>{{ port.PrivatePort }}</td>
-                      <td>{{ port.PublicPort }}</td>
-                      <td>{{ port.Type }}</td>
+          </div>
+          <div class="row">
+            <div class="col s12">
+              <ul class="tabs col s12 center">
+                <li class="tab col s12"><a>Container's Info</a></li>
+              </ul>
+              <div class="row">
+                <div class="input-field col s6">
+                  <i class="material-icons prefix">account_circle</i>
+                  <input
+                    readonly
+                    type="text"
+                    id="user"
+                    v-model="selectedBuild.user">
+                  <label :class="{active: selectedBuild.user}" for="user">User</label>
+                </div>
+                <div class="input-field col s6">
+                  <i class="material-icons prefix">lock</i>
+                  <input
+                    readonly
+                    type="text"
+                    id="pass"
+                    v-model="selectedBuild.pass">
+                  <label :class="{active: selectedBuild.pass}" for="pass">Pass</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <i class="material-icons prefix">storage</i>
+                  <input
+                    readonly
+                    type="text"
+                    id="host"
+                    v-model="selectedBuild.host">
+                  <label :class="{active: selectedBuild.host}" for="host">Host</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s12" >
+                  <table ref="builds">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>IP</th>
+                      <th>Private Port</th>
+                      <th>Public Port</th>
+                      <th>Type</th>
                     </tr>
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(port, index) in selectedBuild.ports" :key="index">
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ port.IP }}</td>
+                        <td>{{ port.PrivatePort }}</td>
+                        <td>{{ port.PublicPort }}</td>
+                        <td>{{ port.Type }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
-        </template>
-        <template v-slot:footer></template>
+        </div>
+      </template>
+      <template v-slot:footer></template>
     </Modal>
 
     <Modal v-if="showModal" @close="showModal = false" class="confirm">
@@ -186,10 +229,10 @@ export default {
   },
   computed: {
     host() {
-      return this.$store.state.imx_fe.host;
+      return this.$store.state.extranet.host;
     },
     containers() {
-      return this.$store.getters['imx_fe/getContainersByBranch'](this.$route.params.branch);
+      return this.$store.getters['extranet/getContainersByBranch'](this.$route.params.branch);
     },
     builds() {
       return this.$store.getters['builds/getForBranch']('branch-builds', this.$route.params.branch);
@@ -198,7 +241,7 @@ export default {
   methods: {
     getContainers() {
       const loader = this.$loading.show({ container: this.$refs.builds });
-      this.$store.dispatch('imx_fe/getContainers').then(() => {
+      this.$store.dispatch('extranet/getContainers').then(() => {
         loader.hide();
       });
     },
@@ -207,8 +250,8 @@ export default {
     },
 
     getDeployedBuildUrl(container) {
-      const port = container.Ports.find(value => value.PrivatePort === 80).PublicPort;
-      return `http://${this.host}:${port}`;
+      const port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
+      return `http://${this.host}:${port}/${container.Labels.build}/`;
     },
 
     openBuildInfoModal(container) {
@@ -226,7 +269,11 @@ export default {
           this.selectedBuild.branch = build.details.branch;
           this.selectedBuild.instance = build.details.instance.name;
           this.selectedBuild.java_version = build.details.java_version;
-          this.selectedBuild.ports = container.Ports;
+          this.selectedBuild.ports = container.Ports
+            .filter(port => port.PrivatePort === 22 || port.PrivatePort === 8591);
+          this.selectedBuild.host = this.host;
+          this.selectedBuild.user = 'ex1';
+          this.selectedBuild.pass = 'Sofphia';
         }
         return false;
       });
@@ -241,10 +288,10 @@ export default {
     },
     removeBuild(container) {
       this.removing = true;
-      this.$store.dispatch('imx_fe/removeBuild', container.Id)
+      this.$store.dispatch('extranet/removeBuild', container.Id)
         .then(() => {
           this.removed = true;
-          this.$store.dispatch('imx_fe/getContainers');
+          this.$store.dispatch('extranet/getContainers');
         })
         .catch((error) => {
           if (error.response.status === 403) {
@@ -263,7 +310,11 @@ export default {
 };
 </script>
 <style scoped>
-  .readonly {
-    pointer-events: none;
+  input:read-only {
+    color: black !important;
+    border-bottom: 1px solid #9e9e9e !important;
+  }
+  .tabs {
+    margin-bottom: 25px;
   }
 </style>
