@@ -6,63 +6,59 @@
       </div>
     </div>
     <div class="row">
-      <div v-if="$route.meta.name !== 'imx-fe-branch'">
+      <div v-if="!checkBranch($route.params.branch)">
         <Branch
+          class="col s12 m6 l4"
           v-for="branch in sorted"
           :key="branch"
           :branch="branch"
           :count="getContainersCount(branch)"
-          :class="{
-            'selected-branch': $route.path === `/imx-fe/branches/${encodeURIComponent(branch)}`,
-            'col s12 m6 l4': $route.meta.name === 'imx-fe-branches'
-          }"
         />
-        <div class="row">
-          <div class="col s12 m6 l2 right" id="perPage">
-            <div class="input-field col s12 l4 right">
-                <Select class="col s12"
-                        v-if="sorted.length"
-                        :select="selectPerPage"
-                        @selectedVal="selectedPerPage"/>
-            </div>
-            <p v-if="sorted.length" class="col s12 l8 right right-align">Items per page:</p>
+        <div class="col s12 m6 l2 right" id="perPage">
+          <div class="input-field col s12 l4 right">
+              <Select class="col s12"
+                      v-if="sorted.length"
+                      :select="selectPerPage"
+                      @selectedVal="selectedPerPage"/>
           </div>
-          <div class="col s12 m6 l6">
-            <paginate
-            v-if="sorted.length"
-            v-model="page"
-            :page-count="lastPage"
-            :click-handler="selectedPage"
-            :prev-class="'material-icons'"
-            :prev-text="'chevron_left'"
-            :next-class="'material-icons'"
-            :next-text="'chevron_right'"
-            :container-class="'pagination'"
-            :page-class="'waves-effect'"
-            :disabled-class="'disabled'"
-            :active-class="'active'">
-            </paginate>
-          </div>
+          <p v-if="sorted.length" class="col s12 l8 right right-align">Items per page:</p>
+        </div>
+        <div class="col s12 m6 l6">
+          <paginate
+          v-if="sorted.length"
+          v-model="page"
+          :page-count="lastPage"
+          :click-handler="selectedPage"
+          :prev-class="'material-icons'"
+          :prev-text="'chevron_left'"
+          :next-class="'material-icons'"
+          :next-text="'chevron_right'"
+          :container-class="'pagination'"
+          :page-class="'waves-effect'"
+          :disabled-class="'disabled'"
+          :active-class="'active'">
+          </paginate>
         </div>
       </div>
-      <div v-else class="col s12 m6 l5 scroll">
-        <Branch
-          v-for="branch in filteredBranches"
-          :key="branch"
-          :branch="branch"
-          :count="getContainersCount(branch)"
-          :class="{
-            'selected-branch': $route.path === `/imx-fe/branches/${encodeURIComponent(branch)}`,
-            'col s12 m6 l4': $route.meta.name === 'imx-fe-branches'
-          }"
-        />
-      </div>
-      <div v-if="$route.meta.name === 'imx-fe-branch'" class="col s12 m6 l7">
-        <div class="card">
-          <div class="card-content">
-            <transition name="branch" mode="out-in">
-              <router-view :key="$route.path"/>
-            </transition>
+      <div v-else>
+        <div class="col s12 m6 l5 scroll" ref="branches">
+          <Branch
+            v-for="branch in filteredBranches"
+            :key="branch"
+            :branch="branch"
+            :count="getContainersCount(branch)"
+            :class="{
+              'selected-branch': $route.path === `/imx-fe/branches/${encodeURIComponent(branch)}`
+            }"
+          />
+        </div>
+        <div class="col s12 m6 l7">
+          <div class="card">
+            <div class="card-content">
+              <transition name="branch" mode="out-in">
+                <router-view :key="$route.path"/>
+              </transition>
+            </div>
           </div>
         </div>
       </div>
@@ -146,13 +142,32 @@ export default {
     getContainersCount(branch) {
       return this.$store.getters['imx_fe/getContainersByBranch'](branch).length;
     },
+    checkBranch(selected) {
+      if (typeof selected !== 'undefined' && this.branches.length !== 0) {
+        const branch = this.branches.find((branch) => {
+          if (branch === selected) {
+            return true;
+          }
+          return false;
+        });
+
+        if (branch) {
+          return true;
+        }
+        this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
+      }
+      return false;
+    },
     getBranches() {
-      const loader = this.$loading.show({ container: this.$el });
+      const loader = this.$loading.show({ container: this.$refs.branches });
       this.$store.dispatch('imx_fe/getBranches')
         .then(() => {
-          const selectedBranch = document.querySelector('.selected-branch');
-          if (selectedBranch) {
-            selectedBranch.scrollIntoView({ block: 'start', inline: 'nearest' });
+          const branch = document.querySelector('.selected-branch');
+          if (branch) {
+            branch.scrollIntoView({
+              block: 'start',
+              inline: 'nearest',
+            });
           }
         })
         .finally(() => loader.hide());
