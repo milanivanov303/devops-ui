@@ -3,13 +3,11 @@
     <Header />
     <main>
       <div class="row">
-        <div class="col s12">
-          <transition
-            :name="transitionName"
-            mode="out-in">
-            <slot />
-          </transition>
-        </div>
+        <transition
+          :name="transitionName"
+          mode="out-in">
+          <slot />
+        </transition>
       </div>
     </main>
     <Footer />
