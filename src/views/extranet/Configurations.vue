@@ -13,16 +13,16 @@
         @delete="openDeleteModal"
       >
         <Column show="project"/>
-        <Column show="type" label="App Type"/>
-        <Column show="version" label="App Version"></Column>
         <Column show="delivery_chain"/>
         <Column show="instance"/>
+        <Column show="app_type"/>
+        <Column show="app_version"/>
         <Column show="branch"/>
         <Column show="prefix"/>
         <Column show="servlet_container"/>
         <Column show="jdk"/>
         <Column show="jre"/>
-        <Column show="description" label="Additional Info" width="20%"/>
+        <Column show="additional_info"/>
       </Table>
 
     </div>
@@ -34,36 +34,6 @@
         configuration
       </template>
       <template v-slot:content>
-        <div class="row">
-          <TextInput
-            class="col s12"
-            label="Type"
-            icon="title"
-            v-model="configuration.type"
-            :invalid="$v.configuration.type.$error"
-            @blur="$v.configuration.type.$touch()"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.type.$error">
-              <p v-if="!$v.configuration.type.required">Type field must not be empty.</p>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <TextInput
-            class="col s12"
-            label="Version"
-            icon="history"
-            v-model="configuration.version"
-            :invalid="$v.configuration.version.$error"
-            @blur="$v.configuration.version.$touch()"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.version.$error">
-              <p v-if="!$v.configuration.version.required">Version field must not be empty.</p>
-            </div>
-          </div>
-        </div>
         <div class="row">
           <Autocomplete
             class="col s12"
@@ -114,6 +84,38 @@
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.instance.$error">
               <p v-if="!$v.configuration.instance.required">Instance field must not be empty.</p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <TextInput
+            class="col s12"
+            label="App Type"
+            icon="title"
+            v-model="configuration.app_type"
+            :invalid="$v.configuration.app_type.$error"
+            @blur="$v.configuration.app_type.$touch()"
+          />
+          <div class="validator col s12">
+            <div class="red-text" v-if="$v.configuration.app_type.$error">
+              <p v-if="!$v.configuration.app_type.required">App Type field must not be empty.</p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <TextInput
+            class="col s12"
+            label="App Version"
+            icon="history"
+            v-model="configuration.app_version"
+            :invalid="$v.configuration.app_version.$error"
+            @blur="$v.configuration.app_version.$touch()"
+          />
+          <div class="validator col s12">
+            <div class="red-text" v-if="$v.configuration.app_version.$error">
+              <p v-if="!$v.configuration.app_version.required">
+                App Version field must not be empty.
+              </p>
             </div>
           </div>
         </div>
@@ -198,9 +200,9 @@
         <div class="row">
           <TextArea
             class="col s12"
-            label="Description"
+            label="Additional info"
             icon="description"
-            v-model="configuration.description"
+            v-model="configuration.additional_info"
           />
         </div>
       </template>
@@ -296,10 +298,10 @@ export default {
   },
   validations: {
     configuration: {
-      type: {
+      app_type: {
         required,
       },
-      version: {
+      app_version: {
         required,
       },
       project: {
@@ -403,8 +405,8 @@ export default {
 
       const payload = Object.assign({}, this.configuration);
 
-      payload.type = this.configuration.type;
-      payload.version = this.configuration.version;
+      payload.app_type = this.configuration.app_type;
+      payload.app_version = this.configuration.app_version;
       payload.project = this.configuration.project.name;
       payload.delivery_chain = this.configuration.delivery_chain.title;
       payload.instance = this.configuration.instance.name;
@@ -415,7 +417,7 @@ export default {
         .then(() => {
           this.$M.toast({
             html: `The configuration has been ${this.action}d!`,
-            classes: 'toast-seccess'
+            classes: 'toast-seccess',
           });
           this.showAddEditModal = false;
         })
@@ -423,7 +425,7 @@ export default {
           if (error.response.status === 403) {
             this.$M.toast({
               html: `You do not have insufficient rights to ${this.action} this configuration`,
-              classes: 'toast-fail'
+              classes: 'toast-fail',
             });
           }
         });

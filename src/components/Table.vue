@@ -2,11 +2,11 @@
   <div class="table-component" >
 
     <div class="row">
-      <div class="input-field col s12 m6 l6">
+      <div class="input-field col s12 m6 l4">
         <i class="material-icons prefix">search</i>
         <input type="text" placeholder="Search..." v-model="currentFilter"/>
       </div>
-      <div class="col s12 m6 l6">
+      <div class="col s12 m6 l8">
         <button
           class="btn-floating waves-effect waves-light right"
           title="Add"
@@ -64,7 +64,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(row, index) in paginatedRows" :key="index">
+        <tr v-for="(row, index) in getPaginatedRows()" :key="index">
           <td
             v-for="(column, index) in columns"
             :key="index"
@@ -128,213 +128,213 @@
 </template>
 
 <script>
-  import Paginate from 'vuejs-paginate/src/components/Paginate';
+import Paginate from 'vuejs-paginate/src/components/Paginate';
 
-  export default {
-    components: {
-      Paginate,
-    },
-    props: {
-      data: { default: () => [], type: Array },
-      noDataText: { default: 'There are no records', type: String},
-      addBtn: { default: true, type: Boolean},
-      exportBtn: { default: true, type: Boolean},
-      viewBtn: { default: true, type: Boolean },
-      editBtn: { default: true, type: Boolean},
-      deleteBtn: { default: true, type: Boolean},
-      filter: { type: String },
-      sortBy: { type: String },
-      sortDir: { type: String },
-      page: { default: 1, type: Number },
-      perPage: { default: 10, type: Number },
-      queryPrefix: { default: '', type: String },
-    },
-    data() {
-      return {
-        columns: [],
-        currentFilter: this.filter,
-        currentSortBy: this.sortBy,
-        currentSortDir: this.sortDir,
-        currentPage: this.page,
-        currentPerPage: this.perPage,
-        lastPage: 1,
-      };
-    },
-    computed: {
-      rows() {
-        let data = this.data;
+export default {
+  components: {
+    Paginate,
+  },
+  props: {
+    data: { default: () => [], type: Array },
+    noDataText: { default: 'There are no records', type: String },
+    addBtn: { default: true, type: Boolean },
+    exportBtn: { default: true, type: Boolean },
+    viewBtn: { default: true, type: Boolean },
+    editBtn: { default: true, type: Boolean },
+    deleteBtn: { default: true, type: Boolean },
+    filter: { type: String },
+    sortBy: { type: String },
+    sortDir: { type: String },
+    page: { default: 1, type: Number },
+    perPage: { default: 10, type: Number },
+    queryPrefix: { default: '', type: String },
+  },
+  data() {
+    return {
+      columns: [],
+      currentFilter: this.filter,
+      currentSortBy: this.sortBy,
+      currentSortDir: this.sortDir,
+      currentPage: this.page,
+      currentPerPage: this.perPage,
+      lastPage: 1,
+    };
+  },
+  computed: {
+    rows() {
+      let { data } = this;
 
-        if (this.currentFilter) {
-          data = data.filter((row) => {
-            const filter = this.currentFilter.toLowerCase();
+      if (this.currentFilter) {
+        data = data.filter((row) => {
+          const filter = this.currentFilter.toLowerCase();
 
-            return Object.keys(row).some((key) => {
-              const columnValue = String(row[key]).toLowerCase();
+          return Object.keys(row).some((key) => {
+            const columnValue = String(row[key]).toLowerCase();
 
-              return columnValue.indexOf(filter) > -1;
-            })
+            return columnValue.indexOf(filter) > -1;
           });
-        }
-
-        if (this.currentSortBy) {
-          data = data.sort((a, b) => {
-            const sortDir = this.currentSortDir === 'asc' ? 1 : -1;
-
-            const dataA = this.getColumnData(a, this.currentSortBy);
-            const dataB = this.getColumnData(b, this.currentSortBy);
-
-            if (dataA > dataB) {
-              return 1 * sortDir;
-            }
-            if (dataA < dataB) {
-              return -1 * sortDir;
-            }
-            return 0;
-          });
-        }
-
-        return data;
-      },
-      paginatedRows() {
-        if (!this.rows.length) {
-          return this.rows;
-        }
-
-        if (this.currentPerPage === 0) {
-          return this.rows;
-        }
-
-        this.lastPage = Math.ceil(this.rows.length / this.currentPerPage);
-
-        if (this.currentPage > this.lastPage) {
-          this.currentPage = this.lastPage;
-        }
-
-        const from = (this.currentPage * this.currentPerPage) - this.currentPerPage;
-        const to = this.currentPage * this.currentPerPage;
-
-        return this.rows.slice(from, to);
+        });
       }
+
+      if (this.currentSortBy) {
+        data = data.sort((a, b) => {
+          const sortDir = this.currentSortDir === 'asc' ? 1 : -1;
+
+          const dataA = this.getColumnData(a, this.currentSortBy);
+          const dataB = this.getColumnData(b, this.currentSortBy);
+
+          if (dataA > dataB) {
+            return 1 * sortDir;
+          }
+          if (dataA < dataB) {
+            return -1 * sortDir;
+          }
+          return 0;
+        });
+      }
+
+      return data;
     },
-    methods: {
-      getColumnHeader(column) {
-        if (column.componentOptions.propsData.label) {
-          return column.componentOptions.propsData.label;
-        }
-
-        if (typeof column.componentOptions.propsData.show === 'string') {
-          const label = column.componentOptions.propsData.show.split('_').join(' ');
-          return label.charAt(0).toUpperCase() + label.slice(1);
-        }
-
-        return 'no-label';
-      },
-      getColumnData(row, show) {
-        if (typeof show === 'function') {
-          return show(row);
-        }
-
-        return row[show];
-      },
-      setSort(sortBy, event) {
-        event.preventDefault();
-
-        if (this.currentSortBy === sortBy) {
-          this.currentSortDir = this.currentSortDir === 'asc' ? 'desc' : 'asc';
-        }
-
-        if (this.currentSortBy !== sortBy) {
-          this.currentSortDir = 'asc';
-        }
-
-        this.currentSortBy = sortBy;
-      },
-      showActionsColumn() {
-        if (this.viewBtn || this.editBtn || this.deleteBtn) {
-          return true;
-        }
-        if (this.$scopedSlots['actions-after']) {
-          return true;
-        }
-        if (this.$scopedSlots['actions-before']) {
-          return true;
-        }
-        return false;
-      },
-      modifyQueryParam(param, value) {
-        let query = Object.assign({}, this.$route.query);
-
-        if (value) {
-          query[this.queryPrefix + param] = value;
-        } else {
-          delete query[this.queryPrefix + param];
-        }
-
-        this.$router.push({ query });
-      },
-      getQueryParam(param, _default = '') {
-        return this.$route.query[this.queryPrefix + param] || _default;
+  },
+  methods: {
+    getPaginatedRows() {
+      if (!this.rows.length) {
+        return this.rows;
       }
+
+      if (this.currentPerPage === 0) {
+        return this.rows;
+      }
+
+      this.lastPage = Math.ceil(this.rows.length / this.currentPerPage);
+
+      if (this.currentPage > this.lastPage) {
+        this.currentPage = this.lastPage;
+      }
+
+      const from = (this.currentPage * this.currentPerPage) - this.currentPerPage;
+      const to = this.currentPage * this.currentPerPage;
+
+      return this.rows.slice(from, to);
     },
-    watch: {
-      currentFilter() {
-        this.currentPage = 1;
-        this.modifyQueryParam('filter', this.currentFilter);
-      },
-      currentSortBy() {
-        this.currentPage = 1;
-        this.modifyQueryParam('sort_by', this.currentSortBy);
-      },
-      currentSortDir() {
-        this.currentPage = 1;
-        this.modifyQueryParam('sort_dir', this.currentSortDir);
-      },
-      currentPage() {
-        this.modifyQueryParam('page', this.currentPage);
-      },
-    },
-    created() {
-      const filter = this.getQueryParam('filter');
-      if (filter) {
-        this.currentFilter = filter;
+    getColumnHeader(column) {
+      if (column.componentOptions.propsData.label) {
+        return column.componentOptions.propsData.label;
       }
 
-      const sortBy = this.getQueryParam('sort_by');
-      if (sortBy) {
-        this.currentSortBy = sortBy;
+      if (typeof column.componentOptions.propsData.show === 'string') {
+        const label = column.componentOptions.propsData.show.split('_').join(' ');
+        return label.charAt(0).toUpperCase() + label.slice(1);
       }
 
-      const sortDir = this.getQueryParam('sort_dir');
-      if (sortDir) {
-        this.currentSortDir = sortDir;
+      return 'no-label';
+    },
+    getColumnData(row, show) {
+      if (typeof show === 'function') {
+        return show(row);
       }
 
-      const page = this.getQueryParam('page');
-      if (page) {
-        // delay current page setting as it gets reset to 1
-        setTimeout(() => {
-          this.currentPage = parseInt(page, 10);
-        }, 50);
+      return row[show];
+    },
+    setSort(sortBy, event) {
+      event.preventDefault();
+
+      if (this.currentSortBy === sortBy) {
+        this.currentSortDir = this.currentSortDir === 'asc' ? 'desc' : 'asc';
       }
+
+      if (this.currentSortBy !== sortBy) {
+        this.currentSortDir = 'asc';
+      }
+
+      this.currentSortBy = sortBy;
     },
-    mounted() {
-      this.columns = this.$slots.default.filter(column => column.componentOptions.tag === 'Column');
+    showActionsColumn() {
+      if (this.viewBtn || this.editBtn || this.deleteBtn) {
+        return true;
+      }
+      if (this.$scopedSlots['actions-after']) {
+        return true;
+      }
+      if (this.$scopedSlots['actions-before']) {
+        return true;
+      }
+      return false;
     },
-    updated() {
-      this.$M.FormSelect.init(this.$el.querySelectorAll('select'));
-      this.$M.Tooltip.init(this.$el.querySelectorAll('[data-tooltip]'));
+    modifyQueryParam(param, value) {
+      const query = Object.assign({}, this.$route.query);
+
+      if (value) {
+        query[this.queryPrefix + param] = value;
+      } else {
+        delete query[this.queryPrefix + param];
+      }
+
+      this.$router.push({ query });
+    },
+    getQueryParam(param, _default = '') {
+      return this.$route.query[this.queryPrefix + param] || _default;
+    },
+  },
+  watch: {
+    currentFilter() {
+      this.currentPage = 1;
+      this.modifyQueryParam('filter', this.currentFilter);
+    },
+    currentSortBy() {
+      this.currentPage = 1;
+      this.modifyQueryParam('sort_by', this.currentSortBy);
+    },
+    currentSortDir() {
+      this.currentPage = 1;
+      this.modifyQueryParam('sort_dir', this.currentSortDir);
+    },
+    currentPage() {
+      this.modifyQueryParam('page', this.currentPage);
+    },
+  },
+  created() {
+    const filter = this.getQueryParam('filter');
+    if (filter) {
+      this.currentFilter = filter;
     }
-  }
 
-  export const Column = {
-    props: {
-      show: { type: [String, Function] },
-      label: { type: [String, Function] },
-      info: { type: String },
-      sortable: { default: true, type: Boolean },
-      filterable: { default: true, type: Boolean },
+    const sortBy = this.getQueryParam('sort_by');
+    if (sortBy) {
+      this.currentSortBy = sortBy;
     }
-  }
+
+    const sortDir = this.getQueryParam('sort_dir');
+    if (sortDir) {
+      this.currentSortDir = sortDir;
+    }
+
+    const page = this.getQueryParam('page');
+    if (page) {
+      // delay current page setting as it gets reset to 1
+      setTimeout(() => {
+        this.currentPage = parseInt(page, 10);
+      }, 50);
+    }
+  },
+  mounted() {
+    this.columns = this.$slots.default.filter(column => column.componentOptions.tag === 'Column');
+  },
+  updated() {
+    this.$M.FormSelect.init(this.$el.querySelectorAll('select'));
+    this.$M.Tooltip.init(this.$el.querySelectorAll('[data-tooltip]'));
+  },
+};
+
+export const Column = {
+  props: {
+    show: { type: [String, Function] },
+    label: { type: [String, Function] },
+    info: { type: String },
+    sortable: { default: true, type: Boolean },
+    filterable: { default: true, type: Boolean },
+  },
+};
 </script>
 
 <style type="text/scss">
