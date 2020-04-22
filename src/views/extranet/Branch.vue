@@ -5,15 +5,15 @@
         <h4>{{ branch }}</h4>
       </div>
     </div>
-    <Builds :containers="containers"></Builds>
+    <Builds/>
     <br>
     <Build />
   </div>
 </template>
 
 <script>
-import Build from '@/components/extranet/Build';
-import Builds from '@/components/extranet/Builds';
+import Build from '@/views/extranet/components/Build';
+import Builds from '@/views/extranet/components/Builds';
 
 export default {
   components: {
@@ -23,9 +23,6 @@ export default {
   computed: {
     branch() {
       return this.$route.params.branch;
-    },
-    containers() {
-      return this.$store.getters['extranet/getContainersByBranch'](this.branch);
     },
   },
 };

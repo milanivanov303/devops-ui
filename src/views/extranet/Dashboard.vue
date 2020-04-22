@@ -1,5 +1,5 @@
 <template>
-  <div class="extranet row">
+  <div class="extranet">
     <div v-if="$route.meta.name === 'extranet'" >
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import Builds from '@/components/extranet/Builds';
+import Builds from '@/views/extranet/components/Builds';
 import BarChart from '../../components/BarChart';
 
 export default {

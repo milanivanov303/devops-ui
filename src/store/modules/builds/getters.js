@@ -44,4 +44,17 @@ export default {
       {},
     );
   },
+
+  getForBranch: state => (stateName, branch) => {
+    if (!state.builds[stateName]) {
+      return [];
+    }
+
+    return state.builds[stateName].filter((build) => {
+      if (build.details.branch === branch) {
+        return true;
+      }
+      return false;
+    });
+  },
 };
