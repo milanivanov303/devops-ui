@@ -25,7 +25,7 @@
         </div>
       </template>
       <template v-slot:content>
-        <form class=" col s12 l10 offset-l1">
+        <form class=" col s12 l11">
           <div class="row">
             <div class="input-field col s12" :class="{invalid: $v.selectedDemo.name.$error}">
               <i class="material-icons prefix">person</i>
@@ -325,10 +325,6 @@ export default {
       this.action = action;
       this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, { status: 'approved' }, demo);
       this.selectBusiness.selected = { name: this.selectedDemo.business };
-      this.selectedDemo.active_from = DateTime.fromSQL(this.selectedDemo.active_from)
-        .toISO();
-      this.selectedDemo.active_to = DateTime.fromSQL(this.selectedDemo.active_to)
-        .toISO();
       const status = this.selectStatus.options
         .find(status => status.value === this.selectedDemo.status);
       if (status) {
@@ -358,7 +354,6 @@ export default {
       this.selectedDemo.business = value.name;
     },
     selectedStatus(value) {
-      this.$v.selectedDemo.status.$touch();
       this.selectedDemo.status = value.value;
     },
     endDateCheck() {
