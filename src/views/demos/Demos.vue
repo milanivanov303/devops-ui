@@ -336,11 +336,11 @@ export default {
       }
       if (this.selectedDemo.id) {
         this.$router.push({
-          path: `/demo/${encodeURIComponent(this.selectedDemo.id)}`,
+          path: `/demos/list/${encodeURIComponent(this.selectedDemo.id)}`,
         });
       } else {
         this.$router.push({
-          path: '/demo/new',
+          path: '/demos/list/new',
         });
       }
     },
@@ -349,7 +349,7 @@ export default {
       this.showAddEditDemoModal = false;
       this.$v.$reset();
       this.$router.push({
-        path: '/demo/',
+        path: '/demos/list',
       });
     },
 
