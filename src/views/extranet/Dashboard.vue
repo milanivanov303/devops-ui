@@ -5,7 +5,36 @@
         <div class="card" ref="my_builds">
           <div class="card-content">
             <span class="card-title">My active extranet builds</span>
-            <Builds :containers="userContainers" ></Builds>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Status</th>
+                  <th>Created By</th>
+                  <th>Url</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(container, index) in userContainers" :key="index">
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ container.Labels.build }}</td>
+                  <td>{{ container.Status }}</td>
+                  <td>{{ container.Labels.username }}</td>
+                  <td>
+                    <a
+                      v-if="container.State === 'running'"
+                      :href="getDeployedBuildUrl(container)"
+                      target="_blank">
+                      <i class="material-icons">cast_connected</i>
+                    </a>
+                  </td>
+                </tr>
+                <tr v-if="userContainers.length === 0">
+                  <td colspan="3">There are no builds</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
@@ -68,12 +97,10 @@
 </template>
 
 <script>
-import Builds from '@/views/extranet/components/Builds';
 import BarChart from '../../components/BarChart';
 
 export default {
   components: {
-    Builds,
     BarChart,
   },
   data() {
@@ -118,6 +145,9 @@ export default {
     };
   },
   computed: {
+    host() {
+      return this.$store.state.extranet.host;
+    },
     userContainers() {
       return this.$store.getters['extranet/getContainersByUser'](
         this.$auth.getUser().username,
@@ -179,13 +209,15 @@ export default {
 
       return Math.round(new Date(newDate).getTime() / 1000);
     },
+    getDeployedBuildUrl(container) {
+      const port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
+      return `http://${this.host}:${port}/${container.Labels.build}/`;
+    },
   },
   mounted() {
-    if (this.$route.meta.name === 'extranet') {
-      this.getContainers();
-      this.getBranchStatistics();
-      this.getUserStatistics();
-    }
+    this.getContainers();
+    this.getBranchStatistics();
+    this.getUserStatistics();
   },
 };
 </script>

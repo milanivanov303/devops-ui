@@ -51,7 +51,7 @@
       </tbody>
     </table>
 
-    <Modal v-if="showInfoModal" @close="showInfoModal = false" class="right-sheet">
+    <Modal v-if="showInfoModal" @close="closeBuildInfoModal()" class="right-sheet">
       <template v-slot:header>{{ container.Labels.build }}</template>
       <template v-slot:content>
         <div class="col s12 l11">
@@ -85,7 +85,7 @@
                 type="text"
                 id="java_version"
                 v-model="selectedBuild.java_version">
-              <label :class="{active: selectedBuild.java_version}" 
+              <label :class="{active: selectedBuild.java_version}"
                      for="java_version">Java Version
               </label>
             </div>
@@ -278,6 +278,10 @@ export default {
         }
         return false;
       });
+    },
+    closeBuildInfoModal() {
+      this.showInfoModal = false;
+      this.selectedBuild = {};
     },
 
     openRemoveBuildModal(container) {
