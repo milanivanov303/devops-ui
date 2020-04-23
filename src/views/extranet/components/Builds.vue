@@ -85,34 +85,35 @@
                 type="text"
                 id="java_version"
                 v-model="selectedBuild.java_version">
-              <label :class="{active: selectedBuild.java_version}"
-                      for="java_version">Java Version</label>
+              <label :class="{active: selectedBuild.java_version}" 
+                     for="java_version">Java Version
+              </label>
             </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <i class="material-icons prefix">event</i>
-                <input
-                  class="readonly"
-                  type="text"
-                  id="created_on"
-                  v-model="selectedBuild.created_on">
-                <label :class="{active: selectedBuild.created_on}"
-                       for="created_on">Created on
-                </label>
-              </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">event</i>
+              <input
+                class="readonly"
+                type="text"
+                id="created_on"
+                v-model="selectedBuild.created_on">
+              <label :class="{active: selectedBuild.created_on}"
+                     for="created_on">Created on
+              </label>
             </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <i class="material-icons prefix">person</i>
-                <input
-                  class="readonly"
-                  type="text"
-                  id="created_by"
-                  v-model="selectedBuild.created_by">
-                <label :class="{active: selectedBuild.created_by}"
-                       for="created_by">Created by
-                </label>
-              </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">person</i>
+              <input
+                class="readonly"
+                type="text"
+                id="created_by"
+                v-model="selectedBuild.created_by">
+              <label :class="{active: selectedBuild.created_by}"
+                      for="created_by">Created by
+              </label>
             </div>
           </div>
           <div class="row">
