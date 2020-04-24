@@ -1,12 +1,13 @@
 <template>
   <div class="table-component" >
 
-    <div class="row">
+    <div class="row" v-if="showTopRow()">
       <div class="input-field col s12 m6 l4">
-        <i class="material-icons prefix">search</i>
-        <input type="text" placeholder="Search..." v-model="currentFilter"/>
+        <i v-if="searchField" class="material-icons prefix">search</i>
+        <input v-if="searchField" type="text" placeholder="Search..." v-model="currentFilter"/>
       </div>
       <div class="col s12 m6 l8">
+        <slot name="top-actions-before" :rows="rows"></slot>
         <button
           class="btn-floating waves-effect waves-light right"
           title="Add"
@@ -23,6 +24,7 @@
          >
           <i class="material-icons left">description</i>
         </button>
+        <slot name="top-actions-after" :rows="rows"></slot>
       </div>
     </div>
 
@@ -94,7 +96,7 @@
       </tbody>
     </table>
 
-    <div class="row">
+    <div class="row" v-if="pagination">
       <div class="col s12 m6 l6">
         <Paginate
           v-if="lastPage > 1"
@@ -137,6 +139,7 @@ export default {
   props: {
     data: { default: () => [], type: Array },
     noDataText: { default: 'There are no records', type: String },
+    searchField: { default: true, Boolean },
     addBtn: { default: true, type: Boolean },
     exportBtn: { default: true, type: Boolean },
     viewBtn: { default: true, type: Boolean },
@@ -145,6 +148,7 @@ export default {
     filter: { type: String },
     sortBy: { type: String },
     sortDir: { type: String },
+    pagination: { default: true, type: Boolean },
     page: { default: 1, type: Number },
     perPage: { default: 10, type: Number },
     queryPrefix: { default: '', type: String },
@@ -261,6 +265,18 @@ export default {
       }
       return false;
     },
+    showTopRow() {
+      if (this.addBtn || this.exportBtn || this.searchField) {
+        return true;
+      }
+      if (this.$scopedSlots['top-actions-before']) {
+        return true;
+      }
+      if (this.$scopedSlots['top-actions-after']) {
+        return true;
+      }
+      return false;
+    },
     modifyQueryParam(param, value) {
       const query = Object.assign({}, this.$route.query);
 
@@ -318,7 +334,9 @@ export default {
     }
   },
   mounted() {
-    this.columns = this.$slots.default.filter(column => column.componentOptions.tag === 'Column');
+    this.columns = this.$slots.default.filter(
+      column => column.componentOptions && column.componentOptions.tag === 'Column',
+    );
   },
   updated() {
     this.$M.FormSelect.init(this.$el.querySelectorAll('select'));

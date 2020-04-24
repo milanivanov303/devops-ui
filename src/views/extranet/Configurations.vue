@@ -8,11 +8,15 @@
         sort-dir="asc"
         :export-btn="false"
         :view-btn="false"
+        :add-btn="$auth.can('extranet.manage-configurations')"
+        :edit-btn="$auth.can('extranet.manage-configurations')"
+        :delete-btn="$auth.can('extranet.manage-configurations')"
         @add="openAddEditModal('create')"
         @edit="(row) => openAddEditModal('update', row)"
         @delete="openDeleteModal"
       >
         <Column show="project"/>
+        <Column show="project_type"/>
         <Column show="delivery_chain"/>
         <Column show="instance"/>
         <Column show="app_type"/>
@@ -22,7 +26,14 @@
         <Column show="servlet_container"/>
         <Column show="jdk"/>
         <Column show="jre"/>
-        <Column show="additional_info"/>
+        <Column
+          show="additional_info"
+          v-if="
+            $auth.can('extranet.manage-configurations')
+            ||
+            $auth.can('extranet.see-configurations-additional-info')
+          "
+        />
       </Table>
 
     </div>
@@ -48,6 +59,23 @@
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.project.$error">
               <p v-if="!$v.configuration.project.required">Project field must not be empty.</p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <TextInput
+            class="col s12"
+            label="Project Type"
+            icon="title"
+            v-model="configuration.project_type"
+            :invalid="$v.configuration.project_type.$error"
+            @blur="$v.configuration.project_type.$touch()"
+          />
+          <div class="validator col s12">
+            <div class="red-text" v-if="$v.configuration.project_type.$error">
+              <p v-if="!$v.configuration.project_type.required">
+                Project type field must not be empty.
+              </p>
             </div>
           </div>
         </div>
@@ -302,6 +330,9 @@ export default {
         required,
       },
       app_version: {
+        required,
+      },
+      project_type: {
         required,
       },
       project: {
