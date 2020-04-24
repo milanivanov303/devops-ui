@@ -1,9 +1,10 @@
 import auth from '@/plugins/auth';
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
-const ExtranetDashboard = () => import(/* webpackChunkName: "extranet-dashboard" */ '../views/extranet/Dashboard.vue');
+const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Dashboard.vue');
 const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
 const ExtranetBranch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
+const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations.vue');
 const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
 const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
@@ -11,7 +12,6 @@ const Demo = () => import(/* webpackChunkName: "demo" */ '../views/Demo.vue');
 const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
 const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions.vue');
-
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
@@ -92,6 +92,17 @@ export default [
         component: ExtranetBranch,
       },
     ],
+  },
+  {
+    path: '/extranet/configurations/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'extranet-configurations',
+      transitionName: 'slide',
+      title: 'Extranet Configurations',
+      breadcrumb: 'Configurations',
+    },
+    component: ExtranetConfigurations,
   },
   {
     path: '/imx-fe',

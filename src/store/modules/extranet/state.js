@@ -5,7 +5,7 @@ export default {
   containers: [],
   clients: [],
   feBranches: [],
-  builds: [],
+  configurations: [],
   host: '',
   error: '',
 };
