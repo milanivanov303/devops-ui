@@ -232,18 +232,10 @@ export default {
       error: null,
     };
   },
-  computed: {
-    host() {
-      return this.$store.state.extranet.host;
-    },
-  },
   methods: {
     getDeployedBuildUrl(container) {
       const port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
-      if (container.Labels.type === 'imx_fe') {
-        return `http://${this.$store.state.imx_fe.host}:${port}/${container.Labels.build}/`;
-      }
-      return `http://${this.$store.state.extranet.host}:${port}/${container.Labels.build}/`;
+      return `http://${this.$store.state[container.Labels.type].host}:${port}/${container.Labels.build}/`;
     },
 
     openBuildInfoModal(container) {
@@ -285,25 +277,10 @@ export default {
     },
     removeBuild(container) {
       this.removing = true;
-      if (container.Labels.type === 'extranet') {
-        this.$store.dispatch('extranet/removeBuild', container.Id)
-          .then(() => {
-            this.removed = true;
-            this.$store.dispatch('extranet/getContainers');
-          })
-          .catch((error) => {
-            if (error.response.status === 403) {
-              this.error = 'You do not have insufficient rights to remove this build';
-            } else {
-              this.error = error;
-            }
-          })
-          .finally(() => { this.removing = false; });
-      }
-      this.$store.dispatch('imx_fe/removeBuild', container.Id)
+      this.$store.dispatch(`${container.Labels.type}/removeBuild`, container.Id)
         .then(() => {
           this.removed = true;
-          this.$store.dispatch('imx_fe/getContainers');
+          //this.$store.dispatch(`${container.Labels.type}/getContainers`);
         })
         .catch((error) => {
           if (error.response.status === 403) {
