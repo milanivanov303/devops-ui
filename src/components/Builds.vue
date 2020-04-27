@@ -217,6 +217,10 @@
 <script>
 
 export default {
+  props: {
+    containers: Array,
+    builds: Array,
+  },
   data() {
     return {
       selectedBuild: {},
@@ -232,39 +236,27 @@ export default {
     host() {
       return this.$store.state.extranet.host;
     },
-    containers() {
-      return this.$store.getters['extranet/getContainersByBranch'](this.$route.params.branch);
-    },
-    builds() {
-      return this.$store.getters['builds/getForBranch']('branch-builds', this.$route.params.branch);
-    },
   },
   methods: {
-    getContainers() {
-      const loader = this.$loading.show({ container: this.$refs.builds });
-      this.$store.dispatch('extranet/getContainers').then(() => {
-        loader.hide();
-      });
-    },
-    getBuilds() {
-      this.$store.dispatch('builds/getBuilds', { stateName: 'branch-builds' });
-    },
-
     getDeployedBuildUrl(container) {
       const port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
-      return `http://${this.host}:${port}/${container.Labels.build}/`;
+      if (container.Labels.type === 'imx_fe') {
+        return `http://${this.$store.state.imx_fe.host}:${port}/${container.Labels.build}/`;
+      }
+      return `http://${this.$store.state.extranet.host}:${port}/${container.Labels.build}/`;
     },
 
     openBuildInfoModal(container) {
       this.showInfoModal = true;
       this.container = container;
       this.builds.find((build) => {
-        if (container.Labels.build === ''.concat(
-          build.details.branch, '.',
-          build.details.client.name, '.',
-          build.details.instance.name, '.',
-          build.details.java_version,
-        )) {
+        if (typeof build.details.instance !== 'undefined'
+          && container.Labels.build === ''.concat(
+            build.details.branch, '.',
+            build.details.client.name, '.',
+            build.details.instance.name, '.',
+            build.details.java_version,
+          )) {
           this.selectedBuild.created_by = container.Labels.username;
           this.selectedBuild.created_on = new Date(container.Created * 1000).toLocaleString('en-GB', { timeZone: 'UTC' });
           this.selectedBuild.branch = build.details.branch;
@@ -293,10 +285,25 @@ export default {
     },
     removeBuild(container) {
       this.removing = true;
-      this.$store.dispatch('extranet/removeBuild', container.Id)
+      if (container.Labels.type === 'extranet') {
+        this.$store.dispatch('extranet/removeBuild', container.Id)
+          .then(() => {
+            this.removed = true;
+            this.$store.dispatch('extranet/getContainers');
+          })
+          .catch((error) => {
+            if (error.response.status === 403) {
+              this.error = 'You do not have insufficient rights to remove this build';
+            } else {
+              this.error = error;
+            }
+          })
+          .finally(() => { this.removing = false; });
+      }
+      this.$store.dispatch('imx_fe/removeBuild', container.Id)
         .then(() => {
           this.removed = true;
-          this.$store.dispatch('extranet/getContainers');
+          this.$store.dispatch('imx_fe/getContainers');
         })
         .catch((error) => {
           if (error.response.status === 403) {
@@ -307,10 +314,6 @@ export default {
         })
         .finally(() => { this.removing = false; });
     },
-  },
-  mounted() {
-    this.getContainers();
-    this.getBuilds();
   },
 };
 </script>

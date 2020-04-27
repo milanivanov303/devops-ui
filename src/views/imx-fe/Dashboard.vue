@@ -4,38 +4,9 @@
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
           <div class="card-content">
-            <span class="card-title">My active iMX FE builds</span>
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Created By</th>
-                    <th>Url</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(container, index) in userContainers" :key="index">
-                    <td>{{ index + 1 }}</td>
-                    <td>{{ container.Labels.build }}</td>
-                    <td>{{ container.Status }}</td>
-                    <td>{{ container.Labels.username }}</td>
-                    <td>
-                      <a
-                        v-if="container.State === 'running'"
-                        :href="getDeployedBuildUrl(container)"
-                        target="_blank">
-                        <i class="material-icons">cast_connected</i>
-                      </a>
-                    </td>
-                  </tr>
-                  <tr v-if="userContainers.length === 0">
-                    <td colspan="3">There are no builds</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <span class="card-title">My active extranet builds</span>
+            <Builds :containers="userContainers" :builds="userBuilds"/>
+          </div>
         </div>
         <div class="card" ref="builds_by_branch">
           <div class="card-content">
@@ -97,10 +68,12 @@
 
 <script>
 import BarChart from '@/components/BarChart';
+import Builds from '@/components/Builds';
 
 export default {
   components: {
     BarChart,
+    Builds,
   },
   data() {
     return {

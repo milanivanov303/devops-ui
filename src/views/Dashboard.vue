@@ -4,36 +4,7 @@
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My active builds</span>
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Created By</th>
-                <th>Url</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(container, index) in userContainers" :key="index">
-                <td>{{ index + 1 }}</td>
-                <td>{{ container.Labels.build }}</td>
-                <td>{{ container.Status }}</td>
-                <td>{{ container.Labels.username }}</td>
-                <td>
-                  <a
-                    v-if="container.State === 'running'"
-                    :href="getDeployedBuildUrl(container)"
-                    target="_blank">
-                    <i class="material-icons">cast_connected</i>
-                  </a>
-                </td>
-              </tr>
-              <tr v-if="userContainers.length === 0">
-                <td colspan="3">There are no builds</td>
-              </tr>
-            </tbody>
-          </table>
+          <Builds :containers="userContainers" :builds="userBuilds"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
@@ -96,10 +67,13 @@
 
 <script>
 import BarChart from '@/components/BarChart';
+import Builds from '@/components/Builds';
+
 
 export default {
   components: {
     BarChart,
+    Builds,
   },
   data() {
     return {
@@ -154,6 +128,11 @@ export default {
 
       return [].concat(extranetContainers, imxFeContainers);
     },
+    userBuilds() {
+      return this.$store.getters['builds/getForUser'](
+        'user-builds', this.$auth.getUser().username,
+      );
+    },
     containersGroupedByBranch() {
       return this.$store.getters['extranet/getContainersGroupedByBranch']();
     },
@@ -192,6 +171,9 @@ export default {
         loader2.hide();
       });
     },
+    getBuildsByUser() {
+      this.$store.dispatch('builds/getBuilds', { stateName: 'user-builds' });
+    },
     getModuleStatistics(days = {}) {
       const loader = this.$loading.show({ container: this.$refs.stats_by_module });
       this.$store.dispatch(
@@ -218,13 +200,6 @@ export default {
       );
 
       return Math.round(new Date(newDate).getTime() / 1000);
-    },
-    getDeployedBuildUrl(container) {
-      const port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
-      if (container.Labels.type === 'imx_fe') {
-        return `http://${this.$store.state.imx_fe.host}:${port}/${container.Labels.build}/`;
-      }
-      return `http://${this.$store.state.extranet.host}:${port}/${container.Labels.build}/`;
     },
   },
   mounted() {

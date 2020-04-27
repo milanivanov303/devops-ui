@@ -2,4 +2,6 @@
 
 export default {
   getError: state => state.error,
+  getInstances: state => state.instances,
+
 };
