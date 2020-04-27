@@ -206,6 +206,7 @@ export default {
     this.getContainers();
     this.getModuleStatistics();
     this.getUserStatistics();
+    this.getBuildsByUser();
   },
 };
 </script>
