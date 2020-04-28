@@ -8,6 +8,9 @@ export default {
   fillDemos(state, demos) {
     state.demos = demos;
   },
+  demos(state, { name, data }) {
+    Vue.set(state.demos, name, data);
+  },
   createDemo(state, demo) {
     const { demos } = state;
     demos.push(demo);

@@ -32,8 +32,7 @@ export default {
     }
   },
 
-  getDemosForPeriod({ commit }, { startDate }) {
-    debugger;
+  getDemosForPeriod({ commit }, { stateName, startDate }) {
     const promise = api.get('demos', {
       filters: JSON.stringify({
         allOf: [
@@ -48,7 +47,7 @@ export default {
     });
 
     promise
-      .then((response) => commit('fillDemos', response.data.data ))
+      .then((response) => commit('demos',  { name: stateName, data: response.data.data } ))
       .catch(() => commit('error', 'Could not get demos list'));
 
     return promise;
