@@ -4,7 +4,7 @@
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My active builds</span>
-          <Builds :containers="userContainers" ></Builds>
+          <Builds :containers="userContainers" :builds="userBuilds"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
@@ -66,13 +66,14 @@
 </template>
 
 <script>
-import Builds from '@/views/extranet/components/Builds';
 import BarChart from '@/components/BarChart';
+import Builds from '@/components/Builds';
+
 
 export default {
   components: {
-    Builds,
     BarChart,
+    Builds,
   },
   data() {
     return {
@@ -127,6 +128,11 @@ export default {
 
       return [].concat(extranetContainers, imxFeContainers);
     },
+    userBuilds() {
+      return this.$store.getters['builds/getForUser'](
+        'user-builds', this.$auth.getUser().username,
+      );
+    },
     containersGroupedByBranch() {
       return this.$store.getters['extranet/getContainersGroupedByBranch']();
     },
@@ -165,6 +171,9 @@ export default {
         loader2.hide();
       });
     },
+    getBuildsByUser() {
+      this.$store.dispatch('builds/getBuilds', { stateName: 'user-builds' });
+    },
     getModuleStatistics(days = {}) {
       const loader = this.$loading.show({ container: this.$refs.stats_by_module });
       this.$store.dispatch(
@@ -197,6 +206,7 @@ export default {
     this.getContainers();
     this.getModuleStatistics();
     this.getUserStatistics();
+    this.getBuildsByUser();
   },
 };
 </script>

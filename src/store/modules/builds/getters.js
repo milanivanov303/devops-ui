@@ -57,4 +57,16 @@ export default {
       return false;
     });
   },
+  getForUser: state => (stateName, user) => {
+    if (!state.builds[stateName]) {
+      return [];
+    }
+
+    return state.builds[stateName].filter((build) => {
+      if (build.details.created_by === user) {
+        return true;
+      }
+      return false;
+    });
+  },
 };

@@ -16,4 +16,10 @@ export default {
   error(state, error) {
     state.error = error;
   },
+  removeBuild(state, id) {
+    state.containers.splice(
+      state.containers.findIndex((container) => container.Id === id),
+      1,
+    );
+  },
 };

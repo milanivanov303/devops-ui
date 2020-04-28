@@ -5,7 +5,7 @@
         <div class="card" ref="my_builds">
           <div class="card-content">
             <span class="card-title">My active extranet builds</span>
-            <Builds :containers="userContainers" ></Builds>
+            <Builds :containers="userContainers" :builds="userBuilds"/>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
@@ -68,8 +68,8 @@
 </template>
 
 <script>
-import Builds from '@/views/extranet/components/Builds';
-import BarChart from '../../components/BarChart';
+import Builds from '@/components/Builds';
+import BarChart from '@/components/BarChart';
 
 export default {
   components: {
@@ -118,10 +118,16 @@ export default {
     };
   },
   computed: {
+    host() {
+      return this.$store.state.extranet.host;
+    },
     userContainers() {
       return this.$store.getters['extranet/getContainersByUser'](
         this.$auth.getUser().username,
       );
+    },
+    userBuilds() {
+      return this.$store.getters['builds/getForUser']('user-builds', this.$auth.getUser().username);
     },
     containersGroupedByBranch() {
       return this.$store.getters['extranet/getContainersGroupedByBranch']();
@@ -152,6 +158,9 @@ export default {
         loader2.hide();
       });
     },
+    getBuildsByUser() {
+      this.$store.dispatch('builds/getBuilds', { stateName: 'user-builds' });
+    },
     getBranchStatistics(days = {}) {
       const loader = this.$loading.show({ container: this.$refs.stats_by_branch });
       this.$store.dispatch(
@@ -181,11 +190,10 @@ export default {
     },
   },
   mounted() {
-    if (this.$route.meta.name === 'extranet') {
-      this.getContainers();
-      this.getBranchStatistics();
-      this.getUserStatistics();
-    }
+    this.getContainers();
+    this.getBuildsByUser();
+    this.getBranchStatistics();
+    this.getUserStatistics();
   },
 };
 </script>

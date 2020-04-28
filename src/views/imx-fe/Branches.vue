@@ -129,6 +129,12 @@ export default {
     },
   },
   methods: {
+    getContainers() {
+      this.$store.dispatch('imx_fe/getContainers');
+    },
+    getBuilds() {
+      this.$store.dispatch('builds/getBuilds', { stateName: 'branch-builds' });
+    },
     selectedPerPage(value) {
       this.perPage = value.name;
     },
@@ -171,9 +177,6 @@ export default {
           }
         })
         .finally(() => loader.hide());
-    },
-    getContainers() {
-      this.$store.dispatch('imx_fe/getContainers');
     },
   },
   mounted() {

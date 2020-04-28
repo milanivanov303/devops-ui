@@ -4,8 +4,8 @@
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
           <div class="card-content">
-            <span class="card-title">My active iMX FE builds</span>
-            <Builds :containers="userContainers" ></Builds>
+            <span class="card-title">My active extranet builds</span>
+            <Builds :containers="userContainers" :builds="userBuilds"/>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
@@ -67,13 +67,13 @@
 </template>
 
 <script>
-import Builds from '@/views/imx-fe/components/Builds';
 import BarChart from '@/components/BarChart';
+import Builds from '@/components/Builds';
 
 export default {
   components: {
-    Builds,
     BarChart,
+    Builds,
   },
   data() {
     return {
@@ -117,6 +117,9 @@ export default {
     };
   },
   computed: {
+    host() {
+      return this.$store.state.extranet.host;
+    },
     userContainers() {
       return this.$store.getters['imx_fe/getContainersByUser'](
         this.$auth.getUser().username,
@@ -177,6 +180,10 @@ export default {
       );
 
       return Math.round(new Date(newDate).getTime() / 1000);
+    },
+    getDeployedBuildUrl(container) {
+      const port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
+      return `http://${this.host}:${port}/${container.Labels.build}/`;
     },
   },
   mounted() {
