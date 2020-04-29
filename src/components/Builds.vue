@@ -51,7 +51,7 @@
       </tbody>
     </table>
 
-    <Modal v-if="showInfoModal" @close="showInfoModal = false" class="right-sheet">
+    <Modal v-if="showInfoModal" @close="closeBuildInfoModal()" class="right-sheet">
       <template v-slot:header>{{ container.Labels.build }}</template>
       <template v-slot:content>
         <div class="col s12 l11">
@@ -85,7 +85,7 @@
                 type="text"
                 id="java_version"
                 v-model="selectedBuild.java_version">
-              <label :class="{active: selectedBuild.java_version}" 
+              <label :class="{active: selectedBuild.java_version}"
                      for="java_version">Java Version
               </label>
             </div>
@@ -217,6 +217,10 @@
 <script>
 
 export default {
+  props: {
+    containers: Array,
+    builds: Array,
+  },
   data() {
     return {
       selectedBuild: {},
@@ -228,43 +232,29 @@ export default {
       error: null,
     };
   },
-  computed: {
-    host() {
-      return this.$store.state.extranet.host;
-    },
-    containers() {
-      return this.$store.getters['extranet/getContainersByBranch'](this.$route.params.branch);
-    },
-    builds() {
-      return this.$store.getters['builds/getForBranch']('branch-builds', this.$route.params.branch);
-    },
-  },
   methods: {
-    getContainers() {
-      const loader = this.$loading.show({ container: this.$refs.builds });
-      this.$store.dispatch('extranet/getContainers').then(() => {
-        loader.hide();
-      });
-    },
-    getBuilds() {
-      this.$store.dispatch('builds/getBuilds', { stateName: 'branch-builds' });
-    },
-
     getDeployedBuildUrl(container) {
-      const port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
-      return `http://${this.host}:${port}/${container.Labels.build}/`;
+      const host = this.$store.state[container.Labels.type].host;
+      const port = container.Ports.find(
+        value => value.PrivatePort === 8591 || value.PrivatePort === 8080
+      );
+      if (host && port) {
+        return `http://${host}:${port.PublicPort}/${container.Labels.build}/`;
+      }
+      return "#no-build-url-found";
     },
 
     openBuildInfoModal(container) {
       this.showInfoModal = true;
       this.container = container;
       this.builds.find((build) => {
-        if (container.Labels.build === ''.concat(
-          build.details.branch, '.',
-          build.details.client.name, '.',
-          build.details.instance.name, '.',
-          build.details.java_version,
-        )) {
+        if (typeof build.details.instance !== 'undefined'
+          && container.Labels.build === ''.concat(
+            build.details.branch, '.',
+            build.details.client.name, '.',
+            build.details.instance.name, '.',
+            build.details.java_version,
+          )) {
           this.selectedBuild.created_by = container.Labels.username;
           this.selectedBuild.created_on = new Date(container.Created * 1000).toLocaleString('en-GB', { timeZone: 'UTC' });
           this.selectedBuild.branch = build.details.branch;
@@ -279,6 +269,10 @@ export default {
         return false;
       });
     },
+    closeBuildInfoModal() {
+      this.showInfoModal = false;
+      this.selectedBuild = {};
+    },
 
     openRemoveBuildModal(container) {
       this.showModal = true;
@@ -289,10 +283,10 @@ export default {
     },
     removeBuild(container) {
       this.removing = true;
-      this.$store.dispatch('extranet/removeBuild', container.Id)
+      this.$store.dispatch(`${container.Labels.type}/removeBuild`, container.Id)
         .then(() => {
           this.removed = true;
-          this.$store.dispatch('extranet/getContainers');
+          //this.$store.dispatch(`${container.Labels.type}/getContainers`);
         })
         .catch((error) => {
           if (error.response.status === 403) {
@@ -303,10 +297,6 @@ export default {
         })
         .finally(() => { this.removing = false; });
     },
-  },
-  mounted() {
-    this.getContainers();
-    this.getBuilds();
   },
 };
 </script>

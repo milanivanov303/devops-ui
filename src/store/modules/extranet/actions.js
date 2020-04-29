@@ -84,7 +84,9 @@ export default {
 
   removeBuild({ commit }, id) {
     const promise = api.delete(`extranet/build/${id}`);
-    promise.catch(error => commit('error', error, { root: true }));
+    promise
+      .then(() => commit('removeBuild', id))
+      .catch(error => commit('error', error, { root: true }));
     return promise;
   },
 
