@@ -47,7 +47,7 @@ export default {
     });
 
     promise
-      .then((response) => commit('demos',  { name: stateName, data: response.data.data } ))
+      .then(response => commit('demos', { name: stateName, data: response.data.data }))
       .catch(() => commit('error', 'Could not get demos list'));
 
     return promise;

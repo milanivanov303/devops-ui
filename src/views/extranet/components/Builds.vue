@@ -85,7 +85,7 @@
                 type="text"
                 id="java_version"
                 v-model="selectedBuild.java_version">
-              <label :class="{active: selectedBuild.java_version}" 
+              <label :class="{active: selectedBuild.java_version}"
                      for="java_version">Java Version
               </label>
             </div>

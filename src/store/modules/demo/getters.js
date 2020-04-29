@@ -5,17 +5,18 @@ export default {
   requstedDemos: state => state.demos.filter(demos => demos.status === 'requested'),
   demo: state => demo => state.demos.filter(demos => demos.id === demo),
   demos: state => state.demos,
+  statDemos: state => state.statDemos,
 
   getAllByStatus: state => (stateName) => {
-    if (!state.demos[stateName]) {
+    if (!state.statDemos[stateName]) {
       return [];
     }
 
-    return state.demos[stateName].reduce(
+    return state.statDemos[stateName].reduce(
       (tally, demo) => {
         if (demo.status === 'requested' || demo.status === 'rejected' || demo.status === 'active') {
           tally[demo.status] = (tally[demo.status] || 0) + 1;
-        };
+        }
         return tally;
       },
       {},
@@ -23,24 +24,24 @@ export default {
   },
 
   getByStatus: state => (stateName, status, dates) => {
-    if (!state.demos[stateName]) {
+    if (!state.statDemos[stateName]) {
       return [];
     }
     return dates.reduce(
       (tally, date) => {
-        state.demos[stateName].find(demo => {
+        state.statDemos[stateName].find((demo) => {
           if (demo.status === status) {
-            if (date === "".concat(new Date(demo.active_from).getUTCFullYear() + "-" + (new Date (demo.active_from).getMonth()+1) + "-" + new Date (demo.active_from).getDate())) {
+            if (date === ''.concat(`${new Date(demo.active_from).getUTCFullYear()}-${new Date(demo.active_from).getMonth() + 1}-${new Date(demo.active_from).getDate()}`)) {
               tally[date] = (tally[date] || 0) + 1;
             } else {
-              tally[date] = 0; 
+              tally[date] = 0;
             }
           }
+          return false;
         });
         return tally;
       },
       {},
-    )
+    );
   },
 };
-

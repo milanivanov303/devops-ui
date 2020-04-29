@@ -9,7 +9,7 @@ export default {
     state.demos = demos;
   },
   demos(state, { name, data }) {
-    Vue.set(state.demos, name, data);
+    Vue.set(state.statDemos, name, data);
   },
   createDemo(state, demo) {
     const { demos } = state;

@@ -2,6 +2,6 @@
 
 export default {
   error: '',
-  //demos: [],
-  demos: {},
+  statDemos: {},
+  demos: [],
 };
