@@ -235,10 +235,13 @@ export default {
   methods: {
     getDeployedBuildUrl(container) {
       const host = this.$store.state[container.Labels.type].host;
-      const port = container.Ports.find(value => value.PrivatePort === 8591 || value.PrivatePort === 8080);
+      const port = container.Ports.find(
+        value => value.PrivatePort === 8591 || value.PrivatePort === 8080
+      );
       if (host && port) {
         return `http://${host}:${port.PublicPort}/${container.Labels.build}/`;
       }
+      return "#no-build-url-found";
     },
 
     openBuildInfoModal(container) {
