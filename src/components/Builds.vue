@@ -256,7 +256,8 @@ export default {
           this.selectedBuild.instance = build.details.instance.name;
           this.selectedBuild.java_version = build.details.java_version;
           this.selectedBuild.ports = container.Ports
-            .filter(port => port.PrivatePort === 22 || port.PrivatePort === 8591);
+            .filter(port => port.PrivatePort === 22 
+            || port.PrivatePort === 8591 || port.PrivatePort === 8080);
           this.selectedBuild.host = this.$store.state[container.Labels.type].host;
           this.selectedBuild.user = 'ex1';
           this.selectedBuild.pass = 'Sofphia';
