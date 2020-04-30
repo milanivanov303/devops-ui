@@ -2,7 +2,12 @@
   <footer>
     <div class="footer-copyright">
       <div class="row">
-        <div class="col s4"></div>
+        <div class="col s4">
+          <a :href="getApiDocumentationLink()" target="_blank">
+            <i class="material-icons">library_books</i>
+            API documentation
+          </a>
+        </div>
         <div class="col s4 center-align"></div>
         <div class="col s4 right-align">
           <img class="codix-logo" src="../../assets/images/logo.png"/>
@@ -14,10 +19,29 @@
 </template>
 
 <script>
+import config from "../../config";
+
 export default {
   data() {
     return {};
   },
-  methods: {},
+  methods: {
+    getApiDocumentationLink() {
+      return `${config.devops.url}/../docs.html`;
+    }
+  },
 };
 </script>
+
+<style lang="scss" scoped>
+  a {
+    height: 48px;
+    line-height: 48px;
+    i {
+      float: left;
+      height: 48px;
+      line-height: 48px;
+      margin-right: 10px;
+    }
+  }
+</style>

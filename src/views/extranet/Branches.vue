@@ -127,6 +127,12 @@ export default {
     },
   },
   methods: {
+    getContainers() {
+      this.$store.dispatch('extranet/getContainers');
+    },
+    getBuilds() {
+      this.$store.dispatch('builds/getBuilds', { stateName: 'branch-builds' });
+    },
     selectedPerPage(value) {
       this.perPage = value.name;
     },
@@ -172,6 +178,8 @@ export default {
   },
   mounted() {
     this.getBranches();
+    this.getContainers();
+    this.getBuilds();
   },
   watch: {
     search(value) {

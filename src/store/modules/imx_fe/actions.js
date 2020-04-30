@@ -49,7 +49,9 @@ export default {
   },
   removeBuild({ commit }, id) {
     const promise = api.delete(`imx-fe/build/${id}`);
-    promise.catch(error => commit('error', error));
+    promise
+      .then(() => commit('removeBuild', id))
+      .catch(error => commit('error', error, { root: true }));
     return promise;
   },
 };
