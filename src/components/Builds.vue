@@ -234,35 +234,31 @@ export default {
   },
   methods: {
     getDeployedBuildUrl(container) {
-      const host = this.$store.state[container.Labels.type].host;
+      const { host } = this.$store.state[container.Labels.type];
       const port = container.Ports.find(
-        value => value.PrivatePort === 8591 || value.PrivatePort === 8080
+        value => value.PrivatePort === 8591 || value.PrivatePort === 8080,
       );
       if (host && port) {
         return `http://${host}:${port.PublicPort}/${container.Labels.build}/`;
       }
-      return "#no-build-url-found";
+      return '#no-build-url-found';
     },
 
     openBuildInfoModal(container) {
       this.showInfoModal = true;
       this.container = container;
       this.builds.find((build) => {
-        if (typeof build.details.instance !== 'undefined'
-          && container.Labels.build === ''.concat(
-            build.details.branch, '.',
-            build.details.client.name, '.',
-            build.details.instance.name, '.',
-            build.details.java_version,
-          )) {
+        if (typeof build.details.container !== 'undefined'
+        && container.Id === build.details.container.Id) {
           this.selectedBuild.created_by = container.Labels.username;
           this.selectedBuild.created_on = new Date(container.Created * 1000).toLocaleString('en-GB', { timeZone: 'UTC' });
           this.selectedBuild.branch = build.details.branch;
           this.selectedBuild.instance = build.details.instance.name;
           this.selectedBuild.java_version = build.details.java_version;
           this.selectedBuild.ports = container.Ports
-            .filter(port => port.PrivatePort === 22 || port.PrivatePort === 8591);
-          this.selectedBuild.host = this.host;
+            .filter(port => port.PrivatePort === 22 
+            || port.PrivatePort === 8591 || port.PrivatePort === 8080);
+          this.selectedBuild.host = this.$store.state[container.Labels.type].host;
           this.selectedBuild.user = 'ex1';
           this.selectedBuild.pass = 'Sofphia';
         }
@@ -286,7 +282,7 @@ export default {
       this.$store.dispatch(`${container.Labels.type}/removeBuild`, container.Id)
         .then(() => {
           this.removed = true;
-          //this.$store.dispatch(`${container.Labels.type}/getContainers`);
+          // this.$store.dispatch(`${container.Labels.type}/getContainers`);
         })
         .catch((error) => {
           if (error.response.status === 403) {
