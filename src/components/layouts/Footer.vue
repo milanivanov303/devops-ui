@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import config from "../../config";
+import config from '../../config';
 
 export default {
   data() {
@@ -28,7 +28,7 @@ export default {
   methods: {
     getApiDocumentationLink() {
       return `${config.devops.url}/../docs.html`;
-    }
+    },
   },
 };
 </script>
