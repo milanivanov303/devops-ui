@@ -234,14 +234,14 @@ export default {
   },
   methods: {
     getDeployedBuildUrl(container) {
-      const host = this.$store.state[container.Labels.type].host;
+      const { host } = this.$store.state[container.Labels.type];
       const port = container.Ports.find(
-        value => value.PrivatePort === 8591 || value.PrivatePort === 8080
+        value => value.PrivatePort === 8591 || value.PrivatePort === 8080,
       );
       if (host && port) {
         return `http://${host}:${port.PublicPort}/${container.Labels.build}/`;
       }
-      return "#no-build-url-found";
+      return '#no-build-url-found';
     },
 
     openBuildInfoModal(container) {
@@ -286,7 +286,7 @@ export default {
       this.$store.dispatch(`${container.Labels.type}/removeBuild`, container.Id)
         .then(() => {
           this.removed = true;
-          //this.$store.dispatch(`${container.Labels.type}/getContainers`);
+          // this.$store.dispatch(`${container.Labels.type}/getContainers`);
         })
         .catch((error) => {
           if (error.response.status === 403) {

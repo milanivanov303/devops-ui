@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="col s12 l6">
-            <div class="card" ref="active_demos">
+            <div class="card" ref="demos">
                 <div class="card-content">
                     <span class="card-title">Number of demos by days</span>
                     <div class="col s12 l6 right">

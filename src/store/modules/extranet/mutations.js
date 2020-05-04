@@ -17,10 +17,10 @@ export default {
   },
   feBranches(state, feBranches) {
     state.feBranches = feBranches;
-  },      
+  },
   removeBuild(state, id) {
     state.containers.splice(
-      state.containers.findIndex((container) => container.Id === id),
+      state.containers.findIndex(container => container.Id === id),
       1,
     );
   },
