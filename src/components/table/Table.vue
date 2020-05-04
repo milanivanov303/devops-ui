@@ -69,6 +69,7 @@
         <tr v-for="(row, index) in getPaginatedRows()" :key="index">
           <td
             v-for="(column, index) in columns"
+            v-html="getColumnData(row, column.componentOptions.propsData.show)"
             :key="index"
             :class="column.data.staticClass"
           >
@@ -238,6 +239,10 @@ export default {
         return show(row);
       }
 
+      if (typeof row[show] === 'object' && row[show] !== null) {
+        return row[show][show];
+      }
+
       return row[show];
     },
     setSort(sortBy, event) {
@@ -345,7 +350,7 @@ export default {
 };
 </script>
 
-<style type="text/scss">
+<style type="text/scss" scoped>
   .input-field {
     width: 60px;
     margin-left: 15px;

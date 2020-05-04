@@ -1,13 +1,24 @@
 <template>
   <div class="col s12 l12">
     <div class="data-table" ref="demos">
-      <Table v-bind:request="request"  @add="openAddEditDemoModal({}, 'create')">
-        <template v-slot:buttons="{ data }">
-          <a v-if="$auth.can(updateDemo) || $auth.can(updateAnyDemo)"
-              @click="openAddEditDemoModal(data, 'update')">
-              <i class="material-icons right">edit</i>
-          </a>
-        </template>
+      <Table
+        :data="demos"
+        sort-by="name"
+        sort-dir="asc"
+        :export-btn="false"
+        :view-btn="false"
+        :delete-btn="false"
+        @add="openAddEditDemoModal({}, 'create')"
+        @edit="(row) => openAddEditDemoModal(row, 'update')"
+      >
+        <Column show="company"/>
+        <Column show="name"/>
+        <Column show="business"/>
+        <Column show="active_from"/>
+        <Column show="active_to"/>
+        <Column show="status"/>
+        <Column show="code"/>
+        <Column label="Url" :show="url => this.demoUrl(url)"/>
       </Table>
     </div>
 
@@ -203,37 +214,22 @@ import {
   required, email, numeric, minLength,
 } from 'vuelidate/lib/validators';
 import 'vue-datetime/dist/vue-datetime.css';
+import { Table, Column } from '@/components/table';
 
 export default {
   components: {
     datetime: Datetime,
+    Table,
+    Column,
   },
 
   data() {
     return {
       showAddEditDemoModal: false,
       isOpen: false,
-
       demoId: '',
       dateNow: DateTime.local().toISO(),
-      request: {
-        data: 'demo/demos',
-        columns: {
-          company: '',
-          name: '',
-          business: '',
-          active_from: '',
-          active_to: '',
-          status: '',
-          code: '',
-          url: value => this.demoUrl(value),
-        },
-        add: true,
-        export: true,
-        action: true,
-        searchable: true,
-      },
-      action: null,
+      action: '',
       selectedDemo: {},
       selectBusiness: {
         id: 'business_select',
@@ -311,12 +307,12 @@ export default {
     },
   },
   computed: {
-    // getError() {
-    //   return this.$store.getters['demo/getError'];
-    // },
     statusCheck() {
       const statuses = ['requested', 'approved', 'rejected'];
       return !statuses.includes(this.selectedDemo.status);
+    },
+    demos() {
+      return this.$store.state.demo.demos;
     },
   },
   methods: {
@@ -325,6 +321,12 @@ export default {
       this.action = action;
       this.selectedDemo = Object.assign({}, { country: 'Bulgaria' }, { status: 'approved' }, demo);
       this.selectBusiness.selected = { name: this.selectedDemo.business };
+      if (action === 'update') {
+        this.selectedDemo.active_from = DateTime.fromSQL(this.selectedDemo.active_from)
+          .toISO();
+        this.selectedDemo.active_to = DateTime.fromSQL(this.selectedDemo.active_to)
+          .toISO();
+      }
       const status = this.selectStatus.options
         .find(status => status.value === this.selectedDemo.status);
       if (status) {
