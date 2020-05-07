@@ -31,4 +31,25 @@ export default {
       commit('error', error);
     }
   },
+
+  getDemosForPeriod({ commit }, { stateName, startDate }) {
+    const promise = api.get('demos', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            active_from: {
+              operator: '>',
+              value: startDate,
+            },
+          },
+        ],
+      }),
+    });
+
+    promise
+      .then(response => commit('demos', { name: stateName, data: response.data.data }))
+      .catch(() => commit('error', 'Could not get demos list'));
+
+    return promise;
+  },
 };
