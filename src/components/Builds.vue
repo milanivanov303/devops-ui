@@ -68,6 +68,17 @@
           </div>
           <div class="row">
             <div class="input-field col s12">
+              <i class="material-icons prefix">business</i>
+              <input
+                readonly
+                type="text"
+                id="fe_branch"
+                v-model="selectedBuild.fe_branch">
+              <label :class="{active: selectedBuild.fe_branch}" for="fe_branch">FE Branch</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
               <i class="material-icons prefix">dynamic_feed</i>
               <input
                 readonly
@@ -119,7 +130,7 @@
           <div class="row">
             <div class="col s12">
               <ul class="tabs col s12 center">
-                <li class="tab col s12"><a>Container's Info</a></li>
+                <li class="tab col s12"><a>Container's Details</a></li>
               </ul>
               <div class="row">
                 <div class="input-field col s6">
@@ -253,6 +264,7 @@ export default {
           this.selectedBuild.created_by = container.Labels.username;
           this.selectedBuild.created_on = new Date(container.Created * 1000).toLocaleString('en-GB', { timeZone: 'UTC' });
           this.selectedBuild.branch = build.details.branch;
+          this.selectedBuild.fe_branch = build.details.fe_branch.name;
           this.selectedBuild.instance = build.details.instance.name;
           this.selectedBuild.java_version = build.details.java_version;
           this.selectedBuild.ports = container.Ports
@@ -282,7 +294,7 @@ export default {
       this.$store.dispatch(`${container.Labels.type}/removeBuild`, container.Id)
         .then(() => {
           this.removed = true;
-          // this.$store.dispatch(`${container.Labels.type}/getContainers`);
+          this.$store.dispatch(`${container.Labels.type}/getContainers`);
         })
         .catch((error) => {
           if (error.response.status === 403) {
