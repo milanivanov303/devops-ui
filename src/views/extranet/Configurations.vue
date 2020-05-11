@@ -63,13 +63,10 @@
           </div>
         </div>
         <div class="row">
-          <TextInput
-            class="col s12"
-            label="Project Type"
-            icon="title"
-            v-model="configuration.project_type"
-            :invalid="$v.configuration.project_type.$error"
-            @blur="$v.configuration.project_type.$touch()"
+          <Select id="select-project-type"
+                  class="col s12"
+                  :select="projectTypeSelect"
+                  @selectedVal="selected => configuration.project_type = selected.value"
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.project_type.$error">
@@ -116,13 +113,10 @@
           </div>
         </div>
         <div class="row">
-          <TextInput
-            class="col s12"
-            label="App Type"
-            icon="title"
-            v-model="configuration.app_type"
-            :invalid="$v.configuration.app_type.$error"
-            @blur="$v.configuration.app_type.$touch()"
+          <Select id="select-app-type"
+                  class="col s12"
+                  :select="appTypeSelect"
+                  @selectedVal="selected => configuration.app_type = selected.value"
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.app_type.$error">
@@ -296,6 +290,46 @@ export default {
       removing: false,
       removed: false,
       error: '',
+      projectTypeSelect: {
+        id: 'project_type_select',
+        name: 'project_type',
+        displayed: 'name',
+        icon: 'title',
+        options: [
+          {
+            name: 'Migration',
+            value: 'migration',
+          },
+          {
+            name: 'New',
+            value: 'new',
+          },
+          {
+            name: 'N/A',
+            value: 'n/a',
+          }
+        ],
+        label: 'Project Type',
+        selected: {},
+      },
+      appTypeSelect: {
+        id: 'app_type_select',
+        name: 'app_type',
+        displayed: 'name',
+        icon: 'title',
+        options: [
+          {
+            name: 'Extranet',
+            value: 'extranet',
+          },
+          {
+            name: 'Debiteur',
+            value: 'debiteur',
+          },
+        ],
+        label: 'App Type',
+        selected: {},
+      },
     };
   },
   computed: {
@@ -318,7 +352,15 @@ export default {
       return [];
     },
     branches() {
-      return this.$store.state.extranet.branches || [];
+      if (this.configuration.app_type === 'extranet') {
+        return this.$store.state.extranet.branches;
+      }
+
+      if (this.configuration.app_type === 'debiteur') {
+        return this.$store.state.extranet.debiteurBranches;
+      }
+
+      return [];
     },
     clients() {
       return this.$store.state.extranet.clients || [];
@@ -368,6 +410,7 @@ export default {
       promises.push(this.$store.dispatch('extranet/getConfigurations'));
       promises.push(this.$store.dispatch('mmpi/getProjects'));
       promises.push(this.$store.dispatch('extranet/getBranches'));
+      promises.push(this.$store.dispatch('extranet/getDebiteurBranches'));
       promises.push(this.$store.dispatch('extranet/getClients'));
 
       Promise.all(promises).finally(() => {
@@ -414,6 +457,13 @@ export default {
       this.$router.push({
         path: `/extranet/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
       });
+
+      this.projectTypeSelect.selected = this.projectTypeSelect.options.find(
+        item => item.value === this.configuration.project_type
+      );
+      this.appTypeSelect.selected = this.appTypeSelect.options.find(
+        item => item.value === this.configuration.app_type
+      );
 
       this.showAddEditModal = true;
       this.action = action;

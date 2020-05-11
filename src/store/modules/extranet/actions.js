@@ -59,7 +59,7 @@ export default {
     return promise;
   },
 
-  getFebranches({ commit }) {
+  getFeBranches({ commit }) {
     const name = 'extranet-fe-branches';
 
     if (this.state.promises[name]) {
@@ -73,6 +73,23 @@ export default {
     promise
       .then(response => commit('feBranches', response.data))
       .catch(() => commit('error', 'Could not get branches list', { root: true }));
+    return promise;
+  },
+
+  getDebiteurBranches({ commit }) {
+    const name = 'extranet-debiteur-branches';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('extranet/debiteur-branches');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('debiteurBranches', response.data))
+      .catch(() => commit('error', 'Could not get debiteur branches list', { root: true }));
     return promise;
   },
 
