@@ -66,7 +66,7 @@
           <Select id="select-project-type"
                   class="col s12"
                   :select="projectTypeSelect"
-                  @selectedVal="selected => configuration.project_type = selected.value"
+                  v-model="configuration.project_type"
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.project_type.$error">
@@ -116,7 +116,7 @@
           <Select id="select-app-type"
                   class="col s12"
                   :select="appTypeSelect"
-                  @selectedVal="selected => configuration.app_type = selected.value"
+                  v-model="configuration.app_type"
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.app_type.$error">
@@ -271,6 +271,7 @@
 import { required } from 'vuelidate/lib/validators';
 import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
+import Select from '@/components/Select';
 
 import { Table, Column } from '@/components/table';
 
@@ -278,6 +279,7 @@ export default {
   components: {
     Autocomplete,
     TextArea,
+    Select,
     Table,
     Column,
   },
@@ -307,7 +309,7 @@ export default {
           {
             name: 'N/A',
             value: 'n/a',
-          }
+          },
         ],
         label: 'Project Type',
         selected: {},
@@ -352,11 +354,11 @@ export default {
       return [];
     },
     branches() {
-      if (this.configuration.app_type === 'extranet') {
+      if (this.configuration.app_type && this.configuration.app_type.value === 'extranet') {
         return this.$store.state.extranet.branches;
       }
 
-      if (this.configuration.app_type === 'debiteur') {
+      if (this.configuration.app_type && this.configuration.app_type.value === 'debiteur') {
         return this.$store.state.extranet.debiteurBranches;
       }
 
@@ -443,6 +445,19 @@ export default {
           project => project.name === this.configuration.project,
         );
       }
+
+      if (this.configuration.project_type) {
+        this.configuration.project_type = this.projectTypeSelect.options.find(
+          projectType => projectType.value === this.configuration.project_type,
+        );
+      }
+
+      if (this.configuration.app_type) {
+        this.configuration.app_type = this.appTypeSelect.options.find(
+          appType => appType.value === this.configuration.app_type,
+        );
+      }
+
       if (this.configuration.delivery_chain) {
         this.configuration.delivery_chain = this.deliveryChains.find(
           deliveryChain => deliveryChain.title === this.configuration.delivery_chain,
@@ -457,13 +472,6 @@ export default {
       this.$router.push({
         path: `/extranet/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
       });
-
-      this.projectTypeSelect.selected = this.projectTypeSelect.options.find(
-        item => item.value === this.configuration.project_type
-      );
-      this.appTypeSelect.selected = this.appTypeSelect.options.find(
-        item => item.value === this.configuration.app_type
-      );
 
       this.showAddEditModal = true;
       this.action = action;
@@ -486,7 +494,8 @@ export default {
 
       const payload = Object.assign({}, this.configuration);
 
-      payload.app_type = this.configuration.app_type;
+      payload.app_type = this.configuration.app_type.value;
+      payload.project_type = this.configuration.project_type.value;
       payload.app_version = this.configuration.app_version;
       payload.project = this.configuration.project.name;
       payload.delivery_chain = this.configuration.delivery_chain.title;
@@ -508,7 +517,18 @@ export default {
               html: `You do not have insufficient rights to ${this.action} this configuration`,
               classes: 'toast-fail',
             });
+            return;
           }
+
+          let errorText = '';
+          Object.values(error.response.data).forEach((value) => {
+            errorText += `${value.join('<br>')}<br>`;
+          });
+
+          this.$M.toast({
+            html: errorText,
+            classes: 'toast-fail',
+          });
         });
     },
 
