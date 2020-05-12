@@ -5,7 +5,7 @@
             :name="select.name"
             ref="custom-select"
             v-model="currentValue"
-            @change="this.$emit('input', currentValue)">
+            @change="$emit('input', currentValue)">
       <option v-for="(option, key) in select.options"
               v-bind:key="key"
               v-bind:value="option">{{ option.name }}</option>
