@@ -264,7 +264,9 @@ export default {
           this.selectedBuild.created_by = container.Labels.username;
           this.selectedBuild.created_on = new Date(container.Created * 1000).toLocaleString('en-GB', { timeZone: 'UTC' });
           this.selectedBuild.branch = build.details.branch;
-          this.selectedBuild.fe_branch = build.details.fe_branch.name;
+          if (build.details.fe_branch) {
+            this.selectedBuild.fe_branch = build.details.fe_branch.name;
+          }
           this.selectedBuild.instance = build.details.instance.name;
           this.selectedBuild.java_version = build.details.java_version;
           this.selectedBuild.ports = container.Ports
