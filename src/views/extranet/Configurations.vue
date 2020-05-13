@@ -18,7 +18,8 @@
         <Column show="project"/>
         <Column show="project_type"/>
         <Column show="delivery_chain"/>
-        <Column show="instance"/>
+        <Column show="dev_instance"/>
+        <Column show="val_instance"/>
         <Column show="app_type"/>
         <Column show="app_version"/>
         <Column show="branch"/>
@@ -53,7 +54,9 @@
             :items="projects"
             v-model="configuration.project"
             :invalid="$v.configuration.project.$error"
-            @change="delete configuration.delivery_chain && delete configuration.instance"
+            @change="delete configuration.delivery_chain &&
+                      delete configuration.dev_instance &&
+                      delete configuration.val_instance"
             @blur="$v.configuration.project.$touch()"
           />
           <div class="validator col s12">
@@ -85,7 +88,7 @@
             :items="deliveryChains"
             v-model="configuration.delivery_chain"
             :invalid="$v.configuration.delivery_chain.$error"
-            @change="delete configuration.instance"
+            @change="delete configuration.dev_instance && delete configuration.val_instance"
             @blur="$v.configuration.delivery_chain.$touch()"
           />
           <div class="validator col s12">
@@ -99,16 +102,32 @@
         <div class="row">
           <Autocomplete
             class="col s12"
-            label="Instance"
+            label="Dev Instance"
             icon="dynamic_feed"
             :items="instances"
-            v-model="configuration.instance"
-            :invalid="$v.configuration.instance.$error"
-            @blur="$v.configuration.instance.$touch()"
+            v-model="configuration.dev_instance"
+            :invalid="$v.configuration.dev_instance.$error"
+            @blur="$v.configuration.dev_instance.$touch()"
           />
           <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.instance.$error">
-              <p v-if="!$v.configuration.instance.required">Instance field must not be empty.</p>
+            <div class="red-text" v-if="$v.configuration.dev_instance.$error">
+              <p v-if="!$v.configuration.dev_instance.required">Dev Instance field must not be empty.</p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <Autocomplete
+            class="col s12"
+            label="Val Instance"
+            icon="dynamic_feed"
+            :items="instances"
+            v-model="configuration.val_instance"
+            :invalid="$v.configuration.val_instance.$error"
+            @blur="$v.configuration.val_instance.$touch()"
+          />
+          <div class="validator col s12">
+            <div class="red-text" v-if="$v.configuration.val_instance.$error">
+              <p v-if="!$v.configuration.val_instance.required">Val Instance field must not be empty.</p>
             </div>
           </div>
         </div>
@@ -153,7 +172,7 @@
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.branch.$error">
-              <p v-if="!$v.configuration.branch.required">Instance field must not be empty.</p>
+              <p v-if="!$v.configuration.branch.required">Branch field must not be empty.</p>
             </div>
           </div>
         </div>
@@ -385,7 +404,10 @@ export default {
       delivery_chain: {
         required,
       },
-      instance: {
+      dev_instance: {
+        required,
+      },
+      val_instance: {
         required,
       },
       branch: {
@@ -463,9 +485,16 @@ export default {
           deliveryChain => deliveryChain.title === this.configuration.delivery_chain,
         );
       }
-      if (this.configuration.instance) {
-        this.configuration.instance = this.instances.find(
-          instance => instance.name === this.configuration.instance,
+
+      if (this.configuration.dev_instance) {
+        this.configuration.dev_instance = this.instances.find(
+          instance => instance.name === this.configuration.dev_instance,
+        );
+      }
+
+      if (this.configuration.val_instance) {
+        this.configuration.val_instance = this.instances.find(
+          instance => instance.name === this.configuration.val_instance,
         );
       }
 
@@ -499,7 +528,8 @@ export default {
       payload.app_version = this.configuration.app_version;
       payload.project = this.configuration.project.name;
       payload.delivery_chain = this.configuration.delivery_chain.title;
-      payload.instance = this.configuration.instance.name;
+      payload.dev_instance = this.configuration.dev_instance.name;
+      payload.val_instance = this.configuration.val_instance.name;
       payload.branch = this.configuration.branch.name;
       payload.prefix = this.configuration.prefix.package;
 
