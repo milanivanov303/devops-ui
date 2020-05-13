@@ -18,7 +18,8 @@
         <Column show="project"/>
         <Column show="project_type"/>
         <Column show="delivery_chain"/>
-        <Column show="instance"/>
+        <Column show="dev_instance"/>
+        <Column show="val_instance"/>
         <Column show="app_type"/>
         <Column show="app_version"/>
         <Column show="branch"/>
@@ -53,7 +54,9 @@
             :items="projects"
             v-model="configuration.project"
             :invalid="$v.configuration.project.$error"
-            @change="delete configuration.delivery_chain && delete configuration.instance"
+            @change="delete configuration.delivery_chain &&
+                      delete configuration.dev_instance &&
+                      delete configuration.val_instance"
             @blur="$v.configuration.project.$touch()"
           />
           <div class="validator col s12">
@@ -63,13 +66,10 @@
           </div>
         </div>
         <div class="row">
-          <TextInput
-            class="col s12"
-            label="Project Type"
-            icon="title"
-            v-model="configuration.project_type"
-            :invalid="$v.configuration.project_type.$error"
-            @blur="$v.configuration.project_type.$touch()"
+          <Select id="select-project-type"
+                  class="col s12"
+                  :select="projectTypeSelect"
+                  v-model="configuration.project_type"
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.project_type.$error">
@@ -88,7 +88,7 @@
             :items="deliveryChains"
             v-model="configuration.delivery_chain"
             :invalid="$v.configuration.delivery_chain.$error"
-            @change="delete configuration.instance"
+            @change="delete configuration.dev_instance && delete configuration.val_instance"
             @blur="$v.configuration.delivery_chain.$touch()"
           />
           <div class="validator col s12">
@@ -102,27 +102,44 @@
         <div class="row">
           <Autocomplete
             class="col s12"
-            label="Instance"
+            label="Dev Instance"
             icon="dynamic_feed"
             :items="instances"
-            v-model="configuration.instance"
-            :invalid="$v.configuration.instance.$error"
-            @blur="$v.configuration.instance.$touch()"
+            v-model="configuration.dev_instance"
+            :invalid="$v.configuration.dev_instance.$error"
+            @blur="$v.configuration.dev_instance.$touch()"
           />
           <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.instance.$error">
-              <p v-if="!$v.configuration.instance.required">Instance field must not be empty.</p>
+            <div class="red-text" v-if="$v.configuration.dev_instance.$error">
+              <p v-if="!$v.configuration.dev_instance.required">
+                Dev Instance field must not be empty.
+              </p>
             </div>
           </div>
         </div>
         <div class="row">
-          <TextInput
+          <Autocomplete
             class="col s12"
-            label="App Type"
-            icon="title"
-            v-model="configuration.app_type"
-            :invalid="$v.configuration.app_type.$error"
-            @blur="$v.configuration.app_type.$touch()"
+            label="Val Instance"
+            icon="dynamic_feed"
+            :items="instances"
+            v-model="configuration.val_instance"
+            :invalid="$v.configuration.val_instance.$error"
+            @blur="$v.configuration.val_instance.$touch()"
+          />
+          <div class="validator col s12">
+            <div class="red-text" v-if="$v.configuration.val_instance.$error">
+              <p v-if="!$v.configuration.val_instance.required">
+                Val Instance field must not be empty.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <Select id="select-app-type"
+                  class="col s12"
+                  :select="appTypeSelect"
+                  v-model="configuration.app_type"
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.app_type.$error">
@@ -159,7 +176,7 @@
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.branch.$error">
-              <p v-if="!$v.configuration.branch.required">Instance field must not be empty.</p>
+              <p v-if="!$v.configuration.branch.required">Branch field must not be empty.</p>
             </div>
           </div>
         </div>
@@ -277,6 +294,7 @@
 import { required } from 'vuelidate/lib/validators';
 import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
+import Select from '@/components/Select';
 
 import { Table, Column } from '@/components/table';
 
@@ -284,6 +302,7 @@ export default {
   components: {
     Autocomplete,
     TextArea,
+    Select,
     Table,
     Column,
   },
@@ -296,6 +315,46 @@ export default {
       removing: false,
       removed: false,
       error: '',
+      projectTypeSelect: {
+        id: 'project_type_select',
+        name: 'project_type',
+        displayed: 'name',
+        icon: 'title',
+        options: [
+          {
+            name: 'Migration',
+            value: 'migration',
+          },
+          {
+            name: 'New',
+            value: 'new',
+          },
+          {
+            name: 'N/A',
+            value: 'n/a',
+          },
+        ],
+        label: 'Project Type',
+        selected: {},
+      },
+      appTypeSelect: {
+        id: 'app_type_select',
+        name: 'app_type',
+        displayed: 'name',
+        icon: 'title',
+        options: [
+          {
+            name: 'Extranet',
+            value: 'extranet',
+          },
+          {
+            name: 'Debiteur',
+            value: 'debiteur',
+          },
+        ],
+        label: 'App Type',
+        selected: {},
+      },
     };
   },
   computed: {
@@ -318,10 +377,26 @@ export default {
       return [];
     },
     branches() {
-      return this.$store.state.extranet.branches || [];
+      if (this.configuration.app_type && this.configuration.app_type.value === 'extranet') {
+        return this.$store.state.extranet.branches;
+      }
+
+      if (this.configuration.app_type && this.configuration.app_type.value === 'debiteur') {
+        return this.$store.state.extranet.debiteurBranches;
+      }
+
+      return [];
     },
     clients() {
-      return this.$store.state.extranet.clients || [];
+      if (this.configuration.app_type && this.configuration.app_type.value === 'extranet') {
+        return this.$store.state.extranet.clients;
+      }
+
+      if (this.configuration.app_type && this.configuration.app_type.value === 'debiteur') {
+        return this.$store.state.extranet.debiteurClients;
+      }
+
+      return [];
     },
   },
   validations: {
@@ -341,7 +416,10 @@ export default {
       delivery_chain: {
         required,
       },
-      instance: {
+      dev_instance: {
+        required,
+      },
+      val_instance: {
         required,
       },
       branch: {
@@ -368,7 +446,9 @@ export default {
       promises.push(this.$store.dispatch('extranet/getConfigurations'));
       promises.push(this.$store.dispatch('mmpi/getProjects'));
       promises.push(this.$store.dispatch('extranet/getBranches'));
+      promises.push(this.$store.dispatch('extranet/getDebiteurBranches'));
       promises.push(this.$store.dispatch('extranet/getClients'));
+      promises.push(this.$store.dispatch('extranet/getDebiteurClients'));
 
       Promise.all(promises).finally(() => {
         loader.hide();
@@ -400,14 +480,34 @@ export default {
           project => project.name === this.configuration.project,
         );
       }
+
+      if (this.configuration.project_type) {
+        this.configuration.project_type = this.projectTypeSelect.options.find(
+          projectType => projectType.value === this.configuration.project_type,
+        );
+      }
+
+      if (this.configuration.app_type) {
+        this.configuration.app_type = this.appTypeSelect.options.find(
+          appType => appType.value === this.configuration.app_type,
+        );
+      }
+
       if (this.configuration.delivery_chain) {
         this.configuration.delivery_chain = this.deliveryChains.find(
           deliveryChain => deliveryChain.title === this.configuration.delivery_chain,
         );
       }
-      if (this.configuration.instance) {
-        this.configuration.instance = this.instances.find(
-          instance => instance.name === this.configuration.instance,
+
+      if (this.configuration.dev_instance) {
+        this.configuration.dev_instance = this.instances.find(
+          instance => instance.name === this.configuration.dev_instance,
+        );
+      }
+
+      if (this.configuration.val_instance) {
+        this.configuration.val_instance = this.instances.find(
+          instance => instance.name === this.configuration.val_instance,
         );
       }
 
@@ -436,11 +536,13 @@ export default {
 
       const payload = Object.assign({}, this.configuration);
 
-      payload.app_type = this.configuration.app_type;
+      payload.app_type = this.configuration.app_type.value;
+      payload.project_type = this.configuration.project_type.value;
       payload.app_version = this.configuration.app_version;
       payload.project = this.configuration.project.name;
       payload.delivery_chain = this.configuration.delivery_chain.title;
-      payload.instance = this.configuration.instance.name;
+      payload.dev_instance = this.configuration.dev_instance.name;
+      payload.val_instance = this.configuration.val_instance.name;
       payload.branch = this.configuration.branch.name;
       payload.prefix = this.configuration.prefix.package;
 
@@ -458,7 +560,18 @@ export default {
               html: `You do not have insufficient rights to ${this.action} this configuration`,
               classes: 'toast-fail',
             });
+            return;
           }
+
+          let errorText = '';
+          Object.values(error.response.data).forEach((value) => {
+            errorText += `${value.join('<br>')}<br>`;
+          });
+
+          this.$M.toast({
+            html: errorText,
+            classes: 'toast-fail',
+          });
         });
     },
 

@@ -186,8 +186,8 @@ export default {
     getInstances() {
       this.$store.dispatch('mmpi/getInstances');
     },
-    getFebranches() {
-      this.$store.dispatch('extranet/getFebranches');
+    getFeBranches() {
+      this.$store.dispatch('extranet/getFeBranches');
     },
     open() {
       this.form = initialState().form;
@@ -270,7 +270,7 @@ export default {
   mounted() {
     this.getClients();
     this.getInstances();
-    this.getFebranches();
+    this.getFeBranches();
   },
 };
 </script>

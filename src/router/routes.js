@@ -8,7 +8,8 @@ const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '
 const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
 const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
-const Demo = () => import(/* webpackChunkName: "demo" */ '../views/Demo.vue');
+const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard.vue');
+const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos.vue');
 const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
 const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions.vue');
@@ -149,7 +150,31 @@ export default [
     ],
   },
   {
-    path: '/demo/:id?',
+    path: '/demos',
+    meta: {
+      requiresAuth: true,
+      name: 'demos',
+      transitionName: 'slide',
+      title: 'Demos Dashboard',
+      breadcrumb: 'Demos',
+    },
+    component: DemosDashboard,
+    children: [
+      {
+        path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+          name: 'demos',
+          transitionName: 'slide',
+          title: 'Demos Dashboard',
+          breadcrumb: 'Dashboard',
+        },
+        component: DemosDashboard,
+      },
+    ],
+  },
+  {
+    path: '/demos/list/:id?',
     meta: {
       requiresAuth: true,
       name: 'demo',
@@ -157,7 +182,7 @@ export default [
       title: 'Demo',
       breadcrumb: 'Demo',
     },
-    component: Demo,
+    component: DemosList,
   },
   {
     path: '/administration/users/:username?',
