@@ -111,7 +111,9 @@
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.dev_instance.$error">
-              <p v-if="!$v.configuration.dev_instance.required">Dev Instance field must not be empty.</p>
+              <p v-if="!$v.configuration.dev_instance.required">
+                Dev Instance field must not be empty.
+              </p>
             </div>
           </div>
         </div>
@@ -127,7 +129,9 @@
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.val_instance.$error">
-              <p v-if="!$v.configuration.val_instance.required">Val Instance field must not be empty.</p>
+              <p v-if="!$v.configuration.val_instance.required">
+                Val Instance field must not be empty.
+              </p>
             </div>
           </div>
         </div>
