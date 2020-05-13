@@ -22,6 +22,23 @@ export default {
     return promise;
   },
 
+  getDebiteurClients({ commit }) {
+    const name = 'extranet-debiteur-clients';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('extranet/debiteur-clients');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('debiteurClients', response.data))
+      .catch(() => commit('error', 'Could not get debiteur clients list', { root: true }));
+    return promise;
+  },
+
   getBranches({ commit }) {
     const name = 'extranet-branches';
 

@@ -388,7 +388,15 @@ export default {
       return [];
     },
     clients() {
-      return this.$store.state.extranet.clients || [];
+      if (this.configuration.app_type && this.configuration.app_type.value === 'extranet') {
+        return this.$store.state.extranet.clients;
+      }
+
+      if (this.configuration.app_type && this.configuration.app_type.value === 'debiteur') {
+        return this.$store.state.extranet.debiteurClients;
+      }
+
+      return [];
     },
   },
   validations: {
@@ -440,6 +448,7 @@ export default {
       promises.push(this.$store.dispatch('extranet/getBranches'));
       promises.push(this.$store.dispatch('extranet/getDebiteurBranches'));
       promises.push(this.$store.dispatch('extranet/getClients'));
+      promises.push(this.$store.dispatch('extranet/getDebiteurClients'));
 
       Promise.all(promises).finally(() => {
         loader.hide();
