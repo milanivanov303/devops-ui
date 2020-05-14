@@ -262,7 +262,7 @@ export default {
         if (typeof build.details.container !== 'undefined'
         && container.Id === build.details.container.Id) {
           this.selectedBuild.created_by = container.Labels.username;
-          this.selectedBuild.created_on = new Date(container.Created * 1000).toLocaleString('en-GB', { timeZone: 'UTC' });
+          this.selectedBuild.created_on = new Date(container.Created * 1000).toLocaleString('en-GB', { timeZone: 'Europe/Sofia' });
           this.selectedBuild.branch = build.details.branch;
           this.selectedBuild.fe_branch = build.details.fe_branch.name;
           this.selectedBuild.instance = build.details.instance.name;
