@@ -1,16 +1,16 @@
 // https://vuex.vuejs.org/en/getters.html
 
 function sortBuilds(builds) {
-  builds = Object.entries(builds).sort((a, b) => b[1] - a[1]);
+  const sorted = Object.entries(builds).sort((a, b) => b[1] - a[1]);
 
-  return builds.reduce(
+  return sorted.reduce(
     (tally, build) => {
-      tally[build[0]] = build[1];
+      tally[build[0]] = build[1]; // eslint-disable-line
       return tally;
     },
-    {}
+    {},
   );
-};
+}
 
 export default {
   getByModule: state => (stateName) => {
@@ -18,7 +18,7 @@ export default {
       return [];
     }
 
-    let builds = state.builds[stateName].reduce(
+    const builds = state.builds[stateName].reduce(
       (tally, build) => {
         tally[build.module] = (tally[build.module] || 0) + 1;
         return tally;
@@ -33,7 +33,7 @@ export default {
       return [];
     }
 
-    let builds = state.builds[stateName].reduce(
+    const builds = state.builds[stateName].reduce(
       (tally, build) => {
         if (!module || build.module === module) {
           tally[build.details.created_by] = (tally[build.details.created_by] || 0) + 1;
@@ -50,7 +50,7 @@ export default {
       return [];
     }
 
-    let builds = state.builds[stateName].reduce(
+    const builds = state.builds[stateName].reduce(
       (tally, build) => {
         if (!module || build.module === module) {
           tally[build.details.branch] = (tally[build.details.branch] || 0) + 1;
