@@ -144,7 +144,6 @@ export default {
     },
     modulesChartData() {
       const builds = this.$store.getters['builds/getByModule']('module-builds');
-
       return {
         labels: Object.keys(builds),
         datasets: [{ data: Object.values(builds) }],
@@ -152,10 +151,9 @@ export default {
     },
     usersChartData() {
       const builds = this.$store.getters['builds/getByUser']('users-builds');
-
       return {
         labels: Object.keys(builds),
-        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) }],
+        datasets: [{ data: Object.values(builds) }],
       };
     },
   },
