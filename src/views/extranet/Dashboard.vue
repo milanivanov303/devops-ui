@@ -136,7 +136,7 @@ export default {
       const builds = this.$store.getters['builds/getByBranch']('extranet-branch-builds', 'extranet');
       return {
         labels: Object.keys(builds),
-        datasets: [{ data: Object.values(builds)}],
+        datasets: [{ data: Object.values(builds) }],
       };
     },
     usersChartData() {
@@ -181,7 +181,7 @@ export default {
     },
     getStartDate(value) {
       const newDate = new Date(
-        new Date().getTime() - (value * 24 * 60 * 60 * 1000)
+        new Date().getTime() - (value * 24 * 60 * 60 * 1000),
       );
 
       return Math.round(new Date(newDate).getTime() / 1000);
