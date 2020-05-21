@@ -134,18 +134,16 @@ export default {
     },
     branchesChartData() {
       const builds = this.$store.getters['builds/getByBranch']('extranet-branch-builds', 'extranet');
-
       return {
         labels: Object.keys(builds),
-        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) }],
+        datasets: [{ data: Object.values(builds)}],
       };
     },
     usersChartData() {
       const builds = this.$store.getters['builds/getByUser']('extranet-users-builds', 'extranet');
-
       return {
         labels: Object.keys(builds),
-        datasets: [{ data: Object.values(builds).sort((a, b) => b - a) }],
+        datasets: [{ data: Object.values(builds) }],
       };
     },
   },
@@ -183,7 +181,7 @@ export default {
     },
     getStartDate(value) {
       const newDate = new Date(
-        new Date().setTime(new Date().getTime() - (value * 24 * 60 * 60 * 1000)),
+        new Date().getTime() - (value * 24 * 60 * 60 * 1000)
       );
 
       return Math.round(new Date(newDate).getTime() / 1000);
