@@ -57,16 +57,8 @@ export default {
   },
 
   getContainers({ commit }) {
-    const name = 'extranet-containers';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
     const promise = api.get('extranet/containers');
-
-    commit('promise', { name, promise }, { root: true });
-
+    
     promise
       .then((response) => {
         commit('containers', response.data.data);
