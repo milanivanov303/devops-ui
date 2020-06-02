@@ -26,6 +26,17 @@
         </button>
         <slot name="top-actions-after" :rows="rows"></slot>
       </div>
+      <div class="col s12 filters">
+        <p v-if="filter_type === 'checkbox'">
+          <label v-for="filter in filterList" :key="filter.name">
+            <input type="checkbox" class="filled-in" v-model="filters" :value="filter.value"/>
+            <span>{{ filter.value }}</span>
+          </label>
+        </p>
+        <div class="input-field col s12 m6 l2" v-if="filter_type === 'dropdown'">
+          <Select :select="selectFilter" @selectedVal="getFilteredRows"/>
+        </div>
+      </div>
     </div>
 
     <table class="responsive-table">
@@ -64,6 +75,19 @@
             Actions
           </th>
         </tr>
+        <!-- <tr>
+          <th v-for="(column, index) in columns"
+            :key="index"
+            :width="column.data.attrs.width"
+            :class="column.data.staticClass"
+          >
+          <input type="text" :placeholder="getColumnHeader(column)" v-model="columnFilter"/>
+            <div class="input-field col s12 m6 l2" v-if="filter_type === 'dropdown'">
+              <Select :select="selectFilter" @selectedVal="getFilteredRows"/>
+            </div>
+          </th>
+
+        </tr> -->
       </thead>
       <tbody>
         <tr v-for="(row, index) in getPaginatedRows()" :key="index">
@@ -153,9 +177,13 @@ export default {
     page: { default: 1, type: Number },
     perPage: { default: 10, type: Number },
     queryPrefix: { default: '', type: String },
+    filter_type: { type: String },
+    filterList: {type: Array },
+    filterColumn: {type: String},
   },
   data() {
     return {
+      filters:[],
       columns: [],
       currentFilter: this.filter,
       currentSortBy: this.sortBy,
@@ -163,6 +191,13 @@ export default {
       currentPage: this.page,
       currentPerPage: this.perPage,
       lastPage: 1,
+      selectFilter: {
+        id: 'filter_select',
+        name: 'filter',
+        displayed: 'name',
+        options: this.filterList,
+        selected: {},
+      },
     };
   },
   computed: {
@@ -179,6 +214,41 @@ export default {
             return columnValue.indexOf(filter) > -1;
           });
         });
+      }
+
+      if (this.filters) {
+        this.filters.forEach((filter) => {
+          if (filter !== "all") {
+              data = data.filter((row) => {
+              if(row[this.filterColumn] === filter) {
+                return row;
+              }
+            });
+          }
+        });
+
+        // this.filterColumns.forEach((column) => {
+        //   this.filters.forEach((filter) => {
+        //       data = data.filter((row) => {
+        //         if(row[column] === filter) {
+        //           return row;
+        //         }
+        //       });
+        //     });
+        //   });
+
+        // const cols = [];
+        // this.columns.forEach((column) => {
+        //   cols.fill(column.componentOptions.propsData.show);
+        // });
+        // console.log(cols);
+
+        // cols.forEach((col) => {
+        //   data.forEach((row) => {
+        //     console.log(data.col);
+        //   });
+        // });
+        
       }
 
       if (this.currentSortBy) {
@@ -221,6 +291,9 @@ export default {
       const to = this.currentPage * this.currentPerPage;
 
       return this.rows.slice(from, to);
+    },
+    getFilteredRows(filter = {}) {
+      this.filters = [ filter.value ];
     },
     getColumnHeader(column) {
       if (column.componentOptions.propsData.label) {
@@ -351,8 +424,13 @@ export default {
 </script>
 
 <style type="text/scss" scoped>
-  .input-field {
+  .input-field.right {
     width: 60px;
     margin-left: 15px;
   }
+  .filters span {
+    padding-left: 25px;
+    padding-right: 15px;
+  }
+
 </style>

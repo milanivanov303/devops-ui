@@ -11,6 +11,9 @@
         :add-btn="$auth.can('extranet.manage-configurations')"
         :edit-btn="$auth.can('extranet.manage-configurations')"
         :delete-btn="$auth.can('extranet.manage-configurations')"
+        filter_type="dropdown"
+        :filterList="filterList"
+        filterColumn="project_type"
         @add="openAddEditModal('create')"
         @edit="(row) => openAddEditModal('update', row)"
         @delete="openDeleteModal"
@@ -355,6 +358,24 @@ export default {
         label: 'App Type',
         selected: {},
       },
+      filterList: [
+        {
+          name: 'All',
+          value: 'all',
+        },
+        {
+          name: 'X3',
+          value: 'X3',
+        },
+        {
+          name: 'Migration',
+          value: 'migration',
+        },
+        {
+          name: 'Debiteur',
+          value: 'debiteur',
+        },
+      ],
     };
   },
   computed: {
