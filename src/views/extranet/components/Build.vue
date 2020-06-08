@@ -243,7 +243,7 @@ export default {
 
               if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
                 this.build.status = data.status;
-                this.$store.dispatch('extranet/getContainers');
+                this.$store.dispatch('builds/getActive');
                 subscribe.unsubscribe();
               }
             },

@@ -5,7 +5,7 @@
         <div class="card" ref="my_builds">
           <div class="card-content">
             <span class="card-title">My active extranet builds</span>
-            <Builds :containers="userContainers" :builds="userBuilds"/>
+            <Builds :builds="userActiveBuilds"/>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
@@ -20,16 +20,16 @@
               </tr>
               </thead>
               <tbody>
-              <tr v-for="(container, index) in containersGroupedByBranch" :key="index">
+              <tr v-for="(build, index) in activeBuildsGroupedByBranch" :key="index">
                 <td>{{ index + 1 }}</td>
                 <td>
-                  <router-link :to="'/imx-fe/branches/' + encodeURIComponent(container.branch)">
-                    {{ container.branch }}
+                  <router-link :to="'/imx-fe/branches/' + encodeURIComponent(build.branch)">
+                    {{ build.branch }}
                   </router-link>
                 </td>
-                <td>{{ container.builds }}</td>
+                <td>{{ build.builds }}</td>
               </tr>
-              <tr v-if="containersGroupedByBranch.length === 0">
+              <tr v-if="activeBuildsGroupedByBranch.length === 0">
                 <td colspan="3">There are no builds</td>
               </tr>
               </tbody>
@@ -46,7 +46,7 @@
                 <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
               </div>
             </div>
-            <BarChart :data="usersChartData" :options="chartOptions" :height="200"></BarChart>
+            <BarChart :data="usersChartData" :height="200"></BarChart>
           </div>
         </div>
         <div class="card" ref="stats_by_branch">
@@ -57,7 +57,7 @@
                 <Select :select="selectStartDate" @selectedVal="getBranchStatistics"/>
               </div>
             </div>
-            <BarChart :data="branchesChartData" :options="chartOptions" :height="200"></BarChart>
+            <BarChart :data="branchesChartData" :height="200"></BarChart>
           </div>
         </div>
       </div>
@@ -102,31 +102,17 @@ export default {
           value: 30,
         },
       },
-      chartOptions: {
-        legend: {
-          display: false,
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-            },
-          }],
-        },
-      },
     };
   },
   computed: {
     host() {
-      return this.$store.state.extranet.host;
+      return this.$store.state.imx_fe.host;
     },
-    userContainers() {
-      return this.$store.getters['imx_fe/getContainersByUser'](
-        this.$auth.getUser().username,
-      );
+    userActiveBuilds() {
+      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'imx-fe');
     },
-    containersGroupedByBranch() {
-      return this.$store.getters['imx_fe/getContainersGroupedByBranch']();
+    activeBuildsGroupedByBranch() {
+      return this.$store.getters['builds/getActiveGroupedByBranch']('imx-fe');
     },
     branchesChartData() {
       const builds = this.$store.getters['builds/getByBranch']('imx-fe-branch-builds', 'imx-fe');
@@ -146,10 +132,14 @@ export default {
     },
   },
   methods: {
-    getContainers() {
+    getBuilds() {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_branch });
-      this.$store.dispatch('imx_fe/getContainers').finally(() => {
+
+      const promise1 = this.$store.dispatch('builds/getActive');
+      const promise2 = this.$store.dispatch('imx_fe/getContainers');
+
+      Promise.all([promise1, promise2]).finally(() => {
         loader1.hide();
         loader2.hide();
       });
@@ -181,13 +171,9 @@ export default {
 
       return Math.round(new Date(newDate).getTime() / 1000);
     },
-    getDeployedBuildUrl(container) {
-      const port = container.Ports.find(value => value.PrivatePort === 8591).PublicPort;
-      return `http://${this.host}:${port}/${container.Labels.build}/`;
-    },
   },
   mounted() {
-    this.getContainers();
+    this.getBuilds();
     this.getBranchStatistics();
     this.getUserStatistics();
   },

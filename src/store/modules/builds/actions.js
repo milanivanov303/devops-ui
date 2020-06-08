@@ -4,13 +4,22 @@ import config from '../../../config';
 const api = new Api(config.devops.url, config.devops.code);
 
 export default {
-  getBuilds({ commit }, { stateName }) {
-    const promise = api.get('builds');
+  getActive({ commit }) {
+    const promise = api.get('builds', {
+        filters: JSON.stringify({
+          allOf: [
+            {
+              status: "running"
+            }
+          ]
+        }),
+    });
+
     promise
       .then((response) => {
-        commit('builds', { name: stateName, data: response.data.data });
+        commit('active', response.data.data);
       })
-      .catch(() => commit('error', 'Could not get builds list'));
+      .catch(() => commit('error', 'Could not get builds list', { root: true }));
     return promise;
   },
 
@@ -30,9 +39,9 @@ export default {
 
     promise
       .then((response) => {
-        commit('builds', { name: stateName, data: response.data.data });
+        commit('statistics', { name: stateName, data: response.data.data });
       })
-      .catch(() => commit('error', 'Could not get builds list'));
+      .catch(() => commit('error', 'Could not get builds list', {root: true}));
 
     return promise;
   },

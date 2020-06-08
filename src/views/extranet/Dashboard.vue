@@ -5,7 +5,7 @@
         <div class="card" ref="my_builds">
           <div class="card-content">
             <span class="card-title">My active extranet builds</span>
-            <Builds :containers="userContainers" :builds="userBuilds"/>
+            <Builds :builds="userActiveBuilds"/>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
@@ -20,17 +20,17 @@
               </tr>
               </thead>
               <tbody>
-              <tr v-for="(container, index) in containersGroupedByBranch" :key="index">
+              <tr v-for="(build, index) in activeBuildsGroupedByBranch" :key="index">
                 <td>{{ index + 1 }}</td>
                 <td>
                   <router-link
-                    v-bind:to="'/extranet/branches/' + encodeURIComponent(container.branch)">
-                    {{ container.branch }}
+                    v-bind:to="'/extranet/branches/' + encodeURIComponent(build.branch)">
+                    {{ build.branch }}
                   </router-link>
                 </td>
-                <td>{{ container.builds }}</td>
+                <td>{{ build.builds }}</td>
               </tr>
-              <tr v-if="containersGroupedByBranch.length === 0">
+              <tr v-if="activeBuildsGroupedByBranch.length === 0">
                 <td colspan="3">There are no builds</td>
               </tr>
               </tbody>
@@ -47,7 +47,7 @@
                 <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
               </div>
             </div>
-            <BarChart :data="usersChartData" :options="chartOptions" :height="200"></BarChart>
+            <BarChart :data="usersChartData" :height="200"></BarChart>
           </div>
         </div>
         <div class="card" ref="stats_by_branch">
@@ -58,7 +58,7 @@
                 <Select :select="selectStartDate" @selectedVal="getBranchStatistics"/>
               </div>
             </div>
-            <BarChart :data="branchesChartData" :options="chartOptions" :height="200"></BarChart>
+            <BarChart :data="branchesChartData" :height="200"></BarChart>
           </div>
         </div>
       </div>
@@ -103,34 +103,17 @@ export default {
           value: 30,
         },
       },
-      chartOptions: {
-        legend: {
-          display: false,
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-            },
-          }],
-        },
-      },
     };
   },
   computed: {
     host() {
       return this.$store.state.extranet.host;
     },
-    userContainers() {
-      return this.$store.getters['extranet/getContainersByUser'](
-        this.$auth.getUser().username,
-      );
+    userActiveBuilds() {
+      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'extranet');
     },
-    userBuilds() {
-      return this.$store.getters['builds/getForUser']('user-builds', this.$auth.getUser().username);
-    },
-    containersGroupedByBranch() {
-      return this.$store.getters['extranet/getContainersGroupedByBranch']();
+    activeBuildsGroupedByBranch() {
+      return this.$store.getters['builds/getActiveGroupedByBranch']('extranet');
     },
     branchesChartData() {
       const builds = this.$store.getters['builds/getByBranch']('extranet-branch-builds', 'extranet');
@@ -148,16 +131,16 @@ export default {
     },
   },
   methods: {
-    getContainers() {
+    getBuilds() {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_branch });
-      this.$store.dispatch('extranet/getContainers').then(() => {
+      const promise1 = this.$store.dispatch('builds/getActive');
+      const promise2 = this.$store.dispatch('extranet/getServices');
+
+      Promise.all([promise1, promise2]).finally(() => {
         loader1.hide();
         loader2.hide();
       });
-    },
-    getBuildsByUser() {
-      this.$store.dispatch('builds/getBuilds', { stateName: 'user-builds' });
     },
     getBranchStatistics(days = {}) {
       const loader = this.$loading.show({ container: this.$refs.stats_by_branch });
@@ -188,8 +171,7 @@ export default {
     },
   },
   mounted() {
-    this.getContainers();
-    this.getBuildsByUser();
+    this.getBuilds();
     this.getBranchStatistics();
     this.getUserStatistics();
   },

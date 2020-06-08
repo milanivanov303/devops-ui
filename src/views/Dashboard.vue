@@ -4,7 +4,7 @@
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My active builds</span>
-          <Builds :containers="userContainers" :builds="userBuilds"></Builds>
+          <Builds :builds="userBuilds"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
@@ -24,14 +24,14 @@
                 <td>
                   <router-link to="/extranet/dashboard">Extranet</router-link>
                 </td>
-                <td>{{ extranetContainersCount }}</td>
+                <td>{{ extranetBuildsCount }}</td>
               </tr>
               <tr>
                 <td>2</td>
                 <td>
                   <router-link to="/imx-fe/dashboard">iMX FE</router-link>
                 </td>
-                <td>{{ imxFeContainersCount }}</td>
+                <td>{{ imxFeBuildsCount }}</td>
               </tr>
             </tbody>
           </table>
@@ -47,7 +47,7 @@
               <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
             </div>
           </div>
-          <BarChart :data="usersChartData" :options="chartOptions" :height="200"></BarChart>
+          <BarChart :data="usersChartData" :height="200"></BarChart>
         </div>
       </div>
       <div class="card" ref="stats_by_module">
@@ -58,7 +58,7 @@
               <Select :select="selectStartDate" @selectedVal="getModuleStatistics"/>
             </div>
           </div>
-          <BarChart :data="modulesChartData" :options="chartOptions" :height="150"></BarChart>
+          <BarChart :data="modulesChartData" :height="150"></BarChart>
         </div>
       </div>
     </div>
@@ -102,45 +102,17 @@ export default {
           value: 30,
         },
       },
-      chartOptions: {
-        legend: {
-          display: false,
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-            },
-          }],
-        },
-      },
     };
   },
   computed: {
-    userContainers() {
-      const extranetContainers = this.$store.getters['extranet/getContainersByUser'](
-        this.$auth.getUser().username,
-      );
-
-      const imxFeContainers = this.$store.getters['imx_fe/getContainersByUser'](
-        this.$auth.getUser().username,
-      );
-
-      return [].concat(extranetContainers, imxFeContainers);
-    },
     userBuilds() {
-      return this.$store.getters['builds/getForUser'](
-        'user-builds', this.$auth.getUser().username,
-      );
+      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username);
     },
-    containersGroupedByBranch() {
-      return this.$store.getters['extranet/getContainersGroupedByBranch']();
+    extranetBuildsCount() {
+      return this.$store.state.builds.active.filter(build => build.module === 'extranet').length;
     },
-    extranetContainersCount() {
-      return this.$store.state.extranet.containers.length;
-    },
-    imxFeContainersCount() {
-      return this.$store.state.imx_fe.containers.length;
+    imxFeBuildsCount() {
+      return this.$store.state.builds.active.filter(build => build.module === 'imx_fe').length;
     },
     modulesChartData() {
       const builds = this.$store.getters['builds/getByModule']('module-builds');
@@ -158,19 +130,17 @@ export default {
     },
   },
   methods: {
-    getContainers() {
+    getBuilds() {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_module });
-      const promise1 = this.$store.dispatch('extranet/getContainers');
-      const promise2 = this.$store.dispatch('imx_fe/getContainers');
+      const promise1 = this.$store.dispatch('builds/getActive');
+      const promise2 = this.$store.dispatch('extranet/getServices');
+      const promise3 = this.$store.dispatch('imx_fe/getContainers');
 
-      Promise.all([promise1, promise2]).finally(() => {
+      Promise.all([promise1, promise2, promise3]).finally(() => {
         loader1.hide();
         loader2.hide();
       });
-    },
-    getBuildsByUser() {
-      this.$store.dispatch('builds/getBuilds', { stateName: 'user-builds' });
     },
     getModuleStatistics(days = {}) {
       const loader = this.$loading.show({ container: this.$refs.stats_by_module });
@@ -201,10 +171,9 @@ export default {
     },
   },
   mounted() {
-    this.getContainers();
+    this.getBuilds();
     this.getModuleStatistics();
     this.getUserStatistics();
-    this.getBuildsByUser();
   },
 };
 </script>

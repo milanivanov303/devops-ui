@@ -5,7 +5,7 @@
         <h4>{{ branch }}</h4>
       </div>
     </div>
-    <Builds :containers="containers" :builds="builds"/>
+    <Builds :builds="builds"/>
     <br>
     <Build />
   </div>
@@ -28,7 +28,7 @@ export default {
       return this.$store.getters['extranet/getContainersByBranch'](this.branch);
     },
     builds() {
-      return this.$store.getters['builds/getForBranch']('branch-builds', this.branch);
+      return this.$store.getters['builds/getActiveByBranch'](this.branch);
     },
   },
 };

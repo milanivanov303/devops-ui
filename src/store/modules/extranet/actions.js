@@ -56,15 +56,15 @@ export default {
     return promise;
   },
 
-  getContainers({ commit }) {
-    const promise = api.get('extranet/containers');
-    
+  getServices({ commit }) {
+    const promise = api.get('extranet/services');
+
     promise
       .then((response) => {
-        commit('containers', response.data.data);
+        commit('services', response.data.data);
         commit('host', response.data.meta.host);
       })
-      .catch(() => commit('error', 'Could not get containers list', { root: true }));
+      .catch(() => commit('error', 'Could not get services list', { root: true }));
     return promise;
   },
 
