@@ -2,7 +2,7 @@
 
 export default {
   branches: [],
-  containers: [],
+  services: [],
   clients: [],
   debiteurClients: [],
   feBranches: [],

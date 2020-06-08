@@ -10,24 +10,24 @@
     <div class="row">
       <div v-if="!checkBranch($route.params.branch)">
         <Branch
-          v-for="branch in sorted"
+          v-for="branch in sortedBranches"
           class="col s12 m6 l4"
           :key="branch.name"
           :branch="branch"
-          :count="getContainersCount(branch.name)"
+          :count="getActiveBuildsCountByBranch(branch.name)"
         />
         <div class="col s12 m6 l2 right" id="perPage">
           <div class="input-field col s12 l4 right">
               <Select class="col s12"
-                      v-if="sorted.length"
+                      v-if="sortedBranches.length"
                       :select="selectPerPage"
                       @selectedVal="selectedPerPage"/>
           </div>
-          <p v-if="sorted.length" class="col s12 l8 right right-align">Items per page:</p>
+          <p v-if="sortedBranches.length" class="col s12 l8 right right-align">Items per page:</p>
         </div>
         <div class="col s12 m6 l6">
           <paginate
-          v-if="sorted.length"
+          v-if="sortedBranches.length"
           v-model="page"
           :page-count="lastPage"
           :click-handler="selectedPage"
@@ -48,7 +48,7 @@
             v-for="branch in filteredBranches"
             :key="branch.name"
             :branch="branch"
-            :count="getContainersCount(branch.name)"
+            :count="getActiveBuildsCountByBranch(branch.name)"
             :class="{
               'selected-branch': $route.path === `/extranet/branches/${branch.name}`
             }"
@@ -118,7 +118,7 @@ export default {
       const regexp = new RegExp(this.search, 'i');
       return this.branches.filter(branch => branch.name.match(regexp));
     },
-    sorted() {
+    sortedBranches() {
       const from = (this.page * this.perPage) - this.perPage;
       const to = (this.page * this.perPage);
       const data = this.filteredBranches;
@@ -127,11 +127,9 @@ export default {
     },
   },
   methods: {
-    getContainers() {
-      this.$store.dispatch('extranet/getContainers');
-    },
-    getBuilds() {
-      this.$store.dispatch('builds/getBuilds', { stateName: 'branch-builds' });
+    getActiveBuilds() {
+      this.$store.dispatch('builds/getActive');
+      this.$store.dispatch('extranet/getServices');
     },
     selectedPerPage(value) {
       this.perPage = value.name;
@@ -143,8 +141,8 @@ export default {
       this.selectPerPage.selected = { name: this.perPage };
       this.lastPage = Math.ceil(data.length / this.perPage);
     },
-    getContainersCount(branch) {
-      return this.$store.getters['extranet/getContainersByBranch'](branch).length;
+    getActiveBuildsCountByBranch(branch) {
+      return this.$store.getters['builds/getActiveByBranch'](branch).length;
     },
     checkBranch(selected) {
       if (typeof selected !== 'undefined' && this.branches.length !== 0) {
@@ -178,8 +176,7 @@ export default {
   },
   mounted() {
     this.getBranches();
-    this.getContainers();
-    this.getBuilds();
+    this.getActiveBuilds();
   },
   watch: {
     search(value) {
