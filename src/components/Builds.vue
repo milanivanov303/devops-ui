@@ -177,9 +177,9 @@
                     <tbody>
                       <tr v-for="(port, index) in selectedBuild.ports" :key="index">
                         <td>{{ index + 1 }}</td>
-                        <td>{{ port.TargetPort || port.PrivatePort }}</td>
-                        <td>{{ port.PublishedPort || port.PublicPort }}</td>
-                        <td>{{ port.Protocol || port.Type }}</td>
+                        <td>{{ port.TargetPort }}</td>
+                        <td>{{ port.PublishedPort }}</td>
+                        <td>{{ port.Protocol }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -242,8 +242,23 @@ export default {
   methods: {
     getBuildUrl(build) {
       const { host } = this.$store.state[build.module];
-      const port = build.details.service.Endpoint.Ports.find(value => value.TargetPort === 8080);
-      return `http://${host}:${port.PublishedPort}/${this.getBuildName(build)}/`;
+      try {
+        let port;
+        try {
+          port = build.details.container.NetworkSettings.Ports['8080/tcp'][0]['HostPort'];
+          return `http://${host}:${port}/${this.getBuildName(build)}/`;
+        } catch (e) {
+          port = build.details.container.NetworkSettings.Ports['8591/tcp'][0]['HostPort'];
+          return `http://${host}:${port}/${this.getBuildName(build)}/`;
+        }
+      } catch (e) {
+        try {
+          const port = build.details.service.Endpoint.Ports.find(value => value.TargetPort === 8080);
+          return `http://${host}:${port.PublishedPort}/${this.getBuildName(build)}/`;
+        } catch (e) {
+          return '';
+        }
+      }
     },
 
     getBuildCreatedOn(build) {
@@ -252,7 +267,13 @@ export default {
     },
 
     getBuildName(build) {
-      return build.details.service.Spec.Name;
+      try {
+        return build.details.container.Name
+          .replace(/^\//, '')
+          .replace(/\.[0-9]*$/, '');
+      } catch (e) {
+        return build.details.service.Spec.Name;
+      }
     },
 
     openBuildInfoModal(build) {
@@ -267,9 +288,24 @@ export default {
       }
       this.selectedBuild.instance = build.details.instance.name;
       this.selectedBuild.java_version = build.details.java_version;
-      this.selectedBuild.ports = build.details.service.Endpoint.Ports.filter(
-        port => port.TargetPort === 22 || port.TargetPort === 8080
-      );
+
+      try {
+        this.selectedBuild.ports = [];
+        for (let port in build.details.container.NetworkSettings.Ports) {
+          this.selectedBuild.ports.push(
+            {
+              TargetPort: port.split('/')[0],
+              PublishedPort: build.details.container.NetworkSettings.Ports[port][0]['HostPort'],
+              Protocol: port.split('/')[1],
+            }
+          );
+        }
+      } catch(e) {
+        this.selectedBuild.ports = build.details.service.Endpoint.Ports.filter(
+          port => port.TargetPort === 22 || port.TargetPort === 8080
+        );
+      }
+
       this.selectedBuild.host = this.$store.state[build.module].host;
 
       this.selectedBuild.user = 'ex1';
