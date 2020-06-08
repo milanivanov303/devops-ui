@@ -6,13 +6,13 @@ const api = new Api(config.devops.url, config.devops.code);
 export default {
   getActive({ commit }) {
     const promise = api.get('builds', {
-        filters: JSON.stringify({
-          allOf: [
-            {
-              status: "running"
-            }
-          ]
-        }),
+      filters: JSON.stringify({
+        allOf: [
+          {
+            status: 'running',
+          },
+        ],
+      }),
     });
 
     promise
@@ -41,7 +41,7 @@ export default {
       .then((response) => {
         commit('statistics', { name: stateName, data: response.data.data });
       })
-      .catch(() => commit('error', 'Could not get builds list', {root: true}));
+      .catch(() => commit('error', 'Could not get builds list', { root: true }));
 
     return promise;
   },
