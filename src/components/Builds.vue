@@ -245,15 +245,16 @@ export default {
       try {
         let port;
         try {
-          port = build.details.container.NetworkSettings.Ports['8080/tcp'][0]['HostPort'];
+          port = build.details.container.NetworkSettings.Ports['8080/tcp'][0].HostPort;
           return `http://${host}:${port}/${this.getBuildName(build)}/`;
         } catch (e) {
-          port = build.details.container.NetworkSettings.Ports['8591/tcp'][0]['HostPort'];
+          port = build.details.container.NetworkSettings.Ports['8591/tcp'][0].HostPort;
           return `http://${host}:${port}/${this.getBuildName(build)}/`;
         }
       } catch (e) {
         try {
-          const port = build.details.service.Endpoint.Ports.find(value => value.TargetPort === 8080);
+          const port = build.details.service.Endpoint.Ports
+            .find(value => value.TargetPort === 8080);
           return `http://${host}:${port.PublishedPort}/${this.getBuildName(build)}/`;
         } catch (e) {
           return '';
@@ -291,18 +292,18 @@ export default {
 
       try {
         this.selectedBuild.ports = [];
-        for (let port in build.details.container.NetworkSettings.Ports) {
+        Object.keys(build.details.container.NetworkSettings.Ports).forEach((port) => {
           this.selectedBuild.ports.push(
             {
               TargetPort: port.split('/')[0],
-              PublishedPort: build.details.container.NetworkSettings.Ports[port][0]['HostPort'],
+              PublishedPort: build.details.container.NetworkSettings.Ports[port][0].HostPort,
               Protocol: port.split('/')[1],
-            }
+            },
           );
-        }
-      } catch(e) {
+        });
+      } catch (e) {
         this.selectedBuild.ports = build.details.service.Endpoint.Ports.filter(
-          port => port.TargetPort === 22 || port.TargetPort === 8080
+          port => port.TargetPort === 22 || port.TargetPort === 8080,
         );
       }
 
@@ -329,7 +330,7 @@ export default {
       this.$store.dispatch(`${build.module}/removeBuild`, build.id)
         .then(() => {
           this.removed = true;
-          this.$store.dispatch(`builds/getActive`);
+          this.$store.dispatch('builds/getActive');
         })
         .catch((error) => {
           if (error.response.status === 403) {

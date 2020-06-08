@@ -17,7 +17,7 @@ export default {
     if (!state.active) {
       return [];
     }
-    return state.active.filter(build => {
+    return state.active.filter((build) => {
       if (module && build.module !== module) {
         return false;
       }
@@ -46,9 +46,7 @@ export default {
     if (!state.active) {
       return [];
     }
-    return state.active.filter(build => {
-      return build.details.branch === branch;
-    });
+    return state.active.filter(build => build.details.branch === branch);
   },
 
   getByModule: state => (stateName) => {

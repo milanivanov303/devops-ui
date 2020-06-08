@@ -21,21 +21,19 @@ export default {
     },
     options: {
       type: Object,
-      default: () => {
-        return {
-          legend: {
-            display: false,
-          },
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true,
-                stepSize: 1,
-              },
-            }],
-          },
-        };
-      },
+      default: () => ({
+        legend: {
+          display: false,
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              stepSize: 1,
+            },
+          }],
+        },
+      }),
     },
     height: {
       type: Number,
