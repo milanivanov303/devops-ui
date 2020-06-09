@@ -26,17 +26,17 @@
         </button>
         <slot name="top-actions-after" :rows="rows"></slot>
       </div>
-      <div class="col s12 filters">
-        <p v-if="filter_type === 'checkbox'">
+
+      <div class="col s12 filters" v-if="filter_type === 'checkbox'">
+        <p>
           <label v-for="filter in filterList" :key="filter.name">
             <input type="checkbox" class="filled-in" v-model="filters" :value="filter.value"/>
             <span>{{ filter.value }}</span>
           </label>
         </p>
-        <div class="input-field col s12 m6 l2" v-if="filter_type === 'dropdown'">
-          <Select :select="selectFilter" @selectedVal="getFilteredRows"/>
-        </div>
+       
       </div>
+
     </div>
 
     <table class="responsive-table">
@@ -75,19 +75,15 @@
             Actions
           </th>
         </tr>
-        <!-- <tr>
+        <tr v-if="filter_type === 'searchField'"> 
           <th v-for="(column, index) in columns"
             :key="index"
             :width="column.data.attrs.width"
             :class="column.data.staticClass"
           >
-          <input type="text" :placeholder="getColumnHeader(column)" v-model="columnFilter"/>
-            <div class="input-field col s12 m6 l2" v-if="filter_type === 'dropdown'">
-              <Select :select="selectFilter" @selectedVal="getFilteredRows"/>
-            </div>
+            <input :id="'filterColumn'.concat(index)" type="text" :placeholder="getColumnHeader(column)" v-on:input="getFilterValue(index)"/>
           </th>
-
-        </tr> -->
+        </tr>
       </thead>
       <tbody>
         <tr v-for="(row, index) in getPaginatedRows()" :key="index">
@@ -179,7 +175,7 @@ export default {
     queryPrefix: { default: '', type: String },
     filter_type: { type: String },
     filterList: {type: Array },
-    filterColumn: {type: String},
+    filterColumn: {type: Array},
   },
   data() {
     return {
@@ -198,11 +194,14 @@ export default {
         options: this.filterList,
         selected: {},
       },
+      filterColumns: this.filterColumn,
+      currentFilterColumn:'',
+      columnIndex: Number,
     };
   },
   computed: {
     rows() {
-      let { data } = this;
+      let { data } = this;    
 
       if (this.currentFilter) {
         data = data.filter((row) => {
@@ -216,41 +215,14 @@ export default {
         });
       }
 
-      if (this.filters) {
-        this.filters.forEach((filter) => {
-          if (filter !== "all") {
-              data = data.filter((row) => {
-              if(row[this.filterColumn] === filter) {
-                return row;
-              }
-            });
-          }
-        });
-
-        // this.filterColumns.forEach((column) => {
-        //   this.filters.forEach((filter) => {
-        //       data = data.filter((row) => {
-        //         if(row[column] === filter) {
-        //           return row;
-        //         }
-        //       });
-        //     });
-        //   });
-
-        // const cols = [];
-        // this.columns.forEach((column) => {
-        //   cols.fill(column.componentOptions.propsData.show);
-        // });
-        // console.log(cols);
-
-        // cols.forEach((col) => {
-        //   data.forEach((row) => {
-        //     console.log(data.col);
-        //   });
-        // });
+      if (this.currentFilterColumn) {
+        const col = this.columns[this.columnIndex].componentOptions.propsData.show
         
+        const regexp = new RegExp(this.currentFilterColumn, 'i');
+        data = data.filter((row) => row[col].match(regexp));
       }
 
+    
       if (this.currentSortBy) {
         data = data.sort((a, b) => {
           const sortDir = this.currentSortDir === 'asc' ? 1 : -1;
@@ -272,6 +244,11 @@ export default {
     },
   },
   methods: {
+    getFilterValue(index) { 
+      const id = 'filterColumn'.concat(index)
+      this.currentFilterColumn = document.getElementById(id).value.toLowerCase();  
+      this.columnIndex = index;
+    },
     getPaginatedRows() {
       if (!this.rows.length) {
         return this.rows;
@@ -374,6 +351,10 @@ export default {
     currentFilter() {
       this.currentPage = 1;
       this.modifyQueryParam('filter', this.currentFilter);
+    },
+    currentFilterColumn() {
+      this.currentPage = 1;
+      this.modifyQueryParam('filterColumn', this.currentFilterColumn);
     },
     currentSortBy() {
       this.currentPage = 1;

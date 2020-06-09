@@ -13,7 +13,7 @@
         :delete-btn="$auth.can('extranet.manage-configurations')"
         filter_type="dropdown"
         :filterList="filterList"
-        filterColumn="project_type"
+        :filterColumn="filterColumns"
         @add="openAddEditModal('create')"
         @edit="(row) => openAddEditModal('update', row)"
         @delete="openDeleteModal"
@@ -376,6 +376,9 @@ export default {
           value: 'debiteur',
         },
       ],
+      filterColumns: [
+        "project_type", "name"
+      ]
     };
   },
   computed: {
