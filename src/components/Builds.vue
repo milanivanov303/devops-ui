@@ -273,7 +273,17 @@ export default {
           .replace(/^\//, '')
           .replace(/\.[0-9]*$/, '');
       } catch (e) {
-        return build.details.service.Spec.Name;
+        return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce(env => {
+          if (env.match(/^EXTRANET_BUILD_DIR=/)) {
+            return env
+              .split('=')
+              .slice(-1)
+              .toString()
+              .split('/')
+              .slice(-1)
+              .toString();
+          }
+        });
       }
     },
 
