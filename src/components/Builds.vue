@@ -273,7 +273,7 @@ export default {
           .replace(/^\//, '')
           .replace(/\.[0-9]*$/, '');
       } catch (e) {
-        return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce(env => {
+        return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
           if (env.match(/^EXTRANET_BUILD_DIR=/)) {
             return env
               .split('=')
@@ -283,6 +283,7 @@ export default {
               .slice(-1)
               .toString();
           }
+          return 'could-not-get-build-name';
         });
       }
     },
