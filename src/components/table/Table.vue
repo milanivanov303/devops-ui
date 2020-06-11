@@ -4,7 +4,7 @@
     <div class="row" v-if="showTopRow()">
       <div class="input-field col s12 m6 l4">
         <i v-if="searchField" class="material-icons prefix">search</i>
-        <input v-if="searchField" type="text" placeholder="Search..." v-model="currentFilter"/>
+        <input v-if="searchField" type="text" placeholder="Search..." v-model="globalSearch"/>
       </div>
       <div class="col s12 m6 l8">
         <slot name="top-actions-before" :rows="rows"></slot>
@@ -27,15 +27,14 @@
         <slot name="top-actions-after" :rows="rows"></slot>
       </div>
 
-      <div class="col s12 filters" v-if="filter_type === 'checkbox'">
+      <!-- <div class="col s12 filters" v-if="filter_type === 'checkbox'">
         <p>
           <label v-for="filter in filterList" :key="filter.name">
             <input type="checkbox" class="filled-in" v-model="filters" :value="filter.value"/>
             <span>{{ filter.value }}</span>
           </label>
         </p>
-       
-      </div>
+      </div> -->
 
     </div>
 
@@ -81,7 +80,22 @@
             :width="column.data.attrs.width"
             :class="column.data.staticClass"
           >
-            <input :id="'filterColumn'.concat(index)" type="text" :placeholder="getColumnHeader(column)" v-on:input="getFilterValue(index)"/>
+            <input v-model="columnFilter[column.componentOptions.propsData.show]" type="text" :placeholder="getColumnHeader(column)"/>
+          </th>
+        </tr>
+        <tr v-if="filter_type === 'dropdown'">
+          <th v-for="(column, index) in columns"
+            :key="index"
+            :width="column.data.attrs.width"
+            :class="column.data.staticClass"
+          >
+            <div v-if="filterColumn.includes(column.componentOptions.propsData.show)" class="input-field col s12">
+              <select v-model="columnFilter[column.componentOptions.propsData.show]">
+                <option value="" disabled selected>Select {{ getColumnHeader(column) }}</option>
+                <option value="">all</option>
+                <option v-for="(option, idx) in columnOptions(index)" :key="idx" :value="option">{{ option }}</option>
+              </select>
+            </div>
           </th>
         </tr>
       </thead>
@@ -174,38 +188,28 @@ export default {
     perPage: { default: 10, type: Number },
     queryPrefix: { default: '', type: String },
     filter_type: { type: String },
-    filterList: {type: Array },
     filterColumn: {type: Array},
   },
   data() {
     return {
-      filters:[],
+      columnFilter: {},
       columns: [],
-      currentFilter: this.filter,
+      globalSearch: this.filter,
       currentSortBy: this.sortBy,
       currentSortDir: this.sortDir,
       currentPage: this.page,
       currentPerPage: this.perPage,
       lastPage: 1,
-      selectFilter: {
-        id: 'filter_select',
-        name: 'filter',
-        displayed: 'name',
-        options: this.filterList,
-        selected: {},
-      },
       filterColumns: this.filterColumn,
-      currentFilterColumn:'',
-      columnIndex: Number,
     };
   },
   computed: {
     rows() {
       let { data } = this;    
 
-      if (this.currentFilter) {
+      if (this.globalSearch) {
         data = data.filter((row) => {
-          const filter = this.currentFilter.toLowerCase();
+          const filter = this.globalSearch.toLowerCase();
 
           return Object.keys(row).some((key) => {
             const columnValue = String(row[key]).toLowerCase();
@@ -215,13 +219,17 @@ export default {
         });
       }
 
-      if (this.currentFilterColumn) {
-        const col = this.columns[this.columnIndex].componentOptions.propsData.show
-        
-        const regexp = new RegExp(this.currentFilterColumn, 'i');
-        data = data.filter((row) => row[col].match(regexp));
-      }
 
+      if(Object.values(this.columnFilter).length !== 0) {
+        Object.entries(this.columnFilter).forEach( ( [key, value] ) => {
+          data = data.filter((row) => {  
+            if(this.getColumnData(row, key).match(new RegExp(value, 'i')) || value === "") {
+              return row;
+            };
+            return false;
+          });  
+        });
+      }
     
       if (this.currentSortBy) {
         data = data.sort((a, b) => {
@@ -244,11 +252,15 @@ export default {
     },
   },
   methods: {
-    getFilterValue(index) { 
-      const id = 'filterColumn'.concat(index)
-      this.currentFilterColumn = document.getElementById(id).value.toLowerCase();  
-      this.columnIndex = index;
+    columnOptions(index) {
+      let { data } = this;    
+      const options = [];
+      const col = this.columns[index].componentOptions.propsData.show;
+      data.forEach((row) => options.push(this.getColumnData(row, col)));
+
+      return options.filter((key,idx) => options.indexOf(key) === idx);
     },
+
     getPaginatedRows() {
       if (!this.rows.length) {
         return this.rows;
@@ -268,9 +280,6 @@ export default {
       const to = this.currentPage * this.currentPerPage;
 
       return this.rows.slice(from, to);
-    },
-    getFilteredRows(filter = {}) {
-      this.filters = [ filter.value ];
     },
     getColumnHeader(column) {
       if (column.componentOptions.propsData.label) {
@@ -334,27 +343,55 @@ export default {
     },
     modifyQueryParam(param, value) {
       const query = Object.assign({}, this.$route.query);
-
-      if (value) {
-        query[this.queryPrefix + param] = value;
-      } else {
-        delete query[this.queryPrefix + param];
+      if(typeof value === 'object') {
+        debugger;
+        Object.entries(this.columnFilter).forEach( ( [key, val] ) => {
+          if(!val) {  
+            delete value[key];
+          } 
+          query[this.queryPrefix + param] = JSON.stringify(value).replace(/"/g,'').replace(/{/g, '').replace(/}/g, '');
+        });
+        if(!query[this.queryPrefix + param]) { delete query[this.queryPrefix + param]; };
+      } 
+      
+      if (typeof value === 'string') {
+        if (value) {
+          query[this.queryPrefix + param] = value;
+        } else {
+          delete query[this.queryPrefix + param];
+        }
       }
 
       this.$router.push({ query });
     },
     getQueryParam(param, _default = '') {
+      if (typeof this.$route.query[this.queryPrefix + param] !== 'undefined' && this.$route.query[this.queryPrefix + param].includes(":")) {
+        const obj = {};
+        if(this.$route.query[this.queryPrefix + param].includes(",")) {
+          this.$route.query[this.queryPrefix + param].split(",").forEach((query) => {
+            obj[query.split(":")[0]] = query.split(":")[1];
+          })
+        } else {
+          obj[this.$route.query[this.queryPrefix + param].split(":")[0]] = this.$route.query[this.queryPrefix + param].split(":")[1];
+        }
+
+        return obj;
+      }
+
       return this.$route.query[this.queryPrefix + param] || _default;
     },
   },
   watch: {
-    currentFilter() {
+    globalSearch() {
       this.currentPage = 1;
-      this.modifyQueryParam('filter', this.currentFilter);
+      this.modifyQueryParam('search', this.globalSearch);
     },
-    currentFilterColumn() {
-      this.currentPage = 1;
-      this.modifyQueryParam('filterColumn', this.currentFilterColumn);
+    columnFilter: {
+      deep: true,
+      handler() {
+        this.currentPage = 1;
+        this.modifyQueryParam('filterColumn', this.columnFilter);
+      }
     },
     currentSortBy() {
       this.currentPage = 1;
@@ -369,9 +406,14 @@ export default {
     },
   },
   created() {
-    const filter = this.getQueryParam('filter');
+    const search = this.getQueryParam('search');
+    if (search) {
+      this.globalSearch = search;
+    }
+
+    const filter = this.getQueryParam('filterColumn');
     if (filter) {
-      this.currentFilter = filter;
+      this.columnFilter = filter;
     }
 
     const sortBy = this.getQueryParam('sort_by');
