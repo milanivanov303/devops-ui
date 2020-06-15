@@ -58,7 +58,7 @@ export default {
 
   getContainers({ commit }) {
     const promise = api.get('extranet/containers');
-    
+
     promise
       .then((response) => {
         commit('containers', response.data.data);

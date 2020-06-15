@@ -358,8 +358,8 @@ export default {
         selected: {},
       },
       filterColumns: [
-        "project_type", "app_type"
-      ]
+        'project_type', 'app_type',
+      ],
     };
   },
   computed: {
