@@ -13,12 +13,48 @@ function sortBuilds(builds) {
 }
 
 export default {
+  getActiveByUser: state => (username, module) => {
+    if (!state.active) {
+      return [];
+    }
+    return state.active.filter((build) => {
+      if (module && build.module !== module) {
+        return false;
+      }
+      return build.details.created_by === username;
+    });
+  },
+
+  getActiveGroupedByBranch: state => (module) => {
+    const branches = {};
+    state
+      .active
+      .filter(build => build.module === module)
+      .forEach((build) => {
+        branches[build.details.branch] = (branches[build.details.branch] + 1) || 1;
+      });
+
+    const builds = [];
+    Object.keys(branches).forEach((branch) => {
+      builds.push({ branch, builds: branches[branch] });
+    });
+
+    return builds.sort((a, b) => b.builds - a.builds);
+  },
+
+  getActiveByBranch: state => (branch) => {
+    if (!state.active) {
+      return [];
+    }
+    return state.active.filter(build => build.details.branch === branch);
+  },
+
   getByModule: state => (stateName) => {
-    if (!state.builds[stateName]) {
+    if (!state.statistics[stateName]) {
       return [];
     }
 
-    const builds = state.builds[stateName].reduce(
+    const builds = state.statistics[stateName].reduce(
       (tally, build) => {
         tally[build.module] = (tally[build.module] || 0) + 1;
         return tally;
@@ -29,11 +65,11 @@ export default {
     return sortBuilds(builds);
   },
   getByUser: state => (stateName, module) => {
-    if (!state.builds[stateName]) {
+    if (!state.statistics[stateName]) {
       return [];
     }
 
-    const builds = state.builds[stateName].reduce(
+    const builds = state.statistics[stateName].reduce(
       (tally, build) => {
         if (!module || build.module === module) {
           tally[build.details.created_by] = (tally[build.details.created_by] || 0) + 1;
@@ -46,11 +82,11 @@ export default {
     return sortBuilds(builds);
   },
   getByBranch: state => (stateName, module) => {
-    if (!state.builds[stateName]) {
+    if (!state.statistics[stateName]) {
       return [];
     }
 
-    const builds = state.builds[stateName].reduce(
+    const builds = state.statistics[stateName].reduce(
       (tally, build) => {
         if (!module || build.module === module) {
           tally[build.details.branch] = (tally[build.details.branch] || 0) + 1;
@@ -64,11 +100,11 @@ export default {
   },
 
   getForBranch: state => (stateName, branch) => {
-    if (!state.builds[stateName]) {
+    if (!state.statistics[stateName]) {
       return [];
     }
 
-    return state.builds[stateName].filter((build) => {
+    return state.statistics[stateName].filter((build) => {
       if (build.details.branch === branch) {
         return true;
       }
@@ -76,11 +112,11 @@ export default {
     });
   },
   getForUser: state => (stateName, user) => {
-    if (!state.builds[stateName]) {
+    if (!state.statistics[stateName]) {
       return [];
     }
 
-    return state.builds[stateName].filter((build) => {
+    return state.statistics[stateName].filter((build) => {
       if (build.details.created_by === user) {
         return true;
       }

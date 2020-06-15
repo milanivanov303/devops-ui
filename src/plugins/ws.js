@@ -1,8 +1,9 @@
 import Stomp from 'stompjs';
 import config from '../../config';
 
-const ws = new WebSocket(config.ws.url);
-const client = Stomp.over(ws);
+const client = Stomp.client(config.ws.url);
+
+client.reconnect_delay = 5000; // The delay is in milli seconds
 
 client.connect(
   config.ws.username,

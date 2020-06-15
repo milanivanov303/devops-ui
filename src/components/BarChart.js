@@ -21,7 +21,19 @@ export default {
     },
     options: {
       type: Object,
-      default: null,
+      default: () => ({
+        legend: {
+          display: false,
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              stepSize: 1,
+            },
+          }],
+        },
+      }),
     },
     height: {
       type: Number,

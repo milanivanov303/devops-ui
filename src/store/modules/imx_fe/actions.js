@@ -24,7 +24,7 @@ export default {
   },
   getContainers({ commit }) {
     const promise = api.get('imx-fe/containers');
-    
+
     promise
       .then((response) => {
         commit('containers', response.data.data);

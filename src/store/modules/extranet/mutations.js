@@ -6,8 +6,8 @@ export default {
   branches(state, branches) {
     state.branches = branches;
   },
-  containers(state, containers) {
-    state.containers = containers;
+  services(state, services) {
+    state.services = services;
   },
   host(state, host) {
     state.host = host;
@@ -25,8 +25,8 @@ export default {
     state.debiteurBranches = branches;
   },
   removeBuild(state, id) {
-    state.containers.splice(
-      state.containers.findIndex(container => container.Id === id),
+    state.services.splice(
+      state.services.findIndex(service => service.ID === id),
       1,
     );
   },

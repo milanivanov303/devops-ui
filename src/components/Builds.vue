@@ -5,29 +5,29 @@
       <tr>
         <th>#</th>
         <th>Name</th>
-        <th>Status</th>
         <th>Created By</th>
+        <th>Created On</th>
         <th>Url</th>
+        <th>Details</th>
         <th></th>
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(container, index) in containers" :key="index">
+      <tr v-for="(build, index) in builds" :key="index">
         <td>{{ index + 1 }}</td>
-        <td>{{ container.Labels.build }}</td>
-        <td>{{ container.Status }}</td>
-        <td>{{ container.Labels.username }}</td>
+        <td>{{ getBuildName(build) }}</td>
+        <td>{{ build.details.created_by }}</td>
+        <td>{{ getBuildCreatedOn(build) }}</td>
         <td>
           <a
-            v-if="container.State === 'running'"
-            :href="getDeployedBuildUrl(container)"
+            :href="getBuildUrl(build)"
             target="_blank"
           >
             <i class="material-icons">cast_connected</i>
           </a>
         </td>
         <td>
-          <a @click="openBuildInfoModal(container)"          >
+          <a @click="openBuildInfoModal(build)" >
             <i class="material-icons">description</i>
           </a>
         </td>
@@ -35,24 +35,24 @@
           <button
             v-if="
               $auth.can('extranet.remove-builds') ||
-              ($auth.getUser().username === container.Labels.username)
+              ($auth.getUser().username === build.details.created_by)
             "
             class="btn-small red"
             title="Remove build"
-            @click="openRemoveBuildModal(container)"
+            @click="openRemoveBuildModal(build)"
           >
             <i class="material-icons left">delete</i> Remove
           </button>
         </td>
       </tr>
-      <tr v-if="containers.length === 0">
+      <tr v-if="builds.length === 0">
         <td colspan="6">There are no builds yet</td>
       </tr>
       </tbody>
     </table>
 
     <Modal v-if="showInfoModal" @close="closeBuildInfoModal()" class="right-sheet">
-      <template v-slot:header>{{ container.Labels.build }}</template>
+      <template v-slot:header>{{ selectedBuild.name }}</template>
       <template v-slot:content>
         <div class="col s12 l11">
           <div class="row">
@@ -169,7 +169,6 @@
                     <thead>
                     <tr>
                       <th>#</th>
-                      <th>IP</th>
                       <th>Private Port</th>
                       <th>Public Port</th>
                       <th>Type</th>
@@ -178,10 +177,9 @@
                     <tbody>
                       <tr v-for="(port, index) in selectedBuild.ports" :key="index">
                         <td>{{ index + 1 }}</td>
-                        <td>{{ port.IP }}</td>
-                        <td>{{ port.PrivatePort }}</td>
-                        <td>{{ port.PublicPort }}</td>
-                        <td>{{ port.Type }}</td>
+                        <td>{{ port.TargetPort }}</td>
+                        <td>{{ port.PublishedPort }}</td>
+                        <td>{{ port.Protocol }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -198,7 +196,7 @@
       <template v-slot:content>
         <div v-if="removing" class="center" >
           <Preloader class="big"></Preloader>
-          <p>Removing build <b>{{ container.Labels.build }}</b> ... </p>
+          <p>Removing build <b>{{ getBuildName(selectedBuild) }}</b> ... </p>
         </div>
         <div v-else-if="removed" class="center" >
           <i class="material-icons large green-text">check_circle_outline</i>
@@ -209,14 +207,14 @@
           <p>{{ error }}</p>
         </div>
         <div v-else>
-          Are you sure you what to remove <b>{{ container.Labels.build }}</b> build?
+          Are you sure you what to remove <b>{{ getBuildName(selectedBuild) }}</b> build?
         </div>
       </template>
       <template v-slot:footer>
         <button
           v-if="!removing && !removed"
           class="waves-effect btn red"
-          @click="removeBuild(container)"
+          @click="removeBuild(selectedBuild)"
         >
           <i class="material-icons left">delete</i> Remove
         </button>
@@ -229,7 +227,6 @@
 
 export default {
   props: {
-    containers: Array,
     builds: Array,
   },
   data() {
@@ -237,66 +234,114 @@ export default {
       selectedBuild: {},
       showInfoModal: false,
       showModal: false,
-      container: null,
       removing: false,
       removed: false,
       error: null,
     };
   },
   methods: {
-    getDeployedBuildUrl(container) {
-      const { host } = this.$store.state[container.Labels.type];
-      const port = container.Ports.find(
-        value => value.PrivatePort === 8591 || value.PrivatePort === 8080,
-      );
-      if (host && port) {
-        return `http://${host}:${port.PublicPort}/${container.Labels.build}/`;
+    getBuildUrl(build) {
+      const { host } = this.$store.state[build.module];
+      try {
+        let port;
+        try {
+          port = build.details.container.NetworkSettings.Ports['8080/tcp'][0].HostPort;
+          return `http://${host}:${port}/${this.getBuildName(build)}/`;
+        } catch (e) {
+          port = build.details.container.NetworkSettings.Ports['8591/tcp'][0].HostPort;
+          return `http://${host}:${port}/${this.getBuildName(build)}/`;
+        }
+      } catch (e) {
+        try {
+          const port = build.details.service.Endpoint.Ports
+            .find(value => value.TargetPort === 8080);
+          return `http://${host}:${port.PublishedPort}/${this.getBuildName(build)}/`;
+        } catch (e) {
+          return '';
+        }
       }
-      return '#no-build-url-found';
     },
 
-    openBuildInfoModal(container) {
-      this.showInfoModal = true;
-      this.container = container;
-      this.builds.find((build) => {
-        if (typeof build.details.container !== 'undefined'
-        && container.Id === build.details.container.Id) {
-          this.selectedBuild.created_by = container.Labels.username;
-          this.selectedBuild.created_on = new Date(container.Created * 1000).toLocaleString('en-GB', { timeZone: 'Europe/Sofia' });
-          this.selectedBuild.branch = build.details.branch;
-          if (build.details.fe_branch) {
-            this.selectedBuild.fe_branch = build.details.fe_branch.name;
-          }
-          this.selectedBuild.instance = build.details.instance.name;
-          this.selectedBuild.java_version = build.details.java_version;
-          this.selectedBuild.ports = container.Ports
-            .filter(port => port.PrivatePort === 22
-            || port.PrivatePort === 8591 || port.PrivatePort === 8080);
-          this.selectedBuild.host = this.$store.state[container.Labels.type].host;
-          this.selectedBuild.user = 'ex1';
-          this.selectedBuild.pass = 'Sofphia';
-        }
-        return false;
-      });
+    getBuildCreatedOn(build) {
+      return (new Date(build.created_on * 1000))
+        .toLocaleString('en-GB', { timeZone: 'Europe/Sofia' });
     },
+
+    getBuildName(build) {
+      try {
+        return build.details.container.Name
+          .replace(/^\//, '')
+          .replace(/\.[0-9]*$/, '');
+      } catch (e) {
+        return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
+          if (env.match(/^EXTRANET_BUILD_DIR=/)) {
+            return env
+              .split('=')
+              .slice(-1)
+              .toString()
+              .split('/')
+              .slice(-1)
+              .toString();
+          }
+          return 'could-not-get-build-name';
+        });
+      }
+    },
+
+    openBuildInfoModal(build) {
+      this.showInfoModal = true;
+
+      this.selectedBuild.name = this.getBuildName(build);
+      this.selectedBuild.created_by = build.details.created_by;
+      this.selectedBuild.created_on = this.getBuildCreatedOn(build);
+      this.selectedBuild.branch = build.details.branch;
+      if (build.details.fe_branch) {
+        this.selectedBuild.fe_branch = build.details.fe_branch.name;
+      }
+      this.selectedBuild.instance = build.details.instance.name;
+      this.selectedBuild.java_version = build.details.java_version;
+
+      try {
+        this.selectedBuild.ports = [];
+        Object.keys(build.details.container.NetworkSettings.Ports).forEach((port) => {
+          this.selectedBuild.ports.push(
+            {
+              TargetPort: port.split('/')[0],
+              PublishedPort: build.details.container.NetworkSettings.Ports[port][0].HostPort,
+              Protocol: port.split('/')[1],
+            },
+          );
+        });
+      } catch (e) {
+        this.selectedBuild.ports = build.details.service.Endpoint.Ports.filter(
+          port => port.TargetPort === 22 || port.TargetPort === 8080,
+        );
+      }
+
+      this.selectedBuild.host = this.$store.state[build.module].host;
+
+      this.selectedBuild.user = 'enterprise';
+      this.selectedBuild.pass = 'Sofphia';
+    },
+
     closeBuildInfoModal() {
       this.showInfoModal = false;
       this.selectedBuild = {};
     },
 
-    openRemoveBuildModal(container) {
+    openRemoveBuildModal(build) {
       this.showModal = true;
-      this.container = container;
+      this.selectedBuild = build;
       this.removing = false;
       this.removed = false;
       this.error = null;
     },
-    removeBuild(container) {
+    removeBuild(build) {
       this.removing = true;
-      this.$store.dispatch(`${container.Labels.type}/removeBuild`, container.Id)
+      this.$store.dispatch(`${build.module}/removeBuild`, build.id)
         .then(() => {
           this.removed = true;
-          this.$store.dispatch(`${container.Labels.type}/getContainers`);
+          this.$store.dispatch('builds/getActive');
         })
         .catch((error) => {
           if (error.response.status === 403) {
