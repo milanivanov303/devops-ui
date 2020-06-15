@@ -320,7 +320,7 @@ export default {
 
       this.selectedBuild.host = this.$store.state[build.module].host;
 
-      this.selectedBuild.user = 'ex1';
+      this.selectedBuild.user = 'enterprise';
       this.selectedBuild.pass = 'Sofphia';
     },
 
