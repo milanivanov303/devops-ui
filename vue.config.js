@@ -1,10 +1,9 @@
 module.exports = {
   lintOnSave: false,
-  devServer: {
-    watchOptions: {
-      ignored: /node_modules/,
-      aggregateTimeout: 300,
-      poll: 1000,
-    },
+  chainWebpack: (config) => {
+    config.output
+      .filename('js/[name].[hash:8].js')
+      .chunkFilename('js/[name].[hash:8].js');
   },
 };
+
