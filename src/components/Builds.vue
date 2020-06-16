@@ -269,9 +269,7 @@ export default {
 
     getBuildName(build) {
       try {
-        return build.details.container.Name
-          .replace(/^\//, '')
-          .replace(/\.[0-9]*$/, '');
+        return build.details.container.Config.Labels.build;
       } catch (e) {
         return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
           if (env.match(/^EXTRANET_BUILD_DIR=/)) {
