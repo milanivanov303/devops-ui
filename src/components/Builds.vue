@@ -7,9 +7,7 @@
         <th>Name</th>
         <th>Created By</th>
         <th>Created On</th>
-        <th>Url</th>
-        <th>Details</th>
-        <th></th>
+        <th>Quick Actions</th>
       </tr>
       </thead>
       <tbody>
@@ -18,31 +16,39 @@
         <td>{{ getBuildName(build) }}</td>
         <td>{{ build.details.created_by }}</td>
         <td>{{ getBuildCreatedOn(build) }}</td>
-        <td>
+        <td class="quick-actions">
           <a
             :href="getBuildUrl(build)"
             target="_blank"
+            data-tooltip="Open build"
+            class="green-text tooltipped"
           >
-            <i class="material-icons">cast_connected</i>
+            <i class="material-icons">launch</i>
           </a>
-        </td>
-        <td>
-          <a @click="openBuildInfoModal(build)" >
-            <i class="material-icons">description</i>
+          <a
+            @click="openBuildInfoModal(build)"
+            data-tooltip="Build details"
+            class="blue-text tooltipped"
+          >
+            <i class="material-icons">error_outline</i>
           </a>
-        </td>
-        <td>
-          <button
-            v-if="
-              $auth.can('extranet.remove-builds') ||
-              ($auth.getUser().username === build.details.created_by)
-            "
-            class="btn-small red"
-            title="Remove build"
+          <a
+            v-if="getWebssh2Url(build)"
+            :href="getWebssh2Url(build)"
+            target="_blank"
+            data-tooltip="Open terminal"
+            class="tooltipped"
+          >
+            <i class="material-icons">wysiwyg</i>
+          </a>
+          <a
+            v-if="canRemoveBuild(build)"
             @click="openRemoveBuildModal(build)"
+            data-tooltip="Remove build"
+            class="red-text tooltipped"
           >
-            <i class="material-icons left">delete</i> Remove
-          </button>
+            <i class="material-icons">delete</i>
+          </a>
         </td>
       </tr>
       <tr v-if="builds.length === 0">
@@ -240,6 +246,15 @@ export default {
     };
   },
   methods: {
+    getBuildPublishedPort(build, port) {
+      try {
+        return build.details.service.Endpoint.Ports
+          .find(value => value.TargetPort === port).PublishedPort;
+      } catch (e) {
+        return null;
+      }
+    },
+
     getBuildUrl(build) {
       const { host } = this.$store.state[build.module];
       try {
@@ -252,14 +267,22 @@ export default {
           return `http://${host}:${port}/${this.getBuildName(build)}/`;
         }
       } catch (e) {
-        try {
-          const port = build.details.service.Endpoint.Ports
-            .find(value => value.TargetPort === 8080);
-          return `http://${host}:${port.PublishedPort}/${this.getBuildName(build)}/`;
-        } catch (e) {
-          return '';
+        const port = this.getBuildPublishedPort(build, 8080);
+        if (port) {
+          return `http://${host}:${port}/${this.getBuildName(build)}/`;
         }
+        return null;
       }
+    },
+
+    getWebssh2Url(build) {
+      const { host } = this.$store.state[build.module];
+      const port = this.getBuildPublishedPort(build, 22);
+
+      if (host && port) {
+        return `http://${window.location.hostname}:2222/ssh/host/${host}?port=${port}`;
+      }
+      return null;
     },
 
     getBuildCreatedOn(build) {
@@ -273,11 +296,7 @@ export default {
       } catch (e) {
         return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
           if (env.match(/^EXTRANET_BUILD_DIR=/)) {
-            return env
-              .split('=')
-              .slice(-1)
-              .toString()
-              .split('/')
+            return env.split('=').slice(-1).toString().split('/')
               .slice(-1)
               .toString();
           }
@@ -311,9 +330,7 @@ export default {
           );
         });
       } catch (e) {
-        this.selectedBuild.ports = build.details.service.Endpoint.Ports.filter(
-          port => port.TargetPort === 22 || port.TargetPort === 8080,
-        );
+        this.selectedBuild.ports = build.details.service.Endpoint.Ports;
       }
 
       this.selectedBuild.host = this.$store.state[build.module].host;
@@ -325,6 +342,14 @@ export default {
     closeBuildInfoModal() {
       this.showInfoModal = false;
       this.selectedBuild = {};
+    },
+
+    canRemoveBuild(build) {
+      if (this.$auth.can('extranet.remove-builds')) {
+        return true;
+      }
+
+      return this.$auth.getUser().username === build.details.created_by;
     },
 
     openRemoveBuildModal(build) {
@@ -351,6 +376,12 @@ export default {
         .finally(() => { this.removing = false; });
     },
   },
+  mounted() {
+    // Init tooltips in component
+    this.$M.Tooltip.init(
+      this.$el.querySelectorAll('.tooltipped'),
+    );
+  },
 };
 </script>
 <style scoped>
@@ -360,5 +391,8 @@ export default {
   }
   .tabs {
     margin-bottom: 25px;
+  }
+  .quick-actions a {
+      margin: 0px 2.5px;
   }
 </style>
