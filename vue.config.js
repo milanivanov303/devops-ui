@@ -6,4 +6,3 @@ module.exports = {
       .chunkFilename('js/[name].[hash:8].js');
   },
 };
-
