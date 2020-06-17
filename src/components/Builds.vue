@@ -231,6 +231,8 @@
 
 <script>
 
+import config from "../config";
+
 export default {
   props: {
     builds: Array,
@@ -280,7 +282,7 @@ export default {
       const port = this.getBuildPublishedPort(build, 22);
 
       if (host && port) {
-        return `http://${window.location.hostname}:2222/ssh/host/${host}?port=${port}`;
+        return `http://${window.location.hostname}:${config.webssh2_port}/ssh/host/${host}?port=${port}`;
       }
       return null;
     },
