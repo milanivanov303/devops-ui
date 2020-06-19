@@ -30,6 +30,23 @@
             </ul>
           </div>
         </li>
+        <li :class="{ active: isActive('debiteur') }">
+          <a class="collapsible-header">
+            <i class="material-icons">laptop_chromebook</i> Debiteur
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li :class="{ active: isActive('debiteur/dashboard') }">
+                <router-link to="/debiteur/dashboard"> Dashboard</router-link>
+              </li>
+              <li v-bind:class="{ active: isActive('debiteur/branches') }">
+                <router-link to="/debiteur/branches"> Branches</router-link>
+              </li>
+              <li><div class="divider"></div></li>
+            </ul>
+          </div>
+        </li>
         <li :class="{ active: isActive('imx-fe') }">
           <a class="collapsible-header">
             <i class="material-icons">devices</i> iMX FE

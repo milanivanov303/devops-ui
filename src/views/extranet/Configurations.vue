@@ -382,7 +382,7 @@ export default {
       }
 
       if (this.configuration.app_type && this.configuration.app_type.value === 'debiteur') {
-        return this.$store.state.extranet.debiteurBranches;
+        return this.$store.state.debiteur.branches;
       }
 
       return [];
@@ -393,7 +393,7 @@ export default {
       }
 
       if (this.configuration.app_type && this.configuration.app_type.value === 'debiteur') {
-        return this.$store.state.extranet.debiteurClients;
+        return this.$store.state.debiteur.clients;
       }
 
       return [];
@@ -446,9 +446,9 @@ export default {
       promises.push(this.$store.dispatch('extranet/getConfigurations'));
       promises.push(this.$store.dispatch('mmpi/getProjects'));
       promises.push(this.$store.dispatch('extranet/getBranches'));
-      promises.push(this.$store.dispatch('extranet/getDebiteurBranches'));
+      promises.push(this.$store.dispatch('debiteur/getBranches'));
       promises.push(this.$store.dispatch('extranet/getClients'));
-      promises.push(this.$store.dispatch('extranet/getDebiteurClients'));
+      promises.push(this.$store.dispatch('debiteur/getClients'));
 
       Promise.all(promises).finally(() => {
         loader.hide();
