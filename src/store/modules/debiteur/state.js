@@ -4,7 +4,5 @@ export default {
   branches: [],
   services: [],
   clients: [],
-  feBranches: [],
-  configurations: [],
   host: '',
 };
