@@ -46,7 +46,7 @@
             </i>
             <a
               href="#"
-              v-if="column.componentOptions.propsData.sortable !== false"
+              v-if="column.componentOptions.propsData.sortable !==false"
               @click="setSort(column.componentOptions.propsData.show, $event)"
             >
               <span class="left">{{ getColumnHeader(column) }}</span>
@@ -57,41 +57,29 @@
                 {{ currentSortDir === 'asc' ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
               </i>
             </a>
-            <span v-else class="left">{{ getColumnHeader(column) }}</span>
+            <span v-if="columnFilter[column.componentOptions.propsData.show]"
+                  class="left">{{ getColumnHeader(column) }}
+            </span>
 
+            <input  v-if="column.componentOptions.propsData.filterable &&
+                    column.componentOptions.propsData.filterType === 'search'"
+                    v-model="columnFilter[column.componentOptions.propsData.show]"
+                    type="text"
+                    :placeholder="getColumnHeader(column)"
+            />
+            <select v-if="column.componentOptions.propsData.filterable &&
+                    column.componentOptions.propsData.filterType === 'dropdown'"
+                    v-model="columnFilter[column.componentOptions.propsData.show]">
+              <option value="" disabled selected>Choose {{ getColumnHeader(column) }}</option>
+              <option value="">all</option>
+              <option v-for="(option, idx) in columnOptions(index)"
+                      :key="idx"
+                      :value="option">{{ option }}
+              </option>
+            </select>
           </th>
           <th v-if="showActionsColumn()">
             Actions
-          </th>
-        </tr>
-        <tr v-if="filter_type === 'searchField'">
-          <th v-for="(column, index) in columns"
-            :key="index"
-            :width="column.data.attrs.width"
-            :class="column.data.staticClass"
-          >
-            <input v-model="columnFilter[column.componentOptions.propsData.show]"
-                   type="text"
-                  :placeholder="getColumnHeader(column)"/>
-          </th>
-        </tr>
-        <tr v-if="filter_type === 'dropdown'">
-          <th v-for="(column, index) in columns"
-            :key="index"
-            :width="column.data.attrs.width"
-            :class="column.data.staticClass"
-          >
-            <div v-if="filterColumn.includes(column.componentOptions.propsData.show)"
-                 class="input-field col s12">
-              <select v-model="columnFilter[column.componentOptions.propsData.show]">
-                <option value="" disabled selected>Select {{ getColumnHeader(column) }}</option>
-                <option value="">all</option>
-                <option v-for="(option, idx) in columnOptions(index)"
-                       :key="idx"
-                       :value="option">{{ option }}
-                </option>
-              </select>
-            </div>
           </th>
         </tr>
       </thead>
@@ -176,15 +164,12 @@ export default {
     viewBtn: { default: true, type: Boolean },
     editBtn: { default: true, type: Boolean },
     deleteBtn: { default: true, type: Boolean },
-    filter: { type: String },
     sortBy: { type: String },
     sortDir: { type: String },
     pagination: { default: true, type: Boolean },
     page: { default: 1, type: Number },
     perPage: { default: 10, type: Number },
     queryPrefix: { default: '', type: String },
-    filter_type: { type: String },
-    filterColumn: { type: Array },
   },
   data() {
     return {
@@ -196,7 +181,6 @@ export default {
       currentPage: this.page,
       currentPerPage: this.perPage,
       lastPage: 1,
-      filterColumns: this.filterColumn,
     };
   },
   computed: {
@@ -349,26 +333,26 @@ export default {
         if (!query[this.queryPrefix + param]) { delete query[this.queryPrefix + param]; }
       }
 
-      if (typeof value === 'string') {
-        if (value) {
-          query[this.queryPrefix + param] = value;
-        } else {
-          delete query[this.queryPrefix + param];
-        }
+      if (typeof value === 'string' && value) {
+        debugger;
+        query[this.queryPrefix + param] = value;
+      } else {
+        delete query[this.queryPrefix + param];
       }
 
       this.$router.push({ query });
     },
     getQueryParam(param, _default = '') {
-      if (typeof this.$route.query[this.queryPrefix + param] !== 'undefined' && this.$route.query[this.queryPrefix + param].includes('=')) {
+      const queryParam = this.$route.query[this.queryPrefix + param];
+      if (typeof queryParam !== 'undefined' && queryParam.includes('=')) {
         const obj = {};
 
-        if (this.$route.query[this.queryPrefix + param].includes('&')) {
-          this.$route.query[this.queryPrefix + param].split('&').forEach((query) => {
+        if (queryParam.includes('&')) {
+          queryParam.split('&').forEach((query) => {
             obj[query.split('=')[0]] = query.split('=')[1];
           });
         } else {
-          obj[this.$route.query[this.queryPrefix + param].split('=')[0]] = this.$route.query[this.queryPrefix + param].split('=')[1];
+          obj[queryParam.split('=')[0]] = queryParam.split('=')[1];
         }
 
         return obj;
@@ -447,9 +431,9 @@ export default {
     width: 60px;
     margin-left: 15px;
   }
-  .filters span {
-    padding-left: 25px;
-    padding-right: 15px;
+  .responsive-table input::placeholder {
+    color: black;
+    opacity: 1; /* Firefox */
   }
 
 </style>
