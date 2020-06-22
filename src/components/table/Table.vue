@@ -46,7 +46,7 @@
             </i>
             <a
               href="#"
-              v-if="column.componentOptions.propsData.sortable !==false"
+              v-if="column.componentOptions.propsData.sortable !== false"
               @click="setSort(column.componentOptions.propsData.show, $event)"
             >
               <span class="left">{{ getColumnHeader(column) }}</span>
@@ -57,18 +57,19 @@
                 {{ currentSortDir === 'asc' ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
               </i>
             </a>
-            <span v-if="columnFilter[column.componentOptions.propsData.show]"
+           
+            <span v-if="columnFilter[column.componentOptions.propsData.show] || 
+                  (column.componentOptions.propsData.sortable == false && 
+                  !column.componentOptions.propsData.filterType)"
                   class="left">{{ getColumnHeader(column) }}
             </span>
 
-            <input  v-if="column.componentOptions.propsData.filterable &&
-                    column.componentOptions.propsData.filterType === 'search'"
-                    v-model="columnFilter[column.componentOptions.propsData.show]"
-                    type="text"
+            <input  v-if="column.componentOptions.propsData.filterType === 'search'"
+                    v-model="columnFilter[column.componentOptions.propsData.show]" 
+                    type="text" 
                     :placeholder="getColumnHeader(column)"
             />
-            <select v-if="column.componentOptions.propsData.filterable &&
-                    column.componentOptions.propsData.filterType === 'dropdown'"
+            <select v-if="column.componentOptions.propsData.filterType === 'dropdown'"
                     v-model="columnFilter[column.componentOptions.propsData.show]">
               <option value="" disabled selected>Choose {{ getColumnHeader(column) }}</option>
               <option value="">all</option>
@@ -77,6 +78,7 @@
                       :value="option">{{ option }}
               </option>
             </select>
+             
           </th>
           <th v-if="showActionsColumn()">
             Actions
@@ -333,8 +335,7 @@ export default {
         if (!query[this.queryPrefix + param]) { delete query[this.queryPrefix + param]; }
       }
 
-      if (typeof value === 'string' && value) {
-        debugger;
+      else if (typeof value === 'string' && value) {
         query[this.queryPrefix + param] = value;
       } else {
         delete query[this.queryPrefix + param];

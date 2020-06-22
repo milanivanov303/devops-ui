@@ -5,7 +5,6 @@ export default {
     label: { type: [String, Function] },
     info: { type: String },
     sortable: { default: true, type: Boolean },
-    filterable: { default: false, type: Boolean },
     filterType: { type: String },
   },
 };
