@@ -1,5 +1,5 @@
 <template>
-  <div class="extranet-branch">
+  <div class="debiteur-branch">
     <div class="row" >
       <div class="col s12" >
         <h4>{{ branch }}</h4>
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import Build from '@/views/extranet/components/Build';
+import Build from '@/views/debiteur/components/Build';
 import Builds from '@/components/Builds';
 
 export default {
@@ -25,7 +25,7 @@ export default {
       return this.$route.params.branch;
     },
     containers() {
-      return this.$store.getters['extranet/getContainersByBranch'](this.branch);
+      return this.$store.getters['debiteur/getContainersByBranch'](this.branch);
     },
     builds() {
       return this.$store.getters['builds/getActiveByBranch'](this.branch);

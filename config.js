@@ -23,4 +23,5 @@ module.exports = {
     vhost: process.env.VUE_APP_WS_VHOST,
   },
   instance: process.env.VUE_APP_ENV,
+  webssh2_port: process.env.VUE_APP_WEBSSH2_PORT,
 };

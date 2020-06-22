@@ -50,7 +50,7 @@
             :branch="branch"
             :count="getActiveBuildsCountByBranch(branch.name)"
             :class="{
-              'selected-branch': $route.path === `/extranet/branches/${branch.name}`
+              'selected-branch': $route.path === `/debiteur/branches/${branch.name}`
             }"
           />
         </div>
@@ -70,7 +70,7 @@
 
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
-import Branch from '@/views/extranet/components/Branch';
+import Branch from '@/views/debiteur/components/Branch';
 
 
 export default {
@@ -108,7 +108,7 @@ export default {
   },
   computed: {
     branches() {
-      return this.$store.state.extranet.branches;
+      return this.$store.state.debiteur.branches;
     },
     filteredBranches() {
       if (!this.search) {
@@ -129,7 +129,7 @@ export default {
   methods: {
     getActiveBuilds() {
       this.$store.dispatch('builds/getActive');
-      this.$store.dispatch('extranet/getServices');
+      this.$store.dispatch('debiteur/getServices');
     },
     selectedPerPage(value) {
       this.perPage = value.name;
@@ -162,7 +162,7 @@ export default {
     },
     getBranches() {
       const loader = this.$loading.show({ container: this.$refs.branches });
-      this.$store.dispatch('extranet/getBranches').then(() => {
+      this.$store.dispatch('debiteur/getBranches').then(() => {
         loader.hide();
         const branch = document.querySelector('.selected-branch');
         if (branch) {

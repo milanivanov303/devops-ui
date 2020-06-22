@@ -22,23 +22,6 @@ export default {
     return promise;
   },
 
-  getDebiteurClients({ commit }) {
-    const name = 'extranet-debiteur-clients';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
-    const promise = api.get('extranet/debiteur-clients');
-
-    commit('promise', { name, promise }, { root: true });
-
-    promise
-      .then(response => commit('debiteurClients', response.data))
-      .catch(() => commit('error', 'Could not get debiteur clients list', { root: true }));
-    return promise;
-  },
-
   getBranches({ commit }) {
     const name = 'extranet-branches';
 
@@ -56,15 +39,15 @@ export default {
     return promise;
   },
 
-  getContainers({ commit }) {
-    const promise = api.get('extranet/containers');
+  getServices({ commit }) {
+    const promise = api.get('extranet/services');
 
     promise
       .then((response) => {
-        commit('containers', response.data.data);
+        commit('services', response.data.data);
         commit('host', response.data.meta.host);
       })
-      .catch(() => commit('error', 'Could not get containers list', { root: true }));
+      .catch(() => commit('error', 'Could not get services list', { root: true }));
     return promise;
   },
 
@@ -82,23 +65,6 @@ export default {
     promise
       .then(response => commit('feBranches', response.data))
       .catch(() => commit('error', 'Could not get branches list', { root: true }));
-    return promise;
-  },
-
-  getDebiteurBranches({ commit }) {
-    const name = 'extranet-debiteur-branches';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
-    const promise = api.get('extranet/debiteur-branches');
-
-    commit('promise', { name, promise }, { root: true });
-
-    promise
-      .then(response => commit('debiteurBranches', response.data))
-      .catch(() => commit('error', 'Could not get debiteur branches list', { root: true }));
     return promise;
   },
 

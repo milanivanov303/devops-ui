@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col s12" >
       <button
-        v-if="$auth.can('extranet.create-builds')"
+        v-if="$auth.can('debiteur.create-builds')"
         class="btn"
         @click="open()">
         <i class="material-icons left">add</i> New build
@@ -64,16 +64,6 @@
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col s12" >
-                  <Autocomplete
-                    label="Fe branch"
-                    icon="dynamic_feed"
-                    :items="feBranches"
-                    v-model="form.feBranch"
-                  />
-                </div>
-              </div>
             </div>
           </template>
           <template v-else>
@@ -131,7 +121,6 @@ function initialState() {
       client: null,
       javaVersion: 8,
       instance: null,
-      fe_branch: null,
     },
     build: {
       started: false,
@@ -154,13 +143,10 @@ export default {
       return this.$route.params.branch;
     },
     clients() {
-      return this.$store.state.extranet.clients;
+      return this.$store.state.debiteur.clients;
     },
     instances() {
       return this.$store.state.mmpi.instances;
-    },
-    feBranches() {
-      return this.$store.state.extranet.feBranches;
     },
   },
   validations: {
@@ -181,13 +167,10 @@ export default {
   },
   methods: {
     getClients() {
-      this.$store.dispatch('extranet/getClients');
+      this.$store.dispatch('debiteur/getClients');
     },
     getInstances() {
       this.$store.dispatch('mmpi/getInstances');
-    },
-    getFeBranches() {
-      this.$store.dispatch('extranet/getFeBranches');
     },
     open() {
       this.form = initialState().form;
@@ -215,10 +198,9 @@ export default {
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-        fe_branch: this.form.feBranch,
       };
 
-      this.$store.dispatch('extranet/startBuild', payload)
+      this.$store.dispatch('debiteur/startBuild', payload)
         .then((response) => {
           this.build.status = 'running';
 
@@ -270,7 +252,6 @@ export default {
   mounted() {
     this.getClients();
     this.getInstances();
-    this.getFeBranches();
   },
 };
 </script>

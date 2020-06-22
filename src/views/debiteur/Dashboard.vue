@@ -1,16 +1,16 @@
 <template>
-  <div class="extranet">
-    <div v-if="$route.meta.name === 'extranet'" >
+  <div class="debiteur">
+    <div v-if="$route.meta.name === 'debiteur'" >
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
           <div class="card-content">
-            <span class="card-title">My active extranet builds</span>
+            <span class="card-title">My active debiteur builds</span>
             <Builds :builds="userActiveBuilds"/>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
           <div class="card-content">
-            <span class="card-title">Active extranet builds by branch</span>
+            <span class="card-title">Active debiteur builds by branch</span>
             <table>
               <thead>
               <tr>
@@ -24,7 +24,7 @@
                 <td>{{ index + 1 }}</td>
                 <td>
                   <router-link
-                    v-bind:to="'/extranet/branches/' + encodeURIComponent(build.branch)">
+                    v-bind:to="'/debiteur/branches/' + encodeURIComponent(build.branch)">
                     {{ build.branch }}
                   </router-link>
                 </td>
@@ -41,7 +41,7 @@
       <div class="col s12 l4">
         <div class="card" ref="stats_by_user">
           <div class="card-content">
-            <span class="card-title">Extranet builds by user</span>
+            <span class="card-title">Debiteur builds by user</span>
             <div class="col s12 l6 right">
               <div class="input-field">
                 <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
@@ -52,7 +52,7 @@
         </div>
         <div class="card" ref="stats_by_branch">
           <div class="card-content">
-            <span class="card-title">Extranet builds by branch</span>
+            <span class="card-title">Debiteur builds by branch</span>
             <div class="col s12 l6 right">
               <div class="input-field">
                 <Select :select="selectStartDate" @selectedVal="getBranchStatistics"/>
@@ -107,23 +107,23 @@ export default {
   },
   computed: {
     host() {
-      return this.$store.state.extranet.host;
+      return this.$store.state.debiteur.host;
     },
     userActiveBuilds() {
-      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'extranet');
+      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'debiteur');
     },
     activeBuildsGroupedByBranch() {
-      return this.$store.getters['builds/getActiveGroupedByBranch']('extranet');
+      return this.$store.getters['builds/getActiveGroupedByBranch']('debiteur');
     },
     branchesChartData() {
-      const builds = this.$store.getters['builds/getByBranch']('extranet-branch-builds', 'extranet');
+      const builds = this.$store.getters['builds/getByBranch']('debiteur-branch-builds', 'debiteur');
       return {
         labels: Object.keys(builds),
         datasets: [{ data: Object.values(builds) }],
       };
     },
     usersChartData() {
-      const builds = this.$store.getters['builds/getByUser']('extranet-users-builds', 'extranet');
+      const builds = this.$store.getters['builds/getByUser']('debiteur-users-builds', 'debiteur');
       return {
         labels: Object.keys(builds),
         datasets: [{ data: Object.values(builds) }],
@@ -135,7 +135,7 @@ export default {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_branch });
       const promise1 = this.$store.dispatch('builds/getActive');
-      const promise2 = this.$store.dispatch('extranet/getServices');
+      const promise2 = this.$store.dispatch('debiteur/getServices');
 
       Promise.all([promise1, promise2]).finally(() => {
         loader1.hide();
@@ -148,7 +148,7 @@ export default {
         'builds/getBuildsForPeriod',
         {
           startDate: this.getStartDate(days.value || this.startDate),
-          stateName: 'extranet-branch-builds',
+          stateName: 'debiteur-branch-builds',
         },
       ).then(() => loader.hide());
     },
@@ -158,7 +158,7 @@ export default {
         'builds/getBuildsForPeriod',
         {
           startDate: this.getStartDate(days.value || this.startDate),
-          stateName: 'extranet-users-builds',
+          stateName: 'debiteur-users-builds',
         },
       ).then(() => loader.hide());
     },
