@@ -1,7 +1,5 @@
 // https://vuex.vuejs.org/en/mutations.html
 
-import Vue from 'vue';
-
 export default {
   branches(state, branches) {
     state.branches = branches;
