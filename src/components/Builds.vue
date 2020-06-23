@@ -240,8 +240,8 @@ export default {
     builds: Array,
     showModule: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {

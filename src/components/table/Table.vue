@@ -57,16 +57,16 @@
                 {{ currentSortDir === 'asc' ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
               </i>
             </a>
-           
-            <span v-if="columnFilter[column.componentOptions.propsData.show] || 
-                  (column.componentOptions.propsData.sortable == false && 
+
+            <span v-if="columnFilter[column.componentOptions.propsData.show] ||
+                  (column.componentOptions.propsData.sortable == false &&
                   !column.componentOptions.propsData.filterType)"
                   class="left">{{ getColumnHeader(column) }}
             </span>
 
             <input  v-if="column.componentOptions.propsData.filterType === 'search'"
-                    v-model="columnFilter[column.componentOptions.propsData.show]" 
-                    type="text" 
+                    v-model="columnFilter[column.componentOptions.propsData.show]"
+                    type="text"
                     :placeholder="getColumnHeader(column)"
             />
             <select v-if="column.componentOptions.propsData.filterType === 'dropdown'"
@@ -78,7 +78,7 @@
                       :value="option">{{ option }}
               </option>
             </select>
-             
+
           </th>
           <th v-if="showActionsColumn()">
             Actions
@@ -333,9 +333,7 @@ export default {
           query[this.queryPrefix + param] = Object.keys(value).map(key => `${key}=${value[key]}`).join('&');
         });
         if (!query[this.queryPrefix + param]) { delete query[this.queryPrefix + param]; }
-      }
-
-      else if (typeof value === 'string' && value) {
+      } else if (typeof value === 'string' && value) {
         query[this.queryPrefix + param] = value;
       } else {
         delete query[this.queryPrefix + param];
@@ -350,9 +348,11 @@ export default {
 
         if (queryParam.includes('&')) {
           queryParam.split('&').forEach((query) => {
+            /* eslint prefer-destructuring: ["error", {VariableDeclarator: {object: false}}] */
             obj[query.split('=')[0]] = query.split('=')[1];
           });
         } else {
+          /* eslint prefer-destructuring: ["error", {VariableDeclarator: {object: false}}] */
           obj[queryParam.split('=')[0]] = queryParam.split('=')[1];
         }
 
