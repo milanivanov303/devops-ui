@@ -16,11 +16,11 @@
         @delete="openDeleteModal"
       >
         <Column show="project"/>
-        <Column show="project_type"/>
+        <Column show="project_type" :sortable="false" filter-type="dropdown"/>
         <Column show="delivery_chain"/>
         <Column show="dev_instance"/>
         <Column show="val_instance"/>
-        <Column show="app_type"/>
+        <Column show="app_type" :sortable="false" filter-type="search"/>
         <Column show="app_version"/>
         <Column show="branch"/>
         <Column show="prefix"/>
@@ -355,6 +355,9 @@ export default {
         label: 'App Type',
         selected: {},
       },
+      filterColumns: [
+        'project_type', 'app_type',
+      ],
     };
   },
   computed: {
