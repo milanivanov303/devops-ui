@@ -5,6 +5,7 @@
       <tr>
         <th>#</th>
         <th>Name</th>
+        <th v-if="showModule">Module</th>
         <th>Created By</th>
         <th>Created On</th>
         <th>Quick Actions</th>
@@ -14,6 +15,7 @@
       <tr v-for="(build, index) in builds" :key="index">
         <td>{{ index + 1 }}</td>
         <td>{{ getBuildName(build) }}</td>
+        <td v-if="showModule">{{ build.module }}</td>
         <td>{{ build.details.created_by }}</td>
         <td>{{ getBuildCreatedOn(build) }}</td>
         <td class="quick-actions">
@@ -236,6 +238,10 @@ import config from '../config';
 export default {
   props: {
     builds: Array,
+    showModule: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

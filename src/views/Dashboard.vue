@@ -4,7 +4,7 @@
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My active builds</span>
-          <Builds :builds="userBuilds"></Builds>
+          <Builds :builds="userBuilds" :show-module="true"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
@@ -25,6 +25,13 @@
                   <router-link to="/extranet/dashboard">Extranet</router-link>
                 </td>
                 <td>{{ extranetBuildsCount }}</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>
+                  <router-link to="/debiteur/dashboard">Debiteur</router-link>
+                </td>
+                <td>{{ debiteurBuildsCount }}</td>
               </tr>
               <tr>
                 <td>2</td>
@@ -110,6 +117,9 @@ export default {
     },
     extranetBuildsCount() {
       return this.$store.state.builds.active.filter(build => build.module === 'extranet').length;
+    },
+    debiteurBuildsCount() {
+      return this.$store.state.builds.active.filter(build => build.module === 'debiteur').length;
     },
     imxFeBuildsCount() {
       return this.$store.state.builds.active.filter(build => build.module === 'imx_fe').length;
