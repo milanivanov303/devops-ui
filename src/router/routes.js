@@ -5,6 +5,9 @@ const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../vi
 const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
 const ExtranetBranch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
 const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations.vue');
+const DebiteurDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Dashboard.vue');
+const DebiteurBranches = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branches.vue');
+const DebiteurBranch = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branch.vue');
 const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
 const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
@@ -104,6 +107,54 @@ export default [
       breadcrumb: 'Configurations',
     },
     component: ExtranetConfigurations,
+  },
+  {
+    path: '/debiteur',
+    meta: {
+      requiresAuth: true,
+      name: 'debiteur',
+      transitionName: 'slide',
+      title: 'Debiteur Dashboard',
+      breadcrumb: 'Debiteur',
+    },
+    component: DebiteurDashboard,
+    children: [
+      {
+        path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+          name: 'debiteur',
+          transitionName: 'slide',
+          title: 'Debiteur Dashboard',
+          breadcrumb: 'Dashboard',
+        },
+        component: DebiteurDashboard,
+      },
+    ],
+  },
+  {
+    path: '/debiteur/branches',
+    meta: {
+      requiresAuth: true,
+      name: 'debiteur-branches',
+      transitionName: 'slide',
+      title: 'Debiteur Branches',
+      breadcrumb: 'Branches',
+    },
+    component: DebiteurBranches,
+    children: [
+      {
+        path: ':branch',
+        meta: {
+          name: 'debiteur-branch',
+          requiresAuth: true,
+          transitionName: 'slide',
+          title: params => params.branch,
+          breadcrumb: params => params.branch,
+        },
+        component: DebiteurBranch,
+      },
+    ],
   },
   {
     path: '/imx-fe',

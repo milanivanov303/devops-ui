@@ -4,7 +4,7 @@
     <div class="row" v-if="showTopRow()">
       <div class="input-field col s12 m6 l4">
         <i v-if="searchField" class="material-icons prefix">search</i>
-        <input v-if="searchField" type="text" placeholder="Search..." v-model="currentFilter"/>
+        <input v-if="searchField" type="text" placeholder="Search..." v-model="globalSearch"/>
       </div>
       <div class="col s12 m6 l8">
         <slot name="top-actions-before" :rows="rows"></slot>
@@ -57,7 +57,27 @@
                 {{ currentSortDir === 'asc' ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
               </i>
             </a>
-            <span v-else class="left">{{ getColumnHeader(column) }}</span>
+
+            <span v-if="columnFilter[column.componentOptions.propsData.show] ||
+                  (column.componentOptions.propsData.sortable == false &&
+                  !column.componentOptions.propsData.filterType)"
+                  class="left">{{ getColumnHeader(column) }}
+            </span>
+
+            <input  v-if="column.componentOptions.propsData.filterType === 'search'"
+                    v-model="columnFilter[column.componentOptions.propsData.show]"
+                    type="text"
+                    :placeholder="getColumnHeader(column)"
+            />
+            <select v-if="column.componentOptions.propsData.filterType === 'dropdown'"
+                    v-model="columnFilter[column.componentOptions.propsData.show]">
+              <option value="" disabled selected>Choose {{ getColumnHeader(column) }}</option>
+              <option value="">all</option>
+              <option v-for="(option, idx) in columnOptions(index)"
+                      :key="idx"
+                      :value="option">{{ option }}
+              </option>
+            </select>
 
           </th>
           <th v-if="showActionsColumn()">
@@ -146,7 +166,6 @@ export default {
     viewBtn: { default: true, type: Boolean },
     editBtn: { default: true, type: Boolean },
     deleteBtn: { default: true, type: Boolean },
-    filter: { type: String },
     sortBy: { type: String },
     sortDir: { type: String },
     pagination: { default: true, type: Boolean },
@@ -156,8 +175,9 @@ export default {
   },
   data() {
     return {
+      columnFilter: {},
       columns: [],
-      currentFilter: this.filter,
+      globalSearch: this.filter,
       currentSortBy: this.sortBy,
       currentSortDir: this.sortDir,
       currentPage: this.page,
@@ -169,14 +189,26 @@ export default {
     rows() {
       let { data } = this;
 
-      if (this.currentFilter) {
+      if (this.globalSearch) {
         data = data.filter((row) => {
-          const filter = this.currentFilter.toLowerCase();
+          const filter = this.globalSearch.toLowerCase();
 
           return Object.keys(row).some((key) => {
             const columnValue = String(row[key]).toLowerCase();
 
             return columnValue.indexOf(filter) > -1;
+          });
+        });
+      }
+
+
+      if (Object.values(this.columnFilter).length !== 0) {
+        Object.entries(this.columnFilter).forEach(([key, value]) => {
+          data = data.filter((row) => {
+            if (this.getColumnData(row, key).match(new RegExp(value, 'i')) || value === '') {
+              return row;
+            }
+            return false;
           });
         });
       }
@@ -202,6 +234,15 @@ export default {
     },
   },
   methods: {
+    columnOptions(index) {
+      const { data } = this;
+      const options = [];
+      const col = this.columns[index].componentOptions.propsData.show;
+      data.forEach(row => options.push(this.getColumnData(row, col)));
+
+      return options.filter((key, idx) => options.indexOf(key) === idx);
+    },
+
     getPaginatedRows() {
       if (!this.rows.length) {
         return this.rows;
@@ -284,8 +325,15 @@ export default {
     },
     modifyQueryParam(param, value) {
       const query = Object.assign({}, this.$route.query);
-
-      if (value) {
+      if (typeof value === 'object') {
+        Object.entries(this.columnFilter).forEach(([key, val]) => {
+          if (!val) {
+            delete value[key];
+          }
+          query[this.queryPrefix + param] = Object.keys(value).map(key => `${key}=${value[key]}`).join('&');
+        });
+        if (!query[this.queryPrefix + param]) { delete query[this.queryPrefix + param]; }
+      } else if (typeof value === 'string' && value) {
         query[this.queryPrefix + param] = value;
       } else {
         delete query[this.queryPrefix + param];
@@ -294,13 +342,37 @@ export default {
       this.$router.push({ query });
     },
     getQueryParam(param, _default = '') {
+      const queryParam = this.$route.query[this.queryPrefix + param];
+      if (typeof queryParam !== 'undefined' && queryParam.includes('=')) {
+        const obj = {};
+
+        if (queryParam.includes('&')) {
+          queryParam.split('&').forEach((query) => {
+            /* eslint prefer-destructuring: ["error", {VariableDeclarator: {object: false}}] */
+            obj[query.split('=')[0]] = query.split('=')[1];
+          });
+        } else {
+          /* eslint prefer-destructuring: ["error", {VariableDeclarator: {object: false}}] */
+          obj[queryParam.split('=')[0]] = queryParam.split('=')[1];
+        }
+
+        return obj;
+      }
+
       return this.$route.query[this.queryPrefix + param] || _default;
     },
   },
   watch: {
-    currentFilter() {
+    globalSearch() {
       this.currentPage = 1;
-      this.modifyQueryParam('filter', this.currentFilter);
+      this.modifyQueryParam('search', this.globalSearch);
+    },
+    columnFilter: {
+      deep: true,
+      handler() {
+        this.currentPage = 1;
+        this.modifyQueryParam('filterColumn', this.columnFilter);
+      },
     },
     currentSortBy() {
       this.currentPage = 1;
@@ -315,9 +387,14 @@ export default {
     },
   },
   created() {
-    const filter = this.getQueryParam('filter');
+    const search = this.getQueryParam('search');
+    if (search) {
+      this.globalSearch = search;
+    }
+
+    const filter = this.getQueryParam('filterColumn');
     if (filter) {
-      this.currentFilter = filter;
+      this.columnFilter = filter;
     }
 
     const sortBy = this.getQueryParam('sort_by');
@@ -351,8 +428,13 @@ export default {
 </script>
 
 <style type="text/scss" scoped>
-  .input-field {
+  .input-field.right {
     width: 60px;
     margin-left: 15px;
   }
+  .responsive-table input::placeholder {
+    color: black;
+    opacity: 1; /* Firefox */
+  }
+
 </style>

@@ -15,14 +15,8 @@ export default {
   clients(state, clients) {
     state.clients = clients;
   },
-  debiteurClients(state, clients) {
-    state.debiteurClients = clients;
-  },
   feBranches(state, branches) {
     state.feBranches = branches;
-  },
-  debiteurBranches(state, branches) {
-    state.debiteurBranches = branches;
   },
   removeBuild(state, id) {
     state.services.splice(

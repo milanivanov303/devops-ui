@@ -7,6 +7,4 @@ export default {
     }
     return state.services.filter(service => service.Spec.Labels.username === username);
   },
-
-  getConfigurations: state => state.configurations,
 };

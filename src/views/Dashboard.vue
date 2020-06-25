@@ -4,7 +4,7 @@
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My active builds</span>
-          <Builds :builds="userBuilds"></Builds>
+          <Builds :builds="userBuilds" :show-module="true"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
@@ -25,6 +25,13 @@
                   <router-link to="/extranet/dashboard">Extranet</router-link>
                 </td>
                 <td>{{ extranetBuildsCount }}</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>
+                  <router-link to="/debiteur/dashboard">Debiteur</router-link>
+                </td>
+                <td>{{ debiteurBuildsCount }}</td>
               </tr>
               <tr>
                 <td>2</td>
@@ -111,6 +118,9 @@ export default {
     extranetBuildsCount() {
       return this.$store.state.builds.active.filter(build => build.module === 'extranet').length;
     },
+    debiteurBuildsCount() {
+      return this.$store.state.builds.active.filter(build => build.module === 'debiteur').length;
+    },
     imxFeBuildsCount() {
       return this.$store.state.builds.active.filter(build => build.module === 'imx_fe').length;
     },
@@ -135,9 +145,10 @@ export default {
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_module });
       const promise1 = this.$store.dispatch('builds/getActive');
       const promise2 = this.$store.dispatch('extranet/getServices');
-      const promise3 = this.$store.dispatch('imx_fe/getContainers');
+      const promise3 = this.$store.dispatch('debiteur/getServices');
+      const promise4 = this.$store.dispatch('imx_fe/getContainers');
 
-      Promise.all([promise1, promise2, promise3]).finally(() => {
+      Promise.all([promise1, promise2, promise3, promise4]).finally(() => {
         loader1.hide();
         loader2.hide();
       });
