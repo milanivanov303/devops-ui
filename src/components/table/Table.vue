@@ -71,7 +71,7 @@
             />
             <select v-if="column.componentOptions.propsData.filterType === 'dropdown'"
                     v-model="columnFilter[column.componentOptions.propsData.show]">
-              <option value="" disabled selected>Choose {{ getColumnHeader(column) }}</option>
+              <option value="" disabled selected>{{ getColumnHeader(column) }}</option>
               <option value="">all</option>
               <option v-for="(option, idx) in columnOptions(index)"
                       :key="idx"
