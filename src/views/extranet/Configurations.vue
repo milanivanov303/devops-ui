@@ -16,11 +16,11 @@
         @delete="openDeleteModal"
       >
         <Column show="project"/>
-        <Column show="project_type"/>
+        <Column show="project_type" :sortable="false" filter-type="dropdown"/>
         <Column show="delivery_chain"/>
         <Column show="dev_instance"/>
         <Column show="val_instance"/>
-        <Column show="app_type"/>
+        <Column show="app_type" :sortable="false" filter-type="search"/>
         <Column show="app_version"/>
         <Column show="branch"/>
         <Column show="prefix"/>
@@ -355,6 +355,9 @@ export default {
         label: 'App Type',
         selected: {},
       },
+      filterColumns: [
+        'project_type', 'app_type',
+      ],
     };
   },
   computed: {
@@ -382,7 +385,7 @@ export default {
       }
 
       if (this.configuration.app_type && this.configuration.app_type.value === 'debiteur') {
-        return this.$store.state.debiteur.branches;
+        return this.$store.state.extranet.debiteurBranches;
       }
 
       return [];
@@ -393,7 +396,7 @@ export default {
       }
 
       if (this.configuration.app_type && this.configuration.app_type.value === 'debiteur') {
-        return this.$store.state.debiteur.clients;
+        return this.$store.state.extranet.debiteurClients;
       }
 
       return [];
@@ -446,9 +449,9 @@ export default {
       promises.push(this.$store.dispatch('extranet/getConfigurations'));
       promises.push(this.$store.dispatch('mmpi/getProjects'));
       promises.push(this.$store.dispatch('extranet/getBranches'));
-      promises.push(this.$store.dispatch('debiteur/getBranches'));
+      promises.push(this.$store.dispatch('extranet/getDebiteurBranches'));
       promises.push(this.$store.dispatch('extranet/getClients'));
-      promises.push(this.$store.dispatch('debiteur/getClients'));
+      promises.push(this.$store.dispatch('extranet/getDebiteurClients'));
 
       Promise.all(promises).finally(() => {
         loader.hide();

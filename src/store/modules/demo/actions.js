@@ -5,17 +5,15 @@ import config from '../../../config';
 const api = new Api(config.devops.url, config.devops.code);
 
 export default {
-  async createDemo({ commit }, payload) {
-    try {
-      let response = '';
-      if (payload.action === 'create') {
-        response = await api.post('demos', payload.formData);
-        commit('createDemo', response.data.data);
-      }
-    } catch (error) {
-      commit('error', error);
-    }
+  createDemo({ commit }, payload) {
+    const promise = api.post('demos', payload);
+    promise
+      .then(response => commit('createDemo', response.data.data))
+      .catch(error => commit('error', error));
+
+    return promise;
   },
+
   updateDemo({ commit }, { id, payload }) {
     const promise = api.put(`demos/${id}`, payload);
     promise
@@ -23,13 +21,15 @@ export default {
       .catch(error => commit('error', error));
     return promise;
   },
-  async getDemos({ commit }, payload) {
-    try {
-      const response = await api.get('demos', payload);
-      commit('fillDemos', response.data.data);
-    } catch (error) {
-      commit('error', error);
-    }
+
+  getDemos({ commit }) {
+    const promise = api.get('demos', {
+      orders: JSON.stringify({ id: 'desc' }),
+    });
+    promise
+      .then(response => commit('fillDemos', response.data.data))
+      .catch(error => commit('error', error));
+    return promise;
   },
 
   getDemosForPeriod({ commit }, { stateName, startDate }) {
