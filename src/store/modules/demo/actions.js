@@ -14,8 +14,8 @@ export default {
     return promise;
   },
 
-  updateDemo({ commit }, { id, payload }) {
-    const promise = api.put(`demos/${id}`, payload);
+  updateDemo({ commit }, payload) {
+    const promise = api.put(`demos/${payload.id}`, payload);
     promise
       .then(response => commit('updateDemo', response.data.data))
       .catch(error => commit('error', error));

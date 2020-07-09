@@ -294,7 +294,6 @@
 import { required } from 'vuelidate/lib/validators';
 import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
-import Select from '@/components/Select';
 
 import { Table, Column } from '@/components/table';
 
