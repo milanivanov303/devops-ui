@@ -319,7 +319,7 @@ export default {
       removing: false,
       removed: false,
       error: '',
-      projectTypes:  [
+      projectTypes: [
         {
           name: 'Migration',
           value: 'migration',

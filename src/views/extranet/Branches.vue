@@ -84,7 +84,7 @@ export default {
     return {
       search: this.$route.query.search,
       page: 1,
-      perPage:  {
+      perPage: {
         value: 12,
       },
       lastPage: 0,
@@ -181,8 +181,8 @@ export default {
       this.$router.push({ query });
     },
     perPage() {
-      this.setLastPage(this.filteredBranches)
-    }
+      this.setLastPage(this.filteredBranches);
+    },
   },
 };
 </script>

@@ -11,7 +11,7 @@
                                   displayed="name"
                                   v-model="statusStatisticsDays"
                                   :options="dateOptions"
-                          />                        
+                          />
                       </div>
                     </div>
                     <BarChart :data="statusChartData" :options="chartOptions"></BarChart>
@@ -29,7 +29,7 @@
                                 displayed="name"
                                 v-model="demoStatisticsDays"
                                 :options="dateOptions"
-                        />                        
+                        />
                       </div>
                     </div>
                     <BarChart :data="demosChartData" :options="chartOptions"></BarChart>
@@ -70,7 +70,7 @@ export default {
       statusStatisticsDays: {
         name: 'Last 30 days',
         value: 30,
-      },     
+      },
       chartOptions: {
         legend: {
           display: false,

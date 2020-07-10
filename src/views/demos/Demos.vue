@@ -279,6 +279,10 @@ export default {
           name: 'Rejected',
           value: 'rejected',
         },
+        {
+          name: 'Requested',
+          value: 'requested',
+        },
       ],
     };
   },
@@ -350,13 +354,13 @@ export default {
 
       if (this.demo.business) {
         this.demo.business = this.businesses.find(
-          business => business.name === this.demo.business
+          business => business.name === this.demo.business,
         );
       }
 
       if (this.demo.status) {
         this.demo.status = this.statuses.find(
-          status => status.value === this.demo.status
+          status => status.value === this.demo.status,
         );
       }
 
