@@ -35,6 +35,11 @@
             $auth.can('extranet.see-configurations-additional-info')
           "
         />
+        <template v-slot:actions-before="{ row }">
+          <a @click="openAddEditModal('build', row)" class="green-text" title="Start Build">
+            <i class="material-icons">send</i>
+          </a>
+        </template>
       </Table>
 
     </div>
@@ -42,229 +47,272 @@
     <Modal v-if="showAddEditModal" @close="closeAddEditModal()" class="right-sheet">
       <template v-slot:header>
         <span v-if="action === 'create'">Create </span>
-        <span v-else>Update </span>
+        <span v-else-if="action === 'edit'">Update </span>
+        <span v-else>Build </span>
         configuration
       </template>
       <template v-slot:content>
-        <div class="row">
-          <Autocomplete
-            class="col s12"
-            label="Project"
-            icon="list_alt"
-            :items="projects"
-            v-model="configuration.project"
-            :invalid="$v.configuration.project.$error"
-            @change="delete configuration.delivery_chain &&
-                      delete configuration.dev_instance &&
-                      delete configuration.val_instance"
-            @blur="$v.configuration.project.$touch()"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.project.$error">
-              <p v-if="!$v.configuration.project.required">Project field must not be empty.</p>
+        <template v-if="build.started === false">
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Project"
+              icon="list_alt"
+              :items="projects"
+              v-model="configuration.project"
+              :invalid="$v.configuration.project.$error"
+              @change="delete configuration.delivery_chain &&
+                        delete configuration.dev_instance &&
+                        delete configuration.val_instance"
+              @blur="$v.configuration.project.$touch()"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.project.$error">
+                <p v-if="!$v.configuration.project.required">Project field must not be empty.</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <Select
-            class="col s12"
-            label="Project type"
-            icon="title"
-            displayed="name"
-            v-model="configuration.project_type"
-            :options="projectTypes"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.project_type.$error">
-              <p v-if="!$v.configuration.project_type.required">
-                Project type field must not be empty.
-              </p>
+          <div class="row">
+            <Select
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Project type"
+              icon="title"
+              displayed="name"
+              v-model="configuration.project_type"
+              :options="projectTypes"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.project_type.$error">
+                <p v-if="!$v.configuration.project_type.required">
+                  Project type field must not be empty.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <Autocomplete
-            class="col s12"
-            label="Delivery chain"
-            icon="refresh"
-            valueKey="title"
-            :items="deliveryChains"
-            v-model="configuration.delivery_chain"
-            :invalid="$v.configuration.delivery_chain.$error"
-            @change="delete configuration.dev_instance && delete configuration.val_instance"
-            @blur="$v.configuration.delivery_chain.$touch()"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.delivery_chain.$error">
-              <p v-if="!$v.configuration.delivery_chain.required">
-                Delivery chain field must not be empty.
-              </p>
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Delivery chain"
+              icon="refresh"
+              valueKey="title"
+              :items="deliveryChains"
+              v-model="configuration.delivery_chain"
+              :invalid="$v.configuration.delivery_chain.$error"
+              @change="delete configuration.dev_instance && delete configuration.val_instance"
+              @blur="$v.configuration.delivery_chain.$touch()"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.delivery_chain.$error">
+                <p v-if="!$v.configuration.delivery_chain.required">
+                  Delivery chain field must not be empty.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <Autocomplete
-            class="col s12"
-            label="Dev Instance"
-            icon="dynamic_feed"
-            :items="instances"
-            v-model="configuration.dev_instance"
-            :invalid="$v.configuration.dev_instance.$error"
-            @blur="$v.configuration.dev_instance.$touch()"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.dev_instance.$error">
-              <p v-if="!$v.configuration.dev_instance.required">
-                Dev Instance field must not be empty.
-              </p>
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Dev Instance"
+              icon="dynamic_feed"
+              :items="instances"
+              v-model="configuration.dev_instance"
+              :invalid="$v.configuration.dev_instance.$error"
+              @blur="$v.configuration.dev_instance.$touch()"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.dev_instance.$error">
+                <p v-if="!$v.configuration.dev_instance.required">
+                  Dev Instance field must not be empty.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <Autocomplete
-            class="col s12"
-            label="Val Instance"
-            icon="dynamic_feed"
-            :items="instances"
-            v-model="configuration.val_instance"
-            :invalid="$v.configuration.val_instance.$error"
-            @blur="$v.configuration.val_instance.$touch()"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.val_instance.$error">
-              <p v-if="!$v.configuration.val_instance.required">
-                Val Instance field must not be empty.
-              </p>
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Val Instance"
+              icon="dynamic_feed"
+              :items="instances"
+              v-model="configuration.val_instance"
+              :invalid="$v.configuration.val_instance.$error"
+              @blur="$v.configuration.val_instance.$touch()"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.val_instance.$error">
+                <p v-if="!$v.configuration.val_instance.required">
+                  Val Instance field must not be empty.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <Select
-            class="col s12"
-            label="App type"
-            icon="title"
-            displayed="name"
-            :options="appTypes"
-            v-model="configuration.app_type"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.app_type.$error">
-              <p v-if="!$v.configuration.app_type.required">App Type field must not be empty.</p>
+          <div class="row">
+            <Select
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="App type"
+              icon="title"
+              displayed="name"
+              :options="appTypes"
+              v-model="configuration.app_type"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.app_type.$error">
+                <p v-if="!$v.configuration.app_type.required">App Type field must not be empty.</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <TextInput
-            class="col s12"
-            label="App Version"
-            icon="history"
-            v-model="configuration.app_version"
-            :invalid="$v.configuration.app_version.$error"
-            @blur="$v.configuration.app_version.$touch()"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.app_version.$error">
-              <p v-if="!$v.configuration.app_version.required">
-                App Version field must not be empty.
-              </p>
+          <div class="row">
+            <TextInput
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="App Version"
+              icon="history"
+              v-model="configuration.app_version"
+              :invalid="$v.configuration.app_version.$error"
+              @blur="$v.configuration.app_version.$touch()"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.app_version.$error">
+                <p v-if="!$v.configuration.app_version.required">
+                  App Version field must not be empty.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <Autocomplete
-            class="col s12"
-            label="Branch"
-            icon="merge_type"
-            :items="branches"
-            v-model="configuration.branch"
-            :invalid="$v.configuration.branch.$error"
-            @blur="$v.configuration.branch.$touch()"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.branch.$error">
-              <p v-if="!$v.configuration.branch.required">Branch field must not be empty.</p>
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Branch"
+              icon="merge_type"
+              :items="branches"
+              v-model="configuration.branch"
+              :invalid="$v.configuration.branch.$error"
+              @blur="$v.configuration.branch.$touch()"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.branch.$error">
+                <p v-if="!$v.configuration.branch.required">Branch field must not be empty.</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <Autocomplete
-            class="col s12"
-            label="Prefix"
-            icon="people"
-            valueKey="package"
-            :items="clients"
-            v-model="configuration.prefix"
-            :invalid="$v.configuration.prefix.$error"
-            @blur="$v.configuration.prefix.$touch()"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.prefix.$error">
-              <p v-if="!$v.configuration.prefix.required">Prefix field must not be empty.</p>
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Prefix"
+              icon="people"
+              valueKey="package"
+              :items="clients"
+              v-model="configuration.prefix"
+              :invalid="$v.configuration.prefix.$error"
+              @blur="$v.configuration.prefix.$touch()"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.prefix.$error">
+                <p v-if="!$v.configuration.prefix.required">Prefix field must not be empty.</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <TextInput
-            class="col s12"
-            label="Servlet container"
-            icon="dns"
-            v-model="configuration.servlet_container"
-            :invalid="$v.configuration.servlet_container.$error"
-            @blur="$v.configuration.servlet_container.$touch()"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.servlet_container.$error">
-              <p v-if="!$v.configuration.servlet_container.required">
-                Servlet container field must not be empty.
-              </p>
+          <div class="row">
+            <TextInput
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Servlet container"
+              icon="dns"
+              v-model="configuration.servlet_container"
+              :invalid="$v.configuration.servlet_container.$error"
+              @blur="$v.configuration.servlet_container.$touch()"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.servlet_container.$error">
+                <p v-if="!$v.configuration.servlet_container.required">
+                  Servlet container field must not be empty.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <Autocomplete
-            class="col s12"
-            label="JDK"
-            icon="history"
-            :items="[1.4, 1.5, 1.6, 1.7, 1.8]"
-            v-model.number="configuration.jdk"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.jdk.$error">
-              <p v-if="!$v.configuration.jdk.required">JDK field must not be empty.</p>
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="JDK"
+              icon="history"
+              :items="[1.4, 1.5, 1.6, 1.7, 1.8]"
+              v-model.number="configuration.jdk"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.jdk.$error">
+                <p v-if="!$v.configuration.jdk.required">JDK field must not be empty.</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <Autocomplete
-            class="col s12"
-            label="JRE"
-            icon="history"
-            :items="[1.4, 1.5, 1.6, 1.7, 1.8]"
-            v-model.number="configuration.jre"
-          />
-          <div class="validator col s12">
-            <div class="red-text" v-if="$v.configuration.jre.$error">
-              <p v-if="!$v.configuration.jre.required">JRE field must not be empty.</p>
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="JRE"
+              icon="history"
+              :items="[1.4, 1.5, 1.6, 1.7, 1.8]"
+              v-model.number="configuration.jre"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.jre.$error">
+                <p v-if="!$v.configuration.jre.required">JRE field must not be empty.</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <TextArea
-            class="col s12"
-            label="Additional info"
-            icon="description"
-            v-model="configuration.additional_info"
-          />
-        </div>
+          <div class="row">
+            <TextArea
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Additional info"
+              icon="description"
+              v-model="configuration.additional_info"
+            />
+          </div>
+        </template>
+        <template v-else>
+          <div key="build" >
+            <div v-if="build.status === 'success'" class="center" >
+              <i class="material-icons large green-text">check_circle_outline</i>
+              <p>Build completed successfully</p>
+            </div>
+
+            <div v-else-if="build.status === 'failed'" class="center">
+              <i class="material-icons large red-text">error_outline</i>
+              <p>{{ build.error || build.summary }}</p>
+            </div>
+
+            <div v-else class="row">
+              <div class="col s12">
+                <p>{{ build.summary }}</p>
+                <Progress v-if="build.status === 'running'" :progress="build.progress"></Progress>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col s12">
+                <div class="log">{{ build.log }}</div>
+              </div>
+            </div>
+          </div>
+        </template>
       </template>
       <template v-slot:footer>
         <button
           class="btn waves-effect waves-light"
           type="submit"
           name="action"
-          @click="save()"
+          @click="action === 'build' ? buildConfiguration() : save()"
         >
-          Save
+          <span v-if="action === 'build'">Build</span>
+          <span v-else>Save</span>
         </button>
       </template>
     </Modal>
@@ -298,9 +346,10 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import client from '@/plugins/ws';
+
 import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
-
 import { Table, Column } from '@/components/table';
 
 export default {
@@ -319,7 +368,7 @@ export default {
       removing: false,
       removed: false,
       error: '',
-      projectTypes:  [
+      projectTypes: [
         {
           name: 'Migration',
           value: 'migration',
@@ -343,9 +392,14 @@ export default {
           value: 'debiteur',
         },
       ],
-      filterColumns: [
-        'project_type', 'app_type',
-      ],
+      build: {
+        started: false,
+        status: '',
+        summary: '',
+        progress: null,
+        log: '',
+        error: null,
+      },
     };
   },
   computed: {
@@ -453,6 +507,9 @@ export default {
             configuration => configuration.id === parseInt(this.$route.params.id, 10),
           );
           if (configuration) {
+            if (this.$route.params.build === 'build') {
+              return this.openAddEditModal('build', configuration);
+            }
             return this.openAddEditModal('update', configuration);
           }
 
@@ -502,9 +559,15 @@ export default {
         );
       }
 
-      this.$router.push({
-        path: `/extranet/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
-      });
+      if (action === 'build') {
+        this.$router.push({
+          path: `/extranet/configurations/${encodeURIComponent(this.configuration.id)}/build`,
+        });
+      } else {
+        this.$router.push({
+          path: `/extranet/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
+        });
+      }
 
       this.showAddEditModal = true;
       this.action = action;
@@ -564,6 +627,57 @@ export default {
             classes: 'toast-fail',
           });
         });
+    },
+    buildConfiguration() {
+      this.build.started = true;
+      this.build.summary = 'Build will start shortly ...';
+
+      this.$store.dispatch('extranet/buildConfiguration', this.configuration)
+        .then((response) => {
+          this.build.status = 'running';
+
+          if (!client.connected) {
+            return;
+          }
+
+          const subscribe = client.subscribe(
+            `/queue/${response.data.broadcast.queue}`,
+            (message) => {
+              const data = JSON.parse(message.body);
+
+              if (data.summary) {
+                this.build.summary = data.summary;
+              }
+              this.build.progress = data.progress || null;
+
+              if (data.log) {
+                this.build.log += data.log;
+                this.scrollLogContainer();
+              }
+
+              if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
+                this.build.status = data.status;
+                subscribe.unsubscribe();
+              }
+            },
+            response.data.broadcast,
+          );
+        })
+        .catch((error) => {
+          this.build.status = 'failed';
+          this.build.summary = 'Could not start build';
+          if (error.response.status === 403) {
+            this.build.error = 'You do not have insufficient rights to create build';
+          } else {
+            this.build.error = error;
+          }
+        });
+    },
+    scrollLogContainer() {
+      setTimeout(() => {
+        const container = this.$el.querySelector('.log');
+        container.scrollTop = container.scrollHeight;
+      }, 100);
     },
 
     openDeleteModal(configuration) {

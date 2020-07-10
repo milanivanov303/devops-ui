@@ -11,7 +11,7 @@
                                   displayed="name"
                                   v-model="statusStatisticsDays"
                                   :options="dateOptions"
-                          />                        
+                          />
                       </div>
                     </div>
                     <BarChart :data="statusChartData" :options="chartOptions"></BarChart>
@@ -29,7 +29,7 @@
                                 displayed="name"
                                 v-model="demoStatisticsDays"
                                 :options="dateOptions"
-                        />                        
+                        />
                       </div>
                     </div>
                     <BarChart :data="demosChartData" :options="chartOptions"></BarChart>
@@ -70,7 +70,7 @@ export default {
       statusStatisticsDays: {
         name: 'Last 30 days',
         value: 30,
-      },     
+      },
       chartOptions: {
         legend: {
           display: false,
@@ -119,7 +119,6 @@ export default {
         }).finally(() => loader1.hide());
     },
     getDemos() {
-      debugger;
       const loader = this.$loading.show({ container: this.$refs.demos });
 
       const promise1 = this.$store.dispatch('demo/getDemosForPeriod',

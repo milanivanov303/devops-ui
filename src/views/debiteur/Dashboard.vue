@@ -110,7 +110,7 @@ export default {
       branchStatisticsDays: {
         name: 'Last 30 days',
         value: 30,
-      }
+      },
     };
   },
   computed: {

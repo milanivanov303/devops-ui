@@ -116,7 +116,7 @@ export default {
       moduleStatisticsDays: {
         name: 'Last 30 days',
         value: 30,
-      }
+      },
     };
   },
   computed: {

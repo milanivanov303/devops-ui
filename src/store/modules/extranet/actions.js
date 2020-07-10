@@ -109,6 +109,12 @@ export default {
     return promise;
   },
 
+  buildConfiguration({ commit }, payload) {
+    const promise = api.post('extranet/configurations/build', payload);
+    promise.catch(error => commit('error', error, { root: true }));
+    return promise;
+  },
+
   updateConfiguration({ commit }, payload) {
     const promise = api.put(`extranet/configurations/${payload.id}`, payload);
 

@@ -433,3 +433,6 @@ caption{
 a{
     cursor: pointer;
 }
+.readonly {
+    pointer-events: none;
+}

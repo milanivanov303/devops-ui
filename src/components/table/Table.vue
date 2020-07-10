@@ -79,7 +79,7 @@
                     v-model="columnFilter[column.componentOptions.propsData.show]"
                     type="text"
                     :placeholder="getColumnHeader(column)"
-            />
+                    />
             <select v-if="column.componentOptions.propsData.filterType === 'dropdown'"
                     v-model="columnFilter[column.componentOptions.propsData.show]">
               <option value="" disabled selected>{{ getColumnHeader(column) }}</option>
@@ -91,7 +91,7 @@
             </select>
 
           </th>
-          <th v-if="showActionsColumn()">
+          <th v-if="showActionsColumn()" width="6%">
             Actions
           </th>
         </tr>

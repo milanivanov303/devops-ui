@@ -49,7 +49,7 @@
                         displayed="name"
                         v-model="userStatisticsDays"
                         :options="dateOptions"
-                />              
+                />
               </div>
             </div>
             <BarChart :data="usersChartData" :height="200"></BarChart>
@@ -65,7 +65,7 @@
                         displayed="name"
                         v-model="branchStatisticsDays"
                         :options="dateOptions"
-                /> 
+                />
               </div>
             </div>
             <BarChart :data="branchesChartData" :height="200"></BarChart>
@@ -110,7 +110,7 @@ export default {
       branchStatisticsDays: {
         name: 'Last 30 days',
         value: 30,
-      }
+      },
     };
   },
   computed: {
