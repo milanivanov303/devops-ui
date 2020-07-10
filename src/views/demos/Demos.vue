@@ -21,12 +21,12 @@
         />
         <Column
           label="Active from"
-          :show="(demo) => $date(demo.active_from).toHuman()"
+          :show="(demo) => demo.active_from ? $date(demo.active_from).toHuman() : ''"
           sort-by="active_from"
         />
         <Column
           label="Active to"
-          :show="(demo) => $date(demo.active_to).toHuman()"
+          :show="(demo) => demo.active_to ? $date(demo.active_to).toHuman() : ''"
           sort-by="active_to"
         />
         <Column
@@ -286,29 +286,38 @@ export default {
       ],
     };
   },
-  validations: {
-    demo: {
-      name: {
-        required,
-        minLen: minLength(6),
-      },
-      email: {
-        required,
-        email,
-      },
-      company: {
-        required,
-      },
-      phone: {
-        numeric,
-      },
-      active_from: {
-        required,
-      },
-      active_to: {
-        required,
-      },
-    },
+  validations() {
+    let validations = {
+      demo: {
+        name: {
+          required,
+          minLen: minLength(6),
+        },
+        email: {
+          required,
+          email,
+        },
+        company: {
+          required,
+        },
+        phone: {
+          numeric,
+        },
+        active_from: {
+          required,
+        },
+        active_to: {
+          required,
+        },
+      }
+    };
+
+    if (this.demo.status && this.demo.status.value === 'rejected') {
+      validations.demo.active_from = {};
+      validations.demo.active_to = {};
+    }
+
+    return validations;
   },
   computed: {
     demos() {
@@ -442,7 +451,7 @@ export default {
             });
 
             if (demo) {
-              return this.openAddEditDemoModal(demo);
+              return this.openAddEditDemoModal(demo, 'update');
             }
 
             this.$M.toast({ html: 'This demo does not exist!', classes: 'toast-fail' });
