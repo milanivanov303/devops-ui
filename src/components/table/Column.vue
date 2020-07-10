@@ -6,7 +6,7 @@ export default {
     info: { type: String },
     sortable: { default: true, type: Boolean },
     sortBy: { type: String },
-    filterable: { default: true, type: Boolean },
+    filterType: { type: String },
   },
 };
 </script>

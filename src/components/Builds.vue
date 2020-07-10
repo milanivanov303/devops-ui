@@ -17,7 +17,7 @@
         <td>{{ getBuildName(build) }}</td>
         <td v-if="showModule">{{ build.module }}</td>
         <td>{{ build.details.created_by }}</td>
-        <td>{{ $date.getHuman(build.created_on) }}</td>
+        <td>{{ $date(build.created_on).toHuman() }}</td>
         <td class="quick-actions">
           <a
             :href="getBuildUrl(build)"
