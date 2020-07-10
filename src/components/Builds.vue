@@ -17,7 +17,7 @@
         <td>{{ getBuildName(build) }}</td>
         <td v-if="showModule">{{ build.module }}</td>
         <td>{{ build.details.created_by }}</td>
-        <td>{{ getBuildCreatedOn(build) }}</td>
+        <td>{{ $date(build.created_on).toHuman() }}</td>
         <td class="quick-actions">
           <a
             :href="getBuildUrl(build)"
@@ -293,11 +293,6 @@ export default {
       return null;
     },
 
-    getBuildCreatedOn(build) {
-      return (new Date(build.created_on * 1000))
-        .toLocaleString('en-GB', { timeZone: 'Europe/Sofia' });
-    },
-
     getBuildName(build) {
       try {
         return build.details.container.Config.Labels.build;
@@ -318,7 +313,7 @@ export default {
 
       this.selectedBuild.name = this.getBuildName(build);
       this.selectedBuild.created_by = build.details.created_by;
-      this.selectedBuild.created_on = this.getBuildCreatedOn(build);
+      this.selectedBuild.created_on = this.$date.getHuman(build.created_on);
       this.selectedBuild.branch = build.details.branch;
       if (build.details.fe_branch) {
         this.selectedBuild.fe_branch = build.details.fe_branch.name;

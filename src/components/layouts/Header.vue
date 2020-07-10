@@ -1,7 +1,7 @@
 <template>
   <header>
     <Navbar />
-    <Sidebar />
+    <Sidebar :key="$route.path" />
   </header>
 </template>
 

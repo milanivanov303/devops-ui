@@ -44,7 +44,12 @@
             <span class="card-title">Extranet builds by user</span>
             <div class="col s12 l6 right">
               <div class="input-field">
-                <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
+                <Select class="col s12"
+                        icon="today"
+                        displayed="name"
+                        v-model="userStatisticsDays"
+                        :options="dateOptions"
+                />              
               </div>
             </div>
             <BarChart :data="usersChartData" :height="200"></BarChart>
@@ -55,7 +60,12 @@
             <span class="card-title">Extranet builds by branch</span>
             <div class="col s12 l6 right">
               <div class="input-field">
-                <Select :select="selectStartDate" @selectedVal="getBranchStatistics"/>
+                <Select class="col s12"
+                        icon="today"
+                        displayed="name"
+                        v-model="branchStatisticsDays"
+                        :options="dateOptions"
+                /> 
               </div>
             </div>
             <BarChart :data="branchesChartData" :height="200"></BarChart>
@@ -79,30 +89,28 @@ export default {
   data() {
     return {
       startDate: 30,
-      selectStartDate: {
-        id: 'startDate_select',
-        name: 'startDate',
-        displayed: 'name',
-        icon: 'today',
-        options: [
-          {
-            name: 'Last 24 hours',
-            value: 1,
-          },
-          {
-            name: 'Last 7 days',
-            value: 7,
-          },
-          {
-            name: 'Last 30 days',
-            value: 30,
-          },
-        ],
-        selected: {
+      dateOptions: [
+        {
+          name: 'Last 24 hours',
+          value: 1,
+        },
+        {
+          name: 'Last 7 days',
+          value: 7,
+        },
+        {
           name: 'Last 30 days',
           value: 30,
         },
+      ],
+      userStatisticsDays: {
+        name: 'Last 30 days',
+        value: 30,
       },
+      branchStatisticsDays: {
+        name: 'Last 30 days',
+        value: 30,
+      }
     };
   },
   computed: {
@@ -142,22 +150,22 @@ export default {
         loader2.hide();
       });
     },
-    getBranchStatistics(days = {}) {
+    getBranchStatistics() {
       const loader = this.$loading.show({ container: this.$refs.stats_by_branch });
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
         {
-          startDate: this.getStartDate(days.value || this.startDate),
+          startDate: this.getStartDate(this.branchStatisticsDays.value || this.startDate),
           stateName: 'extranet-branch-builds',
         },
       ).then(() => loader.hide());
     },
-    getUserStatistics(days = {}) {
+    getUserStatistics() {
       const loader = this.$loading.show({ container: this.$refs.stats_by_user });
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
         {
-          startDate: this.getStartDate(days.value || this.startDate),
+          startDate: this.getStartDate(this.userStatisticsDays.value || this.startDate),
           stateName: 'extranet-users-builds',
         },
       ).then(() => loader.hide());
@@ -168,6 +176,14 @@ export default {
       );
 
       return Math.round(new Date(newDate).getTime() / 1000);
+    },
+  },
+  watch: {
+    userStatisticsDays() {
+      this.getUserStatistics();
+    },
+    branchStatisticsDays() {
+      this.getBranchStatistics();
     },
   },
   mounted() {
