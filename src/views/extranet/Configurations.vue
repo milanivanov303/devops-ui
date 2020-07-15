@@ -22,7 +22,7 @@
         <Column show="val_instance"/>
         <Column show="app_type" :sortable="false" filter-type="dropdown"/>
         <Column show="app_version" :sortable="false" filter-type="dropdown"/>
-        <Column show="branch"/>
+        <Column show="branch" :sortable="false" filter-type="search"/>
         <Column show="prefix"/>
         <Column show="servlet_container"/>
         <Column show="jdk"/>
