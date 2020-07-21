@@ -123,6 +123,9 @@ export default {
       this.setLastPage(data);
       return data.slice(from, to);
     },
+    builds() {
+      return this.$store.state.builds.active;
+    }
   },
   methods: {
     getActiveBuilds() {
@@ -146,9 +149,19 @@ export default {
           }
           return false;
         });
+        const build = this.builds.find((build) => {
+          if (build.details.branch === selected) {
+            return true;
+          }
+          return false;
+        });
 
         if (branch) {
           return true;
+        }
+        if (build) {
+          this.$M.toast({ html: 'This branch does not exist anymore!', classes: 'toast-fail' });
+          return true; 
         }
         this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
       }
