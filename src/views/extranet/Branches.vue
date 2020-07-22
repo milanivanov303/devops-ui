@@ -20,8 +20,10 @@
           <div class="input-field col s12 l4 right">
               <Select class="col s12"
                       v-if="sortedBranches.length"
-                      :select="selectPerPage"
-                      @selectedVal="selectedPerPage"/>
+                      displayed="value"
+                      v-model="perPage"
+                      :options="perPageOptions"
+              />
           </div>
           <p v-if="sortedBranches.length" class="col s12 l8 right right-align">Items per page:</p>
         </div>
@@ -82,28 +84,24 @@ export default {
     return {
       search: this.$route.query.search,
       page: 1,
-      perPage: 12,
-      lastPage: 0,
-      selectPerPage: {
-        id: 'perPage_select',
-        name: 'perPage',
-        displayed: 'name',
-        options: [
-          {
-            name: 6,
-          },
-          {
-            name: 9,
-          },
-          {
-            name: 12,
-          },
-          {
-            name: 15,
-          },
-        ],
-        selected: { name: 12 },
+      perPage: {
+        value: 12,
       },
+      lastPage: 0,
+      perPageOptions: [
+        {
+          value: 6,
+        },
+        {
+          value: 9,
+        },
+        {
+          value: 12,
+        },
+        {
+          value: 15,
+        },
+      ],
     };
   },
   computed: {
@@ -119,27 +117,26 @@ export default {
       return this.branches.filter(branch => branch.name.match(regexp));
     },
     sortedBranches() {
-      const from = (this.page * this.perPage) - this.perPage;
-      const to = (this.page * this.perPage);
+      const from = (this.page * this.perPage.value) - this.perPage.value;
+      const to = (this.page * this.perPage.value);
       const data = this.filteredBranches;
       this.setLastPage(data);
       return data.slice(from, to);
     },
+    builds() {
+      return this.$store.state.builds.active;
+    }
   },
   methods: {
     getActiveBuilds() {
       this.$store.dispatch('builds/getActive');
       this.$store.dispatch('extranet/getServices');
     },
-    selectedPerPage(value) {
-      this.perPage = value.name;
-    },
     selectedPage(page) {
       this.page = page;
     },
     setLastPage(data) {
-      this.selectPerPage.selected = { name: this.perPage };
-      this.lastPage = Math.ceil(data.length / this.perPage);
+      this.lastPage = Math.ceil(data.length / this.perPage.value);
     },
     getActiveBuildsCountByBranch(branch) {
       return this.$store.getters['builds/getActiveByBranch'](branch).length;
@@ -152,9 +149,19 @@ export default {
           }
           return false;
         });
+        const build = this.builds.find((build) => {
+          if (build.details.branch === selected) {
+            return true;
+          }
+          return false;
+        });
 
         if (branch) {
           return true;
+        }
+        if (build) {
+          this.$M.toast({ html: 'This branch does not exist anymore!', classes: 'toast-fail' });
+          return true; 
         }
         this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
       }
@@ -185,6 +192,9 @@ export default {
         query = { search: value };
       }
       this.$router.push({ query });
+    },
+    perPage() {
+      this.setLastPage(this.filteredBranches);
     },
   },
 };

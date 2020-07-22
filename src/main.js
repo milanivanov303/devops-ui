@@ -14,7 +14,7 @@ import '@/config';
 import auth from './plugins/auth';
 import Api from './plugins/api';
 import config from '../config';
-
+import { date } from './plugins/helpers';
 import 'vue-loading-overlay/dist/vue-loading.css';
 
 const api = new Api(config.um.url, config.um.code);
@@ -24,6 +24,7 @@ Vue.use(Loading);
 Vue.use(Vuelidate);
 Vue.prototype.$M = M;
 Vue.prototype.$auth = auth;
+Vue.prototype.$date = date;
 
 Vue.component('default-layout', DefaultLayout);
 Vue.component('login-layout', LoginLayout);

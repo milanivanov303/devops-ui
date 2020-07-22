@@ -51,7 +51,12 @@
           <span class="card-title">Number of builds by user</span>
           <div class="col s12 l6 right">
             <div class="input-field">
-              <Select :select="selectStartDate" @selectedVal="getUserStatistics"/>
+              <Select class="col s12"
+                      icon="today"
+                      displayed="name"
+                      v-model="userStatisticsDays"
+                      :options="dateOptions"
+                />
             </div>
           </div>
           <BarChart :data="usersChartData" :height="200"></BarChart>
@@ -62,7 +67,12 @@
           <span class="card-title">Number of builds by module</span>
           <div class="col s12 l6 right">
             <div class="input-field">
-              <Select :select="selectStartDate" @selectedVal="getModuleStatistics"/>
+              <Select class="col s12"
+                      icon="today"
+                      displayed="name"
+                      v-model="moduleStatisticsDays"
+                      :options="dateOptions"
+                />
             </div>
           </div>
           <BarChart :data="modulesChartData" :height="150"></BarChart>
@@ -85,29 +95,27 @@ export default {
   data() {
     return {
       startDate: 30,
-      selectStartDate: {
-        id: 'startDate_select',
-        name: 'startDate',
-        displayed: 'name',
-        icon: 'today',
-        options: [
-          {
-            name: 'Last 24 hours',
-            value: 1,
-          },
-          {
-            name: 'Last 7 days',
-            value: 7,
-          },
-          {
-            name: 'Last 30 days',
-            value: 30,
-          },
-        ],
-        selected: {
+      dateOptions: [
+        {
+          name: 'Last 24 hours',
+          value: 1,
+        },
+        {
+          name: 'Last 7 days',
+          value: 7,
+        },
+        {
           name: 'Last 30 days',
           value: 30,
         },
+      ],
+      userStatisticsDays: {
+        name: 'Last 30 days',
+        value: 30,
+      },
+      moduleStatisticsDays: {
+        name: 'Last 30 days',
+        value: 30,
       },
     };
   },
@@ -153,22 +161,22 @@ export default {
         loader2.hide();
       });
     },
-    getModuleStatistics(days = {}) {
+    getModuleStatistics() {
       const loader = this.$loading.show({ container: this.$refs.stats_by_module });
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
         {
-          startDate: this.getStartDate(days.value || this.startDate),
+          startDate: this.getStartDate(this.moduleStatisticsDays.value || this.startDate),
           stateName: 'module-builds',
         },
       ).finally(() => loader.hide());
     },
-    getUserStatistics(days = {}) {
+    getUserStatistics() {
       const loader = this.$loading.show({ container: this.$refs.stats_by_user });
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
         {
-          startDate: this.getStartDate(days.value || this.startDate),
+          startDate: this.getStartDate(this.userStatisticsDays.value || this.startDate),
           stateName: 'users-builds',
         },
       ).finally(() => loader.hide());
@@ -179,6 +187,14 @@ export default {
       );
 
       return Math.round(new Date(newDate).getTime() / 1000);
+    },
+  },
+  watch: {
+    userStatisticsDays() {
+      this.getUserStatistics();
+    },
+    moduleStatisticsDays() {
+      this.getModuleStatistics();
     },
   },
   mounted() {

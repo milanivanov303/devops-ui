@@ -22,7 +22,7 @@
         <Column show="val_instance"/>
         <Column show="app_type" :sortable="false" filter-type="dropdown"/>
         <Column show="app_version" :sortable="false" filter-type="dropdown"/>
-        <Column show="branch"/>
+        <Column show="branch" :sortable="false" filter-type="search"/>
         <Column show="prefix"/>
         <Column show="servlet_container"/>
         <Column show="jdk"/>
@@ -66,10 +66,13 @@
           </div>
         </div>
         <div class="row">
-          <Select id="select-project-type"
-                  class="col s12"
-                  :select="projectTypeSelect"
-                  v-model="configuration.project_type"
+          <Select
+            class="col s12"
+            label="Project type"
+            icon="title"
+            displayed="name"
+            v-model="configuration.project_type"
+            :options="projectTypes"
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.project_type.$error">
@@ -136,10 +139,13 @@
           </div>
         </div>
         <div class="row">
-          <Select id="select-app-type"
-                  class="col s12"
-                  :select="appTypeSelect"
-                  v-model="configuration.app_type"
+          <Select
+            class="col s12"
+            label="App type"
+            icon="title"
+            displayed="name"
+            :options="appTypes"
+            v-model="configuration.app_type"
           />
           <div class="validator col s12">
             <div class="red-text" v-if="$v.configuration.app_type.$error">
@@ -294,7 +300,6 @@
 import { required } from 'vuelidate/lib/validators';
 import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
-import Select from '@/components/Select';
 
 import { Table, Column } from '@/components/table';
 
@@ -302,7 +307,6 @@ export default {
   components: {
     Autocomplete,
     TextArea,
-    Select,
     Table,
     Column,
   },
@@ -315,46 +319,30 @@ export default {
       removing: false,
       removed: false,
       error: '',
-      projectTypeSelect: {
-        id: 'project_type_select',
-        name: 'project_type',
-        displayed: 'name',
-        icon: 'title',
-        options: [
-          {
-            name: 'Migration',
-            value: 'migration',
-          },
-          {
-            name: 'New',
-            value: 'new',
-          },
-          {
-            name: 'N/A',
-            value: 'n/a',
-          },
-        ],
-        label: 'Project Type',
-        selected: {},
-      },
-      appTypeSelect: {
-        id: 'app_type_select',
-        name: 'app_type',
-        displayed: 'name',
-        icon: 'title',
-        options: [
-          {
-            name: 'Extranet',
-            value: 'extranet',
-          },
-          {
-            name: 'Debiteur',
-            value: 'debiteur',
-          },
-        ],
-        label: 'App Type',
-        selected: {},
-      },
+      projectTypes: [
+        {
+          name: 'Migration',
+          value: 'migration',
+        },
+        {
+          name: 'New',
+          value: 'new',
+        },
+        {
+          name: 'N/A',
+          value: 'n/a',
+        },
+      ],
+      appTypes: [
+        {
+          name: 'Extranet',
+          value: 'extranet',
+        },
+        {
+          name: 'Debiteur',
+          value: 'debiteur',
+        },
+      ],
       filterColumns: [
         'project_type', 'app_type',
       ],
@@ -485,13 +473,13 @@ export default {
       }
 
       if (this.configuration.project_type) {
-        this.configuration.project_type = this.projectTypeSelect.options.find(
+        this.configuration.project_type = this.projectTypes.find(
           projectType => projectType.value === this.configuration.project_type,
         );
       }
 
       if (this.configuration.app_type) {
-        this.configuration.app_type = this.appTypeSelect.options.find(
+        this.configuration.app_type = this.appTypes.find(
           appType => appType.value === this.configuration.app_type,
         );
       }

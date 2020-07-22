@@ -6,8 +6,13 @@
                     <span class="card-title">Number of demos by status</span>
                     <div class="col s12 l6 right">
                         <div class="input-field">
-                            <Select :select="selectStartDate" @selectedVal="getDemosbyStatus"/>
-                        </div>
+                          <Select class="col s12"
+                                  icon="today"
+                                  displayed="name"
+                                  v-model="statusStatisticsDays"
+                                  :options="dateOptions"
+                          />
+                      </div>
                     </div>
                     <BarChart :data="statusChartData" :options="chartOptions"></BarChart>
                 </div>
@@ -19,8 +24,13 @@
                     <span class="card-title">Number of demos by days</span>
                     <div class="col s12 l6 right">
                         <div class="input-field">
-                            <Select :select="selectStartDate" @selectedVal="getDemos"/>
-                        </div>
+                        <Select class="col s12"
+                                icon="today"
+                                displayed="name"
+                                v-model="demoStatisticsDays"
+                                :options="dateOptions"
+                        />
+                      </div>
                     </div>
                     <BarChart :data="demosChartData" :options="chartOptions"></BarChart>
                 </div>
@@ -39,29 +49,27 @@ export default {
     return {
       dates: [],
       startDate: 30,
-      selectStartDate: {
-        id: 'startDate_select',
-        name: 'startDate',
-        displayed: 'name',
-        icon: 'today',
-        options: [
-          {
-            name: 'Last 24 hours',
-            value: 1,
-          },
-          {
-            name: 'Last 7 days',
-            value: 7,
-          },
-          {
-            name: 'Last 30 days',
-            value: 30,
-          },
-        ],
-        selected: {
+      dateOptions: [
+        {
+          name: 'Last 24 hours',
+          value: 1,
+        },
+        {
+          name: 'Last 7 days',
+          value: 7,
+        },
+        {
           name: 'Last 30 days',
           value: 30,
         },
+      ],
+      demoStatisticsDays: {
+        name: 'Last 30 days',
+        value: 30,
+      },
+      statusStatisticsDays: {
+        name: 'Last 30 days',
+        value: 30,
       },
       chartOptions: {
         legend: {
@@ -102,36 +110,37 @@ export default {
     },
   },
   methods: {
-    getDemosbyStatus(days = {}) {
+    getDemosbyStatus() {
       const loader1 = this.$loading.show({ container: this.$refs.demos_by_status });
       this.$store.dispatch('demo/getDemosForPeriod',
         {
-          startDate: this.getStartDate(days.value || this.startDate),
+          startDate: this.getStartDate(this.statusStatisticsDays.value || this.startDate),
           stateName: 'status-demos',
         }).finally(() => loader1.hide());
     },
-    getDemos(days = {}) {
+    getDemos() {
+      debugger;
       const loader = this.$loading.show({ container: this.$refs.demos });
 
       const promise1 = this.$store.dispatch('demo/getDemosForPeriod',
         {
-          startDate: this.getStartDate(days.value || this.startDate),
+          startDate: this.getStartDate(this.demoStatisticsDays.value || this.startDate),
           stateName: 'active-demos',
         });
       const promise2 = this.$store.dispatch('demo/getDemosForPeriod',
         {
-          startDate: this.getStartDate(days.value || this.startDate),
+          startDate: this.getStartDate(this.demoStatisticsDays.value || this.startDate),
           stateName: 'rejected-demos',
         });
       const promise3 = this.$store.dispatch('demo/getDemosForPeriod',
         {
-          startDate: this.getStartDate(days.value || this.startDate),
+          startDate: this.getStartDate(this.demoStatisticsDays.value || this.startDate),
           stateName: 'requested-demos',
         });
 
       Promise.all([promise1, promise2, promise3]).finally(() => {
         loader.hide();
-        this.getDates(days.value || this.startDate);
+        this.getDates(this.demoStatisticsDays.value || this.startDate);
       });
     },
 
@@ -154,6 +163,14 @@ export default {
           .setTime(currentDate.getTime() + (1 * 24 * 60 * 60 * 1000)));
       }
       this.dates = dateArray;
+    },
+  },
+  watch: {
+    statusStatisticsDays() {
+      this.getDemosbyStatus();
+    },
+    demoStatisticsDays() {
+      this.getDemos();
     },
   },
   mounted() {

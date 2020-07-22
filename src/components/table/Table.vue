@@ -47,12 +47,23 @@
             <a
               href="#"
               v-if="column.componentOptions.propsData.sortable !== false"
-              @click="setSort(column.componentOptions.propsData.show, $event)"
+              @click="
+                setSort(
+                  column.componentOptions.propsData.sortBy
+                  ||
+                  column.componentOptions.propsData.show,
+                  $event
+                )
+              "
             >
               <span class="left">{{ getColumnHeader(column) }}</span>
               <i
                 class="left material-icons"
-                v-if="column.componentOptions.propsData.show === currentSortBy"
+                v-if="
+                  column.componentOptions.propsData.sortBy === currentSortBy
+                  ||
+                  column.componentOptions.propsData.show === currentSortBy
+                "
               >
                 {{ currentSortDir === 'asc' ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
               </i>
@@ -92,9 +103,7 @@
             v-html="getColumnData(row, column.componentOptions.propsData.show)"
             :key="index"
             :class="column.data.staticClass"
-          >
-            {{ getColumnData(row, column.componentOptions.propsData.show) }}
-          </td>
+          ></td>
           <td v-if="showActionsColumn()">
             <slot name="actions-before" :row="row"></slot>
             <a v-if="viewBtn" @click="$emit('view', row)" title="View">

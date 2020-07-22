@@ -125,9 +125,6 @@ export default {
   mounted() {
     this.$M.Sidenav.init(document.querySelector('.sidenav'));
     this.$M.Collapsible.init(document.querySelector('.collapsible'));
-    this.$M.Dropdown.init(document.querySelector('.dorpdown-extranet'), {
-      coverTrigger: false,
-    });
   },
 };
 </script>
