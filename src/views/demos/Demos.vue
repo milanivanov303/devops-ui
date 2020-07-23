@@ -35,7 +35,7 @@
           sort-by="self_service"
         />
         <Column label="Status" :show="(demo) => getStatusIcon(demo)" sort-by="status"/>
-        <Column label="Url" :show="url => this.demoUrl(url)" :sortable="false"/>
+        <Column label="Url" :show="demo => this.getDemoUrl(demo)" :sortable="false"/>
       </Table>
     </div>
 
@@ -422,9 +422,9 @@ export default {
       this.showAddEditDemoModal = false;
     },
 
-    demoUrl(value) {
-      if (value) {
-        return `<a target="_blank" title="${value.url}" href='${value.url}'>
+    getDemoUrl(demo) {
+      if (demo.status === 'active' && demo.url) {
+        return `<a target="_blank" title="${demo.url}" href='${demo.url}'>
                   <i class="material-icons">cast_connected</i>
                 </a>`;
       }
