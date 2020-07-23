@@ -45,4 +45,32 @@ export default {
 
     return promise;
   },
+  getBuildsByStatus({ commit }, { branch, status }) {
+    // if (this.state.builds.builds[status]) {
+    //   return this.state.builds.builds[status].filter((build) => {
+    //     build.details.branch === branch;
+    //   })
+    // }
+
+    const promise = api.get('builds', {
+      filters: JSON.stringify({
+        "allOf": [
+          {
+            "status": status
+          },
+          {
+            "details->branch": branch
+          }
+        ]
+      }),
+    });
+
+    promise
+      .then((response) => {
+        commit('builds', { status: status, builds: response.data.data });
+      })
+      .catch(() => commit('error', 'Could not get builds list', { root: true }));
+
+    return promise;
+  },
 };

@@ -1,63 +1,128 @@
 <template>
   <div>
+    <a class="right tooltipped"
+      @click="showRemoved = !showRemoved" 
+       target="_blank" 
+       :data-tooltip="showRemoved ? 'Hide Removed Builds' : 'Show Removed Builds'">
+      <i class="material-icons prefix">delete_forever</i>
+    </a>
+    <a class="right tooltipped"
+      @click="showFailed = !showFailed"
+       target="_blank" 
+       :data-tooltip="showFailed ? 'Hide Failed Builds' : 'Show Failed Builds'">
+      <i class="material-icons prefix">do_not_disturb</i>
+    </a>
+
     <table ref="builds">
       <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th v-if="showModule">Module</th>
-        <th>Created By</th>
-        <th>Created On</th>
-        <th>Quick Actions</th>
-      </tr>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th v-if="showModule">Module</th>
+          <th>Created By</th>
+          <th>Created On</th>
+          <th>Quick Actions</th>
+        </tr>
       </thead>
       <tbody>
-      <tr v-for="(build, index) in builds" :key="index">
-        <td>{{ index + 1 }}</td>
-        <td>{{ getBuildName(build) }}</td>
-        <td v-if="showModule">{{ build.module }}</td>
-        <td>{{ build.details.created_by }}</td>
-        <td>{{ $date(build.created_on).toHuman() }}</td>
-        <td class="quick-actions">
-          <a
-            :href="getBuildUrl(build)"
-            target="_blank"
-            data-tooltip="Open build"
-            class="green-text tooltipped"
-          >
-            <i class="material-icons">launch</i>
-          </a>
-          <a
-            @click="openBuildInfoModal(build)"
-            data-tooltip="Build details"
-            class="blue-text tooltipped"
-          >
-            <i class="material-icons">error_outline</i>
-          </a>
-          <a
-            v-if="getWebssh2Url(build)"
-            :href="getWebssh2Url(build)"
-            target="_blank"
-            data-tooltip="Open terminal"
-            class="tooltipped"
-          >
-            <i class="material-icons">wysiwyg</i>
-          </a>
-          <a
-            v-if="canRemoveBuild(build)"
-            @click="openRemoveBuildModal(build)"
-            data-tooltip="Remove build"
-            class="red-text tooltipped"
-          >
-            <i class="material-icons">delete</i>
-          </a>
-        </td>
-      </tr>
-      <tr v-if="builds.length === 0">
-        <td colspan="6">There are no builds yet</td>
-      </tr>
+        <tr v-for="(build, index) in runningBuilds" :key="index">
+          <td>{{ index + 1 }}</td>
+          <td>{{ getBuildName(build) }}</td>
+          <td v-if="showModule">{{ build.module }}</td>
+          <td>{{ build.details.created_by }}</td>
+          <td>{{ $date(build.created_on).toHuman() }}</td>
+          <td class="quick-actions">
+            <a
+              :href="getBuildUrl(build)"
+              target="_blank"
+              data-tooltip="Open build"
+              class="green-text tooltipped"
+            >
+              <i class="material-icons">launch</i>
+            </a>
+            <a
+              @click="openBuildInfoModal(build)"
+              data-tooltip="Build details"
+              class="blue-text tooltipped"
+            >
+              <i class="material-icons">error_outline</i>
+            </a>
+            <a
+              v-if="getWebssh2Url(build)"
+              :href="getWebssh2Url(build)"
+              target="_blank"
+              data-tooltip="Open terminal"
+              class="tooltipped"
+            >
+              <i class="material-icons">wysiwyg</i>
+            </a>
+            <a
+              v-if="canRemoveBuild(build)"
+              @click="openRemoveBuildModal(build)"
+              data-tooltip="Remove build"
+              class="red-text tooltipped"
+            >
+              <i class="material-icons">delete</i>
+            </a>
+          </td>
+        </tr>
+        <tr v-if="runningBuilds.length === 0">
+          <td colspan="6">There are no builds yet</td>
+        </tr>
       </tbody>
     </table>
+    <br>
+
+    <div v-if="showRemoved">
+      <span><b>Removed Builds</b></span>
+      <table  ref="removed" >
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Created By</th>
+            <th>Created On</th>
+            <th>Removed On</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(build, index) in removedBuilds" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>{{ getBuildName(build) }}</td>
+            <td>{{ build.details.created_by }}</td>
+            <td>{{ $date(build.created_on).toHuman() }}</td>
+            <td>{{ $date(build.removed_on).toHuman() }}</td>
+          </tr>
+          <tr v-if="!removedBuilds || removedBuilds.length === 0">
+            <td colspan="6">There are no removed builds</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <br>
+
+    <div v-if="showFailed">
+      <span><b>Failed Builds</b></span>
+      <table ref="failed" >
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Created By</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(build, index) in failedBuilds" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>{{ getBuildName(build) }}</td>
+            <td>{{ build.details.created_by }}</td>
+          </tr>
+          <tr v-if="!failedBuilds || failedBuilds.length === 0">
+            <td colspan="6">There are no failed builds</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <Modal v-if="showInfoModal" @close="closeBuildInfoModal()" class="right-sheet">
       <template v-slot:header>{{ selectedBuild.name }}</template>
@@ -245,6 +310,8 @@ export default {
   },
   data() {
     return {
+      showRemoved: false,
+      showFailed: false,
       selectedBuild: {},
       showInfoModal: false,
       showModal: false,
@@ -253,7 +320,32 @@ export default {
       error: null,
     };
   },
+  computed: {
+    runningBuilds() {
+      return this.builds.filter((build) => build.status === 'building' || build.status === 'running');
+    },
+    removedBuilds() {
+      return this.$store.state.builds.builds['removed'];
+    },
+    failedBuilds() {
+      return this.$store.state.builds.builds['failed'];
+    },
+  },
   methods: {
+    getRemovedBuilds(branch) {
+      //call only once
+      this.$store.dispatch('builds/getBuildsByStatus', {
+        branch: branch,
+        status: 'removed',
+      });
+    },
+    getFailedBuilds(branch) {
+      this.$store.dispatch('builds/getBuildsByStatus', {
+        branch: branch,
+        status: 'failed',
+      });
+    },
+
     getBuildPublishedPort(build, port) {
       try {
         return build.details.service.Endpoint.Ports
@@ -379,12 +471,25 @@ export default {
         .finally(() => { this.removing = false; });
     },
   },
+  watch: {
+    showRemoved() {
+      if (this.showRemoved) {
+        this.getRemovedBuilds(this.$route.params.branch);
+      }
+    },
+    showFailed() {
+      if (this.showFailed) {
+        this.getFailedBuilds(this.$route.params.branch);
+      }
+    }
+  },
   mounted() {
     // Init tooltips in component
     this.$M.Tooltip.init(
       this.$el.querySelectorAll('.tooltipped'),
     );
   },
+  
 };
 </script>
 <style scoped>

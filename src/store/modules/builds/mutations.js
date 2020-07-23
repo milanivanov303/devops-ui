@@ -7,4 +7,7 @@ export default {
   statistics(state, { name, data }) {
     Vue.set(state.statistics, name, data);
   },
+  builds(state, { status, builds }) {
+    Vue.set(state.builds, status, builds);
+  },
 };
