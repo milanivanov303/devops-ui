@@ -101,7 +101,13 @@
               :items="deliveryChains"
               v-model="configuration.delivery_chain"
               :invalid="$v.configuration.delivery_chain.$error"
-              @change="delete configuration.dev_instance && delete configuration.val_instance"
+              @change="
+                delete configuration.dev_instance
+                &&
+                delete configuration.val_instance
+                &&
+                delete configuration.deploy_instance
+              "
               @blur="$v.configuration.delivery_chain.$touch()"
             />
             <div class="validator col s12">
@@ -146,6 +152,25 @@
               <div class="red-text" v-if="$v.configuration.val_instance.$error">
                 <p v-if="!$v.configuration.val_instance.required">
                   Val Instance field must not be empty.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Deploy Instance"
+              icon="dynamic_feed"
+              :items="instances"
+              v-model="configuration.deploy_instance"
+              :invalid="$v.configuration.deploy_instance.$error"
+              @blur="$v.configuration.deploy_instance.$touch()"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.configuration.deploy_instance.$error">
+                <p v-if="!$v.configuration.deploy_instance.required">
+                  Deploy Instance field must not be empty.
                 </p>
               </div>
             </div>
@@ -467,6 +492,9 @@ export default {
       val_instance: {
         required,
       },
+      deploy_instance: {
+        required,
+      },
       branch: {
         required,
       },
@@ -559,6 +587,12 @@ export default {
         );
       }
 
+      if (this.configuration.deploy_instance) {
+        this.configuration.deploy_instance = this.instances.find(
+          instance => instance.name === this.configuration.deploy_instance,
+        );
+      }
+
       if (action === 'build') {
         this.$router.push({
           path: `/extranet/configurations/${encodeURIComponent(this.configuration.id)}/build`,
@@ -597,6 +631,7 @@ export default {
       payload.delivery_chain = this.configuration.delivery_chain.title;
       payload.dev_instance = this.configuration.dev_instance.name;
       payload.val_instance = this.configuration.val_instance.name;
+      payload.deploy_instance = this.configuration.deploy_instance.name;
       payload.branch = this.configuration.branch.name;
       payload.prefix = this.configuration.prefix.package;
 
@@ -628,11 +663,21 @@ export default {
           });
         });
     },
+
     buildConfiguration() {
       this.build.started = true;
       this.build.summary = 'Build will start shortly ...';
 
-      this.$store.dispatch('extranet/buildConfiguration', this.configuration)
+      const payload = {
+        instance: this.configuration.dev_instance,
+        deploy_instance: this.configuration.deploy_instance,
+        client: this.clients.find(client => client.package === this.configuration.prefix),
+      };
+
+      this.$store.dispatch('extranet/buildConfiguration', {
+        id: this.configuration.id,
+        payload,
+      })
         .then((response) => {
           this.build.status = 'running';
 
@@ -673,6 +718,7 @@ export default {
           }
         });
     },
+
     scrollLogContainer() {
       setTimeout(() => {
         const container = this.$el.querySelector('.log');
@@ -709,3 +755,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" >
+  .log {
+    height: 60vh;
+    overflow: auto;
+    white-space: pre;
+  }
+</style>
