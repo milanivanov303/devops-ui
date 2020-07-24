@@ -313,7 +313,7 @@ export default {
 
       this.selectedBuild.name = this.getBuildName(build);
       this.selectedBuild.created_by = build.details.created_by;
-      this.selectedBuild.created_on = this.$date.getHuman(build.created_on);
+      this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
       this.selectedBuild.branch = build.details.branch;
       if (build.details.fe_branch) {
         this.selectedBuild.fe_branch = build.details.fe_branch.name;
