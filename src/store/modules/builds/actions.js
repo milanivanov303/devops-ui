@@ -45,29 +45,46 @@ export default {
 
     return promise;
   },
-  getBuildsByStatus({ commit }, { branch, status }) {
+  getBuildsByStatus({ commit }, {
+    branch, module, status, user,
+  }) {
+    
     // if (this.state.builds.builds[status]) {
-    //   return this.state.builds.builds[status].filter((build) => {
-    //     build.details.branch === branch;
-    //   })
+    //   return Object.values(this.state.builds.builds[status]).filter((build) => {
+    //     if(module) {
+    //       return build.module === module;
+    //     };
+    //     if (branch) {
+    //       return build.details.branch === branch;
+    //     };
+    //     if (user) {
+    //       return build.details.created_by === user;
+    //     };
+    //   });
     // }
 
     const promise = api.get('builds', {
       filters: JSON.stringify({
-        "allOf": [
+        allOf: [
           {
-            "status": status
+            status,
           },
           {
-            "details->branch": branch
-          }
-        ]
+            module,
+          },
+          {
+            'details->branch': branch,
+          },
+          {
+            'details->created_by': user,
+          },
+        ],
       }),
     });
 
     promise
       .then((response) => {
-        commit('builds', { status: status, builds: response.data.data });
+        commit('builds', { status, builds: response.data.data });
       })
       .catch(() => commit('error', 'Could not get builds list', { root: true }));
 

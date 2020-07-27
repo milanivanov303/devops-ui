@@ -5,7 +5,7 @@
         <div class="card" ref="my_builds">
           <div class="card-content">
             <span class="card-title">My active extranet builds</span>
-            <Builds :builds="userActiveBuilds"/>
+            <Builds :user="this.$auth.getUser().username" :module="'imx-fe'"></Builds>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">

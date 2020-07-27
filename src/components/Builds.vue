@@ -1,17 +1,13 @@
 <template>
   <div>
-    <a class="right tooltipped"
-      @click="showRemoved = !showRemoved" 
-       target="_blank" 
-       :data-tooltip="showRemoved ? 'Hide Removed Builds' : 'Show Removed Builds'">
-      <i class="material-icons prefix">delete_forever</i>
-    </a>
-    <a class="right tooltipped"
-      @click="showFailed = !showFailed"
-       target="_blank" 
-       :data-tooltip="showFailed ? 'Hide Failed Builds' : 'Show Failed Builds'">
-      <i class="material-icons prefix">do_not_disturb</i>
-    </a>
+    <div class="input-field col s12 m6 l3 right">
+      <select class="select" multiple v-model="status">
+        <option selected value="running">Active</option>
+        <option value="removed">Removed</option>
+        <option value="failed">Failed</option>
+      </select>
+      <label>View builds with status:</label>
+    </div>
 
     <table ref="builds">
       <thead>
@@ -21,18 +17,27 @@
           <th v-if="showModule">Module</th>
           <th>Created By</th>
           <th>Created On</th>
+          <th>Removed On</th>
+          <th>Status</th>
           <th>Quick Actions</th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="(build, index) in runningBuilds" :key="index">
+      <tbody v-for="status in status" :key="status.id">
+        <tr v-for="(build, index) in builds[status]" :key="index">
           <td>{{ index + 1 }}</td>
           <td>{{ getBuildName(build) }}</td>
           <td v-if="showModule">{{ build.module }}</td>
           <td>{{ build.details.created_by }}</td>
           <td>{{ $date(build.created_on).toHuman() }}</td>
+          <td>{{ build.removed_on ? $date(build.removed_on).toHuman() : ''}}</td>
+          <td><div class="chip"
+                  :class="{ 'active': build.status === 'running',
+                            'failed': build.status === 'failed',
+                            'removed': build.status === 'removed'}">
+            <b>{{ build.status }}</b>
+          </div></td>
           <td class="quick-actions">
-            <a
+            <a v-if="status ==='running'"
               :href="getBuildUrl(build)"
               target="_blank"
               data-tooltip="Open build"
@@ -47,8 +52,7 @@
             >
               <i class="material-icons">error_outline</i>
             </a>
-            <a
-              v-if="getWebssh2Url(build)"
+            <a v-if="getWebssh2Url(build) && status ==='running'"
               :href="getWebssh2Url(build)"
               target="_blank"
               data-tooltip="Open terminal"
@@ -57,7 +61,7 @@
               <i class="material-icons">wysiwyg</i>
             </a>
             <a
-              v-if="canRemoveBuild(build)"
+              v-if="canRemoveBuild(build) && status ==='running'"
               @click="openRemoveBuildModal(build)"
               data-tooltip="Remove build"
               class="red-text tooltipped"
@@ -66,63 +70,13 @@
             </a>
           </td>
         </tr>
-        <tr v-if="runningBuilds.length === 0">
-          <td colspan="6">There are no builds yet</td>
+        <!-- TODO: show only once -->
+        <tr v-if="builds[status] === 'undefined'">
+          <td colspan="6">There are no such builds</td>
         </tr>
       </tbody>
     </table>
-    <br>
-
-    <div v-if="showRemoved">
-      <span><b>Removed Builds</b></span>
-      <table  ref="removed" >
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Created By</th>
-            <th>Created On</th>
-            <th>Removed On</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(build, index) in removedBuilds" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ getBuildName(build) }}</td>
-            <td>{{ build.details.created_by }}</td>
-            <td>{{ $date(build.created_on).toHuman() }}</td>
-            <td>{{ $date(build.removed_on).toHuman() }}</td>
-          </tr>
-          <tr v-if="!removedBuilds || removedBuilds.length === 0">
-            <td colspan="6">There are no removed builds</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <br>
-
-    <div v-if="showFailed">
-      <span><b>Failed Builds</b></span>
-      <table ref="failed" >
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Created By</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(build, index) in failedBuilds" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ getBuildName(build) }}</td>
-            <td>{{ build.details.created_by }}</td>
-          </tr>
-          <tr v-if="!failedBuilds || failedBuilds.length === 0">
-            <td colspan="6">There are no failed builds</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Add pagination -->
 
     <Modal v-if="showInfoModal" @close="closeBuildInfoModal()" class="right-sheet">
       <template v-slot:header>{{ selectedBuild.name }}</template>
@@ -297,12 +251,16 @@
 </template>
 
 <script>
-
 import config from '../config';
 
 export default {
   props: {
-    builds: Array,
+    module: {
+      type: String,
+    },
+    user: {
+      type: String,
+    },
     showModule: {
       type: Boolean,
       default: false,
@@ -310,42 +268,38 @@ export default {
   },
   data() {
     return {
-      showRemoved: false,
-      showFailed: false,
+      status: ['running'],
       selectedBuild: {},
       showInfoModal: false,
       showModal: false,
       removing: false,
       removed: false,
       error: null,
+      branch: this.$route.params.branch,
     };
   },
   computed: {
-    runningBuilds() {
-      return this.builds.filter((build) => build.status === 'building' || build.status === 'running');
-    },
-    removedBuilds() {
-      return this.$store.state.builds.builds['removed'];
-    },
-    failedBuilds() {
-      return this.$store.state.builds.builds['failed'];
+    builds() {
+      return this.$store.state.builds.builds;
     },
   },
   methods: {
-    getRemovedBuilds(branch) {
-      //call only once
-      this.$store.dispatch('builds/getBuildsByStatus', {
-        branch: branch,
-        status: 'removed',
-      });
-    },
-    getFailedBuilds(branch) {
-      this.$store.dispatch('builds/getBuildsByStatus', {
-        branch: branch,
-        status: 'failed',
-      });
-    },
+    getBuilds() {
+      if (this.status.length !== 0) {
+        this.status.forEach((status) => {
+          const loader = this.$loading.show({ container: this.$refs.builds });
 
+          this.$store.dispatch('builds/getBuildsByStatus', {
+            branch: this.branch,
+            module: this.module,
+            status,
+            user: this.user,
+          }).then(() => loader.hide());
+        });
+      } else {
+        this.$M.toast({ html: 'Choose build status', classes: 'toast-fail' });
+      }
+    },
     getBuildPublishedPort(build, port) {
       try {
         return build.details.service.Endpoint.Ports
@@ -397,6 +351,16 @@ export default {
           }
           return 'could-not-get-build-name';
         });
+      }
+      finally {
+        if (build.status === 'failed') {
+          return build.details.branch.concat(
+            '_', build.details.client.name,
+            '_', build.details.instance.name,
+            '_', build.details.java_version,
+            '_', build.created_on,
+          );
+        }
       }
     },
 
@@ -472,27 +436,23 @@ export default {
     },
   },
   watch: {
-    showRemoved() {
-      if (this.showRemoved) {
-        this.getRemovedBuilds(this.$route.params.branch);
-      }
+    status() {
+      this.getBuilds();
     },
-    showFailed() {
-      if (this.showFailed) {
-        this.getFailedBuilds(this.$route.params.branch);
-      }
-    }
   },
   mounted() {
-    // Init tooltips in component
-    this.$M.Tooltip.init(
-      this.$el.querySelectorAll('.tooltipped'),
-    );
+    this.getBuilds();
+
+    // Init select
+    this.$M.FormSelect.init(document.querySelector('select'));
+
+    // Init tooltops
+    this.$M.Tooltip.init(document.querySelectorAll('.tooltipped'));
   },
-  
+
 };
 </script>
-<style scoped>
+<style scoped lang='scss'>
   input:read-only {
     color: black !important;
     border-bottom: 1px solid #9e9e9e !important;
@@ -502,5 +462,21 @@ export default {
   }
   .quick-actions a {
       margin: 0px 2.5px;
+  }
+  .chip{
+    background-color: white;
+    border-radius: 7px;
+    &.failed {
+      border: solid red 2px;
+      color: red;
+    }
+    &.active {
+      border: solid #4CAF50 2px;
+      color: #4CAF50;
+    }
+    &.removed {
+      border: solid darkslategray 2px;
+      color: darkslategray;
+    }
   }
 </style>

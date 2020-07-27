@@ -4,7 +4,8 @@
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My active builds</span>
-          <Builds :builds="userBuilds" :show-module="true"></Builds>
+          <!-- TODO: doesn't show failed, doesn't hide removed on unselect -->
+          <Builds :user="this.$auth.getUser().username" :show-module="true"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
@@ -120,9 +121,9 @@ export default {
     };
   },
   computed: {
-    userBuilds() {
-      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username);
-    },
+    // userBuilds() {
+    //   return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username);
+    // },
     extranetBuildsCount() {
       return this.$store.state.builds.active.filter(build => build.module === 'extranet').length;
     },
