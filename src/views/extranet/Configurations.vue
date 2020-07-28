@@ -20,6 +20,7 @@
         <Column show="delivery_chain"/>
         <Column show="dev_instance"/>
         <Column show="val_instance"/>
+        <Column show="deploy_instance"/>
         <Column show="app_type" :sortable="false" filter-type="dropdown"/>
         <Column show="app_version" :sortable="false" filter-type="dropdown"/>
         <Column show="branch"/>
@@ -73,7 +74,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="action === 'create'">
             <Select
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -137,7 +138,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="action === 'create'">
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -175,7 +176,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="action === 'create'">
             <Select
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -191,7 +192,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="action === 'create'">
             <TextInput
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -244,7 +245,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="action === 'create'">
             <TextInput
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -277,7 +278,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="action === 'create'">
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -292,7 +293,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="action === 'create'">
             <TextArea
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -609,6 +610,7 @@ export default {
 
     closeAddEditModal() {
       this.showAddEditModal = false;
+      this.build.started = false;
       this.$v.$reset();
 
       this.$router.push({
