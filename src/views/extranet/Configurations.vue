@@ -125,7 +125,7 @@
               :class="{readonly: action === 'build'}"
               label="Dev Instance"
               icon="dynamic_feed"
-              :items="instances"
+              :items="dev_instances"
               v-model="configuration.dev_instance"
               :invalid="$v.configuration.dev_instance.$error"
               @blur="$v.configuration.dev_instance.$touch()"
@@ -144,7 +144,7 @@
               :class="{readonly: action === 'build'}"
               label="Val Instance"
               icon="dynamic_feed"
-              :items="instances"
+              :items="val_instances"
               v-model="configuration.val_instance"
               :invalid="$v.configuration.val_instance.$error"
               @blur="$v.configuration.val_instance.$touch()"
@@ -163,7 +163,7 @@
               :class="{readonly: action === 'build'}"
               label="Deploy Instance"
               icon="dynamic_feed"
-              :items="instances"
+              :items="deploy_instances"
               v-model="configuration.deploy_instance"
               :invalid="$v.configuration.deploy_instance.$error"
               @blur="$v.configuration.deploy_instance.$touch()"
@@ -441,9 +441,24 @@ export default {
       }
       return [];
     },
-    instances() {
+    val_instances() {
       if (this.configuration.delivery_chain) {
-        return this.configuration.delivery_chain.instances || [];
+        return this.configuration.delivery_chain.instances
+          .filter(instance => instance.instance_type_id === 'VAL') || [];
+      }
+      return [];
+    },
+    dev_instances() {
+      if (this.configuration.delivery_chain) {
+        return this.configuration.delivery_chain.instances
+          .filter(instance => instance.instance_type_id === 'DEV') || [];
+      }
+      return [];
+    },
+    deploy_instances() {
+      if (this.configuration.delivery_chain) {
+        return this.configuration.delivery_chain.instances
+          .filter(instance => instance.environment_type.type === 'EXTRANET') || [];
       }
       return [];
     },

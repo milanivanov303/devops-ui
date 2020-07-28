@@ -67,7 +67,7 @@ export default {
           },
         ],
       }),
-      with: JSON.stringify({ delivery_chains: ['instances'] }),
+      with: JSON.stringify({ delivery_chains: { instances: ['environment_type']} }),
       orders: JSON.stringify({
         name: 'asc',
       }),
