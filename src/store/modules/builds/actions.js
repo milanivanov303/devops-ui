@@ -48,20 +48,8 @@ export default {
   getBuildsByStatus({ commit }, {
     branch, module, status, user,
   }) {
-    
-    // if (this.state.builds.builds[status]) {
-    //   return Object.values(this.state.builds.builds[status]).filter((build) => {
-    //     if(module) {
-    //       return build.module === module;
-    //     };
-    //     if (branch) {
-    //       return build.details.branch === branch;
-    //     };
-    //     if (user) {
-    //       return build.details.created_by === user;
-    //     };
-    //   });
-    // }
+     
+    // TODO: call only once for each status,branch
 
     const promise = api.get('builds', {
       filters: JSON.stringify({

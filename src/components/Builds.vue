@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="row">
     <div class="input-field col s12 m6 l3 right">
       <select class="select" multiple v-model="status">
         <option selected value="running">Active</option>
@@ -22,8 +22,8 @@
           <th>Quick Actions</th>
         </tr>
       </thead>
-      <tbody v-for="status in status" :key="status.id">
-        <tr v-for="(build, index) in builds[status]" :key="index">
+      <tbody>
+        <tr v-for="(build, index) in sortedbuilds" :key="index">
           <td>{{ index + 1 }}</td>
           <td>{{ getBuildName(build) }}</td>
           <td v-if="showModule">{{ build.module }}</td>
@@ -37,7 +37,7 @@
             <b>{{ build.status }}</b>
           </div></td>
           <td class="quick-actions">
-            <a v-if="status ==='running'"
+            <a v-if="build.status ==='running'"
               :href="getBuildUrl(build)"
               target="_blank"
               data-tooltip="Open build"
@@ -52,7 +52,7 @@
             >
               <i class="material-icons">error_outline</i>
             </a>
-            <a v-if="getWebssh2Url(build) && status ==='running'"
+            <a v-if="getWebssh2Url(build) && build.status ==='running'"
               :href="getWebssh2Url(build)"
               target="_blank"
               data-tooltip="Open terminal"
@@ -61,7 +61,7 @@
               <i class="material-icons">wysiwyg</i>
             </a>
             <a
-              v-if="canRemoveBuild(build) && status ==='running'"
+              v-if="canRemoveBuild(build) && build.status ==='running'"
               @click="openRemoveBuildModal(build)"
               data-tooltip="Remove build"
               class="red-text tooltipped"
@@ -70,13 +70,38 @@
             </a>
           </td>
         </tr>
-        <!-- TODO: show only once -->
-        <tr v-if="builds[status] === 'undefined'">
-          <td colspan="6">There are no such builds</td>
+        <tr v-if="sortedbuilds.length === 0">
+          <td colspan="6">There are no builds</td>
         </tr>
       </tbody>
     </table>
-    <!-- Add pagination -->
+    <div class="col s12 m6 l3 right" id="perPage">
+      <div class="input-field col s12 l4 right">
+          <Select class="col s12"
+                  v-if="sortedbuilds.length"
+                  displayed="value"
+                  v-model="perPage"
+                  :options="perPageOptions"
+          />
+      </div>
+      <p v-if="sortedbuilds.length" class="col s12 l8 right right-align">Items per page:</p>
+    </div>
+    <div class="col s12 m6 l6">
+      <paginate
+        v-if="sortedbuilds.length"
+        v-model="page"
+        :page-count="lastPage"
+        :click-handler="selectedPage"
+        :prev-class="'material-icons'"
+        :prev-text="'chevron_left'"
+        :next-class="'material-icons'"
+        :next-text="'chevron_right'"
+        :container-class="'pagination'"
+        :page-class="'waves-effect'"
+        :disabled-class="'disabled'"
+        :active-class="'active'">
+      </paginate>
+    </div>
 
     <Modal v-if="showInfoModal" @close="closeBuildInfoModal()" class="right-sheet">
       <template v-slot:header>{{ selectedBuild.name }}</template>
@@ -218,7 +243,6 @@
       </template>
       <template v-slot:footer></template>
     </Modal>
-
     <Modal v-if="showModal" @close="showModal = false" class="confirm">
       <template v-slot:content>
         <div v-if="removing" class="center" >
@@ -251,6 +275,7 @@
 </template>
 
 <script>
+import Paginate from 'vuejs-paginate/src/components/Paginate';
 import config from '../config';
 
 export default {
@@ -266,6 +291,9 @@ export default {
       default: false,
     },
   },
+  components: {
+    paginate: Paginate,
+  },
   data() {
     return {
       status: ['running'],
@@ -276,11 +304,53 @@ export default {
       removed: false,
       error: null,
       branch: this.$route.params.branch,
+      page: 1,
+      perPage: {
+        value: 10,
+      },
+      lastPage: 0,
+      perPageOptions: [
+        {
+          value: 10,
+        },
+        {
+          value: 20,
+        },
+        {
+          value: 30,
+        },
+        {
+          value: 50,
+        },
+      ],
     };
   },
   computed: {
-    builds() {
-      return this.$store.state.builds.builds;
+    activeBuilds() {
+      if (this.status.includes('running')) {
+        return this.$store.state.builds.builds.running || [];
+      }
+      return [];
+    },
+    removedBuilds() {
+      if (this.status.includes('removed')) {
+        return this.$store.state.builds.builds.removed || [];
+      }
+      return [];
+    },
+    failedBuilds() {
+      if (this.status.includes('failed')) {
+        return this.$store.state.builds.builds.failed || [];
+      }
+      return [];
+    },
+
+    sortedbuilds() {
+      const from = (this.page * this.perPage.value) - this.perPage.value;
+      const to = (this.page * this.perPage.value);
+      const data = this.activeBuilds.concat(this.removedBuilds, this.failedBuilds);
+      this.setLastPage(data);
+      return data.slice(from, to);
     },
   },
   methods: {
@@ -300,6 +370,7 @@ export default {
         this.$M.toast({ html: 'Choose build status', classes: 'toast-fail' });
       }
     },
+
     getBuildPublishedPort(build, port) {
       try {
         return build.details.service.Endpoint.Ports
@@ -308,7 +379,6 @@ export default {
         return null;
       }
     },
-
     getBuildUrl(build) {
       const { host } = this.$store.state[build.module];
       try {
@@ -328,7 +398,6 @@ export default {
         return null;
       }
     },
-
     getWebssh2Url(build) {
       const { host } = this.$store.state[build.module];
       const port = this.getBuildPublishedPort(build, 22);
@@ -338,28 +407,32 @@ export default {
       }
       return null;
     },
-
     getBuildName(build) {
-      try {
-        return build.details.container.Config.Labels.build;
-      } catch (e) {
-        return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
-          if (env.match(/^EXTRANET_BUILD_DIR=/)) {
-            return env.split('=').slice(-1).toString().split('/')
-              .slice(-1)
-              .toString();
-          }
-          return 'could-not-get-build-name';
-        });
-      }
-      finally {
-        if (build.status === 'failed') {
+      if (build.status === 'failed') {
+        try {
           return build.details.branch.concat(
             '_', build.details.client.name,
             '_', build.details.instance.name,
             '_', build.details.java_version,
             '_', build.created_on,
           );
+        } catch (e) {
+          return 'could-not-get-build-name';
+        }
+      }
+
+      try {
+        return build.details.container.Config.Labels.build;
+      } catch (e) {
+        if (build.details.service) {
+          return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
+            if (env.match(/^EXTRANET_BUILD_DIR=/)) {
+              return env.split('=').slice(-1).toString().split('/')
+                .slice(-1)
+                .toString();
+            }
+            return 'could-not-get-build-name';
+          });
         }
       }
     },
@@ -397,7 +470,6 @@ export default {
       this.selectedBuild.user = 'enterprise';
       this.selectedBuild.pass = 'Sofphia';
     },
-
     closeBuildInfoModal() {
       this.showInfoModal = false;
       this.selectedBuild = {};
@@ -410,7 +482,6 @@ export default {
 
       return this.$auth.getUser().username === build.details.created_by;
     },
-
     openRemoveBuildModal(build) {
       this.showModal = true;
       this.selectedBuild = build;
@@ -434,10 +505,20 @@ export default {
         })
         .finally(() => { this.removing = false; });
     },
+
+    selectedPage(page) {
+      this.page = page;
+    },
+    setLastPage(data) {
+      this.lastPage = Math.ceil(data.length / this.perPage.value);
+    },
   },
   watch: {
     status() {
       this.getBuilds();
+    },
+    perPage() {
+      this.setLastPage(this.builds);
     },
   },
   mounted() {
@@ -477,6 +558,14 @@ export default {
     &.removed {
       border: solid darkslategray 2px;
       color: darkslategray;
+    }
+  }
+  #perPage {
+    > div {
+      padding: 0;
+    }
+    p {
+      padding: 13px 0 0 0;
     }
   }
 </style>
