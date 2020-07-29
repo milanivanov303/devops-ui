@@ -48,7 +48,7 @@
     <Modal v-if="showAddEditModal" @close="closeAddEditModal()" class="right-sheet">
       <template v-slot:header>
         <span v-if="action === 'create'">Create </span>
-        <span v-else-if="action === 'edit'">Update </span>
+        <span v-else-if="action === 'update'">Update </span>
         <span v-else>Build </span>
         configuration
       </template>
@@ -74,7 +74,7 @@
               </div>
             </div>
           </div>
-          <div class="row" v-if="action === 'create'">
+          <div class="row" v-if="!(action === 'build')">
             <Select
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -138,7 +138,7 @@
               </div>
             </div>
           </div>
-          <div class="row" v-if="action === 'create'">
+          <div class="row" v-if="!(action === 'build')">
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -176,7 +176,7 @@
               </div>
             </div>
           </div>
-          <div class="row" v-if="action === 'create'">
+          <div class="row" v-if="!(action === 'build')">
             <Select
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -192,7 +192,7 @@
               </div>
             </div>
           </div>
-          <div class="row" v-if="action === 'create'">
+          <div class="row" v-if="!(action === 'build')">
             <TextInput
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -245,7 +245,7 @@
               </div>
             </div>
           </div>
-          <div class="row" v-if="action === 'create'">
+          <div class="row" v-if="!(action === 'build')">
             <TextInput
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -278,7 +278,7 @@
               </div>
             </div>
           </div>
-          <div class="row" v-if="action === 'create'">
+          <div class="row" v-if="!(action === 'build')">
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -293,7 +293,7 @@
               </div>
             </div>
           </div>
-          <div class="row" v-if="action === 'create'">
+          <div class="row" v-if="!(action === 'build')">
             <TextArea
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -565,6 +565,8 @@ export default {
     },
 
     openAddEditModal(action, configuration = {}) {
+      this.showAddEditModal = true;
+      this.action = action;
       this.configuration = Object.assign({}, configuration);
 
       if (this.configuration.project) {
@@ -592,19 +594,19 @@ export default {
       }
 
       if (this.configuration.dev_instance) {
-        this.configuration.dev_instance = this.instances.find(
+        this.configuration.dev_instance = this.dev_instances.find(
           instance => instance.name === this.configuration.dev_instance,
         );
       }
 
       if (this.configuration.val_instance) {
-        this.configuration.val_instance = this.instances.find(
+        this.configuration.val_instance = this.val_instances.find(
           instance => instance.name === this.configuration.val_instance,
         );
       }
 
       if (this.configuration.deploy_instance) {
-        this.configuration.deploy_instance = this.instances.find(
+        this.configuration.deploy_instance = this.deploy_instances.find(
           instance => instance.name === this.configuration.deploy_instance,
         );
       }
@@ -617,10 +619,7 @@ export default {
         this.$router.push({
           path: `/extranet/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
         });
-      }
-
-      this.showAddEditModal = true;
-      this.action = action;
+      }  
     },
 
     closeAddEditModal() {
