@@ -2,6 +2,7 @@
 
 export default {
   instances: [],
+  deploy_instances: [],
   projects: [],
   delivery_chains: [],
   error: '',

@@ -98,7 +98,7 @@ export default [
     ],
   },
   {
-    path: '/extranet/configurations/:id?',
+    path: '/extranet/configurations/:id?/:build?',
     meta: {
       requiresAuth: true,
       name: 'extranet-configurations',
