@@ -52,6 +52,47 @@ export default {
     return promise;
   },
 
+  getDeployInstances({ commit }) {
+    const name = 'deploy_instances';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('instances', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            environment_type: {
+              allOf: [{ type: 'extranet' }],
+            },
+          },
+          {
+            owner: {
+              allOf: [{ key: 'codix' }],
+            },
+          },
+          {
+            status: {
+              allOf: [{ key: 'active' }],
+            },
+          },
+        ],
+      }),
+      orders: JSON.stringify({
+        name: 'asc',
+      }),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('deployInstances', response.data.data))
+      .catch(() => commit('error', 'Could not get instances list', { root: true }));
+
+    return promise;
+  },
+
   getProjects({ commit }) {
     const name = 'projects';
 
@@ -67,7 +108,7 @@ export default {
           },
         ],
       }),
-      with: JSON.stringify({ delivery_chains: { instances: ['environment_type']} }),
+      with: JSON.stringify({ delivery_chains: { instances: ['environment_type'] } }),
       orders: JSON.stringify({
         name: 'asc',
       }),

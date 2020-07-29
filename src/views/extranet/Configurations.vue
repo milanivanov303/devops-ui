@@ -456,11 +456,7 @@ export default {
       return [];
     },
     deploy_instances() {
-      if (this.configuration.delivery_chain) {
-        return this.configuration.delivery_chain.instances
-          .filter(instance => instance.environment_type.type === 'EXTRANET') || [];
-      }
-      return [];
+      return this.$store.state.mmpi.deploy_instances;
     },
     branches() {
       if (this.configuration.app_type && this.configuration.app_type.value === 'extranet') {
@@ -534,6 +530,7 @@ export default {
       const promises = [];
       promises.push(this.$store.dispatch('extranet/getConfigurations'));
       promises.push(this.$store.dispatch('mmpi/getProjects'));
+      promises.push(this.$store.dispatch('mmpi/getDeployInstances'));
       promises.push(this.$store.dispatch('extranet/getBranches'));
       promises.push(this.$store.dispatch('debiteur/getBranches'));
       promises.push(this.$store.dispatch('extranet/getClients'));
@@ -619,7 +616,7 @@ export default {
         this.$router.push({
           path: `/extranet/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
         });
-      }  
+      }
     },
 
     closeAddEditModal() {
