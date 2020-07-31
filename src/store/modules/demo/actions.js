@@ -52,4 +52,21 @@ export default {
 
     return promise;
   },
+
+  getDemosExport({ commit }) {
+    const promise = api.get('demos/export');
+    promise
+    .then((response) => {
+      var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+      var fileLink = document.createElement('a');
+ 
+      fileLink.href = fileURL;
+      fileLink.setAttribute('download', 'demos.xlsx');
+      document.body.appendChild(fileLink);
+ 
+      fileLink.click();
+    })
+    .catch(error => commit('error', error));
+    return promise;
+  },
 };
