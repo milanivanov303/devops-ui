@@ -10,12 +10,12 @@ export default {
   },
 
   markAsRunning(state, id) {
-    let build = state.active.find((build) => build.id === id);
+    const build = state.active.find(build => build.id === id);
     build.status = 'running';
   },
 
   markAsStopped(state, id) {
-    let build = state.active.find((build) => build.id === id);
+    const build = state.active.find(build => build.id === id);
     build.status = 'stopped';
-  }
+  },
 };

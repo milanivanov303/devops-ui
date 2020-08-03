@@ -125,7 +125,7 @@ export default {
     },
     builds() {
       return this.$store.state.builds.active;
-    }
+    },
   },
   methods: {
     getActiveBuilds() {
@@ -161,7 +161,7 @@ export default {
         }
         if (build) {
           this.$M.toast({ html: 'This branch does not exist anymore!', classes: 'toast-fail' });
-          return true; 
+          return true;
         }
         this.$M.toast({ html: 'This branch does not exist!', classes: 'toast-fail' });
       }

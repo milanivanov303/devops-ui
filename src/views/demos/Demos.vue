@@ -287,7 +287,7 @@ export default {
     };
   },
   validations() {
-    let validations = {
+    const validations = {
       demo: {
         name: {
           required,
@@ -309,7 +309,7 @@ export default {
         active_to: {
           required,
         },
-      }
+      },
     };
 
     if (this.demo.status && this.demo.status.value === 'rejected') {
