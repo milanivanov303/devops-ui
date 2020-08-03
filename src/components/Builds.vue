@@ -410,15 +410,15 @@ export default {
     start(build) {
       this.updating = true;
       this.initTooltips();
-      this.$store.dispatch(`builds/start`, build.id)
-      .finally(() => this.updating = false);
+      this.$store.dispatch('builds/start', build.id)
+        .finally(() => { this.updating = false; });
     },
 
     stop(build) {
       this.updating = true;
       this.initTooltips();
-      this.$store.dispatch(`builds/stop`, build.id)
-        .finally(() => this.updating = false);
+      this.$store.dispatch('builds/stop', build.id)
+        .finally(() => { this.updating = false; });
     },
 
     remove(build) {

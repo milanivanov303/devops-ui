@@ -12,8 +12,8 @@ export default {
             status: 'running',
           },
           {
-            status: 'stopped'
-          }
+            status: 'stopped',
+          },
         ],
       }),
     });
@@ -54,7 +54,7 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            "details->service->Spec->Name": name,
+            'details->service->Spec->Name': name,
           },
         ],
       }),
