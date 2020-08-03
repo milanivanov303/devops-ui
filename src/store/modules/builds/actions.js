@@ -7,10 +7,13 @@ export default {
   getActive({ commit }) {
     const promise = api.get('builds', {
       filters: JSON.stringify({
-        allOf: [
+        anyOf: [
           {
             status: 'running',
           },
+          {
+            status: 'stopped'
+          }
         ],
       }),
     });
@@ -42,6 +45,43 @@ export default {
         commit('statistics', { name: stateName, data: response.data.data });
       })
       .catch(() => commit('error', 'Could not get builds list', { root: true }));
+
+    return promise;
+  },
+
+  getBuildByName({ commit }, { name }) {
+    const promise = api.get('builds', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            "details->service->Spec->Name": name,
+          },
+        ],
+      }),
+    });
+
+    promise
+      .catch(() => commit('error', 'Could not get build by name', { root: true }));
+
+    return promise;
+  },
+
+  start({ commit }, id) {
+    const promise = api.post(`builds/${id}/start`);
+
+    promise
+      .then(() => commit('markAsRunning', id))
+      .catch(() => commit('error', 'Could not start build', { root: true }));
+
+    return promise;
+  },
+
+  stop({ commit }, id) {
+    const promise = api.post(`builds/${id}/stop`);
+
+    promise
+      .then(() => commit('markAsStopped', id))
+      .catch(() => commit('error', 'Could not stop build', { root: true }));
 
     return promise;
   },

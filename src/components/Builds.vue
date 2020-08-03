@@ -8,49 +8,73 @@
         <th v-if="showModule">Module</th>
         <th>Created By</th>
         <th>Created On</th>
+        <th>Status</th>
         <th>Quick Actions</th>
       </tr>
       </thead>
       <tbody>
       <tr v-for="(build, index) in builds" :key="index">
         <td>{{ index + 1 }}</td>
-        <td>{{ getBuildName(build) }}</td>
+        <td>{{ getName(build) }}</td>
         <td v-if="showModule">{{ build.module }}</td>
         <td>{{ build.details.created_by }}</td>
         <td>{{ $date(build.created_on).toHuman() }}</td>
+        <td v-html="getStatusText(build)"></td>
         <td class="quick-actions">
-          <a
-            :href="getBuildUrl(build)"
-            target="_blank"
-            data-tooltip="Open build"
-            class="green-text tooltipped"
-          >
-            <i class="material-icons">launch</i>
-          </a>
-          <a
-            @click="openBuildInfoModal(build)"
-            data-tooltip="Build details"
-            class="blue-text tooltipped"
-          >
-            <i class="material-icons">error_outline</i>
-          </a>
-          <a
-            v-if="getWebssh2Url(build)"
-            :href="getWebssh2Url(build)"
-            target="_blank"
-            data-tooltip="Open terminal"
-            class="tooltipped"
-          >
-            <i class="material-icons">wysiwyg</i>
-          </a>
-          <a
-            v-if="canRemoveBuild(build)"
-            @click="openRemoveBuildModal(build)"
-            data-tooltip="Remove build"
-            class="red-text tooltipped"
-          >
-            <i class="material-icons">delete</i>
-          </a>
+          <Progress v-if="updating"/>
+          <div v-else>
+            <a
+              @click="start(build)"
+              target="_blank"
+              data-tooltip="Start"
+              class="green-text tooltipped"
+              v-if="build.status === 'stopped'"
+            >
+              <i class="material-icons">play_arrow</i>
+            </a>
+            <a
+              @click="stop(build)"
+              target="_blank"
+              data-tooltip="Stop"
+              class="red-text tooltipped"
+              v-if="build.status === 'running'"
+            >
+              <i class="material-icons">stop</i>
+            </a>
+            <a
+              :href="getUrl(build)"
+              target="_blank"
+              data-tooltip="Open"
+              class="green-text tooltipped"
+              v-if="build.status === 'running'"
+            >
+              <i class="material-icons">launch</i>
+            </a>
+            <a
+              @click="openInfoModal(build)"
+              data-tooltip="Details"
+              class="blue-text tooltipped"
+            >
+              <i class="material-icons">error_outline</i>
+            </a>
+            <a
+              :href="getWebssh2Url(build)"
+              target="_blank"
+              data-tooltip="Open terminal"
+              class="tooltipped"
+              v-if="build.status === 'running'"
+            >
+              <i class="material-icons">wysiwyg</i>
+            </a>
+            <a
+              v-if="canRemove(build)"
+              @click="openRemoveModal(build)"
+              data-tooltip="Remove"
+              class="red-text tooltipped"
+            >
+              <i class="material-icons">delete</i>
+            </a>
+          </div>
         </td>
       </tr>
       <tr v-if="builds.length === 0">
@@ -59,7 +83,7 @@
       </tbody>
     </table>
 
-    <Modal v-if="showInfoModal" @close="closeBuildInfoModal()" class="right-sheet">
+    <Modal v-if="showInfoModal" @close="closeInfoModal()" class="right-sheet">
       <template v-slot:header>{{ selectedBuild.name }}</template>
       <template v-slot:content>
         <div class="col s12 l11">
@@ -200,11 +224,11 @@
       <template v-slot:footer></template>
     </Modal>
 
-    <Modal v-if="showModal" @close="showModal = false" class="confirm">
+    <Modal v-if="showRemoveModal" @close="showRemoveModal = false" class="confirm">
       <template v-slot:content>
         <div v-if="removing" class="center" >
           <Preloader class="big"></Preloader>
-          <p>Removing build <b>{{ getBuildName(selectedBuild) }}</b> ... </p>
+          <p>Removing build <b>{{ getName(selectedBuild) }}</b> ... </p>
         </div>
         <div v-else-if="removed" class="center" >
           <i class="material-icons large green-text">check_circle_outline</i>
@@ -215,14 +239,14 @@
           <p>{{ error }}</p>
         </div>
         <div v-else>
-          Are you sure you what to remove <b>{{ getBuildName(selectedBuild) }}</b> build?
+          Are you sure you what to remove <b>{{ getName(selectedBuild) }}</b> build?
         </div>
       </template>
       <template v-slot:footer>
         <button
           v-if="!removing && !removed"
           class="waves-effect btn red"
-          @click="removeBuild(selectedBuild)"
+          @click="remove(selectedBuild)"
         >
           <i class="material-icons left">delete</i> Remove
         </button>
@@ -243,18 +267,21 @@ export default {
       default: false,
     },
   },
+
   data() {
     return {
       selectedBuild: {},
       showInfoModal: false,
-      showModal: false,
+      showRemoveModal: false,
+      updating: false,
       removing: false,
       removed: false,
       error: null,
     };
   },
+
   methods: {
-    getBuildPublishedPort(build, port) {
+    getPublishedPort(build, port) {
       try {
         return build.details.service.Endpoint.Ports
           .find(value => value.TargetPort === port).PublishedPort;
@@ -263,21 +290,21 @@ export default {
       }
     },
 
-    getBuildUrl(build) {
+    getUrl(build) {
       const { host } = this.$store.state[build.module];
       try {
         let port;
         try {
           port = build.details.container.NetworkSettings.Ports['8080/tcp'][0].HostPort;
-          return `http://${host}:${port}/${this.getBuildName(build)}/`;
+          return `http://${host}:${port}/${this.getName(build)}/`;
         } catch (e) {
           port = build.details.container.NetworkSettings.Ports['8591/tcp'][0].HostPort;
-          return `http://${host}:${port}/${this.getBuildName(build)}/`;
+          return `http://${host}:${port}/${this.getName(build)}/`;
         }
       } catch (e) {
-        const port = this.getBuildPublishedPort(build, 8080);
+        const port = this.getPublishedPort(build, 8080);
         if (port) {
-          return `http://${host}:${port}/${this.getBuildName(build)}/`;
+          return `http://${host}:${port}/${this.getName(build)}/`;
         }
         return null;
       }
@@ -285,7 +312,7 @@ export default {
 
     getWebssh2Url(build) {
       const { host } = this.$store.state[build.module];
-      const port = this.getBuildPublishedPort(build, 22);
+      const port = this.getPublishedPort(build, 22);
 
       if (host && port) {
         return `http://${window.location.hostname}:${config.webssh2_port}/ssh/host/${host}?port=${port}`;
@@ -293,7 +320,7 @@ export default {
       return null;
     },
 
-    getBuildName(build) {
+    getName(build) {
       try {
         return build.details.container.Config.Labels.build;
       } catch (e) {
@@ -308,10 +335,21 @@ export default {
       }
     },
 
-    openBuildInfoModal(build) {
+    getStatusText(build) {
+      if (build.status === 'running') {
+        return `<span class="new badge green" data-badge-caption="">${build.status}</span>`;
+      }
+
+      if (build.status === 'stopped') {
+        return `<span class="new badge red" data-badge-caption="">${build.status}</span>`;
+      }
+      return `<span class="new badge" data-badge-caption="">${build.status}</span>`;
+    },
+
+    openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild.name = this.getBuildName(build);
+      this.selectedBuild.name = this.getName(build);
       this.selectedBuild.created_by = build.details.created_by;
       this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
       this.selectedBuild.branch = build.details.branch;
@@ -342,12 +380,12 @@ export default {
       this.selectedBuild.pass = 'Sofphia';
     },
 
-    closeBuildInfoModal() {
+    closeInfoModal() {
       this.showInfoModal = false;
       this.selectedBuild = {};
     },
 
-    canRemoveBuild(build) {
+    canRemove(build) {
       if (this.$auth.can('extranet.remove-builds')) {
         return true;
       }
@@ -355,14 +393,35 @@ export default {
       return this.$auth.getUser().username === build.details.created_by;
     },
 
-    openRemoveBuildModal(build) {
-      this.showModal = true;
+    openRemoveModal(build) {
+      this.showRemoveModal = true;
       this.selectedBuild = build;
       this.removing = false;
       this.removed = false;
       this.error = null;
     },
-    removeBuild(build) {
+
+    initTooltips() {
+      this.$M.Tooltip.init(
+        this.$el.querySelectorAll('.tooltipped'),
+      );
+    },
+
+    start(build) {
+      this.updating = true;
+      this.initTooltips();
+      this.$store.dispatch(`builds/start`, build.id)
+      .finally(() => this.updating = false);
+    },
+
+    stop(build) {
+      this.updating = true;
+      this.initTooltips();
+      this.$store.dispatch(`builds/stop`, build.id)
+        .finally(() => this.updating = false);
+    },
+
+    remove(build) {
       this.removing = true;
       this.$store.dispatch(`${build.module}/removeBuild`, build.id)
         .then(() => {
@@ -379,11 +438,13 @@ export default {
         .finally(() => { this.removing = false; });
     },
   },
+
+  updated() {
+    this.initTooltips();
+  },
+
   mounted() {
-    // Init tooltips in component
-    this.$M.Tooltip.init(
-      this.$el.querySelectorAll('.tooltipped'),
-    );
+    this.initTooltips();
   },
 };
 </script>
