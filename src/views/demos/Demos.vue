@@ -489,28 +489,10 @@ export default {
           this.error = error;
         });
     },
-
+    
+    //Export all Demos in Exsel file
     exportDemos() {
       this.$store.dispatch('demo/getDemosExport');
-
-      // axios({
-      //   url: 'http://localhost:8022/v1/demos/export',
-      //   method: 'GET',
-      //   headers: {
-      //     'X-AUTH-TOKEN': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE1OTYxOTY4NjgsIm5hbSI6IkFsZWtzYW5kYXIgVHNlbm92IiwidXNyIjoiYXRzZW5vdiIsImVtbCI6ImF0c2Vub3ZAY29kaXguYmciLCJleHAiOjE1OTYyMDA3NjgsInR5cCI6ImF1dGgiLCJwZXIiOiIqIn0.IItP_7tQuw2LE3oInK04dXFqTzm_7tEDq-wf1BDAgpmeAhndBpVNlBB00skXCfkz4UuentN2Db7s9cRBxCEgjk9vpYO8INZxbTgMdJC6mHjw2zR4QXZzbAUmeLEmya-gEYi6GiqE_DgtYaf4NCPetDA48hfgo4FxDNYx7rpijsn9uWfTurpw8uaZYYbwgbuAdb036fQkMrkyrE3Fs-t-W3LWhqWtymxXTgGis27VEI_oPYEhX_CrAs8dg3FXR2VPb6Ovg7mwk5vGMzvLU5nfxFcN3bvjfnZiLKL-Qs8VnJv__P__NzzF1279XbHh2MaT0n-LFxKYY77daW70Z5XPRA'
-      //   },
-      //   responseType: 'blob',
-      // }).then((response) => {
-      //   var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-      //   var fileLink = document.createElement('a');
-      //   var dateNow = DateTime.local().toLocaleString(DateTime.DATE_SHORT);
-
-      //   fileLink.href = fileURL;
-      //   fileLink.setAttribute('download', dateNow + '_demos.xlsx');
-      //   document.body.appendChild(fileLink);
-
-      //   fileLink.click();
-      // });
     },
   },
   mounted() {

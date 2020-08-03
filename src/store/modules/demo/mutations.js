@@ -24,7 +24,4 @@ export default {
       return state.demos;
     });
   },
-  demosExport(state, demos) {
-    state.demos = demos;
-  },
 };
