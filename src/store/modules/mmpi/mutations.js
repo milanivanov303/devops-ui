@@ -4,6 +4,9 @@ export default {
   instances(state, instances) {
     state.instances = instances;
   },
+  deployInstances(state, deployInstances) {
+    state.deploy_instances = deployInstances;
+  },
   projects(state, projects) {
     state.projects = projects;
   },

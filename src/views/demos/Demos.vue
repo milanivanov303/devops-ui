@@ -5,7 +5,7 @@
         :data="demos"
         sort-by="created_on"
         sort-dir="desc"
-        :export-btn="false"
+        @export="exportDemos()"
         :view-btn="false"
         :delete-btn="false"
         @add="openAddEditDemoModal({}, 'create')"
@@ -287,7 +287,7 @@ export default {
     };
   },
   validations() {
-    let validations = {
+    const validations = {
       demo: {
         name: {
           required,
@@ -309,7 +309,7 @@ export default {
         active_to: {
           required,
         },
-      }
+      },
     };
 
     if (this.demo.status && this.demo.status.value === 'rejected') {
@@ -488,6 +488,11 @@ export default {
         .catch((error) => {
           this.error = error;
         });
+    },
+    
+    //Export all Demos in Exsel file
+    exportDemos() {
+      this.$store.dispatch('demo/getDemosExport');
     },
   },
   mounted() {
