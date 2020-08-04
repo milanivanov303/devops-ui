@@ -21,7 +21,7 @@
         <td>{{ $date(build.created_on).toHuman() }}</td>
         <td v-html="getStatusText(build)"></td>
         <td class="quick-actions">
-          <Progress v-if="updating"/>
+          <Progress v-if="updating === build.id"/>
           <div v-else>
             <a
               @click="start(build)"
@@ -408,14 +408,14 @@ export default {
     },
 
     start(build) {
-      this.updating = true;
+      this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/start', build.id)
         .finally(() => { this.updating = false; });
     },
 
     stop(build) {
-      this.updating = true;
+      this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/stop', build.id)
         .finally(() => { this.updating = false; });
