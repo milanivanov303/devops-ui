@@ -119,7 +119,6 @@ export default {
         }).finally(() => loader1.hide());
     },
     getDemos() {
-      debugger;
       const loader = this.$loading.show({ container: this.$refs.demos });
 
       const promise1 = this.$store.dispatch('demo/getDemosForPeriod',

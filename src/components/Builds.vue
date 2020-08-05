@@ -11,84 +11,100 @@
 
     <table ref="builds">
       <thead>
-        <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th v-if="showModule">Module</th>
-          <th>Created By</th>
-          <th>Created On</th>
-          <th>Removed On</th>
-          <th>Status</th>
-          <th>Quick Actions</th>
-        </tr>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th v-if="showModule">Module</th>
+        <th>Created By</th>
+        <th>Created On</th>
+        <th>Status</th>
+        <th>Quick Actions</th>
+      </tr>
       </thead>
       <tbody>
-        <tr v-for="(build, index) in sortedbuilds" :key="index">
-          <td>{{ index + 1 }}</td>
-          <td>{{ getBuildName(build) }}</td>
-          <td v-if="showModule">{{ build.module }}</td>
-          <td>{{ build.details.created_by }}</td>
-          <td>{{ $date(build.created_on).toHuman() }}</td>
-          <td>{{ build.removed_on ? $date(build.removed_on).toHuman() : ''}}</td>
-          <td><div class="chip"
-                  :class="{ 'active': build.status === 'running',
-                            'failed': build.status === 'failed',
-                            'removed': build.status === 'removed'}">
-            <b>{{ build.status }}</b>
-          </div></td>
-          <td class="quick-actions">
-            <a v-if="build.status ==='running'"
-              :href="getBuildUrl(build)"
+      <tr v-for="(build, index) in sortedbuilds" :key="index">
+        <td>{{ index + 1 }}</td>
+        <td>{{ getName(build) }}</td>
+        <td v-if="showModule">{{ build.module }}</td>
+        <td>{{ build.details.created_by }}</td>
+        <td>{{ $date(build.created_on).toHuman() }}</td>
+        <td v-html="getStatusText(build)"></td>
+        <td class="quick-actions">
+          <Progress v-if="updating === build.id"/>
+          <div v-else>
+            <a
+              @click="start(build)"
               target="_blank"
-              data-tooltip="Open build"
+              data-tooltip="Start"
               class="green-text tooltipped"
+              v-if="build.status === 'stopped'"
+            >
+              <i class="material-icons">play_arrow</i>
+            </a>
+            <a
+              @click="stop(build)"
+              target="_blank"
+              data-tooltip="Stop"
+              class="red-text tooltipped"
+              v-if="build.status === 'running'"
+            >
+              <i class="material-icons">stop</i>
+            </a>
+            <a
+              :href="getUrl(build)"
+              target="_blank"
+              data-tooltip="Open"
+              class="green-text tooltipped"
+              v-if="build.status === 'running'"
             >
               <i class="material-icons">launch</i>
             </a>
             <a
-              @click="openBuildInfoModal(build)"
-              data-tooltip="Build details"
+              @click="openInfoModal(build)"
+              data-tooltip="Details"
               class="blue-text tooltipped"
             >
               <i class="material-icons">error_outline</i>
             </a>
-            <a v-if="getWebssh2Url(build) && build.status ==='running'"
+            <a
               :href="getWebssh2Url(build)"
               target="_blank"
               data-tooltip="Open terminal"
               class="tooltipped"
+              v-if="build.status === 'running'"
             >
               <i class="material-icons">wysiwyg</i>
             </a>
             <a
-              v-if="canRemoveBuild(build) && build.status ==='running'"
-              @click="openRemoveBuildModal(build)"
-              data-tooltip="Remove build"
+              v-if="canRemove(build)"
+              @click="openRemoveModal(build)"
+              data-tooltip="Remove"
               class="red-text tooltipped"
             >
               <i class="material-icons">delete</i>
             </a>
-          </td>
-        </tr>
-        <tr v-if="sortedbuilds.length === 0">
-          <td colspan="6">There are no builds</td>
-        </tr>
+          </div>
+        </td>
+      </tr>
+      <tr v-if="sortedbuilds.length === 0">
+        <td colspan="6">There are no builds yet</td>
+      </tr>
       </tbody>
     </table>
-    <div class="col s12 m6 l3 right" id="perPage">
+    <div class="col s12 m6 right" id="perPage">
       <div class="input-field col s12 l4 right">
-          <Select class="col s12"
-                  v-if="sortedbuilds.length"
-                  displayed="value"
-                  v-model="perPage"
-                  :options="perPageOptions"
-          />
+        <Select class="col s12"
+                v-if="sortedbuilds.length"
+                displayed="value"
+                v-model="perPage"
+                :options="perPageOptions"
+        />
       </div>
       <p v-if="sortedbuilds.length" class="col s12 l8 right right-align">Items per page:</p>
     </div>
-    <div class="col s12 m6 l6">
+    <div class="col s12 m6">
       <paginate
-        v-if="sortedbuilds.length"
+        v-if="sortedbuilds.length && lastPage > 1"
         v-model="page"
         :page-count="lastPage"
         :click-handler="selectedPage"
@@ -102,8 +118,7 @@
         :active-class="'active'">
       </paginate>
     </div>
-
-    <Modal v-if="showInfoModal" @close="closeBuildInfoModal()" class="right-sheet">
+    <Modal v-if="showInfoModal" @close="closeInfoModal()" class="right-sheet">
       <template v-slot:header>{{ selectedBuild.name }}</template>
       <template v-slot:content>
         <div class="col s12 l11">
@@ -179,6 +194,19 @@
               </label>
             </div>
           </div>
+          <div class="row" v-if="selectedBuild.removed_on">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">event</i>
+              <input
+                class="readonly"
+                type="text"
+                id="removed_on"
+                v-model="selectedBuild.removed_on">
+              <label :class="{active: selectedBuild.removed_on}"
+                     for="created_on">Removed on
+              </label>
+            </div>
+          </div>
           <div class="row">
             <div class="col s12">
               <ul class="tabs col s12 center">
@@ -243,11 +271,12 @@
       </template>
       <template v-slot:footer></template>
     </Modal>
-    <Modal v-if="showModal" @close="showModal = false" class="confirm">
+
+    <Modal v-if="showRemoveModal" @close="showRemoveModal = false" class="confirm">
       <template v-slot:content>
         <div v-if="removing" class="center" >
           <Preloader class="big"></Preloader>
-          <p>Removing build <b>{{ getBuildName(selectedBuild) }}</b> ... </p>
+          <p>Removing build <b>{{ getName(selectedBuild) }}</b> ... </p>
         </div>
         <div v-else-if="removed" class="center" >
           <i class="material-icons large green-text">check_circle_outline</i>
@@ -258,14 +287,14 @@
           <p>{{ error }}</p>
         </div>
         <div v-else>
-          Are you sure you what to remove <b>{{ getBuildName(selectedBuild) }}</b> build?
+          Are you sure you what to remove <b>{{ getName(selectedBuild) }}</b> build?
         </div>
       </template>
       <template v-slot:footer>
         <button
           v-if="!removing && !removed"
           class="waves-effect btn red"
-          @click="removeBuild(selectedBuild)"
+          @click="remove(selectedBuild)"
         >
           <i class="material-icons left">delete</i> Remove
         </button>
@@ -292,14 +321,15 @@ export default {
     },
   },
   components: {
-    paginate: Paginate,
+    Paginate,
   },
   data() {
     return {
       status: ['running'],
       selectedBuild: {},
       showInfoModal: false,
-      showModal: false,
+      showRemoveModal: false,
+      updating: false,
       removing: false,
       removed: false,
       error: null,
@@ -346,32 +376,33 @@ export default {
     },
 
     sortedbuilds() {
-      const from = (this.page * this.perPage.value) - this.perPage.value;
-      const to = (this.page * this.perPage.value);
-      const data = this.activeBuilds.concat(this.removedBuilds, this.failedBuilds);
-      this.setLastPage(data);
-      return data.slice(from, to);
+      return this.activeBuilds.concat(this.removedBuilds, this.failedBuilds);
     },
   },
   methods: {
     getBuilds() {
+      //perPage: shows for each status 
       if (this.status.length !== 0) {
         this.status.forEach((status) => {
           const loader = this.$loading.show({ container: this.$refs.builds });
-
           this.$store.dispatch('builds/getBuildsByStatus', {
             branch: this.branch,
             module: this.module,
             status,
             user: this.user,
-          }).then(() => loader.hide());
+            perPage: this.perPage.value,
+            page: this.page,
+          }).then(() => {
+            this.setLastPage();
+            loader.hide();
+          });
         });
       } else {
         this.$M.toast({ html: 'Choose build status', classes: 'toast-fail' });
       }
     },
 
-    getBuildPublishedPort(build, port) {
+    getPublishedPort(build, port) {
       try {
         return build.details.service.Endpoint.Ports
           .find(value => value.TargetPort === port).PublishedPort;
@@ -379,48 +410,37 @@ export default {
         return null;
       }
     },
-    getBuildUrl(build) {
+
+    getUrl(build) {
       const { host } = this.$store.state[build.module];
       try {
         let port;
         try {
           port = build.details.container.NetworkSettings.Ports['8080/tcp'][0].HostPort;
-          return `http://${host}:${port}/${this.getBuildName(build)}/`;
+          return `http://${host}:${port}/${this.getName(build)}/`;
         } catch (e) {
           port = build.details.container.NetworkSettings.Ports['8591/tcp'][0].HostPort;
-          return `http://${host}:${port}/${this.getBuildName(build)}/`;
+          return `http://${host}:${port}/${this.getName(build)}/`;
         }
       } catch (e) {
-        const port = this.getBuildPublishedPort(build, 8080);
+        const port = this.getPublishedPort(build, 8080);
         if (port) {
-          return `http://${host}:${port}/${this.getBuildName(build)}/`;
+          return `http://${host}:${port}/${this.getName(build)}/`;
         }
         return null;
       }
     },
     getWebssh2Url(build) {
       const { host } = this.$store.state[build.module];
-      const port = this.getBuildPublishedPort(build, 22);
+      const port = this.getPublishedPort(build, 22);
 
       if (host && port) {
         return `http://${window.location.hostname}:${config.webssh2_port}/ssh/host/${host}?port=${port}`;
       }
       return null;
     },
-    getBuildName(build) {
-      if (build.status === 'failed') {
-        try {
-          return build.details.branch.concat(
-            '_', build.details.client.name,
-            '_', build.details.instance.name,
-            '_', build.details.java_version,
-            '_', build.created_on,
-          );
-        } catch (e) {
-          return 'could-not-get-build-name';
-        }
-      }
 
+    getName(build) {
       try {
         return build.details.container.Config.Labels.build;
       } catch (e) {
@@ -437,15 +457,29 @@ export default {
       }
     },
 
-    openBuildInfoModal(build) {
+    getStatusText(build) {
+      if (build.status === 'running') {
+        return `<span class="new badge green" data-badge-caption="">${build.status}</span>`;
+      }
+
+      if (build.status === 'stopped' || build.status === 'failed') {
+        return `<span class="new badge red" data-badge-caption="">${build.status}</span>`;
+      }
+      return `<span class="new badge" data-badge-caption="">${build.status}</span>`;
+    },
+
+    openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild.name = this.getBuildName(build);
+      this.selectedBuild.name = this.getName(build);
       this.selectedBuild.created_by = build.details.created_by;
       this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
       this.selectedBuild.branch = build.details.branch;
       if (build.details.fe_branch) {
         this.selectedBuild.fe_branch = build.details.fe_branch.name;
+      }
+      if (build.removed_on) {
+        this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
       }
       this.selectedBuild.instance = build.details.instance.name;
       this.selectedBuild.java_version = build.details.java_version;
@@ -470,26 +504,49 @@ export default {
       this.selectedBuild.user = 'enterprise';
       this.selectedBuild.pass = 'Sofphia';
     },
-    closeBuildInfoModal() {
+
+    closeInfoModal() {
       this.showInfoModal = false;
       this.selectedBuild = {};
     },
 
-    canRemoveBuild(build) {
+    canRemove(build) {
       if (this.$auth.can('extranet.remove-builds')) {
         return true;
       }
 
       return this.$auth.getUser().username === build.details.created_by;
     },
-    openRemoveBuildModal(build) {
-      this.showModal = true;
+
+    openRemoveModal(build) {
+      this.showRemoveModal = true;
       this.selectedBuild = build;
       this.removing = false;
       this.removed = false;
       this.error = null;
     },
-    removeBuild(build) {
+
+    initTooltips() {
+      this.$M.Tooltip.init(
+        this.$el.querySelectorAll('.tooltipped'),
+      );
+    },
+
+    start(build) {
+      this.updating = build.id;
+      this.initTooltips();
+      this.$store.dispatch('builds/start', build.id)
+        .finally(() => { this.updating = false; });
+    },
+
+    stop(build) {
+      this.updating = build.id;
+      this.initTooltips();
+      this.$store.dispatch('builds/stop', build.id)
+        .finally(() => { this.updating = false; });
+    },
+
+    remove(build) {
       this.removing = true;
       this.$store.dispatch(`${build.module}/removeBuild`, build.id)
         .then(() => {
@@ -508,9 +565,10 @@ export default {
 
     selectedPage(page) {
       this.page = page;
+      this.getBuilds();
     },
-    setLastPage(data) {
-      this.lastPage = Math.ceil(data.length / this.perPage.value);
+    setLastPage() {
+      this.lastPage = Math.ceil(this.$store.state.builds.paginationData.total / this.perPage.value);
     },
   },
   watch: {
@@ -518,21 +576,23 @@ export default {
       this.getBuilds();
     },
     perPage() {
-      this.setLastPage(this.builds);
+      this.getBuilds();
     },
   },
+
+  updated() {
+    this.initTooltips();
+  },
+
   mounted() {
+    this.initTooltips();
     this.getBuilds();
-
-    // Init select
     this.$M.FormSelect.init(document.querySelector('select'));
-
-    // Init tooltops
-    this.$M.Tooltip.init(document.querySelectorAll('.tooltipped'));
   },
 
 };
 </script>
+
 <style scoped lang='scss'>
   input:read-only {
     color: black !important;
@@ -542,23 +602,7 @@ export default {
     margin-bottom: 25px;
   }
   .quick-actions a {
-      margin: 0px 2.5px;
-  }
-  .chip{
-    background-color: white;
-    border-radius: 7px;
-    &.failed {
-      border: solid red 2px;
-      color: red;
-    }
-    &.active {
-      border: solid #4CAF50 2px;
-      color: #4CAF50;
-    }
-    &.removed {
-      border: solid darkslategray 2px;
-      color: darkslategray;
-    }
+    margin: 0px 2.5px;
   }
   #perPage {
     > div {
