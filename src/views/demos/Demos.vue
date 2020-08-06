@@ -489,8 +489,8 @@ export default {
           this.error = error;
         });
     },
-    
-    //Export all Demos in Exsel file
+
+    // Export all Demos in Exsel file
     exportDemos() {
       this.$store.dispatch('demo/getDemosExport');
     },

@@ -8,7 +8,7 @@
       </select>
       <label>View builds with status:</label>
     </div>
-    
+
     <table ref="builds">
       <thead>
       <tr>
@@ -22,7 +22,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(build, index) in sortedbuilds" :key="index">
+      <tr v-for="(build, index) in builds" :key="index">
         <td>{{ (page - 1) * perPage.value + index + 1 }}</td>
         <td>{{ getName(build) }}</td>
         <td v-if="showModule">{{ build.module }}</td>
@@ -86,7 +86,7 @@
           </div>
         </td>
       </tr>
-      <tr v-if="sortedbuilds.length === 0">
+      <tr v-if="builds.length === 0">
         <td colspan="6">There are no builds yet</td>
       </tr>
       </tbody>
@@ -94,17 +94,17 @@
     <div class="col s12 m6 right" id="perPage">
       <div class="input-field col s12 l4 right">
         <Select class="col s12"
-                v-if="sortedbuilds.length"
+                v-if="builds.length"
                 displayed="value"
                 v-model="perPage"
                 :options="perPageOptions"
         />
       </div>
-      <p v-if="sortedbuilds.length" class="col s12 l8 right right-align">Items per page:</p>
+      <p v-if="builds.length" class="col s12 l8 right right-align">Items per page:</p>
     </div>
     <div class="col s12 m6">
       <paginate
-        v-if="sortedbuilds.length && lastPage > 1"
+        v-if="builds.length && lastPage > 1"
         v-model="page"
         :page-count="lastPage"
         :click-handler="selectedPage"
@@ -356,50 +356,28 @@ export default {
     };
   },
   computed: {
-    activeBuilds() {
-      if (this.status.includes('running')) {
-        return this.$store.state.builds.builds.running || [];
-      }
-      return [];
-    },
-    removedBuilds() {
-      if (this.status.includes('removed')) {
-        return this.$store.state.builds.builds.removed || [];
-      }
-      return [];
-    },
-    failedBuilds() {
-      if (this.status.includes('failed')) {
-        return this.$store.state.builds.builds.failed || [];
-      }
-      return [];
-    },
-
-    sortedbuilds() {
-      return this.activeBuilds.concat(this.removedBuilds, this.failedBuilds);
+    builds() {
+      return this.$store.state.builds.builds;
     },
   },
   methods: {
     getBuilds() {
-      //perPage: shows for each status 
-      if (this.status.length !== 0) {
-        this.status.forEach((status) => {
-          const loader = this.$loading.show({ container: this.$refs.builds });
-          this.$store.dispatch('builds/getBuildsByStatus', {
-            branch: this.branch,
-            module: this.module,
-            status,
-            user: this.user,
-            perPage: this.perPage.value,
-            page: this.page,
-          }).then(() => {
-            this.setLastPage();
-            loader.hide();
-          });
-        });
-      } else {
+      if (this.status.length === 0) {
         this.$M.toast({ html: 'Choose build status', classes: 'toast-fail' });
       }
+
+      const loader = this.$loading.show({ container: this.$refs.builds });
+      this.$store.dispatch('builds/getBuildsByStatus', {
+        branch: this.branch,
+        module: this.module,
+        status: this.status,
+        user: this.user,
+        perPage: this.perPage.value,
+        page: this.page,
+      }).then(() => {
+        this.setLastPage();
+        loader.hide();
+      });
     },
 
     getPublishedPort(build, port) {
@@ -454,6 +432,7 @@ export default {
             return 'could-not-get-build-name';
           });
         }
+        return 'could-not-get-build-name';
       }
     },
 

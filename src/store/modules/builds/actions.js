@@ -53,49 +53,50 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            "details->service->Spec->Name": name,
+            'details->service->Spec->Name': name,
           },
         ],
       }),
     });
-	
+
     promise
       .catch(() => commit('error', 'Could not get build by name', { root: true }));
     return promise;
   },
-	
-	
+
+
   start({ commit }, id) {
     const promise = api.post(`builds/${id}/start`);
-	
+
     promise
       .then(() => commit('markAsRunning', id))
-      .catch(() => commit('error', 'Could not start build', { root: true }));	
+      .catch(() => commit('error', 'Could not start build', { root: true }));
 
     return promise;
   },
-	
+
   stop({ commit }, id) {
     const promise = api.post(`builds/${id}/stop`);
-	
+
     promise
       .then(() => commit('markAsStopped', id))
       .catch(() => commit('error', 'Could not stop build', { root: true }));
 
     return promise;
-	
   },
-  
+
   getBuildsByStatus({ commit }, {
-    branch, module, status, user, perPage, page
+    branch, module, status, user, perPage, page,
   }) {
     const promise = api.get('builds', {
-      
+
       filters: JSON.stringify({
         allOf: [
           {
-            // "anyOf":[{"status":"running"},{"status":"stopped"}]
-            status,
+            status: {
+              operator: 'in',
+              value: status,
+            },
           },
           {
             module,
@@ -108,13 +109,16 @@ export default {
           },
         ],
       }),
+      orders: JSON.stringify({
+        status: 'asc',
+      }),
       per_page: perPage,
-      page: page,
+      page,
     });
 
     promise
       .then((response) => {
-        commit('builds', { status, builds: response.data.data, paginationData: response.data.meta });
+        commit('builds', { builds: response.data.data, paginationData: response.data.meta });
       })
       .catch(() => commit('error', 'Could not get builds list', { root: true }));
 

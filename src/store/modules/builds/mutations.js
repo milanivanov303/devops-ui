@@ -8,9 +8,9 @@ export default {
   statistics(state, { name, data }) {
     Vue.set(state.statistics, name, data);
   },
-  
-  builds(state, { status, builds, paginationData }) {
-    Vue.set(state.builds, status, builds);
+
+  builds(state, { builds, paginationData }) {
+    state.builds = builds;
     state.paginationData = paginationData;
   },
 

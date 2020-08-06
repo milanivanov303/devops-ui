@@ -1,6 +1,6 @@
 export default {
   active: [],
   statistics: {},
-  builds: {},
-  paginationData: {}, 
+  builds: [],
+  paginationData: {},
 };
