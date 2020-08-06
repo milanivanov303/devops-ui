@@ -8,7 +8,7 @@
       </select>
       <label>View builds with status:</label>
     </div>
-
+    
     <table ref="builds">
       <thead>
       <tr>
@@ -23,7 +23,7 @@
       </thead>
       <tbody>
       <tr v-for="(build, index) in sortedbuilds" :key="index">
-        <td>{{ index + 1 }}</td>
+        <td>{{ (page - 1) * perPage.value + index + 1 }}</td>
         <td>{{ getName(build) }}</td>
         <td v-if="showModule">{{ build.module }}</td>
         <td>{{ build.details.created_by }}</td>

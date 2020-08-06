@@ -94,6 +94,7 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
+            // "anyOf":[{"status":"running"},{"status":"stopped"}]
             status,
           },
           {
