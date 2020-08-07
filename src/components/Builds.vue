@@ -552,6 +552,7 @@ export default {
   },
   watch: {
     status() {
+      this.page = 1;
       this.getBuilds();
     },
     perPage() {
