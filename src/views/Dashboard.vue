@@ -34,7 +34,7 @@
                 <td>{{ debiteurBuildsCount }}</td>
               </tr>
               <tr>
-                <td>2</td>
+                <td>3</td>
                 <td>
                   <router-link to="/imx-fe/dashboard">iMX FE</router-link>
                 </td>

@@ -2,7 +2,8 @@
   <div class="row">
     <div class="input-field col s12 m6 l3 right">
       <select class="select" multiple v-model="status">
-        <option selected value="running">Active</option>
+        <option value="running">Running</option>
+        <option value="stopped">Stopped</option>
         <option value="removed">Removed</option>
         <option value="failed">Failed</option>
       </select>
@@ -325,7 +326,7 @@ export default {
   },
   data() {
     return {
-      status: ['running'],
+      status: ['running', 'stopped'],
       selectedBuild: {},
       showInfoModal: false,
       showRemoveModal: false,
