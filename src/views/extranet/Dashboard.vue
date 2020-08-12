@@ -4,7 +4,7 @@
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
           <div class="card-content">
-            <span class="card-title">My active extranet builds</span>
+            <span class="card-title">My extranet builds</span>
             <Builds :user="this.$auth.getUser().username" :module="'extranet'"></Builds>
           </div>
         </div>

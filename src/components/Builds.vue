@@ -1,13 +1,13 @@
 <template>
   <div class="row">
     <div class="input-field col s12 m6 l3 right">
+      <i class="material-icons prefix">timelapse</i>
       <select class="select" multiple v-model="status">
         <option value="running">Running</option>
         <option value="stopped">Stopped</option>
         <option value="removed">Removed</option>
         <option value="failed">Failed</option>
       </select>
-      <label>View builds with status:</label>
     </div>
 
     <table ref="builds">
@@ -77,7 +77,7 @@
               <i class="material-icons">wysiwyg</i>
             </a>
             <a
-              v-if="canRemove(build)"
+              v-if="canRemove(build) & build.status === 'running' && build.status !== 'stopped'"
               @click="openRemoveModal(build)"
               data-tooltip="Remove"
               class="red-text tooltipped"

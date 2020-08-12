@@ -4,7 +4,7 @@
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
           <div class="card-content">
-            <span class="card-title">My active debiteur builds</span>
+            <span class="card-title">My debiteur builds</span>
             <Builds :user="this.$auth.getUser().username" :module="'debiteur'"></Builds>
           </div>
         </div>
