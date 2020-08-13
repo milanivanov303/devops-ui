@@ -4,8 +4,8 @@
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
           <div class="card-content">
-            <span class="card-title">My active extranet builds</span>
-            <Builds :builds="userActiveBuilds"/>
+            <span class="card-title">My extranet builds</span>
+            <Builds :user="this.$auth.getUser().username" :module="'extranet'"></Builds>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
@@ -116,9 +116,6 @@ export default {
   computed: {
     host() {
       return this.$store.state.extranet.host;
-    },
-    userActiveBuilds() {
-      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'extranet');
     },
     activeBuildsGroupedByBranch() {
       return this.$store.getters['builds/getActiveGroupedByBranch']('extranet');

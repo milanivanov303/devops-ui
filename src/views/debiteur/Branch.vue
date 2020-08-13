@@ -5,7 +5,7 @@
         <h4>{{ branch }}</h4>
       </div>
     </div>
-    <Builds :builds="builds"/>
+    <Builds/>
     <br>
     <Build />
   </div>
@@ -24,12 +24,9 @@ export default {
     branch() {
       return this.$route.params.branch;
     },
-    containers() {
-      return this.$store.getters['debiteur/getContainersByBranch'](this.branch);
-    },
-    builds() {
-      return this.$store.getters['builds/getActiveByBranch'](this.branch);
-    },
+    // containers() {
+    //   return this.$store.getters['debiteur/getContainersByBranch'](this.branch);
+    // },
   },
 };
 </script>

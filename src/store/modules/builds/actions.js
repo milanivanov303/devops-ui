@@ -48,7 +48,6 @@ export default {
 
     return promise;
   },
-
   getBuildByName({ commit }, { name }) {
     const promise = api.get('builds', {
       filters: JSON.stringify({
@@ -62,9 +61,9 @@ export default {
 
     promise
       .catch(() => commit('error', 'Could not get build by name', { root: true }));
-
     return promise;
   },
+
 
   start({ commit }, id) {
     const promise = api.post(`builds/${id}/start`);
@@ -82,6 +81,46 @@ export default {
     promise
       .then(() => commit('markAsStopped', id))
       .catch(() => commit('error', 'Could not stop build', { root: true }));
+
+    return promise;
+  },
+
+  getBuildsByStatus({ commit }, {
+    branch, module, status, user, perPage, page,
+  }) {
+    const promise = api.get('builds', {
+
+      filters: JSON.stringify({
+        allOf: [
+          {
+            status: {
+              operator: 'in',
+              value: status,
+            },
+          },
+          {
+            module,
+          },
+          {
+            'details->branch': branch,
+          },
+          {
+            'details->created_by': user,
+          },
+        ],
+      }),
+      orders: JSON.stringify({
+        status: 'asc',
+      }),
+      per_page: perPage,
+      page,
+    });
+
+    promise
+      .then((response) => {
+        commit('builds', { builds: response.data.data, paginationData: response.data.meta });
+      })
+      .catch(() => commit('error', 'Could not get builds list', { root: true }));
 
     return promise;
   },

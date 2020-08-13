@@ -9,6 +9,11 @@ export default {
     Vue.set(state.statistics, name, data);
   },
 
+  builds(state, { builds, paginationData }) {
+    state.builds = builds;
+    state.paginationData = paginationData;
+  },
+
   markAsRunning(state, id) {
     const build = state.active.find(build => build.id === id);
     build.status = 'running';

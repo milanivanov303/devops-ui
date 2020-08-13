@@ -1,7 +1,7 @@
 // https://vuex.vuejs.org/en/actions.html
+import { DateTime } from 'luxon';
 import Api from '../../../plugins/api';
 import config from '../../../config';
-import { DateTime } from 'luxon';
 
 const api = new Api(config.devops.url, config.devops.code);
 
@@ -59,23 +59,24 @@ export default {
    */
   getDemosExport({ commit }) {
     const promise = api.get(
-      'demos/export', 
+      'demos/export',
       '',
       {
         responseType: 'blob',
-      });
+      },
+    );
     promise
-    .then(response => {
-      let fileURL = window.URL.createObjectURL(new Blob([response.data]));
-      let fileLink = document.createElement('a');
- 
-      fileLink.href = fileURL;
-      fileLink.setAttribute('download', DateTime.local().toFormat('dd_MM_y') + '_demos.xlsx');
-      document.body.appendChild(fileLink);
- 
-      fileLink.click();
-    })
-    .catch(error => commit('error', error));
+      .then((response) => {
+        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        const fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', `${DateTime.local().toFormat('dd_MM_y')}_demos.xlsx`);
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      })
+      .catch(error => commit('error', error));
     return promise;
   },
 };
