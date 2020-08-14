@@ -8,6 +8,10 @@ module.exports = {
     url: process.env.VUE_APP_USER_MANAGEMENT_API_URL,
     code: process.env.VUE_APP_USER_MANAGEMENT_API_CODE,
   },
+  cms: {
+    url: process.env.VUE_APP_CMS_API_URL,
+    code: process.env.VUE_APP_CMS_API_CODE,
+  },
   devops: {
     url: process.env.VUE_APP_DEVOPS_API_URL,
     code: process.env.VUE_APP_DEVOPS_API_CODE,

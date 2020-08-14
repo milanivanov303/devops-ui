@@ -13,6 +13,10 @@ const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/im
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard.vue');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos.vue');
+const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults.vue');
+const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/ResponseFile.vue');
+const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates.vue');
+const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory.vue');
 const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
 const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions.vue');
@@ -234,6 +238,46 @@ export default [
       breadcrumb: 'Demo',
     },
     component: DemosList,
+  },
+  {
+    path: '/cms/config-defaults',
+    meta: {
+      alias: '/configDefaults',
+      name: 'configDefaults',
+      requiresAuth: true,
+      breadcrumb: 'Config Defaults',
+    },
+    component: ConfigDefaults,
+  },
+  {
+    path: '/cms/response-file',
+    meta: {
+      alias: '/responseFile',
+      name: 'responseFile',
+      requiresAuth: true,
+      breadcrumb: 'Response File',
+    },
+    component: ResponseFile,
+  },
+  {
+    path: '/cms/inventory',
+    meta: {
+      alias: '/inventory',
+      name: 'inventory',
+      requiresAuth: true,
+      breadcrumb: 'Inventory',
+    },
+    component: Inventory,
+  },
+  {
+    path: '/cms/templates',
+    meta: {
+      alias: '/templates',
+      name: 'templates',
+      requiresAuth: true,
+      breadcrumb: 'Templates',
+    },
+    component: Templates,
   },
   {
     path: '/administration/users/:username?',
