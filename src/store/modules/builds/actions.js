@@ -48,7 +48,8 @@ export default {
 
     return promise;
   },
-  getBuildByName({ commit }, { name }) {
+
+  findBuildByName({ commit }, name) {
     const promise = api.get('builds', {
       filters: JSON.stringify({
         allOf: [

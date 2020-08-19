@@ -19,6 +19,7 @@ const AdministrationActions = () => import(/* webpackChunkName: "administration-
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
+const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild.vue');
 
 export default [
   {
@@ -274,6 +275,14 @@ export default [
       requiresAuth: false,
     },
     component: LoggedInSSOUser,
+  },
+  {
+    path: '/builds/:name/*',
+    meta: {
+      layout: 'basic',
+      requiresAuth: false,
+    },
+    component: OpenBuild,
   },
   {
     path: '*',

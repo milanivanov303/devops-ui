@@ -9,6 +9,7 @@ import store from './store';
 
 import DefaultLayout from './components/layouts/Default';
 import LoginLayout from './components/layouts/Login';
+import BasicLayout from './components/layouts/Basic'
 
 import '@/config';
 import auth from './plugins/auth';
@@ -27,6 +28,7 @@ Vue.prototype.$auth = auth;
 Vue.prototype.$date = date;
 
 Vue.component('default-layout', DefaultLayout);
+Vue.component('basic-layout', BasicLayout);
 Vue.component('login-layout', LoginLayout);
 
 Vue.config.productionTip = false;
