@@ -370,11 +370,10 @@ export default {
         perPage: this.perPage.value,
         page: this.page,
       })
-        .then(response => {
+        .then((response) => {
           this.builds = response.data.data;
           this.paginationData = response.data.meta;
           this.setLastPage();
-
         })
         .finally(() => loader.hide());
     },
@@ -515,7 +514,7 @@ export default {
       this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/start', build.id)
-        .then(() => this.updateBuildStatus(build, 'running'))
+        .then(() => { build.status = 'running'; })
         .finally(() => { this.updating = false; });
     },
 
@@ -523,13 +522,8 @@ export default {
       this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/stop', build.id)
-        .then(() => this.updateBuildStatus(build, 'stopped'))
+        .then(() => { build.status = 'stopped'; })
         .finally(() => { this.updating = false; });
-    },
-
-    updateBuildStatus(build, status) {
-      const _build = this.builds.find(_build => _build.id === build.id);
-      _build.status = status;
     },
 
     remove(build) {
