@@ -69,7 +69,6 @@ export default {
     const promise = api.post(`builds/${id}/start`);
 
     promise
-      .then(() => commit('markAsRunning', id))
       .catch(() => commit('error', 'Could not start build', { root: true }));
 
     return promise;
@@ -79,7 +78,6 @@ export default {
     const promise = api.post(`builds/${id}/stop`);
 
     promise
-      .then(() => commit('markAsStopped', id))
       .catch(() => commit('error', 'Could not stop build', { root: true }));
 
     return promise;
@@ -117,9 +115,6 @@ export default {
     });
 
     promise
-      .then((response) => {
-        commit('builds', { builds: response.data.data, paginationData: response.data.meta });
-      })
       .catch(() => commit('error', 'Could not get builds list', { root: true }));
 
     return promise;

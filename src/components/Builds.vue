@@ -77,7 +77,7 @@
               <i class="material-icons">wysiwyg</i>
             </a>
             <a
-              v-if="canRemove(build) & build.status === 'running' && build.status !== 'stopped'"
+              v-if="canRemove(build) && (build.status === 'running' || build.status === 'stopped')"
               @click="openRemoveModal(build)"
               data-tooltip="Remove"
               class="red-text tooltipped"
@@ -326,6 +326,8 @@ export default {
   },
   data() {
     return {
+      builds: [],
+      paginationData: {},
       status: ['running', 'stopped'],
       selectedBuild: {},
       showInfoModal: false,
@@ -356,18 +358,10 @@ export default {
       ],
     };
   },
-  computed: {
-    builds() {
-      return this.$store.state.builds.builds;
-    },
-  },
   methods: {
     getBuilds() {
-      if (this.status.length === 0) {
-        this.$M.toast({ html: 'Choose build status', classes: 'toast-fail' });
-      }
-
       const loader = this.$loading.show({ container: this.$refs.builds });
+
       this.$store.dispatch('builds/getBuildsByStatus', {
         branch: this.branch,
         module: this.module,
@@ -375,10 +369,14 @@ export default {
         user: this.user,
         perPage: this.perPage.value,
         page: this.page,
-      }).then(() => {
-        this.setLastPage();
-        loader.hide();
-      });
+      })
+        .then(response => {
+          this.builds = response.data.data;
+          this.paginationData = response.data.meta;
+          this.setLastPage();
+
+        })
+        .finally(() => loader.hide());
     },
 
     getPublishedPort(build, port) {
@@ -409,6 +407,7 @@ export default {
         return null;
       }
     },
+
     getWebssh2Url(build) {
       const { host } = this.$store.state[build.module];
       const port = this.getPublishedPort(build, 22);
@@ -516,6 +515,7 @@ export default {
       this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/start', build.id)
+        .then(() => this.updateBuildStatus(build, 'running'))
         .finally(() => { this.updating = false; });
     },
 
@@ -523,7 +523,13 @@ export default {
       this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/stop', build.id)
+        .then(() => this.updateBuildStatus(build, 'stopped'))
         .finally(() => { this.updating = false; });
+    },
+
+    updateBuildStatus(build, status) {
+      const _build = this.builds.find(_build => _build.id === build.id);
+      _build.status = status;
     },
 
     remove(build) {
@@ -547,8 +553,9 @@ export default {
       this.page = page;
       this.getBuilds();
     },
+
     setLastPage() {
-      this.lastPage = Math.ceil(this.$store.state.builds.paginationData.total / this.perPage.value);
+      this.lastPage = Math.ceil(this.paginationData.total / this.perPage.value);
     },
   },
   watch: {
