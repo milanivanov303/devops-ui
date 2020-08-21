@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container">
+    <div class="col s12 l12">
       <h1 class="center">Templates</h1>
       <custom-confirm ref="custom-confirm"
                       :message="confirmMsg"
@@ -27,7 +27,7 @@
             <div class="row">
               <div class="input-field col s12 center-align">
                 <a href="#!"
-                  @click="showMsg = true"
+                  @click="showMsg = `true`"
                   class="btn waves-effect waves-light"
                   style="data-original-height: 0"
                   :disabled="disable">Update</a>

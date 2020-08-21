@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="col s12 l12">
     <h1 class="card-title center-align">Response File</h1>
     <div class="frame">
       <form @submit.prevent="submitted">

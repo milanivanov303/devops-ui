@@ -52,13 +52,13 @@
       </tbody>
     </table>
     <div class="row" v-if="sorted.length && pagination">
-      <div class="col s12 m6 l2 right" id="perPage">
-        <div class="input-field col s5 m4 l4 right">
+      <div class="col s12 m4 l6 right" id="perPage">
+        <div class="input-field col s6 m8 l4 right">
             <Select class="col s12"
                     :select="selectPerPage"
                     @selectedVal="selectedPerPage"/>
         </div>
-        <p class="col s7 m8 l8 right right-align"> Items per page:</p>
+        <p class="col s6 m4 l8 right right-align"> Items per page:</p>
       </div>
       <div class="col s12 m6 l6 left">
         <paginate
@@ -81,10 +81,12 @@
 </template>
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
+import Select from '@/components/partials/Select';
 
 export default {
   components: {
     paginate: Paginate,
+    Select,
   },
   data() {
     const sortOrders = {};
@@ -99,7 +101,7 @@ export default {
       colKey: '',
       page: 1,
       lastPage: 0,
-      perPage: 2,
+      perPage: 10,
       selectPerPage: {
         id: 'perPage_select',
         name: 'perPage',
@@ -164,6 +166,7 @@ export default {
       this.sortOrders[val] *= -1;
     },
     selectedPerPage(value) {
+      console.log(value);
       this.perPage = value.name;
     },
     selectedPage(page) {

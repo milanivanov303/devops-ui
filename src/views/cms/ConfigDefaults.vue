@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="col s12 l12">
     <div class="row">
       <h1 class="card-title center-align col s12">Config Defaults</h1>
     </div>

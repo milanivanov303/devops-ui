@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="col s12 l12">
     <h1 class="center">Inventory</h1>
     <div class="frame">
       <form @submit.prevent="submitted" class="searchForm">
