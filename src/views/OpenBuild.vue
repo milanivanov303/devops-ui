@@ -1,6 +1,6 @@
 <template>
   <div>
-    Open build {{ $route.params.name }} {{ build.status }}
+    <p v-if="build.status !== 'running'">Open build {{ $route.params.name }} {{ build.status }}</p>
 
     <iframe ref="iframe"></iframe>
   </div>
@@ -20,6 +20,7 @@ export default {
   methods: {
     setBuildUrl() {
       let url = this.getUrl(this.build);
+      url = 'https://asparuh.codixfr.private/prt/';
 
       if (this.$route.query.uri) {
         url += this.$route.query.uri;
