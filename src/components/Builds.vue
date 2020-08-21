@@ -4,6 +4,7 @@
       <i class="material-icons prefix">timelapse</i>
       <select class="select" multiple v-model="status">
         <option value="running">Running</option>
+        <option value="building">Building</option>
         <option value="stopped">Stopped</option>
         <option value="removed">Removed</option>
         <option value="failed">Failed</option>
@@ -132,6 +133,12 @@
                 id="branch"
                 v-model="selectedBuild.branch">
               <label :class="{active: selectedBuild.branch}" for="branch">Branch</label>
+            </div>
+          </div>
+          <div v-if="selectedBuild.log !== null" class="row">
+            <label>Logs</label>
+            <div>
+              <div class="log">{{ selectedBuild.log }}</div>
             </div>
           </div>
           <div class="row">
@@ -328,7 +335,7 @@ export default {
     return {
       builds: [],
       paginationData: {},
-      status: ['running', 'stopped'],
+      status: ['running', 'stopped', 'building'],
       selectedBuild: {},
       showInfoModal: false,
       showRemoveModal: false,
@@ -447,6 +454,31 @@ export default {
     },
 
     openInfoModal(build) {
+
+      if (build.status === 'building' && client.connected === true) {
+
+        build.details.broadcast['ack'] = 'client';
+
+        const subscribe = client.subscribe(
+          `/queue/${build.details.broadcast.queue}`,
+          (message) => {
+            const data = JSON.parse(message.body);
+
+            if (data.log) {
+               this.selectedBuild.log += data.log;
+            }
+
+            message.nack();
+
+            if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
+                this.$store.dispatch('builds/getActive');
+                subscribe.unsubscribe();
+            }
+          },
+          build.details.broadcast,
+        );
+      }
+
       this.showInfoModal = true;
 
       this.selectedBuild.name = this.getName(build);
@@ -485,7 +517,9 @@ export default {
 
     closeInfoModal() {
       this.showInfoModal = false;
-      this.selectedBuild = {};
+      this.selectedBuild = {
+        log: null,
+      };
     },
 
     canRemove(build) {
