@@ -4,7 +4,7 @@
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My builds</span>
-          <Builds :user="this.$auth.getUser().username" :show-module="true"></Builds>
+          <Builds :user="this.$auth.getUser().username"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">

@@ -204,11 +204,11 @@ export default {
         .then((response) => {
           this.build.status = 'running';
 
-          if (!client.connected) {
+          if (!this.$ws.isConnected()) {
             return;
           }
 
-          const subscribe = client.subscribe(
+          const subscribe = this.$ws.subscribe(
             `/queue/${response.data.broadcast.queue}`,
             (message) => {
               const data = JSON.parse(message.body);
@@ -225,7 +225,7 @@ export default {
 
               if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
                 this.build.status = data.status;
-                this.$store.dispatch('builds/getActive');
+                this.$emit('created');
                 subscribe.unsubscribe();
               }
             },

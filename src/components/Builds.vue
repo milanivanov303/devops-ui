@@ -15,7 +15,7 @@
       <tr>
         <th>#</th>
         <th>Name</th>
-        <th v-if="showModule">Module</th>
+        <th v-if="!module">Module</th>
         <th>Created By</th>
         <th>Created On</th>
         <th>Status</th>
@@ -26,7 +26,7 @@
       <tr v-for="(build, index) in builds" :key="index">
         <td>{{ (page - 1) * perPage.value + index + 1 }}</td>
         <td>{{ getName(build) }}</td>
-        <td v-if="showModule">{{ build.module }}</td>
+        <td v-if="!module">{{ build.module }}</td>
         <td>{{ build.details.created_by }}</td>
         <td>{{ $date(build.created_on).toHuman() }}</td>
         <td v-html="getStatusText(build)"></td>
@@ -313,12 +313,11 @@ export default {
     module: {
       type: String,
     },
-    user: {
+    branch: {
       type: String,
     },
-    showModule: {
-      type: Boolean,
-      default: false,
+    user: {
+      type: String,
     },
   },
   components: {
@@ -336,7 +335,6 @@ export default {
       removing: false,
       removed: false,
       error: null,
-      branch: this.$route.params.branch,
       page: 1,
       perPage: {
         value: 10,
@@ -531,7 +529,7 @@ export default {
       this.$store.dispatch(`${build.module}/removeBuild`, build.id)
         .then(() => {
           this.removed = true;
-          this.$store.dispatch('builds/getActive');
+          this.builds = this.builds.filter((_build) => _build.id !== build.id);
         })
         .catch((error) => {
           if (error.response.status === 403) {
