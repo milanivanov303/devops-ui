@@ -16,8 +16,10 @@ import Api from './plugins/api';
 import config from '../config';
 import { date } from './plugins/helpers';
 import 'vue-loading-overlay/dist/vue-loading.css';
+import WebSocket from './plugins/ws';
 
 const api = new Api(config.um.url, config.um.code);
+const ws = new WebSocket(config.ws.url, config.ws.username, config.ws.password, config.ws.vhost);
 
 Vue.use(vuEaCore, { store, config, api });
 Vue.use(Loading);
@@ -25,6 +27,7 @@ Vue.use(Vuelidate);
 Vue.prototype.$M = M;
 Vue.prototype.$auth = auth;
 Vue.prototype.$date = date;
+Vue.prototype.$ws = ws;
 
 Vue.component('default-layout', DefaultLayout);
 Vue.component('login-layout', LoginLayout);
