@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import Build from '../../views/extranet/components/Build';
+import Build from './components/Build';
 import Builds from '../../components/Builds';
 
 export default {

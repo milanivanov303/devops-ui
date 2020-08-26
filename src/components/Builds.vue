@@ -529,7 +529,7 @@ export default {
       this.$store.dispatch(`${build.module}/removeBuild`, build.id)
         .then(() => {
           this.removed = true;
-          this.builds = this.builds.filter((_build) => _build.id !== build.id);
+          this.builds = this.builds.filter(_build => _build.id !== build.id);
         })
         .catch((error) => {
           if (error.response.status === 403) {
