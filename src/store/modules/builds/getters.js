@@ -123,4 +123,6 @@ export default {
       return false;
     });
   },
+  paginationData: state => state.paginationData,
+
 };

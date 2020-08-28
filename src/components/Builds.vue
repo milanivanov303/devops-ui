@@ -1,11 +1,21 @@
 <template>
-  <div>
+  <div class="row">
+    <div class="input-field col s12 m6 l3 right">
+      <i class="material-icons prefix">timelapse</i>
+      <select class="select" multiple v-model="status">
+        <option value="running">Running</option>
+        <option value="stopped">Stopped</option>
+        <option value="removed">Removed</option>
+        <option value="failed">Failed</option>
+      </select>
+    </div>
+
     <table ref="builds">
       <thead>
       <tr>
         <th>#</th>
         <th>Name</th>
-        <th v-if="showModule">Module</th>
+        <th v-if="!module">Module</th>
         <th>Created By</th>
         <th>Created On</th>
         <th>Status</th>
@@ -14,9 +24,9 @@
       </thead>
       <tbody>
       <tr v-for="(build, index) in builds" :key="index">
-        <td>{{ index + 1 }}</td>
+        <td>{{ (page - 1) * perPage.value + index + 1 }}</td>
         <td>{{ getName(build) }}</td>
-        <td v-if="showModule">{{ build.module }}</td>
+        <td v-if="!module">{{ build.module }}</td>
         <td>{{ build.details.created_by }}</td>
         <td>{{ $date(build.created_on).toHuman() }}</td>
         <td v-html="getStatusText(build)"></td>
@@ -67,7 +77,7 @@
               <i class="material-icons">wysiwyg</i>
             </a>
             <a
-              v-if="canRemove(build)"
+              v-if="canRemove(build) && (build.status === 'running' || build.status === 'stopped')"
               @click="openRemoveModal(build)"
               data-tooltip="Remove"
               class="red-text tooltipped"
@@ -82,7 +92,33 @@
       </tr>
       </tbody>
     </table>
-
+    <div class="col s12 m6 right" id="perPage">
+      <div class="input-field col s12 l4 right">
+        <Select class="col s12"
+                v-if="builds.length"
+                displayed="value"
+                v-model="perPage"
+                :options="perPageOptions"
+        />
+      </div>
+      <p v-if="builds.length" class="col s12 l8 right right-align">Items per page:</p>
+    </div>
+    <div class="col s12 m6">
+      <paginate
+        v-if="builds.length && lastPage > 1"
+        v-model="page"
+        :page-count="lastPage"
+        :click-handler="selectedPage"
+        :prev-class="'material-icons'"
+        :prev-text="'chevron_left'"
+        :next-class="'material-icons'"
+        :next-text="'chevron_right'"
+        :container-class="'pagination'"
+        :page-class="'waves-effect'"
+        :disabled-class="'disabled'"
+        :active-class="'active'">
+      </paginate>
+    </div>
     <Modal v-if="showInfoModal" @close="closeInfoModal()" class="right-sheet">
       <template v-slot:header>{{ selectedBuild.name }}</template>
       <template v-slot:content>
@@ -156,6 +192,19 @@
                 v-model="selectedBuild.created_by">
               <label :class="{active: selectedBuild.created_by}"
                       for="created_by">Created by
+              </label>
+            </div>
+          </div>
+          <div class="row" v-if="selectedBuild.removed_on">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">event</i>
+              <input
+                class="readonly"
+                type="text"
+                id="removed_on"
+                v-model="selectedBuild.removed_on">
+              <label :class="{active: selectedBuild.removed_on}"
+                     for="created_on">Removed on
               </label>
             </div>
           </div>
@@ -256,20 +305,29 @@
 </template>
 
 <script>
-
+import Paginate from 'vuejs-paginate/src/components/Paginate';
 import config from '../config';
 
 export default {
   props: {
-    builds: Array,
-    showModule: {
-      type: Boolean,
-      default: false,
+    module: {
+      type: String,
+    },
+    branch: {
+      type: String,
+    },
+    user: {
+      type: String,
     },
   },
-
+  components: {
+    Paginate,
+  },
   data() {
     return {
+      builds: [],
+      paginationData: {},
+      status: ['running', 'stopped'],
       selectedBuild: {},
       showInfoModal: false,
       showRemoveModal: false,
@@ -277,10 +335,47 @@ export default {
       removing: false,
       removed: false,
       error: null,
+      page: 1,
+      perPage: {
+        value: 10,
+      },
+      lastPage: 0,
+      perPageOptions: [
+        {
+          value: 10,
+        },
+        {
+          value: 20,
+        },
+        {
+          value: 30,
+        },
+        {
+          value: 50,
+        },
+      ],
     };
   },
-
   methods: {
+    getBuilds() {
+      const loader = this.$loading.show({ container: this.$refs.builds });
+
+      this.$store.dispatch('builds/getBuildsByStatus', {
+        branch: this.branch,
+        module: this.module,
+        status: this.status,
+        user: this.user,
+        perPage: this.perPage.value,
+        page: this.page,
+      })
+        .then((response) => {
+          this.builds = response.data.data;
+          this.paginationData = response.data.meta;
+          this.setLastPage();
+        })
+        .finally(() => loader.hide());
+    },
+
     getPublishedPort(build, port) {
       try {
         return build.details.service.Endpoint.Ports
@@ -324,14 +419,17 @@ export default {
       try {
         return build.details.container.Config.Labels.build;
       } catch (e) {
-        return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
-          if (env.match(/^EXTRANET_BUILD_DIR=/)) {
-            return env.split('=').slice(-1).toString().split('/')
-              .slice(-1)
-              .toString();
-          }
-          return 'could-not-get-build-name';
-        });
+        if (build.details.service) {
+          return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
+            if (env.match(/^EXTRANET_BUILD_DIR=/)) {
+              return env.split('=').slice(-1).toString().split('/')
+                .slice(-1)
+                .toString();
+            }
+            return 'could-not-get-build-name';
+          });
+        }
+        return 'could-not-get-build-name';
       }
     },
 
@@ -340,7 +438,7 @@ export default {
         return `<span class="new badge green" data-badge-caption="">${build.status}</span>`;
       }
 
-      if (build.status === 'stopped') {
+      if (build.status === 'stopped' || build.status === 'failed') {
         return `<span class="new badge red" data-badge-caption="">${build.status}</span>`;
       }
       return `<span class="new badge" data-badge-caption="">${build.status}</span>`;
@@ -355,6 +453,9 @@ export default {
       this.selectedBuild.branch = build.details.branch;
       if (build.details.fe_branch) {
         this.selectedBuild.fe_branch = build.details.fe_branch.name;
+      }
+      if (build.removed_on) {
+        this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
       }
       this.selectedBuild.instance = build.details.instance.name;
       this.selectedBuild.java_version = build.details.java_version;
@@ -411,6 +512,7 @@ export default {
       this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/start', build.id)
+        .then(() => { build.status = 'running'; })
         .finally(() => { this.updating = false; });
     },
 
@@ -418,6 +520,7 @@ export default {
       this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/stop', build.id)
+        .then(() => { build.status = 'stopped'; })
         .finally(() => { this.updating = false; });
     },
 
@@ -426,7 +529,7 @@ export default {
       this.$store.dispatch(`${build.module}/removeBuild`, build.id)
         .then(() => {
           this.removed = true;
-          this.$store.dispatch('builds/getActive');
+          this.builds = this.builds.filter(_build => _build.id !== build.id);
         })
         .catch((error) => {
           if (error.response.status === 403) {
@@ -437,6 +540,24 @@ export default {
         })
         .finally(() => { this.removing = false; });
     },
+
+    selectedPage(page) {
+      this.page = page;
+      this.getBuilds();
+    },
+
+    setLastPage() {
+      this.lastPage = Math.ceil(this.paginationData.total / this.perPage.value);
+    },
+  },
+  watch: {
+    status() {
+      this.page = 1;
+      this.getBuilds();
+    },
+    perPage() {
+      this.getBuilds();
+    },
   },
 
   updated() {
@@ -445,10 +566,14 @@ export default {
 
   mounted() {
     this.initTooltips();
+    this.getBuilds();
+    this.$M.FormSelect.init(document.querySelector('select'));
   },
+
 };
 </script>
-<style scoped>
+
+<style scoped lang='scss'>
   input:read-only {
     color: black !important;
     border-bottom: 1px solid #9e9e9e !important;
@@ -457,6 +582,14 @@ export default {
     margin-bottom: 25px;
   }
   .quick-actions a {
-      margin: 0px 2.5px;
+    margin: 0px 2.5px;
+  }
+  #perPage {
+    > div {
+      padding: 0;
+    }
+    p {
+      padding: 13px 0 0 0;
+    }
   }
 </style>

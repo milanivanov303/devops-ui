@@ -98,8 +98,6 @@
 
 import { required } from 'vuelidate/lib/validators';
 
-import client from '@/plugins/ws';
-
 function initialState() {
   return {
     showModal: false,
@@ -167,11 +165,11 @@ export default {
         .then((response) => {
           this.build.status = 'running';
 
-          if (!client.connected) {
+          if (!this.$ws.isConnected()) {
             return;
           }
 
-          const subscribe = client.subscribe(
+          const subscribe = this.$ws.subscribe(
             `/queue/${response.data.broadcast.queue}`,
             (message) => {
               const data = JSON.parse(message.body);
@@ -187,7 +185,7 @@ export default {
 
               if (data.status && data.status !== 'running') {
                 this.build.status = data.status;
-                this.$store.dispatch('imx_fe/getContainers');
+                this.$emit('created');
                 subscribe.unsubscribe();
               }
             },

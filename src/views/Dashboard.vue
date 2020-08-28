@@ -3,8 +3,8 @@
     <div class="col s12 l8">
       <div class="card" ref="my_builds">
         <div class="card-content">
-          <span class="card-title">My active builds</span>
-          <Builds :builds="userBuilds" :show-module="true"></Builds>
+          <span class="card-title">My builds</span>
+          <Builds :user="this.$auth.getUser().username"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
@@ -34,7 +34,7 @@
                 <td>{{ debiteurBuildsCount }}</td>
               </tr>
               <tr>
-                <td>2</td>
+                <td>3</td>
                 <td>
                   <router-link to="/imx-fe/dashboard">iMX FE</router-link>
                 </td>
@@ -120,9 +120,6 @@ export default {
     };
   },
   computed: {
-    userBuilds() {
-      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username);
-    },
     extranetBuildsCount() {
       return this.$store.state.builds.active.filter(build => build.module === 'extranet').length;
     },
