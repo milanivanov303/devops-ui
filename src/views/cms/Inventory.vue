@@ -4,7 +4,7 @@
     <div class="frame">
       <form @submit.prevent="submitted" class="searchForm">
         <div class="row">
-          <SelectModel
+          <Select
             class="col s6"
             label="Projects"
             icon="laptop_mac"
@@ -13,7 +13,7 @@
             :options="getProjects"
             @change="selectedProject"
           />
-          <SelectModel
+          <Select
             class="col s6"
             label="Delivery chains"
             icon="linear_scale"
@@ -24,7 +24,7 @@
           />
         </div>
         <div class="row">
-          <SelectModel
+          <Select
             class="col s6"
             label="First instance"
             icon="storage"
@@ -32,7 +32,7 @@
             :options="getFirstInstances"
             @change="firstSelectedInstance"
           />
-          <SelectModel
+          <Select
             class="col s6"
             label="Second instance"
             icon="storage"
@@ -56,16 +56,14 @@
   </div>
 </template>
 <script>
-import AddRspFile from '@/components/cms/AddRspFile';
-import SelectModel from '@/components/partials/SelectModel';
-import Table from '@/components/partials/Table';
+// import AddRspFile from '@/components/cms/AddRspFile';
+// import Table from '@/components/partials/Table';
 
 export default {
-  components: {
-    SelectModel,
-    'add-rsp-modal': AddRspFile,
-    Table,
-  },
+  // components: {
+  //   'add-rsp-modal': AddRspFile,
+  //   Table,
+  // },
   mounted() {
     this.loadProjects();
   },
@@ -79,10 +77,10 @@ export default {
   },
   computed: {
     getProjects() {
-      return this.$store.state.projects.projects;
+      return this.$store.state.mmpi.projects;
     },
     getDeliveryChains() {
-      return this.$store.getters['deliveryChains/deliveryChains']('');
+      return this.$store.getters['mmpi/deliveryChains']('');
     },
     getFirstInstances() {
       return this.$store.getters['cms/getInventoryInstances']('');
@@ -112,7 +110,7 @@ export default {
   methods: {
     loadProjects() {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('projects/getProjects', {
+      this.$store.dispatch('mmpi/getProjectsCMS', {
         inactive: 0,
         order_by: 'name asc',
       }).then(() => {
@@ -123,7 +121,7 @@ export default {
       const loader = this.$loading.show({ container: this.$el });
       this.resetInstances();
       this.$store.state.cms.inventoryInstances = [];
-      this.$store.dispatch('deliveryChains/getDeliveryChains', {
+      this.$store.dispatch('mmpi/getDeliveryChainsCMS', {
         project: value.id,
         status: 'active',
         order_by: 'title asc',

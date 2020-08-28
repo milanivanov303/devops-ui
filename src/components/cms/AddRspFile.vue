@@ -142,7 +142,7 @@ export default {
   methods: {
     selectedProject(value) {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('deliveryChains/getDeliveryChains', {
+      this.$store.dispatch('mmpi/getDeliveryChainsCMS', {
         project: value.id,
         status: 'active',
         order_by: 'title asc',

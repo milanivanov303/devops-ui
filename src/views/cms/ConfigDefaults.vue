@@ -74,7 +74,7 @@
                     class="modal-close waves-effect waves-blue btn-flat left">Close</a>
               </div>
               <div class="row">
-                <SelectModel
+                <Select
                   class="col s12"
                   label="Instances"
                   icon="storage"
@@ -98,18 +98,14 @@
 </template>
 <script>
 import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
-import SelectModel from '@/components/partials/SelectModel';
-import SwitchBox from '@/components/partials/SwitchBox';
-import Table from '@/components/partials/Table';
-import Select from '@/components/partials/Select';
+// import SwitchBox from '@/components/partials/SwitchBox';
+// import Table from '@/components/partials/Table';
 
 export default {
   components: {
     'create-modal': CreateConfigDefault,
-    SelectModel,
-    Table,
-    SwitchBox,
-    Select,
+    // Table,
+    // SwitchBox,
   },
   mounted() {
     this.prepareData();
@@ -156,7 +152,7 @@ export default {
       };
     },
     instances() {
-      return this.$store.state.instances.devInstances;
+      return this.$store.state.mmpi.devInstances;
     },
   },
   methods: {
@@ -228,7 +224,7 @@ export default {
       this.cancel();
     },
     async loadInstances() {
-      await this.$store.dispatch('instances/getDevInstances');
+      await this.$store.dispatch('mmpi/getDevInstances');
     },
   },
 };

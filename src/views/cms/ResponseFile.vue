@@ -4,7 +4,7 @@
     <div class="frame">
       <form @submit.prevent="submitted">
         <div class="row">
-          <SelectModel
+          <Select
             class="col s6"
             label="Projects"
             icon="laptop_mac"
@@ -12,7 +12,7 @@
             :options="getProjects"
             @change="selectedProject"
           />
-          <SelectModel
+          <Select
             class="col s6"
             label="Delivery chains"
             icon="linear_scale"
@@ -49,7 +49,7 @@
                 </div>
               </div>
               <div class="row">
-                <SelectModel
+                <Select
                   class="col s12"
                   label="Instances"
                   icon="storage"
@@ -131,14 +131,12 @@
   </div>
 </template>
 <script>
-import Table from '@/components/partials/Table';
-import SelectModel from '@/components/partials/SelectModel';
+// import Table from '@/components/partials/Table';
 
 export default {
-  components: {
-    SelectModel,
-    Table,
-  },
+  // components: {
+  //   Table,
+  // },
   mounted() {
     this.loadProjects();
     this.$store.subscribe((mutation) => {
