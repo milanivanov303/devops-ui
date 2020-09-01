@@ -140,7 +140,7 @@ export default {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_branch });
       const promise1 = this.$store.dispatch('builds/getActive');
-      const promise2 = this.$store.dispatch('extranet/getServices');
+      const promise2 = this.$store.dispatch('extranet/getHost');
 
       Promise.all([promise1, promise2]).finally(() => {
         loader1.hide();
