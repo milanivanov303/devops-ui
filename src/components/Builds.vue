@@ -15,7 +15,7 @@
       <tr>
         <th>#</th>
         <th>Name</th>
-        <th v-if="showModule">Module</th>
+        <th v-if="!module">Module</th>
         <th>Created By</th>
         <th>Created On</th>
         <th>Status</th>
@@ -25,8 +25,8 @@
       <tbody>
       <tr v-for="(build, index) in builds" :key="index">
         <td>{{ (page - 1) * perPage.value + index + 1 }}</td>
-        <td>{{ getName(build) }}</td>
-        <td v-if="showModule">{{ build.module }}</td>
+        <td>{{ build.name }}</td>
+        <td v-if="!module">{{ build.module }}</td>
         <td>{{ build.details.created_by }}</td>
         <td>{{ $date(build.created_on).toHuman() }}</td>
         <td v-html="getStatusText(build)"></td>
@@ -77,7 +77,7 @@
               <i class="material-icons">wysiwyg</i>
             </a>
             <a
-              v-if="canRemove(build) & build.status === 'running' && build.status !== 'stopped'"
+              v-if="canRemove(build) && (build.status === 'running' || build.status === 'stopped')"
               @click="openRemoveModal(build)"
               data-tooltip="Remove"
               class="red-text tooltipped"
@@ -277,7 +277,7 @@
       <template v-slot:content>
         <div v-if="removing" class="center" >
           <Preloader class="big"></Preloader>
-          <p>Removing build <b>{{ getName(selectedBuild) }}</b> ... </p>
+          <p>Removing build <b>{{ selectedBuild.name }}</b> ... </p>
         </div>
         <div v-else-if="removed" class="center" >
           <i class="material-icons large green-text">check_circle_outline</i>
@@ -288,7 +288,7 @@
           <p>{{ error }}</p>
         </div>
         <div v-else>
-          Are you sure you what to remove <b>{{ getName(selectedBuild) }}</b> build?
+          Are you sure you what to remove <b>{{ selectedBuild.name }}</b> build?
         </div>
       </template>
       <template v-slot:footer>
@@ -313,12 +313,11 @@ export default {
     module: {
       type: String,
     },
-    user: {
+    branch: {
       type: String,
     },
-    showModule: {
-      type: Boolean,
-      default: false,
+    user: {
+      type: String,
     },
   },
   components: {
@@ -326,6 +325,8 @@ export default {
   },
   data() {
     return {
+      builds: [],
+      paginationData: {},
       status: ['running', 'stopped'],
       selectedBuild: {},
       showInfoModal: false,
@@ -334,7 +335,6 @@ export default {
       removing: false,
       removed: false,
       error: null,
-      branch: this.$route.params.branch,
       page: 1,
       perPage: {
         value: 10,
@@ -356,18 +356,10 @@ export default {
       ],
     };
   },
-  computed: {
-    builds() {
-      return this.$store.state.builds.builds;
-    },
-  },
   methods: {
     getBuilds() {
-      if (this.status.length === 0) {
-        this.$M.toast({ html: 'Choose build status', classes: 'toast-fail' });
-      }
-
       const loader = this.$loading.show({ container: this.$refs.builds });
+
       this.$store.dispatch('builds/getBuildsByStatus', {
         branch: this.branch,
         module: this.module,
@@ -375,10 +367,13 @@ export default {
         user: this.user,
         perPage: this.perPage.value,
         page: this.page,
-      }).then(() => {
-        this.setLastPage();
-        loader.hide();
-      });
+      })
+        .then((response) => {
+          this.builds = response.data.data;
+          this.paginationData = response.data.meta;
+          this.setLastPage();
+        })
+        .finally(() => loader.hide());
     },
 
     getPublishedPort(build, port) {
@@ -392,23 +387,14 @@ export default {
 
     getUrl(build) {
       const { host } = this.$store.state[build.module];
-      try {
-        let port;
-        try {
-          port = build.details.container.NetworkSettings.Ports['8080/tcp'][0].HostPort;
-          return `http://${host}:${port}/${this.getName(build)}/`;
-        } catch (e) {
-          port = build.details.container.NetworkSettings.Ports['8591/tcp'][0].HostPort;
-          return `http://${host}:${port}/${this.getName(build)}/`;
-        }
-      } catch (e) {
-        const port = this.getPublishedPort(build, 8080);
-        if (port) {
-          return `http://${host}:${port}/${this.getName(build)}/`;
-        }
-        return null;
+      const port = this.getPublishedPort(build, 8080);
+
+      if (port) {
+        return `http://${host}:${port}/${build.name}`;
       }
+      return null;
     },
+
     getWebssh2Url(build) {
       const { host } = this.$store.state[build.module];
       const port = this.getPublishedPort(build, 22);
@@ -417,24 +403,6 @@ export default {
         return `http://${window.location.hostname}:${config.webssh2_port}/ssh/host/${host}?port=${port}`;
       }
       return null;
-    },
-
-    getName(build) {
-      try {
-        return build.details.container.Config.Labels.build;
-      } catch (e) {
-        if (build.details.service) {
-          return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
-            if (env.match(/^EXTRANET_BUILD_DIR=/)) {
-              return env.split('=').slice(-1).toString().split('/')
-                .slice(-1)
-                .toString();
-            }
-            return 'could-not-get-build-name';
-          });
-        }
-        return 'could-not-get-build-name';
-      }
     },
 
     getStatusText(build) {
@@ -451,7 +419,6 @@ export default {
     openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild.name = this.getName(build);
       this.selectedBuild.created_by = build.details.created_by;
       this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
       this.selectedBuild.branch = build.details.branch;
@@ -463,24 +430,8 @@ export default {
       }
       this.selectedBuild.instance = build.details.instance.name;
       this.selectedBuild.java_version = build.details.java_version;
-
-      try {
-        this.selectedBuild.ports = [];
-        Object.keys(build.details.container.NetworkSettings.Ports).forEach((port) => {
-          this.selectedBuild.ports.push(
-            {
-              TargetPort: port.split('/')[0],
-              PublishedPort: build.details.container.NetworkSettings.Ports[port][0].HostPort,
-              Protocol: port.split('/')[1],
-            },
-          );
-        });
-      } catch (e) {
-        this.selectedBuild.ports = build.details.service.Endpoint.Ports;
-      }
-
+      this.selectedBuild.ports = build.details.service.Endpoint.Ports;
       this.selectedBuild.host = this.$store.state[build.module].host;
-
       this.selectedBuild.user = 'enterprise';
       this.selectedBuild.pass = 'Sofphia';
     },
@@ -516,6 +467,7 @@ export default {
       this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/start', build.id)
+        .then(() => { build.status = 'running'; })
         .finally(() => { this.updating = false; });
     },
 
@@ -523,6 +475,7 @@ export default {
       this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/stop', build.id)
+        .then(() => { build.status = 'stopped'; })
         .finally(() => { this.updating = false; });
     },
 
@@ -531,7 +484,7 @@ export default {
       this.$store.dispatch(`${build.module}/removeBuild`, build.id)
         .then(() => {
           this.removed = true;
-          this.$store.dispatch('builds/getActive');
+          this.builds = this.builds.filter(_build => _build.id !== build.id);
         })
         .catch((error) => {
           if (error.response.status === 403) {
@@ -547,8 +500,9 @@ export default {
       this.page = page;
       this.getBuilds();
     },
+
     setLastPage() {
-      this.lastPage = Math.ceil(this.$store.state.builds.paginationData.total / this.perPage.value);
+      this.lastPage = Math.ceil(this.paginationData.total / this.perPage.value);
     },
   },
   watch: {

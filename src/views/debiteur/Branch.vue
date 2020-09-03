@@ -5,15 +5,15 @@
         <h4>{{ branch }}</h4>
       </div>
     </div>
-    <Builds/>
+    <Builds ref="builds" :branch="branch" module="debiteur"/>
     <br>
-    <Build />
+    <Build @created="() => this.$refs.builds.getBuilds()"/>
   </div>
 </template>
 
 <script>
-import Build from '@/views/debiteur/components/Build';
-import Builds from '@/components/Builds';
+import Build from './components/Build';
+import Builds from '../../components/Builds';
 
 export default {
   components: {
@@ -24,9 +24,6 @@ export default {
     branch() {
       return this.$route.params.branch;
     },
-    // containers() {
-    //   return this.$store.getters['debiteur/getContainersByBranch'](this.branch);
-    // },
   },
 };
 </script>

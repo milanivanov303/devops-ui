@@ -4,7 +4,7 @@
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My builds</span>
-          <Builds :user="this.$auth.getUser().username" :show-module="true"></Builds>
+          <Builds :user="this.$auth.getUser().username"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
@@ -149,8 +149,8 @@ export default {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_module });
       const promise1 = this.$store.dispatch('builds/getActive');
-      const promise2 = this.$store.dispatch('extranet/getServices');
-      const promise3 = this.$store.dispatch('debiteur/getServices');
+      const promise2 = this.$store.dispatch('extranet/getHost');
+      const promise3 = this.$store.dispatch('debiteur/getHost');
       const promise4 = this.$store.dispatch('imx_fe/getContainers');
 
       Promise.all([promise1, promise2, promise3, promise4]).finally(() => {

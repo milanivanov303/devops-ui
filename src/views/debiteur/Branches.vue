@@ -127,7 +127,7 @@ export default {
   methods: {
     getActiveBuilds() {
       this.$store.dispatch('builds/getActive');
-      this.$store.dispatch('debiteur/getServices');
+      this.$store.dispatch('debiteur/getHost');
     },
     selectedPage(page) {
       this.page = page;
