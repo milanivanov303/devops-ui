@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     computedValue() {
-      if (!this.value || this.value[this.getValueKey()] === '') {
+      if (!this.value) {
         return '';
       }
       return this.value[this.getValueKey()] || this.value;
