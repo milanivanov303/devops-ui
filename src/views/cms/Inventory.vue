@@ -60,10 +60,10 @@
 // import Table from '@/components/partials/Table';
 
 export default {
-  // components: {
-  //   'add-rsp-modal': AddRspFile,
-  //   Table,
-  // },
+  components: {
+    // 'add-rsp-modal': AddRspFile,
+    // Table,
+  },
   mounted() {
     this.loadProjects();
   },
@@ -71,6 +71,7 @@ export default {
     return {
       project: [],
       deliveryChain: [],
+      getDeliveryChains: [],
       loader: '',
       openModal: false,
     };
@@ -79,9 +80,9 @@ export default {
     getProjects() {
       return this.$store.state.mmpi.projects;
     },
-    getDeliveryChains() {
-      return this.$store.getters['mmpi/deliveryChains']('');
-    },
+    // getDeliveryChains() {
+    //   return this.$store.getters['mmpi/deliveryChains']('');
+    // },
     getFirstInstances() {
       return this.$store.getters['cms/getInventoryInstances']('');
     },
@@ -108,29 +109,19 @@ export default {
     },
   },
   methods: {
-    loadProjects() {
+    async loadProjects() {
       const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('mmpi/getProjectsCMS', {
+      await this.$store.dispatch('mmpi/getProjects', {
         inactive: 0,
         order_by: 'name asc',
-      }).then(() => {
-        loader.hide();
       });
+      //await this.$store.dispatch('mmpi/getDeliveryChainsCMS');
+      loader.hide();
     },
     selectedProject(value) {
-      const loader = this.$loading.show({ container: this.$el });
       this.resetInstances();
       this.$store.state.cms.inventoryInstances = [];
-      this.$store.dispatch('mmpi/getDeliveryChainsCMS', {
-        project: value.id,
-        status: 'active',
-        order_by: 'title asc',
-        with: JSON.stringify({
-          instances: {},
-        }),
-      }).then(() => {
-        loader.hide();
-      });
+      this.$store.dispatch('mmpi/getDeliveryChainsCMS', value);
     },
     selectedDeliveryChain(value) {
       this.resetInstances();

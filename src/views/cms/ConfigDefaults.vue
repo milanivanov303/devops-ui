@@ -1,96 +1,122 @@
 <template>
-  <div class="col s12 l12">
-    <div class="row">
-      <h1 class="card-title center-align col s12">Config Defaults</h1>
-    </div>
-    <Table
-      :request="defaultVariables"
-      :pagination="false"
-      @add="isClicked = true">
-      <template v-slot:buttons="{ data }">
-        <a @click="details(data, 'details')" title="details">
-          <i class="material-icons right">settings</i>
-        </a>
-      </template>
-    </Table>
-    <create-modal v-if="isClicked"
-                  @return="isClicked = false"></create-modal>
-    <div @submit.prevent="onSubmit" id="action" ref="config-info" class="modal right-sheet">
-      <div class="frame">
-        <div class="modal-content">
-          <h3 class="center">Variable Information</h3>
-          <Alert
-            v-if="error !== ''"
-            :msg="error"/>
-          <form>
-            <div class="row">
-              <div class="input-field col s12">
-                <i class="material-icons prefix">label_outline</i>
-                <input
-                  disabled
-                  id="variable_name"
-                  type="text"
-                  v-model="selectedVariable.name">
-                <label for="variable_name" class="active">Variable Name</label>
-              </div>
+  <div class="row">
+    <div class="col s12 l12">
+      <div class="data-table">
+        <div class="row">
+          <h1 class="card-title center-align col s12 l12">Config Defaults</h1>
+        </div>
+        <Table 
+          :data="defaultVariables"
+          :pagination="false"
+          @add="isClicked = true"
+          @edit="(row) => details(row, 'details')"
+          :perPage="5000"
+          sort-by="name"
+          sort-dir="asc"
+          :export-btn="false"
+          :view-btn="false"
+          :add-btn="$auth.can('can-manage-config-defaults')"
+          :edit-btn="$auth.can('can-manage-config-defaults')"
+          :delete-btn="false">
+          <Column
+              show="id"
+          />
+          <Column
+              show="name"
+          />
+          <Column
+              show="value"
+          />
+          <Column
+              label="Description"
+              show="description"
+          />
+        </Table>
+        <create-modal v-if="isClicked"
+                      @return="isClicked = false"></create-modal>
+        <div @submit.prevent="onSubmit" id="action" ref="config-info" class="modal right-sheet">
+          <div class="frame">
+            <div class="modal-content">
+              <h3 class="center">Variable Information</h3>
+              <Alert
+                v-if="error !== ''"
+                :msg="error"/>
+              <form>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <i class="material-icons prefix">label_outline</i>
+                    <input
+                      disabled
+                      id="variable_name"
+                      type="text"
+                      v-model="selectedVariable.name">
+                    <label for="variable_name" class="active">Variable Name</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <i class="material-icons prefix">label_outline</i>
+                    <label for="up_variable_value" class="active">Variable Value</label>
+                    <input
+                      disabled
+                      id="up_variable_value"
+                      type="text"
+                      v-model="selectedVariable.value">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <i class="material-icons prefix">mode_edit</i>
+                    <textarea id="variable_description"
+                              class="materialize-textarea"
+                              v-model.trim="selectedVariable.description"></textarea>
+                    <label for="icon_prefix2" class="active">Description</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <Select class="col s12" v-if="modal.isOpen"
+                          label="Codix Team"
+                          icon="group"
+                          displayed="name"
+                          :selected="this.$store.getters['cms/getOneCodixTeam'](this.selectedVariable.codix_team_id)"
+                          :options="codixTeams"
+                          v-model="selectedVariable.codix_team"
+                          @change="selectedCodixTeam"/>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12 m6 l6">
+                    <button
+                      v-if="$auth.can('can-manage-config-defaults')"
+                      class="btn waves-effect waves-light right"
+                      type="submit"
+                      name="action">
+                      Update</button>
+                  </div>
+                  <div class="input-field col s12 m6 l6">
+                    <a href="#!"
+                      @click="cancel"
+                        class="modal-close waves-effect waves-blue btn-flat left">Close</a>
+                  </div>
+                  <div class="row">
+                    <Select
+                      class="col s12"
+                      label="Instances"
+                      icon="storage"
+                      displayed="name"
+                      helperText="Check variable in templates from instance"
+                      :options="instances"
+                      v-model="instance"
+                      @change="checkInTemplates"
+                    />
+                  </div>
+                  <SwitchBox
+                    v-show="templates.options"
+                    class="switch-box"
+                    :request="templates"/>
+                </div>
+              </form>
             </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <i class="material-icons prefix">label_outline</i>
-                <label for="up_variable_value" class="active">Variable Value</label>
-                <input
-                  disabled
-                  id="up_variable_value"
-                  type="text"
-                  v-model="selectedVariable.value">
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <i class="material-icons prefix">mode_edit</i>
-                <textarea id="variable_description"
-                          class="materialize-textarea"
-                          v-model.trim="selectedVariable.description"></textarea>
-                <label for="icon_prefix2" class="active">Description</label>
-              </div>
-            </div>
-            <div class="row">
-              <Select class="col s12" v-if="modal.isOpen"
-                      :select="getCodixTeams"
-                      @selectedVal="selectedCodixTeam"/>
-            </div>
-            <div class="row">
-              <div class="input-field col s12 m6 l6">
-                <button
-                  v-if="$auth.can('can-manage-config-defaults')"
-                  class="btn waves-effect waves-light right"
-                  type="submit"
-                  name="action">
-                  Update</button>
-              </div>
-              <div class="input-field col s12 m6 l6">
-                <a href="#!"
-                  @click="cancel"
-                    class="modal-close waves-effect waves-blue btn-flat left">Close</a>
-              </div>
-              <div class="row">
-                <Select
-                  class="col s12"
-                  label="Instances"
-                  icon="storage"
-                  displayed="name"
-                  helperText="Check variable in templates from instance"
-                  :options="instances"
-                  v-model="instance"
-                  @change="checkInTemplates"
-                />
-              </div>
-              <SwitchBox
-                v-show="templates.options"
-                class="switch-box"
-                :request="templates"/>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
@@ -98,16 +124,14 @@
 </template>
 <script>
 import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
-// import SwitchBox from '@/components/partials/SwitchBox';
-// import Table from '@/components/partials/Table';
+import SwitchBox from '@/components/partials/SwitchBox';
 
 export default {
   components: {
     'create-modal': CreateConfigDefault,
-    // Table,
-    // SwitchBox,
+    SwitchBox,
   },
-  mounted() {
+  mounted() { 
     this.prepareData();
   },
   data() {
@@ -115,19 +139,6 @@ export default {
       instance: {},
       templates: {},
       error: '',
-      defaultVariables: {
-        data: 'cms/getVariables',
-        columns: {
-          id: '',
-          name: '',
-          value: '',
-          description: '',
-        },
-        add: true,
-        export: false,
-        action: true,
-        searchable: true,
-      },
       selectedVariable: {
         name: '',
         value: '',
@@ -140,20 +151,15 @@ export default {
     };
   },
   computed: {
-    getCodixTeams() {
-      return {
-        id: 'select_codix_team',
-        name: 'select_codix_team',
-        displayed: 'name',
-        icon: 'group',
-        options: this.$store.state.cms.codixTeams,
-        label: 'Codix Team',
-        selected: this.$store.getters['cms/getOneCodixTeam'](this.selectedVariable.codix_team_id),
-      };
+    defaultVariables() {
+      return this.$store.state.cms.variables;
     },
     instances() {
       return this.$store.state.mmpi.devInstances;
     },
+    codixTeams() {
+      return this.$store.state.cms.codixTeams;
+    }
   },
   methods: {
     async prepareData() {
@@ -171,11 +177,18 @@ export default {
       });
       this.$store.dispatch('cms/getCodixTeams');
     },
-    selectedCodixTeam(value) {
-      this.selectedVariable.codix_team_id = value.id;
+    selectedCodixTeam(codixTeam) {
+      this.selectedVariable.codix_team_id = codixTeam.id;
     },
-    details(value) {
-      this.selectedVariable = Object.assign({}, value);
+    details(variable) {
+      this.selectedVariable = Object.assign({}, variable);
+      
+      if (this.selectedVariable.codix_team_id) {
+        this.selectedVariable.codix_team = this.codixTeams.find(
+          codixTeam => codixTeam.id === this.selectedVariable.codix_team_id,
+        );
+      }
+
       this.$M.Modal.init(this.$refs['config-info'], {
         dismissible: false,
         onOpenStart: this.modal.isOpen = true,

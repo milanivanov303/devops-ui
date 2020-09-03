@@ -6,7 +6,7 @@
         <form>
           <div class="row">
             <div class="col s4">
-              <SelectModel
+              <Select
                 label="Codix Team"
                 icon="group"
                 displayed='name'
@@ -20,7 +20,7 @@
               </div>
             </div>
             <div class="col s4">
-              <SelectModel
+              <Select
                 label="IMX Module"
                 icon="extension"
                 displayed='name'
@@ -35,7 +35,7 @@
               </div>
             </div>
             <div class="col s4">
-              <SelectModel
+              <Select
                 label="Submodule"
                 icon="extension"
                 displayed='name'
@@ -148,12 +148,8 @@
 </template>
 <script>
 import { required } from 'vuelidate/lib/validators';
-import SelectModel from '@/components/partials/SelectModel';
 
 export default {
-  components: {
-    SelectModel,
-  },
   mounted() {
     this.$store.dispatch('cms/getModules', {
       with: JSON.stringify({

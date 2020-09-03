@@ -131,7 +131,8 @@ export default {
     }
 
     const promise = api.get('delivery-chains', {
-      with: JSON.stringify(['instances']),
+      status: 'active',
+      with: JSON.stringify(['instances', 'projects']),
       orders: JSON.stringify({
         title: 'asc',
       }),
@@ -147,68 +148,8 @@ export default {
   },
 
   /**
-   * Get delivery chains for CMS tab
+   * Get Dev Instances for CMS tab
    */
-  async getDeliveryChainsCMS({ commit }, payload) {
-    try {
-      const resp = await api.get('delivery-chains', payload);
-      commit('deliveryChains', resp.data.data);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
-  },
-
-  /**
-   * Get projects chains for CMS tab
-   */
-  async getProjectsCMS({ commit, state }, payload) {
-    if (state.projects.length) {
-      return;
-    }
-    try {
-      const resp = await api.get('projects', payload);
-      commit('projects', resp.data.data);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
-  },
-
-  async addRolesTmp({ commit }, payload) {
-    try {
-      const resp = await api.put(`projects/roles-tmp/${payload.id}`, payload.data);
-      commit('updateProject', resp.data.data);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
-  },
-
-  async addRoles({ commit }, payload) {
-    try {
-      const resp = await api.put(`projects/roles/${payload.id}`, payload.data);
-      commit('updateProject', resp.data.data);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
-  },
-
-  /**
-   * Get Instances for CMS tab
-   */
-  async getInstancesCMS({ commit, state }, payload) {
-    if (state.instances.length) {
-      return;
-    }
-    try {
-      const response = await api.get('instances', payload);
-      commit('instances', response.data.data);
-    } catch (error) {
-      commit('error', error);
-    }
-  },
   async getDevInstances({ commit }) {
     const name = 'devInstances';
 

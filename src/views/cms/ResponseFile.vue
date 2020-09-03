@@ -26,7 +26,19 @@
         v-if="$store.getters['cms/getRspVariables'].length"
         :request="getVariables"
         :pagination="false"
-        @add="isClicked = true">
+        @add="isClicked = true"
+        sort-by="name"
+        sort-dir="asc"
+        :export-btn="false"
+        :view-btn="false"
+        :add-btn="false"
+        :edit-btn="false"
+        :delete-btn="false">
+        <Column v-for="(column, key) in getVariables.columns"
+          v-bind:key="key"
+          :label="key"
+          :show="key"
+        />
         <template v-slot:buttons="{ data }">
           <a @click="details(data, 'details')" title="details">
             <i class="material-icons right">settings</i>
