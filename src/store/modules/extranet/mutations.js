@@ -10,7 +10,7 @@ export default {
     state.host = host;
   },
   clients(state, clients) {
-    state.clients = clients.filter(client => client.package !== '');
+    state.clients = clients;
   },
   feBranches(state, branches) {
     state.feBranches = branches;
