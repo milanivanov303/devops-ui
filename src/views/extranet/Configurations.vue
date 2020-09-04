@@ -167,6 +167,8 @@
               displayed="name"
               :options="appTypes"
               v-model="configuration.app_type"
+              @change="delete configuration.branch &&
+                       delete configuration.prefix"
             />
             <div class="validator col s12">
               <div class="red-text" v-if="$v.configuration.app_type.$error">
