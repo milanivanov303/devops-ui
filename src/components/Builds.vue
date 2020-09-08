@@ -25,7 +25,7 @@
       <tbody>
       <tr v-for="(build, index) in builds" :key="index">
         <td>{{ (page - 1) * perPage.value + index + 1 }}</td>
-        <td>{{ getName(build) }}</td>
+        <td>{{ build.name }}</td>
         <td v-if="!module">{{ build.module }}</td>
         <td>{{ build.details.created_by }}</td>
         <td>{{ $date(build.created_on).toHuman() }}</td>
@@ -277,7 +277,7 @@
       <template v-slot:content>
         <div v-if="removing" class="center" >
           <Preloader class="big"></Preloader>
-          <p>Removing build <b>{{ getName(selectedBuild) }}</b> ... </p>
+          <p>Removing build <b>{{ selectedBuild.name }}</b> ... </p>
         </div>
         <div v-else-if="removed" class="center" >
           <i class="material-icons large green-text">check_circle_outline</i>
@@ -288,7 +288,7 @@
           <p>{{ error }}</p>
         </div>
         <div v-else>
-          Are you sure you what to remove <b>{{ getName(selectedBuild) }}</b> build?
+          Are you sure you what to remove <b>{{ selectedBuild.name }}</b> build?
         </div>
       </template>
       <template v-slot:footer>
@@ -387,22 +387,12 @@ export default {
 
     getUrl(build) {
       const { host } = this.$store.state[build.module];
-      try {
-        let port;
-        try {
-          port = build.details.container.NetworkSettings.Ports['8080/tcp'][0].HostPort;
-          return `http://${host}:${port}/${this.getName(build)}/`;
-        } catch (e) {
-          port = build.details.container.NetworkSettings.Ports['8591/tcp'][0].HostPort;
-          return `http://${host}:${port}/${this.getName(build)}/`;
-        }
-      } catch (e) {
-        const port = this.getPublishedPort(build, 8080);
-        if (port) {
-          return `http://${host}:${port}/${this.getName(build)}/`;
-        }
-        return null;
+      const port = this.getPublishedPort(build, 8080);
+
+      if (port) {
+        return `http://${host}:${port}/${build.name}`;
       }
+      return null;
     },
 
     getWebssh2Url(build) {
@@ -413,24 +403,6 @@ export default {
         return `http://${window.location.hostname}:${config.webssh2_port}/ssh/host/${host}?port=${port}`;
       }
       return null;
-    },
-
-    getName(build) {
-      try {
-        return build.details.container.Config.Labels.build;
-      } catch (e) {
-        if (build.details.service) {
-          return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
-            if (env.match(/^EXTRANET_BUILD_DIR=/)) {
-              return env.split('=').slice(-1).toString().split('/')
-                .slice(-1)
-                .toString();
-            }
-            return 'could-not-get-build-name';
-          });
-        }
-        return 'could-not-get-build-name';
-      }
     },
 
     getStatusText(build) {
@@ -447,7 +419,6 @@ export default {
     openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild.name = this.getName(build);
       this.selectedBuild.created_by = build.details.created_by;
       this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
       this.selectedBuild.branch = build.details.branch;
@@ -459,24 +430,8 @@ export default {
       }
       this.selectedBuild.instance = build.details.instance.name;
       this.selectedBuild.java_version = build.details.java_version;
-
-      try {
-        this.selectedBuild.ports = [];
-        Object.keys(build.details.container.NetworkSettings.Ports).forEach((port) => {
-          this.selectedBuild.ports.push(
-            {
-              TargetPort: port.split('/')[0],
-              PublishedPort: build.details.container.NetworkSettings.Ports[port][0].HostPort,
-              Protocol: port.split('/')[1],
-            },
-          );
-        });
-      } catch (e) {
-        this.selectedBuild.ports = build.details.service.Endpoint.Ports;
-      }
-
+      this.selectedBuild.ports = build.details.service.Endpoint.Ports;
       this.selectedBuild.host = this.$store.state[build.module].host;
-
       this.selectedBuild.user = 'enterprise';
       this.selectedBuild.pass = 'Sofphia';
     },

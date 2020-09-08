@@ -146,16 +146,7 @@
               icon="dynamic_feed"
               :items="val_instances"
               v-model="configuration.val_instance"
-              :invalid="$v.configuration.val_instance.$error"
-              @blur="$v.configuration.val_instance.$touch()"
             />
-            <div class="validator col s12">
-              <div class="red-text" v-if="$v.configuration.val_instance.$error">
-                <p v-if="!$v.configuration.val_instance.required">
-                  Val Instance field must not be empty.
-                </p>
-              </div>
-            </div>
           </div>
           <div class="row">
             <Autocomplete
@@ -165,16 +156,7 @@
               icon="dynamic_feed"
               :items="deploy_instances"
               v-model="configuration.deploy_instance"
-              :invalid="$v.configuration.deploy_instance.$error"
-              @blur="$v.configuration.deploy_instance.$touch()"
             />
-            <div class="validator col s12">
-              <div class="red-text" v-if="$v.configuration.deploy_instance.$error">
-                <p v-if="!$v.configuration.deploy_instance.required">
-                  Deploy Instance field must not be empty.
-                </p>
-              </div>
-            </div>
           </div>
           <div class="row" v-if="!(action === 'build')">
             <Select
@@ -185,6 +167,8 @@
               displayed="name"
               :options="appTypes"
               v-model="configuration.app_type"
+              @change="delete configuration.branch &&
+                       delete configuration.prefix"
             />
             <div class="validator col s12">
               <div class="red-text" v-if="$v.configuration.app_type.$error">
@@ -501,12 +485,6 @@ export default {
       dev_instance: {
         required,
       },
-      val_instance: {
-        required,
-      },
-      deploy_instance: {
-        required,
-      },
       branch: {
         required,
       },
@@ -643,8 +621,12 @@ export default {
       payload.project = this.configuration.project.name;
       payload.delivery_chain = this.configuration.delivery_chain.title;
       payload.dev_instance = this.configuration.dev_instance.name;
-      payload.val_instance = this.configuration.val_instance.name;
-      payload.deploy_instance = this.configuration.deploy_instance.name;
+      if(this.configuration.val_instance) {
+        payload.val_instance = this.configuration.val_instance.name;
+      }
+      if (this.configuration.deploy_instance) {
+        payload.deploy_instance = this.configuration.deploy_instance.name;
+      }
       payload.branch = this.configuration.branch.name;
       payload.prefix = this.configuration.prefix.package;
 

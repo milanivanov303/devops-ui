@@ -39,15 +39,14 @@ export default {
     return promise;
   },
 
-  getServices({ commit }) {
-    const promise = api.get('debiteur/services');
+  getHost({ commit }) {
+    const promise = api.get('debiteur/host');
 
     promise
       .then((response) => {
-        commit('services', response.data.data);
-        commit('host', response.data.meta.host);
+        commit('host', response.data.host);
       })
-      .catch(() => commit('error', 'Could not get services list', { root: true }));
+      .catch(() => commit('error', 'Could not get host name', { root: true }));
     return promise;
   },
 

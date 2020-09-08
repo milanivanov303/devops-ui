@@ -130,7 +130,7 @@ export default {
   methods: {
     getActiveBuilds() {
       this.$store.dispatch('builds/getActive');
-      this.$store.dispatch('extranet/getServices');
+      this.$store.dispatch('extranet/getHost');
     },
     selectedPage(page) {
       this.page = page;
