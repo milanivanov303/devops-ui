@@ -277,7 +277,7 @@ export default [
     component: LoggedInSSOUser,
   },
   {
-    path: '/builds/:name/*',
+    path: '/:name',
     meta: {
       layout: 'basic',
       requiresAuth: false,

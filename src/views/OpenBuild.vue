@@ -1,97 +1,94 @@
 <template>
   <div>
-    <p v-if="build.status !== 'running'">Open build {{ $route.params.name }} {{ build.status }}</p>
-
-    <iframe ref="iframe"></iframe>
+    <p>Open build {{ $route.params.name }}</p>
   </div>
 </template>
 
 <script>
 
-import { buildMixin } from '../mixins/buildMixin';
+import config from "@/config";
+import Axios from "axios";
+
+const um = Axios.create({
+  baseURL: config.um.url,
+  headers: {
+    Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE1OTk2NTk4NDUsIm5hbSI6IkVBIEF1dG8iLCJ1c3IiOiJlYV9hdXRvIiwiZW1sIjoicGhwaWRAY29kaXhmci5wcml2YXRlIiwidHlwIjoicmVmcmVzaCJ9.pTZMqjRVdgEI7UFSYBdbvef4h_DSeYA-AQSyuI9Gh0VWecKVj1eyD-aMGpB0tU40Ytrla8UJXIUqQ0hadsoPi6YLQrzooPApAJwbYN8mf2fr1KML2HS7hbi2hogH5xPuzr-oOnDNR7gyzk5CZyOWrJqbljR7ZbXJCtlwCCqVdEjD9IolBpN2E3VbqQuYToMcD-F4zP1JHP4u60logYJTfm3ITMY5vFju9Viw_HJfK6qJGSfdP6RbMMVGC2LUzY3ErD30_u_ypQbJ7MP1aHlzwKGLNSNFa3_0rhaMLShpuSsYLylamhItmYIy_fM9C95qnftUrAFOmv3x518srHztlQ`
+  }
+});
+
+const api = Axios.create({
+  baseURL: config.devops.url
+});
+api.interceptors.request.use();
+api.interceptors.response.use(null, error => {
+  if (error.response.status === 401) {
+    return um.get(`auth/token?code=${config.devops.code}`).then((response) => {
+      error.config.headers.Authorization = `Bearer ${response.data.token}`;
+      return Axios.create().request(error.config);
+    });
+  }
+  return Promise.reject(error);
+});
 
 export default {
-  mixins: [buildMixin],
   data() {
     return {
       build: {}
     };
   },
   methods: {
-    setBuildUrl() {
-      let url = this.getUrl(this.build);
-      url = 'https://asparuh.codixfr.private/prt/';
+    checkBuild() {
 
-      if (this.$route.query.uri) {
-        url += this.$route.query.uri;
-      }
+      api.get(`builds/${this.build.id}/ping`)
+        .then(() => {
+          // TODO: show build working message here !!!
 
-      this.$refs.iframe.setAttribute('src', url);
+          setTimeout(() => window.location.reload(), 1000);
+        })
+        .catch(() => {
+          setTimeout(() => this.checkBuild(),3000);
+        });
     },
-
-    updateUrl(data) {
-      let query = Object.assign({}, this.$route.query);
-      query.uri = data.location.href
-        .replace(data.location.origin, '')
-        .replace('/' + this.$route.params.name + '/', '');
-
-      this.$router.push({ query });
-      window.document.title = data.title;
-    },
-
-    startListener() {
-      const eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-      const messageEvent = eventMethod === "attachEvent" ? "onmessage" : "message";
-
-      window[eventMethod](messageEvent, function(e) {
-
-        try {
-          const key = e.message ? "message" : "data";
-          const data = JSON.parse(e[key]);
-
-          this.updateUrl(data);
-        } catch (e) { }
-      }.bind(this), false);
-    }
   },
+
   mounted() {
-    this.startListener();
+    const filters = JSON.stringify({
+      filters: JSON.stringify({
+        allOf: [
+          {
+            'details->service->Spec->Name': this.$route.params.name,
+          },
+        ],
+      }),
+    });
 
-    // TODO: to not get services just because of the docker host
-    const promise1 = this.$store.dispatch('extranet/getServices');
-    const promise2 = this.$store.dispatch('builds/findBuildByName', this.$route.params.name);
+    api.get(`builds?filters=${filters}`)
+      .then((response) => {
+        if (response.data.data.length === 0) {
 
-    Promise.all([promise1, promise2]).then((responses) => {
-      if (responses[1].data.data.length === 0) {
-        return;
-      }
+          // TODO: show build not found message here !!!
 
-      this.build = responses[1].data.data[0];
-      if (this.build.status === 'stopped') {
-        this.$store.dispatch('builds/start', this.build.id)
-          .then(() => {
-            this.build.status = 'running';
-            this.setBuildUrl()
-          });
-        return;
-      }
+          return;
+        }
 
-      if (this.build.status === 'running') {
-        this.setBuildUrl();
-      }
+        this.build = response.data.data[0];
+        if (this.build.status === 'stopped') {
+
+          // TODO: show starting build message here !!!
+
+          api.get(`builds/${this.build.id}/ping`)
+            .then(() => {
+
+              // TODO: show build started message here !!!
+
+              // We wait for tomcat to start now
+              this.checkBuild();
+            });
+          return;
+        }
+
+        this.checkBuild();
     });
   },
 };
 </script>
-
-<style>
-  body {
-    margin: 0;
-    overflow: hidden;
-  }
-  iframe {
-    border: 0;
-    height: 100vh;
-    width: 100%
-  }
-</style>

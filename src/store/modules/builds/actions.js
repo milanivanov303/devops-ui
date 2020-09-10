@@ -84,6 +84,15 @@ export default {
     return promise;
   },
 
+  ping({ commit }, id) {
+    const promise = api.post(`builds/${id}/ping`);
+
+    promise
+      .catch(() => commit('error', 'Could not ping build', { root: true }));
+
+    return promise;
+  },
+
   getBuildsByStatus({ commit }, {
     branch, module, status, user, perPage, page,
   }) {
