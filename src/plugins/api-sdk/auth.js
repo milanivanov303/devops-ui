@@ -31,7 +31,6 @@ class Auth {
   }
 
   errorInterceptor(error) {
-    debugger;
     if (error.response.status === 401 && this.username && this.password) {
       return this.login(this.username, this.password).then((response) => {
         error.config.headers.Authorization = `Bearer ${response.data.token}`;

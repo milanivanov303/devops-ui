@@ -22,10 +22,10 @@ const apiSdkAuto = () => {
       config.um.url,
       config.auth.code,
       {
-        session_name: 'ea_auto_session',
+        session_name: config.auth_auto.session_name,
         session_expire: config.auth.session_expire,
-        username: 'ea_auto',
-        password: 'auto_ea',
+        username: config.auth_auto.username,
+        password: config.auth_auto.password,
       },
     );
   }
