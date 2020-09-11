@@ -7,16 +7,15 @@
 
 <script>
 
-import { getParam } from '@/plugins/helpers';
 import config from '@/config';
 
 export default {
   computed: {
     name() {
-      return getParam('name');
+      return this.$route.query.name;
     },
     username() {
-      return getParam('username');
+      return this.$route.query.username;
     },
   },
   mounted() {

@@ -1,9 +1,4 @@
 // https://vuex.vuejs.org/en/actions.html
-import Api from '../../../plugins/api';
-import config from '../../../config';
-
-const api = new Api(config.devops.url, config.devops.code);
-
 export default {
   getBranches({ commit }) {
     const name = 'imx_fe_branches';
@@ -12,7 +7,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('imx-fe/branches');
+    const promise = api('devops').get('imx-fe/branches');
 
     commit('promise', { name, promise }, { root: true });
 
@@ -23,7 +18,7 @@ export default {
     return promise;
   },
   getContainers({ commit }) {
-    const promise = api.get('imx-fe/containers');
+    const promise = api('devops').get('imx-fe/containers');
 
     promise
       .then((response) => {
@@ -35,12 +30,12 @@ export default {
     return promise;
   },
   startBuild({ commit }, payload) {
-    const promise = api.post('imx-fe/build', payload);
+    const promise = api('devops').post('imx-fe/build', payload);
     promise.catch(error => commit('error', error));
     return promise;
   },
   removeBuild({ commit }, id) {
-    const promise = api.delete(`imx-fe/build/${id}`);
+    const promise = api('devops').delete(`imx-fe/build/${id}`);
     promise
       .then(() => commit('removeBuild', id))
       .catch(error => commit('error', error, { root: true }));

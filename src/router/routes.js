@@ -1,5 +1,3 @@
-import auth from '@/plugins/auth';
-
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
 const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Dashboard.vue');
 const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
@@ -277,7 +275,7 @@ export default [
     component: LoggedInSSOUser,
   },
   {
-    path: '/:name',
+    path: '/:name(.*_\\d+)/:uri(.*)?',
     meta: {
       layout: 'basic',
       requiresAuth: false,

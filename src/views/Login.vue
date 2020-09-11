@@ -122,6 +122,10 @@ export default {
       iframe.onload = (e) => {
         this.gettingSSOUser = false;
 
+        if (!e.target.contentDocument) {
+          return;
+        }
+
         const name = e.target.contentDocument.getElementById('name').innerText;
         const username = e.target.contentDocument.getElementById('username').innerText;
 

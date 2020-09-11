@@ -1,50 +1,53 @@
 <template>
   <div>
-    <p>Open build {{ $route.params.name }}</p>
+    <p>Open build {{ name }}</p>
   </div>
 </template>
 
 <script>
 
+const api = window.apiAuto('devops');
+
 export default {
   data() {
     return {
-      build: {}
+      build: {},
     };
+  },
+  computed: {
+    name() {
+      return this.$route.params.name;
+    },
   },
   methods: {
     checkBuild() {
-
-      this.$store.dispatch('builds/ping', this.build.id)
+      api.get(`builds/${this.build.id}/ping`)
         .then(() => {
           // TODO: show build working message here !!!
 
-          setTimeout(() => window.location.reload(), 1000);
+          // setTimeout(() => window.location.reload(), 1000);
         })
         .catch(() => {
-          setTimeout(() => this.checkBuild(),3000);
+          setTimeout(() => this.checkBuild(), 3000);
         });
     },
   },
 
   mounted() {
-    this.$store.dispatch('builds/findBuildByName', this.$route.params.name)
+    api.get('builds', { name: this.name })
       .then((response) => {
         if (response.data.data.length === 0) {
-
           // TODO: show build not found message here !!!
 
           return;
         }
 
-        this.build = response.data.data[0];
+        [this.build] = response.data.data;
         if (this.build.status === 'stopped') {
-
           // TODO: show starting build message here !!!
 
-          this.$store.dispatch('builds/start', this.build.id)
+          api.post(`builds/${this.build.id}/start`)
             .then(() => {
-
               // TODO: show build started message here !!!
 
               // We wait for tomcat to start now
@@ -54,7 +57,7 @@ export default {
         }
 
         this.checkBuild();
-    });
+      });
   },
 };
 </script>

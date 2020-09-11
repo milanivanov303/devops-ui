@@ -387,14 +387,6 @@ export default {
 
     getUrl(build) {
       return `/${build.name}`;
-
-      const { host } = this.$store.state[build.module];
-      const port = this.getPublishedPort(build, 8080);
-
-      if (port) {
-        return `http://${host}:${port}/${build.name}`;
-      }
-      return null;
     },
 
     getWebssh2Url(build) {
