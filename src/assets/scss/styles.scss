@@ -178,6 +178,11 @@ a.sidenav-trigger.top-nav {
     }
 }
 
+h3 {
+    font-size: 24px;
+    font-weight: 500;
+}
+
 .alert {
     @extend .card;
     width: 100%;
@@ -429,6 +434,10 @@ a{
 }
 .readonly {
     pointer-events: none;
+}
+
+.autocomplete-content.dropdown-content {
+    top: 46px !important; 
 }
 
 #buildProgress {

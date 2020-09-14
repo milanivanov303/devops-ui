@@ -53,6 +53,7 @@
                     <i class="large material-icons col s12">person_pin</i>
                   </a>
                   <Preloader v-if="gettingSSOUser" class="small" />
+                  <p v-else>Quick login with <b>User Management (SSO)</b></p>
                 </div>
                 <Preloader v-if="loggingInSSO" class="preloader-wrapper small" />
               </div>
