@@ -1,5 +1,3 @@
-import auth from '@/plugins/auth';
-
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
 const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Dashboard.vue');
 const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
@@ -19,6 +17,7 @@ const AdministrationActions = () => import(/* webpackChunkName: "administration-
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
+const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild.vue');
 
 export default [
   {
@@ -274,6 +273,14 @@ export default [
       requiresAuth: false,
     },
     component: LoggedInSSOUser,
+  },
+  {
+    path: '/:name(.*_\\d+)/:uri(.*)?',
+    meta: {
+      layout: 'basic',
+      requiresAuth: false,
+    },
+    component: OpenBuild,
   },
   {
     path: '*',

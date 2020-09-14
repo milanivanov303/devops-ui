@@ -621,7 +621,7 @@ export default {
       payload.project = this.configuration.project.name;
       payload.delivery_chain = this.configuration.delivery_chain.title;
       payload.dev_instance = this.configuration.dev_instance.name;
-      if(this.configuration.val_instance) {
+      if (this.configuration.val_instance) {
         payload.val_instance = this.configuration.val_instance.name;
       }
       if (this.configuration.deploy_instance) {

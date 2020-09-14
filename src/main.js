@@ -9,27 +9,28 @@ import store from './store';
 
 import DefaultLayout from './components/layouts/Default';
 import LoginLayout from './components/layouts/Login';
+import BasicLayout from './components/layouts/Basic';
 
 import '@/config';
-import auth from './plugins/auth';
-import Api from './plugins/api';
 import config from '../config';
+import './plugins/backend';
 import { date } from './plugins/helpers';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import WebSocket from './plugins/ws';
 
-const api = new Api(config.um.url, config.um.code);
-const ws = new WebSocket(config.ws.url, config.ws.username, config.ws.password, config.ws.vhost);
-
-Vue.use(vuEaCore, { store, config, api });
+Vue.use(vuEaCore, { store, config, api: api('um') });
 Vue.use(Loading);
 Vue.use(Vuelidate);
+
 Vue.prototype.$M = M;
 Vue.prototype.$auth = auth;
 Vue.prototype.$date = date;
+
+const ws = new WebSocket(config.ws.url, config.ws.username, config.ws.password, config.ws.vhost);
 Vue.prototype.$ws = ws;
 
 Vue.component('default-layout', DefaultLayout);
+Vue.component('basic-layout', BasicLayout);
 Vue.component('login-layout', LoginLayout);
 
 Vue.config.productionTip = false;

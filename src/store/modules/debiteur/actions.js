@@ -1,8 +1,4 @@
 // https://vuex.vuejs.org/en/actions.html
-import Api from '../../../plugins/api';
-import config from '../../../config';
-
-const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   getClients({ commit }) {
@@ -12,7 +8,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('debiteur/clients');
+    const promise = api('devops').get('debiteur/clients');
 
     commit('promise', { name, promise }, { root: true });
 
@@ -29,7 +25,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('debiteur/branches');
+    const promise = api('devops').get('debiteur/branches');
 
     commit('promise', { name, promise }, { root: true });
 
@@ -40,7 +36,7 @@ export default {
   },
 
   getHost({ commit }) {
-    const promise = api.get('debiteur/host');
+    const promise = api('devops').get('debiteur/host');
 
     promise
       .then((response) => {
@@ -51,13 +47,13 @@ export default {
   },
 
   startBuild({ commit }, payload) {
-    const promise = api.post('debiteur/build', payload);
+    const promise = api('devops').post('debiteur/build', payload);
     promise.catch(error => commit('error', error, { root: true }));
     return promise;
   },
 
   removeBuild({ commit }, id) {
-    const promise = api.delete(`debiteur/build/${id}`);
+    const promise = api('devops').delete(`debiteur/build/${id}`);
     promise
       .then(() => commit('removeBuild', id))
       .catch(error => commit('error', error, { root: true }));

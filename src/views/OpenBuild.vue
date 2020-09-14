@@ -1,0 +1,130 @@
+<template>
+<main>
+  <div class="container">
+    <h6 class="row center">Opening build <b>{{ $route.params.name }}</b></h6>
+    <div ref="autostart_builds">
+      <div class="row center">
+        <i class="material-icons">{{ icon }}</i>
+      </div>
+      <div class="row center">
+        <div class="row">
+          <div id="buildProgress" class="progress col s12 m10 offset-m1 hidden">
+            <div class="indeterminate"></div>
+          </div>
+        </div>
+        <h3 class="center">{{ header }}</h3>
+        <h5 class="center">{{ message }}</h5>
+        <div class="row">
+          <div id="tomcatProgress" class="progress col s8 offset-s2 m4 offset-m4 hidden">
+            <div class="indeterminate"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+  
+</template>
+
+<script>
+
+const api = apiAuto('devops');
+
+export default {
+  data() {
+    return {
+      build: {},
+      icon: '',
+      header: '',
+      message: '',
+      checkStarted: 0
+    };
+  },
+  computed: {
+    name() {
+      return this.$route.params.name;
+    },
+  },
+  methods: {
+    checkBuild() {
+
+      if (this.checkStarted === 0) {
+        setInterval(() => {this.checkStarted++; }, 5 * 60 * 1000);
+      }
+
+
+      api.get(`builds/${this.build.id}/ping`)
+        .then(() => {
+
+          this.icon = 'check_circle';
+          this.header = '- Build is working -';
+          this.message = '';
+          document.getElementById('tomcatProgress').classList.add('hidden');
+ 
+          setTimeout(() => window.location.reload(), 1000);
+        })
+        .catch(() => {
+
+          if (this.checkStarted >= 5) {
+            document.getElementById('tomcatProgress').classList.add('hidden');
+            this.icon = 'cancel';
+            this.header = '- Tomcat could not start -';
+            this.message = 'Please contact phpid';
+            return;
+          }
+
+          setTimeout(() => this.checkBuild(), 3000);
+        });
+    },
+  },
+
+  mounted() {
+    const loader = this.$loading.show({ container: this.$refs.autostart_builds });
+
+    api.get('builds', { name: this.name })
+      .then((response) => {
+        loader.hide();
+        if (response.data.data.length === 0) {
+          this.icon = 'cancel';
+          this.header = '- Sorry - '
+          this.message = 'There is no such build';
+          return;
+        }
+
+        this.build = response.data.data[0];
+
+        if (this.build.status === 'stopped') {
+          this.icon = 'laptop_chromebook';
+          this.message = 'Build starting...';
+          document.getElementById('buildProgress').classList.remove('hidden');
+         
+          api.post(`builds/${this.build.id}/start`)
+            .then(() => {
+              this.header = '- Build started successfully - '
+              this.message = 'Waiting for tomcat to start...'
+
+              document.getElementById('buildProgress').classList.add('hidden');
+              document.getElementById('tomcatProgress').classList.remove('hidden');
+
+              this.checkBuild();
+            });
+          return;
+        }
+
+        this.checkBuild();
+      });
+  },
+};
+</script>
+
+<style scoped lang='scss'>
+  .page main{
+    padding-left: 0 !important;
+    padding-top: 200px;
+  }
+
+  i {
+    font-size: 17rem;
+  }
+
+</style>

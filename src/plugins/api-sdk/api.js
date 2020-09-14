@@ -1,20 +1,21 @@
 import Axios from 'axios';
 import queryString from 'query-string';
-import auth from '@/plugins/auth';
 
 class Api {
-  constructor(url, code) {
-    this.url = url;
+  constructor(auth, url, code) {
+    this.auth = auth;
     this.code = code;
 
-    this.axios = Axios.create();
+    this.axios = Axios.create({
+      baseURL: url,
+    });
 
     this.axios.interceptors.request.use(this.requestInterceptor.bind(this));
     this.axios.interceptors.response.use(null, this.errorInterceptor.bind(this));
   }
 
   requestInterceptor(config) {
-    auth.getApiToken(this.code).then((response) => {
+    this.auth.getApiToken(this.code).then((response) => {
       const token = response.data ? response.data.token : response;
       config.headers.Authorization = `Bearer ${token}`;
     });
@@ -23,7 +24,7 @@ class Api {
 
   errorInterceptor(error) {
     if (error.response.status === 401) {
-      return auth.getNewApiToken(this.code).then((response) => {
+      return this.auth.getNewApiToken(this.code).then((response) => {
         error.config.headers.Authorization = `Bearer ${response.data.token}`;
         return Axios.create().request(error.config);
       });
@@ -36,19 +37,19 @@ class Api {
     if (query) {
       query = `?${query}`;
     }
-    return this.axios.get(`${this.url}/${uri}${query}`, config);
+    return this.axios.get(`${uri}${query}`, config);
   }
 
   put(uri, data, config = {}) {
-    return this.axios.put(`${this.url}/${uri}`, data, config);
+    return this.axios.put(`${uri}`, data, config);
   }
 
   post(uri, data, config = {}) {
-    return this.axios.post(`${this.url}/${uri}`, data, config);
+    return this.axios.post(`${uri}`, data, config);
   }
 
   delete(uri, config = {}) {
-    return this.axios.delete(`${this.url}/${uri}`, config);
+    return this.axios.delete(`${uri}`, config);
   }
 }
 
