@@ -23,7 +23,7 @@
     </div>
   </div>
 </main>
-  
+
 </template>
 
 <script>
@@ -37,7 +37,7 @@ export default {
       icon: '',
       header: '',
       message: '',
-      checkStarted: 0
+      checkStarted: 0,
     };
   },
   computed: {
@@ -47,24 +47,21 @@ export default {
   },
   methods: {
     checkBuild() {
-
       if (this.checkStarted === 0) {
-        setInterval(() => {this.checkStarted++; }, 5 * 60 * 1000);
+        setInterval(() => { this.checkStarted += 1; }, 5 * 60 * 1000);
       }
 
 
       api.get(`builds/${this.build.id}/ping`)
         .then(() => {
-
           this.icon = 'check_circle';
           this.header = '- Build is working -';
           this.message = '';
           document.getElementById('tomcatProgress').classList.add('hidden');
- 
+
           setTimeout(() => window.location.reload(), 1000);
         })
         .catch(() => {
-
           if (this.checkStarted >= 5) {
             document.getElementById('tomcatProgress').classList.add('hidden');
             this.icon = 'cancel';
@@ -86,22 +83,22 @@ export default {
         loader.hide();
         if (response.data.data.length === 0) {
           this.icon = 'cancel';
-          this.header = '- Sorry - '
+          this.header = '- Sorry - ';
           this.message = 'There is no such build';
           return;
         }
 
-        this.build = response.data.data[0];
+        [this.build] = response.data.data;
 
         if (this.build.status === 'stopped') {
           this.icon = 'laptop_chromebook';
           this.message = 'Build starting...';
           document.getElementById('buildProgress').classList.remove('hidden');
-         
+
           api.post(`builds/${this.build.id}/start`)
             .then(() => {
-              this.header = '- Build started successfully - '
-              this.message = 'Waiting for tomcat to start...'
+              this.header = '- Build started successfully - ';
+              this.message = 'Waiting for tomcat to start...';
 
               document.getElementById('buildProgress').classList.add('hidden');
               document.getElementById('tomcatProgress').classList.remove('hidden');
