@@ -2,34 +2,24 @@
 <main>
   <div class="container">
     <h6 class="row center">Opening build <b>{{ $route.params.name }}</b></h6>
-    <div class="row center">
-      <i v-if="buildStatus === 'not-found'" class="material-icons large">cancel</i>
-      <i v-if="buildStatus === 'build-starting' || buildStatus === 'build-started'" class="material-icons large">laptop_chromebook</i>
-      <i v-if="buildStatus === 'tomcat-started'" class="material-icons large">check_circle</i>
-    </div>
-    <div class="row center">.
-      <div v-if="buildStatus === 'not-found'" class="row">
-        <h2 class="row center">- Sorry -</h2> 
-        <h5 class="row center">There is no such build</h5> 
+    <div ref="autostart_builds">
+      <div class="row center">
+        <i class="material-icons">{{ icon }}</i>
       </div>
-
       <div class="row center">
         <div class="row">
           <div id="buildProgress" class="progress col s12 m10 offset-m1 hidden">
             <div class="indeterminate"></div>
           </div>
         </div>
-        <h5 v-if="buildStatus === 'build-starting'" class="row center">Build starting...</h5>
-        <h5 v-if="buildStatus === 'build-started'" class="center">Build started successfully!<br>Waiting for tomcat to start...</h5>
-        <h5 v-if="buildStatus === 'tomcat-started'" class="row center">Build is working!</h5>
+        <h3 class="center">{{ header }}</h3>
+        <h5 class="center">{{ message }}</h5>
         <div class="row">
           <div id="tomcatProgress" class="progress col s8 offset-s2 m4 offset-m4 hidden">
             <div class="indeterminate"></div>
           </div>
         </div>
-        
       </div>
-    
     </div>
   </div>
 </main>
@@ -44,7 +34,10 @@ export default {
   data() {
     return {
       build: {},
-      buildStatus: '',
+      icon: '',
+      header: '',
+      message: '',
+      checkStarted: 0
     };
   },
   computed: {
@@ -54,45 +47,63 @@ export default {
   },
   methods: {
     checkBuild() {
+
+      if (this.checkStarted === 0) {
+        setInterval(() => {this.checkStarted++; }, 5 * 60 * 1000);
+      }
+
+
       api.get(`builds/${this.build.id}/ping`)
         .then(() => {
 
-          this.buildStatus = 'tomcat-started'
+          this.icon = 'check_circle';
+          this.header = '- Build is working -';
+          this.message = '';
           document.getElementById('tomcatProgress').classList.add('hidden');
  
           setTimeout(() => window.location.reload(), 1000);
         })
         .catch(() => {
-          //no longer than 5 min
+
+          if (this.checkStarted >= 5) {
+            document.getElementById('tomcatProgress').classList.add('hidden');
+            this.icon = 'cancel';
+            this.header = '- Tomcat could not start -';
+            this.message = 'Please contact phpid';
+            return;
+          }
 
           setTimeout(() => this.checkBuild(), 3000);
         });
     },
-
   },
 
   mounted() {
+    const loader = this.$loading.show({ container: this.$refs.autostart_builds });
+
     api.get('builds', { name: this.name })
       .then((response) => {
+        loader.hide();
         if (response.data.data.length === 0) {
-          this.buildStatus = 'not-found';
+          this.icon = 'cancel';
+          this.header = '- Sorry - '
+          this.message = 'There is no such build';
           return;
         }
 
         this.build = response.data.data[0];
 
         if (this.build.status === 'stopped') {
-
-          this.buildStatus = 'build-starting';
+          this.icon = 'laptop_chromebook';
+          this.message = 'Build starting...';
           document.getElementById('buildProgress').classList.remove('hidden');
          
           api.post(`builds/${this.build.id}/start`)
             .then(() => {
+              this.header = '- Build started successfully - '
+              this.message = 'Waiting for tomcat to start...'
 
-              this.buildStatus = 'build-started';
               document.getElementById('buildProgress').classList.add('hidden');
-
-              // We wait for tomcat to start now
               document.getElementById('tomcatProgress').classList.remove('hidden');
 
               this.checkBuild();
@@ -112,37 +123,8 @@ export default {
     padding-top: 200px;
   }
 
-  i.large {
+  i {
     font-size: 17rem;
-  }
-
-  #buildProgress {
-    background-color: #ededed;
-    border-radius: 13px;
-    padding: 3px;
-    height: 15px !important;
-  }
-
-  #buildProgress>div {
-    background-color: #222831;
-    border-radius: 10px;
-    margin: 3px 0 3px 0;
-  }
-  #tomcatProgress {
-    background-color: #ededed;
-    border-radius: 13px;
-    padding: 3px;
-    height: 5px !important;
-  }
-
-  #tomcatProgress>div {
-    background-color: #222831;
-    border-radius: 10px;
-    margin: 3px 0 3px 0;
-  }
-
-  .hidden {
-    display: none;
   }
 
 </style>

@@ -170,18 +170,12 @@ a.sidenav-trigger.top-nav {
     }
 }
 
-
 .dropdown-content {
     li > a > i {
         font-size: 22px;
         margin-right: 5px;
         padding: 0px;
     }
-}
-
-h3 {
-    font-size: 24px;
-    font-weight: 500;
 }
 
 .alert {
@@ -436,3 +430,32 @@ a{
 .readonly {
     pointer-events: none;
 }
+
+#buildProgress {
+    background-color: #ededed;
+    border-radius: 13px;
+    padding: 3px;
+    height: 15px !important;
+  }
+
+  #buildProgress>div {
+    background-color: #222831;
+    border-radius: 10px;
+    margin: 3px 0 3px 0;
+  }
+  #tomcatProgress {
+    background-color: #ededed;
+    border-radius: 13px;
+    padding: 3px;
+    height: 5px !important;
+  }
+
+  #tomcatProgress>div {
+    background-color: #222831;
+    border-radius: 10px;
+    margin: 3px 0 3px 0;
+  }
+
+  .hidden {
+    display: none;
+  }
