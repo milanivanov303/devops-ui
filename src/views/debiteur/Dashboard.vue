@@ -5,7 +5,7 @@
         <div class="card" ref="my_builds">
           <div class="card-content">
             <span class="card-title">My debiteur builds</span>
-            <Builds :user="this.$auth.getUser().username" :module="'debiteur'"></Builds>
+            <Builds :user="this.$auth.getUser().username" module="debiteur"></Builds>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
@@ -143,7 +143,7 @@ export default {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_branch });
       const promise1 = this.$store.dispatch('builds/getActive');
-      const promise2 = this.$store.dispatch('debiteur/getServices');
+      const promise2 = this.$store.dispatch('debiteur/getHost');
 
       Promise.all([promise1, promise2]).finally(() => {
         loader1.hide();
