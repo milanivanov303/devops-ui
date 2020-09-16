@@ -37,7 +37,7 @@ export default {
       icon: '',
       header: '',
       message: '',
-      checkStarted: 0,
+      checkTimer: 0,
     };
   },
   computed: {
@@ -47,11 +47,6 @@ export default {
   },
   methods: {
     checkBuild() {
-      if (this.checkStarted === 0) {
-        setInterval(() => { this.checkStarted += 1; }, 5 * 60 * 1000);
-      }
-
-
       api.get(`builds/${this.build.id}/ping`)
         .then(() => {
           this.icon = 'check_circle';
@@ -62,7 +57,7 @@ export default {
           setTimeout(() => window.location.reload(), 1000);
         })
         .catch(() => {
-          if (this.checkStarted >= 5) {
+          if (this.checkTimer >= 5 * 60 /* 5 minutes */) {
             document.getElementById('tomcatProgress').classList.add('hidden');
             this.icon = 'cancel';
             this.header = '- Tomcat could not start -';
@@ -90,25 +85,22 @@ export default {
 
         [this.build] = response.data.data;
 
-        if (this.build.status === 'stopped') {
-          this.icon = 'laptop_chromebook';
-          this.message = 'Build starting...';
-          document.getElementById('buildProgress').classList.remove('hidden');
+        this.icon = 'laptop_chromebook';
+        this.message = 'Build starting...';
+        document.getElementById('buildProgress').classList.remove('hidden');
 
-          api.post(`builds/${this.build.id}/start`)
-            .then(() => {
-              this.header = '- Build started successfully - ';
-              this.message = 'Waiting for tomcat to start...';
+        api.post(`builds/${this.build.id}/start`)
+          .then(() => {
+            this.header = '- Build started successfully - ';
+            this.message = 'Waiting for tomcat to start...';
 
-              document.getElementById('buildProgress').classList.add('hidden');
-              document.getElementById('tomcatProgress').classList.remove('hidden');
+            document.getElementById('buildProgress').classList.add('hidden');
+            document.getElementById('tomcatProgress').classList.remove('hidden');
 
-              this.checkBuild();
-            });
-          return;
-        }
+            setInterval(() => { this.checkTimer += 1; }, 1000);
+            this.checkBuild();
+          });
 
-        this.checkBuild();
       });
   },
 };
