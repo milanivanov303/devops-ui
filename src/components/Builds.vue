@@ -135,7 +135,7 @@
               <label :class="{active: selectedBuild.branch}" for="branch">Branch</label>
             </div>
           </div>
-          <div v-if="selectedBuild.log !== null" class="row">
+          <div v-if="selectedBuild.log" class="row">
             <label>Logs</label>
             <div>
               <div class="log">{{ selectedBuild.log }}</div>
@@ -335,7 +335,9 @@ export default {
       builds: [],
       paginationData: {},
       status: ['running', 'stopped', 'building'],
-      selectedBuild: {},
+      selectedBuild: {
+        log: null
+      },
       showInfoModal: false,
       showRemoveModal: false,
       updating: false,
@@ -419,24 +421,21 @@ export default {
 
     openInfoModal(build) {
 
-      if (build.status === 'building' && client.connected === true) {
+      if (build.status === 'building' && this.$ws.isConnected() === true) {
 
-        build.details.broadcast['ack'] = 'client';
-
-        const subscribe = client.subscribe(
+        const subscribe = this.$ws.subscribe(
           `/queue/${build.details.broadcast.queue}`,
           (message) => {
             const data = JSON.parse(message.body);
 
             if (data.log) {
-               this.selectedBuild.log += data.log;
+              this.selectedBuild.log += data.log;
             }
 
-            message.nack();
-
             if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
-                this.$store.dispatch('builds/getActive');
-                subscribe.unsubscribe();
+              this.selectedBuild.status = data.status;
+              this.$emit('created');
+              subscribe.unsubscribe();
             }
           },
           build.details.broadcast,
@@ -456,7 +455,9 @@ export default {
       }
       this.selectedBuild.instance = build.details.instance.name;
       this.selectedBuild.java_version = build.details.java_version;
-      this.selectedBuild.ports = build.details.service.Endpoint.Ports;
+      if (typeof build.details.service !== 'undefined') {
+        this.selectedBuild.ports = build.details.service.Endpoint.Ports;
+      }
       this.selectedBuild.host = this.$store.state[build.module].host;
       this.selectedBuild.user = 'enterprise';
       this.selectedBuild.pass = 'Sofphia';
