@@ -107,6 +107,11 @@
                    Inventory
                 </router-link>
               </li>
+              <li :class="{ active: isActive('cms/modification') }">
+                <router-link to="/cms/modification">
+                  Modification
+                </router-link>
+              </li>
               <li><div class="divider"></div></li>
             </ul>
           </div>

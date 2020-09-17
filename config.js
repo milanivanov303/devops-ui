@@ -19,6 +19,11 @@ module.exports = {
   mmpi: {
     url: process.env.VUE_APP_MMPI_API_URL,
     code: process.env.VUE_APP_MMPI_API_CODE,
+    web: process.env.VUE_APP_MMPI_URL,
+    modif_cmd: process.env.VUE_APP_MODIF_CMD,
+    modif_module_home: process.env.VUE_APP_MODIF_MODULE_HOME,
+    modif_scripts_destination: process.env.VUE_APP_MODIF_SCRIPTS_DESTINATION,
+    modif_tmp_destination: process.env.VUE_APP_MODIF_TMP_DESTINATION,
   },
   ws: {
     url: process.env.VUE_APP_WS_URL,

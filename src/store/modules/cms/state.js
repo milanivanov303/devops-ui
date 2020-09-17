@@ -20,4 +20,8 @@ export default {
   secondSelectedInstance: '',
   firstInstanceVariables: [],
   secondInstanceVariables: [],
+  //Get issue/issues state in CMS/Modification tab
+  issue: '',
+  //Get instanse status state in CMS/Modification tab
+  instanceStatus: '',
 };

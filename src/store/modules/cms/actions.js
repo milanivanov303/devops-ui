@@ -8,6 +8,8 @@ const apiMMPI = new Api(config.mmpi.url, config.mmpi.code);
 export default {
   getTemplates({ commit }, payload) {
     const promise = api.get('cms/run-commands', payload);
+    console.log("Get Templates");
+    console.log(promise);
     promise
       .catch(error => commit('error', error));
     return promise;
@@ -248,6 +250,70 @@ export default {
     } catch (error) {
       console.log(error);
       commit('error', error);
+    }
+  },
+  //Add modification in CMS/Modification tab
+  async addModification({ commit }, payload) {
+    try {
+      //Commented rows below, because work just on page cms/modification other two pages are not currently functional
+      // let uri = '';
+      // if (payload.type_id === 'binary') {
+      //   uri = 'binaries';
+      // } else if (payload.type_id === 'cmd') {
+      //   uri = 'commands';
+      // } else if (payload.type_id === 'cms') {
+      //   uri = 'cms';
+      // }
+      const response = await apiMMPI.post(`modifications/cms`, payload);
+      return response.data.data;
+    } catch (error) {
+      console.log(error);
+      commit('error', error);
+      return error;
+    }
+  },
+  //get issue for CMS/Modification tab
+  async getIssue({ commit, state }, ttsId) {
+    try {
+      const payload = {
+        tts_id: ttsId,
+        order_by: 'tts_id asc',
+        with: JSON.stringify({
+          project: {
+            delivery_chains: {
+              instances: {
+                owner: {},
+                status: {},
+              },
+              type: {},
+              branches: {
+                repo_type: {},
+              },
+              dc_role: {},
+            },
+          },
+        }),
+      };
+      await apiMMPI.get('issues', payload).then((resp) => {
+        const [issue] = resp.data.data;
+        if (issue) {
+          commit('issue', issue);
+        }
+      });
+    } catch (error) {
+      commit('error', error);
+    }
+  },
+  //Get instanse status of CMS/Modification tab
+  async getInstanceStatus({ commit, state }) {
+    if (!state.instanceStatus) {
+      try {
+        await apiMMPI.get('enum-values', { type: 'instance_status' }).then((resp) => {
+          commit('instanceStatus', resp.data.data);
+        });
+      } catch (error) {
+        commit('error', error);
+      }
     }
   },
 };
