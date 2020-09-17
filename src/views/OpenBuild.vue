@@ -50,26 +50,23 @@ export default {
     checkBuild() {
       api.get(`builds/${this.build.id}/ping`)
         .then(() => {
-          if(this.checkCounter === 0 && this.build.status === 'running') {
-
+          if (this.checkCounter === 0 && this.build.status === 'running') {
             document.getElementById('tomcatProgress').classList.add('hidden');
             document.getElementById('autostart_builds').classList.add('fail');
 
             this.icon = 'cancel';
             this.header = '- Could not load the build -';
             this.message = 'Please try again or contact phpid';
-
           } else {
             document.getElementById('tomcatProgress').classList.add('hidden');
             document.getElementById('autostart_builds').classList.add('success');
 
             this.icon = 'check_circle';
             this.header = '- Build is working -';
-            this.message = '';            
-            
-            setTimeout(() => window.location.reload(), 1000);
+            this.message = '';
+
+            setTimeout(() => window.location.reload(), 2000);
           }
-          
         })
         .catch(() => {
           if (this.checkTimer >= 5 * 60 /* 5 minutes */) {
@@ -79,10 +76,10 @@ export default {
             this.icon = 'cancel';
             this.header = '- Tomcat could not start -';
             this.message = 'Please contact phpid';
-            
+
             return;
           }
-          this.checkCounter++;
+          this.checkCounter += 1;
           setTimeout(() => this.checkBuild(), 3000);
         });
     },
@@ -119,7 +116,6 @@ export default {
             setInterval(() => { this.checkTimer += 1; }, 1000);
             this.checkBuild();
           });
-
       });
   },
 };
@@ -134,7 +130,7 @@ export default {
   i {
     font-size: 17rem;
   }
-  
+
   .success {
     color: #29A19C
 
@@ -144,5 +140,5 @@ export default {
     color: #C40147;
 
   }
-  
+
   </style>
