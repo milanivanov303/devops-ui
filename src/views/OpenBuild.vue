@@ -38,7 +38,7 @@ export default {
       header: '',
       message: '',
       checkTimer: 0,
-      checkCounter: 0,
+      reload: true,
     };
   },
   computed: {
@@ -50,23 +50,25 @@ export default {
     checkBuild() {
       api.get(`builds/${this.build.id}/ping`)
         .then(() => {
-          if (this.checkCounter === 0 && this.build.status === 'running') {
+          if (!this.reload) {
             document.getElementById('tomcatProgress').classList.add('hidden');
             document.getElementById('autostart_builds').classList.add('fail');
 
             this.icon = 'cancel';
             this.header = '- Could not load the build -';
             this.message = 'Please try again or contact phpid';
-          } else {
-            document.getElementById('tomcatProgress').classList.add('hidden');
-            document.getElementById('autostart_builds').classList.add('success');
+            
+            return;
+          } 
 
-            this.icon = 'check_circle';
-            this.header = '- Build is working -';
-            this.message = '';
+          document.getElementById('tomcatProgress').classList.add('hidden');
+          document.getElementById('autostart_builds').classList.add('success');
 
-            setTimeout(() => window.location.reload(), 2000);
-          }
+          this.icon = 'check_circle';
+          this.header = '- Build is working -';
+          this.message = '';
+
+          setTimeout(() => window.location.reload(), 2000);
         })
         .catch(() => {
           if (this.checkTimer >= 5 * 60 /* 5 minutes */) {
@@ -79,7 +81,7 @@ export default {
 
             return;
           }
-          this.checkCounter += 1;
+          this.reload = true;
           setTimeout(() => this.checkBuild(), 3000);
         });
     },
@@ -100,6 +102,10 @@ export default {
         }
 
         [this.build] = response.data.data;
+
+        if(this.build.status === 'running') {
+          this.reload = false;
+        }
 
         this.icon = 'laptop_chromebook';
         this.message = 'Build starting...';
