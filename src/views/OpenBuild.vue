@@ -3,7 +3,7 @@
   <div class="container">
     <h6 class="row center">Opening build <b>{{ $route.params.name }}</b></h6>
     <div ref="autostart_builds">
-      <div class="row center">
+      <div id="autostart_builds" class="row center">
         <i class="material-icons">{{ icon }}</i>
       </div>
       <div class="row center">
@@ -38,6 +38,7 @@ export default {
       header: '',
       message: '',
       checkTimer: 0,
+      checkCounter: 0,
     };
   },
   computed: {
@@ -49,22 +50,39 @@ export default {
     checkBuild() {
       api.get(`builds/${this.build.id}/ping`)
         .then(() => {
-          this.icon = 'check_circle';
-          this.header = '- Build is working -';
-          this.message = '';
-          document.getElementById('tomcatProgress').classList.add('hidden');
+          if(this.checkCounter === 0 && this.build.status === 'running') {
 
-          setTimeout(() => window.location.reload(), 1000);
+            document.getElementById('tomcatProgress').classList.add('hidden');
+            document.getElementById('autostart_builds').classList.add('fail');
+
+            this.icon = 'cancel';
+            this.header = '- Could not load the build -';
+            this.message = 'Please try again or contact phpid';
+
+          } else {
+            document.getElementById('tomcatProgress').classList.add('hidden');
+            document.getElementById('autostart_builds').classList.add('success');
+
+            this.icon = 'check_circle';
+            this.header = '- Build is working -';
+            this.message = '';            
+            
+            setTimeout(() => window.location.reload(), 1000);
+          }
+          
         })
         .catch(() => {
           if (this.checkTimer >= 5 * 60 /* 5 minutes */) {
             document.getElementById('tomcatProgress').classList.add('hidden');
+            document.getElementById('autostart_builds').classList.add('fail');
+
             this.icon = 'cancel';
             this.header = '- Tomcat could not start -';
             this.message = 'Please contact phpid';
+            
             return;
           }
-
+          this.checkCounter++;
           setTimeout(() => this.checkBuild(), 3000);
         });
     },
@@ -77,6 +95,7 @@ export default {
       .then((response) => {
         loader.hide();
         if (response.data.data.length === 0) {
+          document.getElementById('autostart_builds').classList.add('fail');
           this.icon = 'cancel';
           this.header = '- Sorry - ';
           this.message = 'There is no such build';
@@ -115,5 +134,15 @@ export default {
   i {
     font-size: 17rem;
   }
+  
+  .success {
+    color: #29A19C
 
-</style>
+  }
+
+  .fail {
+    color: #C40147;
+
+  }
+  
+  </style>
