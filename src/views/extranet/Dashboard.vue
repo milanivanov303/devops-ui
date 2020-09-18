@@ -28,7 +28,16 @@
                     {{ build.branch }}
                   </router-link>
                 </td>
-                <td>{{ build.builds }}</td>
+                <td>
+                  <span v-if="build.builds.running"
+                        class="new badge"
+                        data-badge-caption="running">{{ build.builds.running }}
+                  </span>
+                  <span v-if="build.builds.stopped"
+                        class="new badge red"
+                        data-badge-caption="stopped">{{ build.builds.stopped }}
+                  </span>
+                </td>
               </tr>
               <tr v-if="activeBuildsGroupedByBranch.length === 0">
                 <td colspan="3">There are no builds</td>

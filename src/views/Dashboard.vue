@@ -19,26 +19,28 @@
             </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>1</td>
+              <tr v-for="(build, index) in activeBuildsGroupedByModule" :key="index">
+                <td>{{ index + 1 }}</td>
                 <td>
-                  <router-link to="/extranet/dashboard">Extranet</router-link>
+                  <router-link :to="'/' + build.module +'/dashboard'">
+                    {{ capitalize(build.module) }}
+                  </router-link>
                 </td>
-                <td>{{ extranetBuildsCount }}</td>
-              </tr>
-              <tr>
-                <td>2</td>
                 <td>
-                  <router-link to="/debiteur/dashboard">Debiteur</router-link>
+                  <span v-if="build.builds.building"
+                        class="new badge blue"
+                        data-badge-caption="building">{{ build.builds.building }}
+                  </span>
+                  <span v-if="build.builds.running"
+                        class="new badge"
+                        data-badge-caption="running">{{ build.builds.running }}
+                  </span>
+                  <span v-if="build.builds.stopped"
+                        class="new badge red"
+                        data-badge-caption="stopped">{{ build.builds.stopped }}
+                  </span>
+
                 </td>
-                <td>{{ debiteurBuildsCount }}</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>
-                  <router-link to="/imx-fe/dashboard">iMX FE</router-link>
-                </td>
-                <td>{{ imxFeBuildsCount }}</td>
               </tr>
             </tbody>
           </table>
@@ -120,14 +122,8 @@ export default {
     };
   },
   computed: {
-    extranetBuildsCount() {
-      return this.$store.state.builds.active.filter(build => build.module === 'extranet').length;
-    },
-    debiteurBuildsCount() {
-      return this.$store.state.builds.active.filter(build => build.module === 'debiteur').length;
-    },
-    imxFeBuildsCount() {
-      return this.$store.state.builds.active.filter(build => build.module === 'imx_fe').length;
+    activeBuildsGroupedByModule() {
+      return this.$store.getters['builds/getActiveGroupedByModule'];
     },
     modulesChartData() {
       const builds = this.$store.getters['builds/getByModule']('module-builds');
@@ -184,6 +180,10 @@ export default {
       );
 
       return Math.round(new Date(newDate).getTime() / 1000);
+    },
+    capitalize(string) {
+      if (typeof string !== 'string') return '';
+      return string.charAt(0).toUpperCase() + string.slice(1);
     },
   },
   watch: {

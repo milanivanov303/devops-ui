@@ -9,6 +9,9 @@ export default {
           {
             status: 'stopped',
           },
+          {
+            status: 'building',
+          },
         ],
       }),
     });

@@ -31,12 +31,36 @@ export default {
       .active
       .filter(build => build.module === module)
       .forEach((build) => {
-        branches[build.details.branch] = (branches[build.details.branch] + 1) || 1;
+        if (!branches[build.details.branch]) {
+          branches[build.details.branch] = {};
+        }
+        branches[build.details.branch][build.status] = branches[build.details.branch][build.status]
+        + 1 || 1;
       });
+
 
     const builds = [];
     Object.keys(branches).forEach((branch) => {
       builds.push({ branch, builds: branches[branch] });
+    });
+
+    return builds.sort((a, b) => b.builds - a.builds);
+  },
+  getActiveGroupedByModule: (state) => {
+    const branches = {};
+    state
+      .active
+      .forEach((build) => {
+        if (!branches[build.module]) {
+          branches[build.module] = {};
+        }
+        branches[build.module][build.status] = branches[build.module][build.status] + 1 || 1;
+      });
+
+
+    const builds = [];
+    Object.keys(branches).forEach((module) => {
+      builds.push({ module, builds: branches[module] });
     });
 
     return builds.sort((a, b) => b.builds - a.builds);
