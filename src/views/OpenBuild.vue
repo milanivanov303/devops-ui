@@ -3,7 +3,7 @@
   <div class="container">
     <h6 class="row center">Opening build <b>{{ $route.params.name }}</b></h6>
     <div ref="autostart_builds">
-      <div class="row center">
+      <div id="autostart_builds" class="row center">
         <i class="material-icons">{{ icon }}</i>
       </div>
       <div class="row center">
@@ -38,6 +38,7 @@ export default {
       header: '',
       message: '',
       checkTimer: 0,
+      reload: true,
     };
   },
   computed: {
@@ -49,22 +50,38 @@ export default {
     checkBuild() {
       api.get(`builds/${this.build.id}/ping`)
         .then(() => {
+          if (!this.reload) {
+            document.getElementById('tomcatProgress').classList.add('hidden');
+            document.getElementById('autostart_builds').classList.add('fail');
+
+            this.icon = 'cancel';
+            this.header = '- Could not load the build -';
+            this.message = 'Please try again or contact phpid';
+            
+            return;
+          } 
+
+          document.getElementById('tomcatProgress').classList.add('hidden');
+          document.getElementById('autostart_builds').classList.add('success');
+
           this.icon = 'check_circle';
           this.header = '- Build is working -';
           this.message = '';
-          document.getElementById('tomcatProgress').classList.add('hidden');
 
-          setTimeout(() => window.location.reload(), 1000);
+          setTimeout(() => window.location.reload(), 2000);
         })
         .catch(() => {
           if (this.checkTimer >= 5 * 60 /* 5 minutes */) {
             document.getElementById('tomcatProgress').classList.add('hidden');
+            document.getElementById('autostart_builds').classList.add('fail');
+
             this.icon = 'cancel';
             this.header = '- Tomcat could not start -';
             this.message = 'Please contact phpid';
+
             return;
           }
-
+          this.reload = true;
           setTimeout(() => this.checkBuild(), 3000);
         });
     },
@@ -77,6 +94,7 @@ export default {
       .then((response) => {
         loader.hide();
         if (response.data.data.length === 0) {
+          document.getElementById('autostart_builds').classList.add('fail');
           this.icon = 'cancel';
           this.header = '- Sorry - ';
           this.message = 'There is no such build';
@@ -84,6 +102,10 @@ export default {
         }
 
         [this.build] = response.data.data;
+
+        if(this.build.status === 'running') {
+          this.reload = false;
+        }
 
         this.icon = 'laptop_chromebook';
         this.message = 'Build starting...';
@@ -100,7 +122,6 @@ export default {
             setInterval(() => { this.checkTimer += 1; }, 1000);
             this.checkBuild();
           });
-
       });
   },
 };
@@ -116,4 +137,14 @@ export default {
     font-size: 17rem;
   }
 
-</style>
+  .success {
+    color: #29A19C
+
+  }
+
+  .fail {
+    color: #C40147;
+
+  }
+
+  </style>
