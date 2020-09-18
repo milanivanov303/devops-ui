@@ -478,6 +478,7 @@ export default {
       this.$store.dispatch(`${build.module}/removeBuild`, build.id)
         .then(() => {
           this.removed = true;
+          this.$store.commit('builds/remove', build.id);
           this.builds = this.builds.filter(_build => _build.id !== build.id);
         })
         .catch((error) => {

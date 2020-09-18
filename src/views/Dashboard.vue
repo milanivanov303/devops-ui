@@ -32,14 +32,13 @@
                         data-badge-caption="building">{{ build.builds.building }}
                   </span>
                   <span v-if="build.builds.running"
-                        class="new badge"
+                        class="new badge green"
                         data-badge-caption="running">{{ build.builds.running }}
                   </span>
                   <span v-if="build.builds.stopped"
                         class="new badge red"
                         data-badge-caption="stopped">{{ build.builds.stopped }}
                   </span>
-
                 </td>
               </tr>
             </tbody>

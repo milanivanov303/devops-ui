@@ -51,6 +51,7 @@ export default {
     const promise = api('devops').post(`builds/${id}/start`);
 
     promise
+      .then(() => commit('start', id))
       .catch(() => commit('error', 'Could not start build', { root: true }));
 
     return promise;
@@ -60,6 +61,7 @@ export default {
     const promise = api('devops').post(`builds/${id}/stop`);
 
     promise
+      .then(() => commit('stop', id))
       .catch(() => commit('error', 'Could not stop build', { root: true }));
 
     return promise;
