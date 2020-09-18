@@ -29,6 +29,10 @@
                   </router-link>
                 </td>
                 <td>
+                  <span v-if="build.builds.building"
+                        class="new badge blue"
+                        data-badge-caption="building">{{ build.builds.building }}
+                  </span>
                   <span v-if="build.builds.running"
                         class="new badge"
                         data-badge-caption="running">{{ build.builds.running }}
