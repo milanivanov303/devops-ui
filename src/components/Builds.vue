@@ -4,7 +4,8 @@
       <i class="material-icons prefix">timelapse</i>
       <select class="select" multiple v-model="status">
         <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
+        <option value="removed">Removed</option>
+        <option value="failed">Failed</option>
       </select>
     </div>
 
@@ -337,7 +338,7 @@ export default {
       showModal: false,
       builds: [],
       paginationData: {},
-      status: ['active'],
+      status: ['active', 'running', 'building', 'stopped'],
       selectedBuild: {
         log: null
       },
@@ -389,15 +390,7 @@ export default {
     },
 
     getStatus() {
-      if (this.status.length === 1) {
-        if (this.status.includes('active')) {
-          return ['running', 'building', 'stopped'];
-        } else {
-          return ['removed', 'failed'];
-        }
-      } else {
-        return ['running', 'building', 'stopped', 'removed', 'failed'];
-      }
+      return this.status.concat(['running', 'building', 'stopped']);
     },
 
     getPublishedPort(build, port) {
