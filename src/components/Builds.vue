@@ -3,11 +3,8 @@
     <div class="input-field col s12 m6 l3 right">
       <i class="material-icons prefix">timelapse</i>
       <select class="select" multiple v-model="status">
-        <option value="running">Running</option>
-        <option value="building">Building</option>
-        <option value="stopped">Stopped</option>
-        <option value="removed">Removed</option>
-        <option value="failed">Failed</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
       </select>
     </div>
 
@@ -133,12 +130,6 @@
                 id="branch"
                 v-model="selectedBuild.branch">
               <label :class="{active: selectedBuild.branch}" for="branch">Branch</label>
-            </div>
-          </div>
-          <div v-if="selectedBuild.log" class="row">
-            <label>Logs</label>
-            <div>
-              <div class="log">{{ selectedBuild.log }}</div>
             </div>
           </div>
           <div class="row">
@@ -308,12 +299,21 @@
         </button>
       </template>
     </Modal>
+
+    <log-modal
+      :branch="branch"
+      :show-modal="showModal"
+      :broadcast="this.broadcast"
+    >
+    </log-modal>
+
   </div>
 </template>
 
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
 import config from '../config';
+import LogModal from "@/components/LogModal";
 
 export default {
   props: {
@@ -328,13 +328,16 @@ export default {
     },
   },
   components: {
+    LogModal,
     Paginate,
   },
   data() {
     return {
+      broadcast: '',
+      showModal: false,
       builds: [],
       paginationData: {},
-      status: ['running', 'stopped', 'building'],
+      status: ['active'],
       selectedBuild: {
         log: null
       },
@@ -372,7 +375,7 @@ export default {
       this.$store.dispatch('builds/getBuildsByStatus', {
         branch: this.branch,
         module: this.module,
-        status: this.status,
+        status: this.getStatus(),
         user: this.user,
         perPage: this.perPage.value,
         page: this.page,
@@ -383,6 +386,18 @@ export default {
           this.setLastPage();
         })
         .finally(() => loader.hide());
+    },
+
+    getStatus() {
+      if (this.status.length === 1) {
+        if (this.status.includes('active')) {
+          return ['running', 'building', 'stopped'];
+        } else {
+          return ['removed', 'failed'];
+        }
+      } else {
+        return ['running', 'building', 'stopped', 'removed', 'failed'];
+      }
     },
 
     getPublishedPort(build, port) {
@@ -422,24 +437,8 @@ export default {
     openInfoModal(build) {
 
       if (build.status === 'building' && this.$ws.isConnected() === true) {
-
-        const subscribe = this.$ws.subscribe(
-          `/queue/${build.details.broadcast.queue}`,
-          (message) => {
-            const data = JSON.parse(message.body);
-
-            if (data.log) {
-              this.selectedBuild.log += data.log;
-            }
-
-            if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
-              this.selectedBuild.status = data.status;
-              this.$emit('created');
-              subscribe.unsubscribe();
-            }
-          },
-          build.details.broadcast,
-        );
+        this.broadcast = build.details.broadcast;
+        this.showModal = true;
       }
 
       this.showInfoModal = true;
