@@ -96,7 +96,7 @@ export default {
             'details->branch': branch,
           },
           {
-            'details->created_by': user,
+            created_by: user,
           },
         ],
       }),

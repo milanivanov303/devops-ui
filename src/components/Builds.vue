@@ -27,7 +27,7 @@
         <td>{{ (page - 1) * perPage.value + index + 1 }}</td>
         <td>{{ build.name }}</td>
         <td v-if="!module">{{ build.module }}</td>
-        <td>{{ build.details.created_by }}</td>
+        <td>{{ build.created_by }}</td>
         <td>{{ $date(build.created_on).toHuman() }}</td>
         <td v-html="getStatusText(build)"></td>
         <td class="quick-actions">
@@ -205,6 +205,19 @@
                 v-model="selectedBuild.removed_on">
               <label :class="{active: selectedBuild.removed_on}"
                      for="created_on">Removed on
+              </label>
+            </div>
+          </div>
+          <div class="row" v-if="selectedBuild.removed_by" >
+            <div class="input-field col s12">
+              <i class="material-icons prefix">person</i>
+              <input
+                class="readonly"
+                type="text"
+                id="removed_by"
+                v-model="selectedBuild.removed_by">
+              <label :class="{active: selectedBuild.removed_by}"
+                      for="removed_by">Removed by
               </label>
             </div>
           </div>
@@ -413,7 +426,7 @@ export default {
     openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild.created_by = build.details.created_by;
+      this.selectedBuild.created_by = build.created_by;
       this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
       this.selectedBuild.branch = build.details.branch;
       if (build.details.fe_branch) {
@@ -421,6 +434,9 @@ export default {
       }
       if (build.removed_on) {
         this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
+      }
+      if (build.removed_by) {
+        this.selectedBuild.removed_by = build.removed_by;
       }
       this.selectedBuild.instance = build.details.instance.name;
       this.selectedBuild.java_version = build.details.java_version;
@@ -440,7 +456,7 @@ export default {
         return true;
       }
 
-      return this.$auth.getUser().username === build.details.created_by;
+      return this.$auth.getUser().username === build.created_by;
     },
 
     openRemoveModal(build) {
