@@ -436,7 +436,7 @@ export default {
       if (build.removed_on) {
         this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
       }
-      this.selectedBuild.removed_by = "auto-removed";
+      this.selectedBuild.removed_by = 'auto-removed';
       if (build.removed_by) {
         this.selectedBuild.removed_by = build.removed_by;
       }

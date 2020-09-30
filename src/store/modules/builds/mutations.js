@@ -30,6 +30,5 @@ export default {
       state.active.findIndex(build => build.id === id),
       1,
     );
-
   },
 };

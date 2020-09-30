@@ -57,9 +57,9 @@ export default {
             this.icon = 'cancel';
             this.header = '- Could not load the build -';
             this.message = 'Please try again or contact phpid';
-            
+
             return;
-          } 
+          }
 
           document.getElementById('tomcatProgress').classList.add('hidden');
           document.getElementById('autostart_builds').classList.add('success');
@@ -103,7 +103,7 @@ export default {
 
         [this.build] = response.data.data;
 
-        if(this.build.status === 'running') {
+        if (this.build.status === 'running') {
           this.reload = false;
         }
 

@@ -20,7 +20,7 @@ export default {
   },
   mounted() {
     if (!window.location.search) {
-      window.location.href = `${config.um.url}/../logged-in-user`;
+      window.location.href = `${config.um.url}/../logged-in-user?return_url=${encodeURI(window.location.href)}`;
     }
   },
 };
