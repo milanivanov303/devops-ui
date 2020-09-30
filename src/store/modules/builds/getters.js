@@ -21,7 +21,7 @@ export default {
       if (module && build.module !== module) {
         return false;
       }
-      return build.details.created_by === username;
+      return build.created_by === username;
     });
   },
 
@@ -96,7 +96,7 @@ export default {
     const builds = state.statistics[stateName].reduce(
       (tally, build) => {
         if (!module || build.module === module) {
-          tally[build.details.created_by] = (tally[build.details.created_by] || 0) + 1;
+          tally[build.created_by] = (tally[build.created_by] || 0) + 1;
         }
         return tally;
       },
@@ -141,7 +141,7 @@ export default {
     }
 
     return state.statistics[stateName].filter((build) => {
-      if (build.details.created_by === user) {
+      if (build.created_by === user) {
         return true;
       }
       return false;
