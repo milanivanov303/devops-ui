@@ -208,7 +208,7 @@
               </label>
             </div>
           </div>
-          <div class="row" v-if="selectedBuild.removed_by" >
+          <div class="row" v-if="selectedBuild.status === 'removed'" >
             <div class="input-field col s12">
               <i class="material-icons prefix">person</i>
               <input
@@ -426,6 +426,7 @@ export default {
     openInfoModal(build) {
       this.showInfoModal = true;
 
+      this.selectedBuild.status = build.status;
       this.selectedBuild.created_by = build.created_by;
       this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
       this.selectedBuild.branch = build.details.branch;
@@ -435,6 +436,7 @@ export default {
       if (build.removed_on) {
         this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
       }
+      this.selectedBuild.removed_by = "auto-removed";
       if (build.removed_by) {
         this.selectedBuild.removed_by = build.removed_by;
       }
