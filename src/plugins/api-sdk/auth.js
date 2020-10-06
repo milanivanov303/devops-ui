@@ -1,24 +1,25 @@
-/* eslint class-methods-use-this: "off" */
+/* eslint class-methods-use-this: ["error", { "exceptMethods": ["getExpire"] }] */
 
 import Axios from 'axios';
-import config from '@/config';
-import { getParam, deleteParam, getSsoUrl } from '@/plugins/helpers';
-import Storage from '@/plugins/storage';
+import Storage from './storage';
+import { deleteParam, getParam, getReturnUri } from './helpers';
 
 class Auth {
-  constructor() {
-    this.storage = new Storage(config.auth.session_name);
-    this.code = config.auth.code;
-    this.expire = this.getExpire(config.auth.session_expire);
+  constructor(url, code, options = {}) {
+    this.url = url;
+    this.code = code;
+
+    this.storage = new Storage(options.session_name || 'app_session');
+    this.expire = this.getExpire(options.session_expire || '1 hour');
+
+    this.username = options.username || null;
+    this.password = options.password || null;
 
     this.axios = Axios.create({
-      baseURL: config.um.url,
+      baseURL: url,
     });
     this.axios.interceptors.request.use(this.requestInterceptor.bind(this));
-
-    if (this.getUser()) {
-      this.getIdentity();
-    }
+    this.axios.interceptors.response.use(null, this.errorInterceptor.bind(this));
   }
 
   requestInterceptor(config) {
@@ -27,6 +28,16 @@ class Auth {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
+  }
+
+  errorInterceptor(error) {
+    if (error.response.status === 401 && this.username && this.password) {
+      return this.login(this.username, this.password).then((response) => {
+        error.config.headers.Authorization = `Bearer ${response.data.token}`;
+        return Axios.create().request(error.config);
+      });
+    }
+    return Promise.reject(error);
   }
 
   sessionExpired() {
@@ -71,7 +82,7 @@ class Auth {
   loginSSO() {
     const token = getParam('token');
     if (!token) {
-      window.location.href = `${getSsoUrl()}&code=${this.code}`;
+      window.location.href = `${this.getSsoUrl()}&code=${this.code}`;
       return Promise.resolve();
     }
 
@@ -81,6 +92,15 @@ class Auth {
     deleteParam('token');
 
     return this.getIdentity();
+  }
+
+  getSsoUrl() {
+    let redirectUrl = `${window.location.origin}/login`;
+    const returnUri = getReturnUri();
+    if (returnUri) {
+      redirectUrl += `?sso_login=true&return_uri=${returnUri}`;
+    }
+    return `${this.url}/../login?redirect_url=${encodeURIComponent(redirectUrl)}`;
   }
 
   logout() {
@@ -104,7 +124,11 @@ class Auth {
 
   getNewApiToken(code) {
     const promise = this.axios.get(`auth/token?code=${code}`);
-    promise.then(response => this.storage.set(`token.${code}`, response.data.token));
+
+    promise.then(
+      response => this.storage.set(`token.${code}`, response.data.token),
+    );
+
     return promise;
   }
 
@@ -131,4 +155,4 @@ class Auth {
   }
 }
 
-export default new Auth();
+export default Auth;

@@ -1,11 +1,6 @@
-import Api from '../../../plugins/api';
-import config from '../../../config';
-
-const api = new Api(config.devops.url, config.devops.code);
-
 export default {
   getActive({ commit }) {
-    const promise = api.get('builds', {
+    const promise = api('devops').get('builds', {
       filters: JSON.stringify({
         anyOf: [
           {
@@ -13,6 +8,9 @@ export default {
           },
           {
             status: 'stopped',
+          },
+          {
+            status: 'building',
           },
         ],
       }),
@@ -27,7 +25,7 @@ export default {
   },
 
   getBuildsForPeriod({ commit }, { startDate, stateName }) {
-    const promise = api.get('builds', {
+    const promise = api('devops').get('builds', {
       filters: JSON.stringify({
         allOf: [
           {
@@ -48,37 +46,32 @@ export default {
 
     return promise;
   },
-  getBuildByName({ commit }, { name }) {
-    const promise = api.get('builds', {
-      filters: JSON.stringify({
-        allOf: [
-          {
-            'details->service->Spec->Name': name,
-          },
-        ],
-      }),
-    });
-
-    promise
-      .catch(() => commit('error', 'Could not get build by name', { root: true }));
-    return promise;
-  },
-
 
   start({ commit }, id) {
-    const promise = api.post(`builds/${id}/start`);
+    const promise = api('devops').post(`builds/${id}/start`);
 
     promise
+      .then(() => commit('start', id))
       .catch(() => commit('error', 'Could not start build', { root: true }));
 
     return promise;
   },
 
   stop({ commit }, id) {
-    const promise = api.post(`builds/${id}/stop`);
+    const promise = api('devops').post(`builds/${id}/stop`);
 
     promise
+      .then(() => commit('stop', id))
       .catch(() => commit('error', 'Could not stop build', { root: true }));
+
+    return promise;
+  },
+
+  ping({ commit }, id) {
+    const promise = api('devops').get(`builds/${id}/ping`);
+
+    promise
+      .catch(() => commit('error', 'Could not ping build', { root: true }));
 
     return promise;
   },
@@ -86,7 +79,7 @@ export default {
   getBuildsByStatus({ commit }, {
     branch, module, status, user, perPage, page,
   }) {
-    const promise = api.get('builds', {
+    const promise = api('devops').get('builds', {
 
       filters: JSON.stringify({
         allOf: [
@@ -103,7 +96,7 @@ export default {
             'details->branch': branch,
           },
           {
-            'details->created_by': user,
+            created_by: user,
           },
         ],
       }),

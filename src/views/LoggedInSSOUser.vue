@@ -7,21 +7,20 @@
 
 <script>
 
-import { getParam } from '@/plugins/helpers';
 import config from '@/config';
 
 export default {
   computed: {
     name() {
-      return getParam('name');
+      return this.$route.query.name;
     },
     username() {
-      return getParam('username');
+      return this.$route.query.username;
     },
   },
   mounted() {
     if (!window.location.search) {
-      window.location.href = `${config.um.url}/../logged-in-user`;
+      window.location.href = `${config.um.url}/../logged-in-user?return_url=${encodeURI(window.location.href)}`;
     }
   },
 };

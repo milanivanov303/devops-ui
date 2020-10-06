@@ -31,4 +31,9 @@ module.exports = {
       },
     },
   },
+  globals: {
+    auth: 'writable',
+    api: 'readonly',
+    apiAuto: 'readonly',
+  },
 };

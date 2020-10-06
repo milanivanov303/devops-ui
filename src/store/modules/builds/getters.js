@@ -21,7 +21,7 @@ export default {
       if (module && build.module !== module) {
         return false;
       }
-      return build.details.created_by === username;
+      return build.created_by === username;
     });
   },
 
@@ -31,12 +31,36 @@ export default {
       .active
       .filter(build => build.module === module)
       .forEach((build) => {
-        branches[build.details.branch] = (branches[build.details.branch] + 1) || 1;
+        if (!branches[build.details.branch]) {
+          branches[build.details.branch] = {};
+        }
+        branches[build.details.branch][build.status] = branches[build.details.branch][build.status]
+        + 1 || 1;
       });
+
 
     const builds = [];
     Object.keys(branches).forEach((branch) => {
       builds.push({ branch, builds: branches[branch] });
+    });
+
+    return builds.sort((a, b) => b.builds - a.builds);
+  },
+  getActiveGroupedByModule: (state) => {
+    const branches = {};
+    state
+      .active
+      .forEach((build) => {
+        if (!branches[build.module]) {
+          branches[build.module] = {};
+        }
+        branches[build.module][build.status] = branches[build.module][build.status] + 1 || 1;
+      });
+
+
+    const builds = [];
+    Object.keys(branches).forEach((module) => {
+      builds.push({ module, builds: branches[module] });
     });
 
     return builds.sort((a, b) => b.builds - a.builds);
@@ -72,7 +96,7 @@ export default {
     const builds = state.statistics[stateName].reduce(
       (tally, build) => {
         if (!module || build.module === module) {
-          tally[build.details.created_by] = (tally[build.details.created_by] || 0) + 1;
+          tally[build.created_by] = (tally[build.created_by] || 0) + 1;
         }
         return tally;
       },
@@ -117,7 +141,7 @@ export default {
     }
 
     return state.statistics[stateName].filter((build) => {
-      if (build.details.created_by === user) {
+      if (build.created_by === user) {
         return true;
       }
       return false;
