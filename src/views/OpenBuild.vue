@@ -3,7 +3,7 @@
   <div class="container">
     <h6 class="row center">Opening build <b>{{ $route.params.name }}</b></h6>
     <div ref="autostart_builds">
-      <div class="row center">
+      <div id="autostart_builds" class="row center">
         <i class="material-icons">{{ icon }}</i>
       </div>
       <div class="row center">
@@ -37,7 +37,8 @@ export default {
       icon: '',
       header: '',
       message: '',
-      checkStarted: 0,
+      checkTimer: 0,
+      reload: true,
     };
   },
   computed: {
@@ -47,29 +48,40 @@ export default {
   },
   methods: {
     checkBuild() {
-      if (this.checkStarted === 0) {
-        setInterval(() => { this.checkStarted += 1; }, 5 * 60 * 1000);
-      }
-
-
       api.get(`builds/${this.build.id}/ping`)
         .then(() => {
-          this.icon = 'check_circle';
-          this.header = '- Build is working -';
-          this.message = '';
-          document.getElementById('tomcatProgress').classList.add('hidden');
-
-          setTimeout(() => window.location.reload(), 1000);
-        })
-        .catch(() => {
-          if (this.checkStarted >= 5) {
+          if (!this.reload) {
             document.getElementById('tomcatProgress').classList.add('hidden');
+            document.getElementById('autostart_builds').classList.add('fail');
+
             this.icon = 'cancel';
-            this.header = '- Tomcat could not start -';
-            this.message = 'Please contact phpid';
+            this.header = '- Could not load the build -';
+            this.message = 'Please try again or contact phpid';
+
             return;
           }
 
+          document.getElementById('tomcatProgress').classList.add('hidden');
+          document.getElementById('autostart_builds').classList.add('success');
+
+          this.icon = 'check_circle';
+          this.header = '- Build is working -';
+          this.message = '';
+
+          setTimeout(() => window.location.reload(), 2000);
+        })
+        .catch(() => {
+          if (this.checkTimer >= 5 * 60 /* 5 minutes */) {
+            document.getElementById('tomcatProgress').classList.add('hidden');
+            document.getElementById('autostart_builds').classList.add('fail');
+
+            this.icon = 'cancel';
+            this.header = '- Tomcat could not start -';
+            this.message = 'Please contact phpid';
+
+            return;
+          }
+          this.reload = true;
           setTimeout(() => this.checkBuild(), 3000);
         });
     },
@@ -82,6 +94,7 @@ export default {
       .then((response) => {
         loader.hide();
         if (response.data.data.length === 0) {
+          document.getElementById('autostart_builds').classList.add('fail');
           this.icon = 'cancel';
           this.header = '- Sorry - ';
           this.message = 'There is no such build';
@@ -90,25 +103,25 @@ export default {
 
         [this.build] = response.data.data;
 
-        if (this.build.status === 'stopped') {
-          this.icon = 'laptop_chromebook';
-          this.message = 'Build starting...';
-          document.getElementById('buildProgress').classList.remove('hidden');
-
-          api.post(`builds/${this.build.id}/start`)
-            .then(() => {
-              this.header = '- Build started successfully - ';
-              this.message = 'Waiting for tomcat to start...';
-
-              document.getElementById('buildProgress').classList.add('hidden');
-              document.getElementById('tomcatProgress').classList.remove('hidden');
-
-              this.checkBuild();
-            });
-          return;
+        if (this.build.status === 'running') {
+          this.reload = false;
         }
 
-        this.checkBuild();
+        this.icon = 'laptop_chromebook';
+        this.message = 'Build starting...';
+        document.getElementById('buildProgress').classList.remove('hidden');
+
+        api.post(`builds/${this.build.id}/start`)
+          .then(() => {
+            this.header = '- Build started successfully - ';
+            this.message = 'Waiting for tomcat to start...';
+
+            document.getElementById('buildProgress').classList.add('hidden');
+            document.getElementById('tomcatProgress').classList.remove('hidden');
+
+            setInterval(() => { this.checkTimer += 1; }, 1000);
+            this.checkBuild();
+          });
       });
   },
 };
@@ -124,4 +137,14 @@ export default {
     font-size: 17rem;
   }
 
-</style>
+  .success {
+    color: #29A19C
+
+  }
+
+  .fail {
+    color: #C40147;
+
+  }
+
+  </style>

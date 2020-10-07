@@ -240,6 +240,10 @@ export default {
               }
 
               if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
+                if (data.action === 'deploy' && data.status === 'success') {
+                  this.$store.dispatch('builds/getActive');
+                }
+
                 this.build.status = data.status;
                 this.$emit('created');
                 subscribe.unsubscribe();
