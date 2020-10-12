@@ -5,9 +5,9 @@
         <h4>{{ branch }}</h4>
       </div>
     </div>
-    <Builds ref="builds" :branch="branch" module="extranet"/>
+    <Builds :branch="branch" module="extranet"/>
     <br>
-    <Build @created="() => this.$refs.builds.getBuilds()"/>
+    <Build/>
   </div>
 </template>
 

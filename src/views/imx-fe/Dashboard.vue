@@ -96,6 +96,7 @@
 <script>
 import BarChart from '@/components/BarChart';
 import Builds from '@/components/Builds';
+import EventBus from '@/event-bus';
 
 export default {
   components: {
@@ -197,6 +198,7 @@ export default {
       return Math.round(new Date(newDate).getTime() / 1000);
     },
   },
+
   watch: {
     userStatisticsDays() {
       this.getUserStatistics();
@@ -205,10 +207,19 @@ export default {
       this.getBranchStatistics();
     },
   },
+
   mounted() {
     this.getBuilds();
     this.getBranchStatistics();
     this.getUserStatistics();
+  },
+
+  created() {
+    EventBus.$on('build.created', () => {
+      this.getBuilds();
+      this.getBranchStatistics();
+      this.getUserStatistics();
+    });
   },
 };
 </script>

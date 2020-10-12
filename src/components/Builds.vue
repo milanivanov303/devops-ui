@@ -67,6 +67,15 @@
               <i class="material-icons">error_outline</i>
             </a>
             <a
+              @click="openProgressModal(build)"
+              target="_blank"
+              data-tooltip="Progress"
+              class="tooltipped"
+              v-if="build.status === 'building'"
+            >
+              <i class="material-icons">update</i>
+            </a>
+            <a
               :href="getWebssh2Url(build)"
               target="_blank"
               data-tooltip="Open terminal"
@@ -87,10 +96,11 @@
         </td>
       </tr>
       <tr v-if="builds.length === 0">
-        <td colspan="6">There are no builds yet</td>
+        <td colspan="7">There are no builds yet</td>
       </tr>
       </tbody>
     </table>
+
     <div class="col s12 m6 right" id="perPage">
       <div class="input-field col s12 l4 right">
         <Select class="col s12"
@@ -118,6 +128,7 @@
         :active-class="'active'">
       </paginate>
     </div>
+
     <Modal v-if="showInfoModal" @close="closeInfoModal()" class="right-sheet">
       <template v-slot:header>{{ selectedBuild.name }}</template>
       <template v-slot:content>
@@ -215,8 +226,8 @@
                 type="text"
                 id="removed_by"
                 v-model="selectedBuild.removed_by">
-              <label :class="{active: selectedBuild.removed_by}"
-                      for="removed_by">Removed by
+              <label :class="{active: selectedBuild.removed_by}" for="removed_by">
+                Removed by
               </label>
             </div>
           </div>
@@ -314,20 +325,20 @@
       </template>
     </Modal>
 
-    <log-modal
-      :branch="branch"
-      :show-modal="showModal"
-      :broadcast="this.broadcast"
-    >
-    </log-modal>
-
+    <Modal v-if="showProgressModal" @close="showProgressModal = false" class="right-sheet">
+      <template v-slot:header>{{ selectedBuild.name }}</template>
+      <template v-slot:content>
+        <BuildProgress :broadcast="broadcast"></BuildProgress>
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
 import config from '../config';
-import LogModal from "@/components/LogModal";
+import BuildProgress from '@/components/BuildProgress';
+import EventBus from '@/event-bus';
 
 export default {
   props: {
@@ -342,8 +353,8 @@ export default {
     },
   },
   components: {
-    LogModal,
     Paginate,
+    BuildProgress,
   },
   data() {
     return {
@@ -351,12 +362,13 @@ export default {
       showModal: false,
       builds: [],
       paginationData: {},
-      status: ['active', 'running', 'building', 'stopped'],
+      status: ['active'],
       selectedBuild: {
-        log: null
+        log: null,
       },
       showInfoModal: false,
       showRemoveModal: false,
+      showProgressModal: false,
       updating: false,
       removing: false,
       removed: false,
@@ -403,7 +415,11 @@ export default {
     },
 
     getStatus() {
-      return this.status.concat(['running', 'building', 'stopped']);
+      if (this.status.indexOf('active') !== -1) {
+        return this.status.concat(['running', 'building', 'stopped']);
+      }
+
+      return this.status;
     },
 
     getPublishedPort(build, port) {
@@ -441,28 +457,23 @@ export default {
     },
 
     openInfoModal(build) {
-
-      if (build.status === 'building' && this.$ws.isConnected() === true) {
-        this.broadcast = build.details.broadcast;
-        this.showModal = true;
-      }
-
       this.showInfoModal = true;
 
-      this.selectedBuild.status = build.status;
-      this.selectedBuild.created_by = build.created_by;
+      this.selectedBuild = build;
+
       this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
-      this.selectedBuild.branch = build.details.branch;
+
       if (build.details.fe_branch) {
         this.selectedBuild.fe_branch = build.details.fe_branch.name;
       }
       if (build.removed_on) {
         this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
       }
-      this.selectedBuild.removed_by = 'auto-removed';
-      if (build.removed_by) {
-        this.selectedBuild.removed_by = build.removed_by;
+
+      if (!build.removed_by) {
+        this.selectedBuild.removed_by = 'auto-removed';
       }
+
       this.selectedBuild.instance = build.details.instance.name;
       this.selectedBuild.java_version = build.details.java_version;
       if (typeof build.details.service !== 'undefined') {
@@ -471,6 +482,12 @@ export default {
       this.selectedBuild.host = this.$store.state[build.module].host;
       this.selectedBuild.user = 'enterprise';
       this.selectedBuild.pass = 'Sofphia';
+    },
+
+    openProgressModal(build) {
+      this.selectedBuild = build;
+      this.broadcast = build.details.broadcast;
+      this.showProgressModal = true;
     },
 
     closeInfoModal() {
@@ -545,6 +562,7 @@ export default {
       this.lastPage = Math.ceil(this.paginationData.total / this.perPage.value);
     },
   },
+
   watch: {
     status() {
       this.page = 1;
@@ -565,6 +583,9 @@ export default {
     this.$M.FormSelect.init(document.querySelector('select'));
   },
 
+  created() {
+    EventBus.$on('build.created', () => this.getBuilds());
+  },
 };
 </script>
 
