@@ -5,6 +5,7 @@ export default {
   error(state, error) {
     state.error = error;
   },
+
   variables(state, variables) {
     state.variables = variables;
   },
@@ -19,6 +20,7 @@ export default {
   createVariable(state, variable) {
     state.variables.push(variable);
   },
+
   modules(state, modules) {
     state.modules = modules;
   },

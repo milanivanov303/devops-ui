@@ -6,6 +6,86 @@ const api = new Api(config.cms.url, config.cms.code);
 const apiMMPI = new Api(config.mmpi.url, config.mmpi.code);
 
 export default {
+  getVariables({ commit }) {
+    const name = 'config-defaults';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('default-variables', {
+      limit: '1000000',
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('variables', response.data.data))
+      .catch(() => commit('error', 'Could not get config-defaults list', { root: true }));
+    return promise;
+
+  },
+  getImxModules({ commit }) {
+    const name = 'imx-modules';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('modules', {
+      with: JSON.stringify(['submodules']),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('modules', response.data.data))
+      .catch(() => commit('error', 'Could not get IMX Modules', { root: true }));
+    return promise;
+  },
+  getCodixTeams({ commit }) {
+    const name = 'codix-teams';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api.get('codix-teams');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('codixTeams', response.data.data))
+      .catch(() => commit('error', 'Could not get Codix Teams', { root: true }));
+    return promise;
+  },
+  submitVariable({ commit }, payload) {
+
+    var promise;
+
+    if (payload.commitMsg) {
+      promise = api.post(`default-variables/${payload.commitMsg.ttsKey}/` + 
+                         `${payload.commitMsg.techChanges}/${payload.commitMsg.funcChanges}`,
+                          payload.variable);
+
+      promise
+        .then(response => commit('createVariable', response.data.data))
+        .catch(error => commit('error', error, { root: true }));
+      return promise;   
+    } 
+
+    promise = api.put(`default-variables/${payload.variable.id}`, payload.variable);
+
+    promise
+      .then(response => commit('updateVariable', response.data.data))
+      .catch(error => commit('error', error, { root: true }));
+    return promise;
+  
+  },
+
+
+
+
   getTemplates({ commit }, payload) {
     const promise = api.get('cms/run-commands', payload);
     console.log("Get Templates");
@@ -13,59 +93,6 @@ export default {
     promise
       .catch(error => commit('error', error));
     return promise;
-  },
-  async checkVariableTemplates({ commit }, payload) {
-    const name = 'cms-list-template';
-    const promise = await api.get('cms/run-commands', payload);
-    commit('promise', { name, promise }, { root: true });
-    return promise.data;
-  },
-  async getVariables({ commit, state }, payload) {
-    if (!state.variables.length) {
-      try {
-        const result = await api.get('default-variables', payload);
-        commit('variables', result.data.data);
-      } catch (error) {
-        console.log(error);
-        commit('error', error);
-      }
-    }
-  },
-  async submitVariable({ commit }, payload) {
-    try {
-      if (payload.id) {
-        const result = await api.put(`default-variables/${payload.id}`, payload);
-        commit('updateVariable', result.data.data);
-      } else {
-        const result = await api.post(`default-variables/${payload.commitMsg.ttsKey}/${payload.commitMsg.techChanges}/${payload.commitMsg.funcChanges}`, payload.variable);
-        commit('createVariable', result.data.data);
-      }
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
-  },
-  async getModules({ commit, state }, payload) {
-    if (!state.modules.length) {
-      try {
-        const result = await api.get('modules', payload);
-        commit('modules', result.data.data);
-      } catch (error) {
-        console.log(error);
-        commit('error', error);
-      }
-    }
-  },
-  async uploadRspFile({ commit }, payload) {
-    const headers = {
-      headers: { 'content-type': 'multipart/form-data' },
-    };
-    try {
-      await api.post('response-variables/uploadRspFile', payload, headers);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
   },
   async getRspVariables({ commit }, payload) {
     commit('rspVariables', '');
@@ -77,15 +104,6 @@ export default {
         console.log(error);
         commit('error', error);
       }
-    }
-  },
-  async updateRspVariable({ commit }, payload) {
-    try {
-      const result = await api.put(`response-variables/${payload.id}`, payload);
-      commit('updateRspVariable', result.data.data);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
     }
   },
   getSelectedInstance({ commit }, payload) {
@@ -158,17 +176,6 @@ export default {
       }
     }
   },
-  async getCodixTeams({ commit, state }) {
-    if (state.codixTeams.length === 0) {
-      try {
-        const result = await api.get('codix-teams');
-        commit('codixTeams', result.data.data);
-      } catch (error) {
-        console.log(error);
-        commit('error', error);
-      }
-    }
-  },
   async getTemplatesMMPI({ commit }, payload) {
     try {
       const resp = await apiMMPI.get('sources', payload);
@@ -201,22 +208,6 @@ export default {
       commit('error', error);
     }
   },
-  async submitTemplate({ state }, payload) {
-    try {
-      const response = await api.put('templates/template-content',
-        {
-          path: state.selectedTemplate.source_path,
-          name: state.selectedTemplate.source_name,
-          revision: state.selectedRevision.revision,
-          content: payload.content,
-          commitMsg: payload.commitMsg,
-        });
-      return response;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  },
   async getInventoryInstances({ commit, state, dispatch }, instances) {
     if (state.instances) {
       const payload = await dispatch('cms/getUniqueInstancesId', null, { root: true });
@@ -233,44 +224,6 @@ export default {
   },
   getSecondSelectedInstance({ commit }, payload) {
     commit('secondSelectedInstance', payload);
-  },
-  async firstInstanceVariables({ commit }, payload) {
-    try {
-      const resp = await api.get(`response-variables?instance_id=${payload.id}`);
-      commit('firstInstanceVariables', resp.data.data);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
-  },
-  async secondInstanceVariables({ commit }, payload) {
-    try {
-      const resp = await api.get(`response-variables?instance_id=${payload.id}`);
-      commit('secondInstanceVariables', resp.data.data);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
-  },
-  //Add modification in CMS/Modification tab
-  async addModification({ commit }, payload) {
-    try {
-      //Commented rows below, because work just on page cms/modification other two pages are not currently functional
-      // let uri = '';
-      // if (payload.type_id === 'binary') {
-      //   uri = 'binaries';
-      // } else if (payload.type_id === 'cmd') {
-      //   uri = 'commands';
-      // } else if (payload.type_id === 'cms') {
-      //   uri = 'cms';
-      // }
-      const response = await apiMMPI.post(`modifications/cms`, payload);
-      return response.data.data;
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-      return error;
-    }
   },
   //get issue for CMS/Modification tab
   async getIssue({ commit, state }, ttsId) {
@@ -316,4 +269,88 @@ export default {
       }
     }
   },
+  async checkVariableTemplates({ commit }, payload) {
+    const name = 'cms-list-template';
+    const promise = await api.get('cms/run-commands', payload);
+    commit('promise', { name, promise }, { root: true });
+    return promise.data;
+  },
+  async uploadRspFile({ commit }, payload) {
+    const headers = {
+      headers: { 'content-type': 'multipart/form-data' },
+    };
+    try {
+      await api.post('response-variables/uploadRspFile', payload, headers);
+    } catch (error) {
+      console.log(error);
+      commit('error', error);
+    }
+  },
+
+  async updateRspVariable({ commit }, payload) {
+    try {
+      const result = await api.put(`response-variables/${payload.id}`, payload);
+      commit('updateRspVariable', result.data.data);
+    } catch (error) {
+      console.log(error);
+      commit('error', error);
+    }
+  },
+    
+  async submitTemplate({ state }, payload) {
+    try {
+      const response = await api.put('templates/template-content',
+        {
+          path: state.selectedTemplate.source_path,
+          name: state.selectedTemplate.source_name,
+          revision: state.selectedRevision.revision,
+          content: payload.content,
+          commitMsg: payload.commitMsg,
+        });
+      return response;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  },
+
+  async firstInstanceVariables({ commit }, payload) {
+    try {
+      const resp = await api.get(`response-variables?instance_id=${payload.id}`);
+      commit('firstInstanceVariables', resp.data.data);
+    } catch (error) {
+      console.log(error);
+      commit('error', error);
+    }
+  },
+  async secondInstanceVariables({ commit }, payload) {
+    try {
+      const resp = await api.get(`response-variables?instance_id=${payload.id}`);
+      commit('secondInstanceVariables', resp.data.data);
+    } catch (error) {
+      console.log(error);
+      commit('error', error);
+    }
+  },
+  //Add modification in CMS/Modification tab
+  async addModification({ commit }, payload) {
+    try {
+      //Commented rows below, because work just on page cms/modification other two pages are not currently functional
+      // let uri = '';
+      // if (payload.type_id === 'binary') {
+      //   uri = 'binaries';
+      // } else if (payload.type_id === 'cmd') {
+      //   uri = 'commands';
+      // } else if (payload.type_id === 'cms') {
+      //   uri = 'cms';
+      // }
+      const response = await apiMMPI.post(`modifications/cms`, payload);
+      return response.data.data;
+    } catch (error) {
+      console.log(error);
+      commit('error', error);
+      return error;
+    }
+  },
+
 };
