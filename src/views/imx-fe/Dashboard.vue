@@ -5,7 +5,7 @@
         <div class="card" ref="my_builds">
           <div class="card-content">
             <span class="card-title">My IMX FE builds</span>
-            <Builds :user="this.$auth.getUser().username" module="imx-fe"></Builds>
+            <Builds :user="this.$auth.getUser().username" module="imx_fe"></Builds>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
@@ -28,10 +28,6 @@
                   </router-link>
                 </td>
                 <td>
-                  <span v-if="build.builds.building"
-                        class="new badge blue"
-                        data-badge-caption="building">{{ build.builds.building }}
-                  </span>
                   <span v-if="build.builds.building"
                         class="new badge blue"
                         data-badge-caption="building">{{ build.builds.building }}
@@ -135,13 +131,13 @@ export default {
       return this.$store.state.imx_fe.host;
     },
     userActiveBuilds() {
-      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'imx-fe');
+      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'imx_fe');
     },
     activeBuildsGroupedByBranch() {
-      return this.$store.getters['builds/getActiveGroupedByBranch']('imx-fe');
+      return this.$store.getters['builds/getActiveGroupedByBranch']('imx_fe');
     },
     branchesChartData() {
-      const builds = this.$store.getters['builds/getByBranch']('imx-fe-branch-builds', 'imx-fe');
+      const builds = this.$store.getters['builds/getByBranch']('imx-fe-branch-builds', 'imx_fe');
 
       return {
         labels: Object.keys(builds),
@@ -149,7 +145,7 @@ export default {
       };
     },
     usersChartData() {
-      const builds = this.$store.getters['builds/getByUser']('imx-fe-users-builds', 'imx-fe');
+      const builds = this.$store.getters['builds/getByUser']('imx-fe-users-builds', 'imx_fe');
 
       return {
         labels: Object.keys(builds),
