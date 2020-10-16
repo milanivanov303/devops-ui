@@ -11,8 +11,7 @@
       <Modal v-if="showModal" @close="close()" @opened="initForm()" class="right-sheet">
         <template v-slot:header>{{ branch }} // Create new build </template>
         <template v-slot:content>
-          <template v-if="build.started === false">
-            <div  class="col s12 l11" key="form" >
+          <div v-if="build.started === false" class="col s12 l11" key="form" >
               <div class="row">
                 <div class="col s12" >
                   <Autocomplete
@@ -75,34 +74,13 @@
                 </div>
               </div>
             </div>
-          </template>
-          <template v-else>
-            <div key="build" >
-
-              <div v-if="build.status === 'success'" class="center" >
-                <i class="material-icons large green-text">check_circle_outline</i>
-                <p>Build completed successfully</p>
-              </div>
-
-              <div v-else-if="build.status === 'failed'" class="center">
-                <i class="material-icons large red-text">error_outline</i>
-                <p>{{ build.error || build.summary }}</p>
-              </div>
-
-              <div v-else class="row">
-                <div class="col s12">
-                  <p>{{ build.summary }}</p>
-                  <Progress v-if="build.status === 'running'" :progress="build.progress"></Progress>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col s12">
-                  <div class="log">{{ build.log }}</div>
-                </div>
-              </div>
-            </div>
-          </template>
+          <BuildProgress
+            v-else
+            :broadcast="build.broadcast"
+            :status="build.status"
+            :summary="build.summary"
+            :error="build.error"
+          ></BuildProgress>
         </template>
         <template v-slot:footer>
           <button
@@ -121,6 +99,8 @@
 <script>
 
 import { required } from 'vuelidate/lib/validators';
+import BuildProgress from '@/components/BuildProgress';
+import EventBus from '@/event-bus';
 
 function initialState() {
   return {
@@ -135,15 +115,14 @@ function initialState() {
       started: false,
       status: '',
       summary: '',
-      progress: null,
-      log: '',
       error: null,
+      broadcast: null,
     },
   };
 }
 
 export default {
-
+  components: { BuildProgress },
   data() {
     return initialState();
   },
@@ -205,52 +184,18 @@ export default {
         return;
       }
 
-      this.build.started = true;
-      this.build.summary = 'Build will start shortly ...';
-
-      const payload = {
+      this.$store.dispatch('extranet/startBuild', {
         branch: this.branch,
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
         fe_branch: this.form.feBranch,
-      };
-
-      this.$store.dispatch('extranet/startBuild', payload)
+      })
         .then((response) => {
           this.build.status = 'running';
-
-          if (!this.$ws.isConnected()) {
-            return;
-          }
-
-          const subscribe = this.$ws.subscribe(
-            `/queue/${response.data.broadcast.queue}`,
-            (message) => {
-              const data = JSON.parse(message.body);
-
-              if (data.summary) {
-                this.build.summary = data.summary;
-              }
-              this.build.progress = data.progress || null;
-
-              if (data.log) {
-                this.build.log += data.log;
-                this.scrollLogContainer();
-              }
-
-              if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
-                if (data.action === 'deploy' && data.status === 'success') {
-                  this.$store.dispatch('builds/getActive');
-                }
-
-                this.build.status = data.status;
-                this.$emit('created');
-                subscribe.unsubscribe();
-              }
-            },
-            response.data.broadcast,
-          );
+          this.build.summary = 'Build will start shortly ...';
+          this.build.broadcast = response.data.broadcast;
+          EventBus.$emit('build.created');
         })
         .catch((error) => {
           this.build.status = 'failed';
@@ -260,7 +205,8 @@ export default {
           } else {
             this.build.error = error;
           }
-        });
+        })
+        .finally(() => { this.build.started = true; });
     },
     scrollLogContainer() {
       setTimeout(() => {

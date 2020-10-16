@@ -4,13 +4,10 @@ export default {
       filters: JSON.stringify({
         anyOf: [
           {
-            status: 'running',
-          },
-          {
-            status: 'stopped',
-          },
-          {
-            status: 'building',
+            status: {
+              operator: 'in',
+              value: ['running', 'stopped', 'building'],
+            },
           },
         ],
       }),
@@ -101,7 +98,7 @@ export default {
         ],
       }),
       orders: JSON.stringify({
-        status: 'asc',
+        created_on: 'desc',
       }),
       per_page: perPage,
       page,

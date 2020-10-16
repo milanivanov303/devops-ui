@@ -93,6 +93,7 @@
 <script>
 import Builds from '@/components/Builds';
 import BarChart from '@/components/BarChart';
+import EventBus from '@/event-bus';
 
 export default {
   components: {
@@ -200,6 +201,14 @@ export default {
     this.getBuilds();
     this.getBranchStatistics();
     this.getUserStatistics();
+  },
+
+  created() {
+    EventBus.$on('build.created', () => {
+      this.getBuilds();
+      this.getBranchStatistics();
+      this.getUserStatistics();
+    });
   },
 };
 </script>
