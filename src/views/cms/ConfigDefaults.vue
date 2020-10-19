@@ -291,6 +291,7 @@ export default {
 
           return this.$store.getters['cms/variableNameIsUnique'](this.selectedVariable.name);
         },
+        required,
       }
 
       validations.commitMsg = {
