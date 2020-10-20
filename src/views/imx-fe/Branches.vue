@@ -12,7 +12,7 @@
           v-for="branch in sorted"
           :key="branch"
           :branch="branch"
-          :count="getContainersCount(branch)"
+          :count="getActiveBuildsCountByBranch(branch)"
         />
         <div class="col s12 m6 l2 right" id="perPage">
           <div class="input-field col s12 l4 right">
@@ -47,7 +47,7 @@
             v-for="branch in filteredBranches"
             :key="branch"
             :branch="branch"
-            :count="getContainersCount(branch)"
+            :count="getActiveBuildsCountByBranch(branch)"
             :class="{
               'selected-branch': $route.path === `/imx-fe/branches/${encodeURIComponent(branch)}`
             }"
@@ -70,6 +70,7 @@
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
 import Branch from '@/views/imx-fe/components/Branch';
+import EventBus from '@/event-bus';
 
 
 export default {
@@ -114,9 +115,6 @@ export default {
       const regexp = new RegExp(this.search, 'i');
       return this.branches.filter(branch => branch.match(regexp));
     },
-    containers() {
-      return this.$store.state.extranet.containers;
-    },
     sorted() {
       const from = (this.page * this.perPage.value) - this.perPage.value;
       const to = (this.page * this.perPage.value);
@@ -126,11 +124,8 @@ export default {
     },
   },
   methods: {
-    getContainers() {
-      this.$store.dispatch('imx_fe/getContainers');
-    },
-    getBuilds() {
-      this.$store.dispatch('builds/getBuilds', { stateName: 'branch-builds' });
+    getActiveBuilds() {
+      this.$store.dispatch('builds/getActive');
     },
     selectedPage(page) {
       this.page = page;
@@ -138,8 +133,8 @@ export default {
     setLastPage(data) {
       this.lastPage = Math.ceil(data.length / this.perPage.value);
     },
-    getContainersCount(branch) {
-      return this.$store.getters['imx_fe/getContainersByBranch'](branch).length;
+    getActiveBuildsCountByBranch(branch) {
+      return this.$store.getters['builds/getActiveByBranch'](branch).length;
     },
     checkBranch(selected) {
       if (typeof selected !== 'undefined' && this.branches.length !== 0) {
@@ -172,10 +167,7 @@ export default {
         .finally(() => loader.hide());
     },
   },
-  mounted() {
-    this.getBranches();
-    this.getContainers();
-  },
+
   watch: {
     search(value) {
       let query = {};
@@ -187,6 +179,17 @@ export default {
     perPage() {
       this.setLastPage(this.filteredBranches);
     },
+  },
+
+  mounted() {
+    this.getBranches();
+    this.getActiveBuilds();
+  },
+
+  created() {
+    EventBus.$on('build.created', () => {
+      this.getActiveBuilds();
+    });
   },
 };
 </script>

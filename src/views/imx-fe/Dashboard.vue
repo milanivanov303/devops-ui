@@ -4,8 +4,8 @@
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
           <div class="card-content">
-            <span class="card-title">My active extranet builds</span>
-            <Builds :builds="userActiveBuilds"/>
+            <span class="card-title">My IMX FE builds</span>
+            <Builds :user="this.$auth.getUser().username" module="imx_fe"></Builds>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
@@ -27,7 +27,20 @@
                     {{ build.branch }}
                   </router-link>
                 </td>
-                <td>{{ build.builds }}</td>
+                <td>
+                  <span v-if="build.builds.building"
+                        class="new badge blue"
+                        data-badge-caption="building">{{ build.builds.building }}
+                  </span>
+                  <span v-if="build.builds.running"
+                        class="new badge green"
+                        data-badge-caption="running">{{ build.builds.running }}
+                  </span>
+                  <span v-if="build.builds.stopped"
+                        class="new badge red"
+                        data-badge-caption="stopped">{{ build.builds.stopped }}
+                  </span>
+                </td>
               </tr>
               <tr v-if="activeBuildsGroupedByBranch.length === 0">
                 <td colspan="3">There are no builds</td>
@@ -79,6 +92,7 @@
 <script>
 import BarChart from '@/components/BarChart';
 import Builds from '@/components/Builds';
+import EventBus from '@/event-bus';
 
 export default {
   components: {
@@ -117,13 +131,13 @@ export default {
       return this.$store.state.imx_fe.host;
     },
     userActiveBuilds() {
-      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'imx-fe');
+      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'imx_fe');
     },
     activeBuildsGroupedByBranch() {
-      return this.$store.getters['builds/getActiveGroupedByBranch']('imx-fe');
+      return this.$store.getters['builds/getActiveGroupedByBranch']('imx_fe');
     },
     branchesChartData() {
-      const builds = this.$store.getters['builds/getByBranch']('imx-fe-branch-builds', 'imx-fe');
+      const builds = this.$store.getters['builds/getByBranch']('imx-fe-branch-builds', 'imx_fe');
 
       return {
         labels: Object.keys(builds),
@@ -131,7 +145,7 @@ export default {
       };
     },
     usersChartData() {
-      const builds = this.$store.getters['builds/getByUser']('imx-fe-users-builds', 'imx-fe');
+      const builds = this.$store.getters['builds/getByUser']('imx-fe-users-builds', 'imx_fe');
 
       return {
         labels: Object.keys(builds),
@@ -180,6 +194,7 @@ export default {
       return Math.round(new Date(newDate).getTime() / 1000);
     },
   },
+
   watch: {
     userStatisticsDays() {
       this.getUserStatistics();
@@ -188,10 +203,19 @@ export default {
       this.getBranchStatistics();
     },
   },
+
   mounted() {
     this.getBuilds();
     this.getBranchStatistics();
     this.getUserStatistics();
+  },
+
+  created() {
+    EventBus.$on('build.created', () => {
+      this.getBuilds();
+      this.getBranchStatistics();
+      this.getUserStatistics();
+    });
   },
 };
 </script>

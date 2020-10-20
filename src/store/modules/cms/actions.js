@@ -1,9 +1,9 @@
 // https://vuex.vuejs.org/en/actions.html
-import Api from '../../../plugins/api';
-import config from '../../../config';
+// import Api from '../../../plugins/api-sdk/api';
+// import config from '../../../config';
 
-const api = new Api(config.cms.url, config.cms.code);
-const apiMMPI = new Api(config.mmpi.url, config.mmpi.code);
+// const api = new Api(config.cms.url, config.cms.code);
+// const apiMMPI = new Api(config.mmpi.url, config.mmpi.code);
 
 export default {
   getVariables({ commit }) {
@@ -13,7 +13,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('default-variables', {
+    const promise = api('cms').get('default-variables', {
       limit: '1000000',
     });
 
@@ -32,7 +32,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('modules', {
+    const promise = api('cms').get('modules', {
       with: JSON.stringify(['submodules']),
     });
 
@@ -50,7 +50,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('codix-teams');
+    const promise = api('cms').get('codix-teams');
 
     commit('promise', { name, promise }, { root: true });
 
@@ -64,7 +64,7 @@ export default {
     var promise;
 
     if (payload.commitMsg) {
-      promise = api.post(`default-variables/${payload.commitMsg.ttsKey}/` + 
+      promise = api('cms').post(`default-variables/${payload.commitMsg.ttsKey}/` + 
                          `${payload.commitMsg.techChanges}/${payload.commitMsg.funcChanges}`,
                           payload.variable);
 
@@ -74,7 +74,7 @@ export default {
       return promise;   
     } 
 
-    promise = api.put(`default-variables/${payload.variable.id}`, payload.variable);
+    promise = api('cms').put(`default-variables/${payload.variable.id}`, payload.variable);
 
     promise
       .then(response => commit('updateVariable', response.data.data))

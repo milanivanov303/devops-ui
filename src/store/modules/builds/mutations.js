@@ -9,13 +9,26 @@ export default {
     Vue.set(state.statistics, name, data);
   },
 
-  markAsRunning(state, id) {
-    const build = state.active.find(build => build.id === id);
-    build.status = 'running';
+  start(state, id) {
+    state.active.map((a) => {
+      if (a.id === id) {
+        a.status = 'running';
+      }
+      return state.active;
+    });
   },
-
-  markAsStopped(state, id) {
-    const build = state.active.find(build => build.id === id);
-    build.status = 'stopped';
+  stop(state, id) {
+    state.active.map((a) => {
+      if (a.id === id) {
+        a.status = 'stopped';
+      }
+      return state.active;
+    });
+  },
+  remove(state, id) {
+    state.active.splice(
+      state.active.findIndex(build => build.id === id),
+      1,
+    );
   },
 };

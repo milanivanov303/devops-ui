@@ -10,7 +10,6 @@
 // Lib imports
 import Vue from 'vue';
 import Router from 'vue-router';
-import auth from '@/plugins/auth';
 
 // Routes
 import paths from './routes';

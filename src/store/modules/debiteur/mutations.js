@@ -4,9 +4,6 @@ export default {
   branches(state, branches) {
     state.branches = branches;
   },
-  services(state, services) {
-    state.services = services;
-  },
   host(state, host) {
     state.host = host;
   },

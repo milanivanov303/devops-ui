@@ -1,8 +1,4 @@
 // https://vuex.vuejs.org/en/actions.html
-import Api from '../../../plugins/api';
-import config from '../../../config';
-
-const api = new Api(config.mmpi.url, config.mmpi.code);
 
 export default {
   getInstances({ commit }) {
@@ -12,7 +8,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('instances', {
+    const promise = api('mmpi').get('instances', {
       filters: JSON.stringify({
         allOf: [
           {
@@ -59,7 +55,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('instances', {
+    const promise = api('mmpi').get('instances', {
       filters: JSON.stringify({
         allOf: [
           {
@@ -100,7 +96,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('projects', {
+    const promise = api('mmpi').get('projects', {
       filters: JSON.stringify({
         allOf: [
           {
@@ -130,9 +126,8 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('delivery-chains', {
-      status: 'active',
-      with: JSON.stringify(['instances', 'projects']),
+    const promise = api('mmpi').get('delivery-chains', {
+      with: JSON.stringify(['instances']),
       orders: JSON.stringify({
         title: 'asc',
       }),
@@ -203,7 +198,7 @@ export default {
       }),
     };
 
-    const promise = api.get('instances', payload);
+    const promise = api('mmpi').get('instances', payload);
 
     commit('promise', { name, promise }, { root: true });
 
