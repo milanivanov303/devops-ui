@@ -126,14 +126,8 @@ export default {
       return this.state.promises[name];
     }
 
-<<<<<<< HEAD
-    const promise = api.get('delivery-chains', {
-      status: 'active',
-      with: JSON.stringify(['instances', 'projects']),
-=======
     const promise = api('mmpi').get('delivery-chains', {
       with: JSON.stringify(['instances']),
->>>>>>> develop
       orders: JSON.stringify({
         title: 'asc',
       }),
@@ -204,7 +198,7 @@ export default {
       }),
     };
 
-    const promise = api.get('instances', payload);
+    const promise = api('mmpi').get('instances', payload);
 
     commit('promise', { name, promise }, { root: true });
 

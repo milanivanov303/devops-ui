@@ -1,6 +1,7 @@
 module.exports = {
   auth: {
     code: process.env.VUE_APP_DEVOPS_API_CODE,
+    applications: process.env.VUE_APP_AUTH_APPS,
     session_expire: process.env.VUE_APP_AUTH_SESSION_EXPIRE,
     session_name: process.env.VUE_APP_AUTH_SESSION_NAME,
   },
