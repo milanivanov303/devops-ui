@@ -73,6 +73,7 @@
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
 import Branch from '@/views/extranet/components/Branch';
+import EventBus from '@/event-bus';
 
 
 export default {
@@ -130,7 +131,7 @@ export default {
   methods: {
     getActiveBuilds() {
       this.$store.dispatch('builds/getActive');
-      this.$store.dispatch('extranet/getServices');
+      this.$store.dispatch('extranet/getHost');
     },
     selectedPage(page) {
       this.page = page;
@@ -181,10 +182,7 @@ export default {
       });
     },
   },
-  mounted() {
-    this.getBranches();
-    this.getActiveBuilds();
-  },
+
   watch: {
     search(value) {
       let query = {};
@@ -196,6 +194,17 @@ export default {
     perPage() {
       this.setLastPage(this.filteredBranches);
     },
+  },
+
+  mounted() {
+    this.getBranches();
+    this.getActiveBuilds();
+  },
+
+  created() {
+    EventBus.$on('build.created', () => {
+      this.getActiveBuilds();
+    });
   },
 };
 </script>

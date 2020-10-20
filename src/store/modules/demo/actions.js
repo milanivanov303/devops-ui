@@ -1,13 +1,9 @@
 // https://vuex.vuejs.org/en/actions.html
-import Api from '../../../plugins/api';
-import config from '../../../config';
 import { DateTime } from 'luxon';
-
-const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   createDemo({ commit }, payload) {
-    const promise = api.post('demos', payload);
+    const promise = api('devops').post('demos', payload);
     promise
       .then(response => commit('createDemo', response.data.data))
       .catch(error => commit('error', error));
@@ -16,7 +12,7 @@ export default {
   },
 
   updateDemo({ commit }, payload) {
-    const promise = api.put(`demos/${payload.id}`, payload);
+    const promise = api('devops').put(`demos/${payload.id}`, payload);
     promise
       .then(response => commit('updateDemo', response.data.data))
       .catch(error => commit('error', error));
@@ -24,7 +20,7 @@ export default {
   },
 
   getDemos({ commit }) {
-    const promise = api.get('demos', {
+    const promise = api('devops').get('demos', {
       orders: JSON.stringify({ id: 'desc' }),
     });
     promise
@@ -34,7 +30,7 @@ export default {
   },
 
   getDemosForPeriod({ commit }, { stateName, startDate }) {
-    const promise = api.get('demos', {
+    const promise = api('devops').get('demos', {
       filters: JSON.stringify({
         allOf: [
           {
@@ -58,24 +54,25 @@ export default {
    * Send Request to API and get responce xlsx file
    */
   getDemosExport({ commit }) {
-    const promise = api.get(
-      'demos/export', 
+    const promise = api('devops').get(
+      'demos/export',
       '',
       {
         responseType: 'blob',
-      });
+      },
+    );
     promise
-    .then(response => {
-      let fileURL = window.URL.createObjectURL(new Blob([response.data]));
-      let fileLink = document.createElement('a');
- 
-      fileLink.href = fileURL;
-      fileLink.setAttribute('download', DateTime.local().toFormat('dd_MM_y') + '_demos.xlsx');
-      document.body.appendChild(fileLink);
- 
-      fileLink.click();
-    })
-    .catch(error => commit('error', error));
+      .then((response) => {
+        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        const fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', `${DateTime.local().toFormat('dd_MM_y')}_demos.xlsx`);
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      })
+      .catch(error => commit('error', error));
     return promise;
   },
 };

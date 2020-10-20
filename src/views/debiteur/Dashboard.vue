@@ -4,8 +4,8 @@
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
           <div class="card-content">
-            <span class="card-title">My active debiteur builds</span>
-            <Builds :builds="userActiveBuilds"/>
+            <span class="card-title">My debiteur builds</span>
+            <Builds :user="this.$auth.getUser().username" module="debiteur"></Builds>
           </div>
         </div>
         <div class="card" ref="builds_by_branch">
@@ -28,7 +28,20 @@
                     {{ build.branch }}
                   </router-link>
                 </td>
-                <td>{{ build.builds }}</td>
+                <td>
+                  <span v-if="build.builds.building"
+                        class="new badge blue"
+                        data-badge-caption="building">{{ build.builds.building }}
+                  </span>
+                  <span v-if="build.builds.running"
+                        class="new badge green"
+                        data-badge-caption="running">{{ build.builds.running }}
+                  </span>
+                  <span v-if="build.builds.stopped"
+                        class="new badge red"
+                        data-badge-caption="stopped">{{ build.builds.stopped }}
+                  </span>
+                </td>
               </tr>
               <tr v-if="activeBuildsGroupedByBranch.length === 0">
                 <td colspan="3">There are no builds</td>
@@ -80,6 +93,7 @@
 <script>
 import Builds from '@/components/Builds';
 import BarChart from '@/components/BarChart';
+import EventBus from '@/event-bus';
 
 export default {
   components: {
@@ -143,7 +157,7 @@ export default {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_branch });
       const promise1 = this.$store.dispatch('builds/getActive');
-      const promise2 = this.$store.dispatch('debiteur/getServices');
+      const promise2 = this.$store.dispatch('debiteur/getHost');
 
       Promise.all([promise1, promise2]).finally(() => {
         loader1.hide();
@@ -190,6 +204,14 @@ export default {
     this.getBuilds();
     this.getBranchStatistics();
     this.getUserStatistics();
+  },
+
+  created() {
+    EventBus.$on('build.created', () => {
+      this.getBuilds();
+      this.getBranchStatistics();
+      this.getUserStatistics();
+    });
   },
 };
 </script>

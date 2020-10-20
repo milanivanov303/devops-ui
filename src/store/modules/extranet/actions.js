@@ -1,8 +1,4 @@
 // https://vuex.vuejs.org/en/actions.html
-import Api from '../../../plugins/api';
-import config from '../../../config';
-
-const api = new Api(config.devops.url, config.devops.code);
 
 export default {
   getClients({ commit }) {
@@ -12,7 +8,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('extranet/clients');
+    const promise = api('devops').get('extranet/clients');
 
     commit('promise', { name, promise }, { root: true });
 
@@ -29,7 +25,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('extranet/branches');
+    const promise = api('devops').get('extranet/branches');
 
     commit('promise', { name, promise }, { root: true });
 
@@ -39,15 +35,14 @@ export default {
     return promise;
   },
 
-  getServices({ commit }) {
-    const promise = api.get('extranet/services');
+  getHost({ commit }) {
+    const promise = api('devops').get('extranet/host');
 
     promise
       .then((response) => {
-        commit('services', response.data.data);
-        commit('host', response.data.meta.host);
+        commit('host', response.data.host);
       })
-      .catch(() => commit('error', 'Could not get services list', { root: true }));
+      .catch(() => commit('error', 'Could not get host name', { root: true }));
     return promise;
   },
 
@@ -58,7 +53,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('extranet/fe-branches');
+    const promise = api('devops').get('extranet/fe-branches');
 
     commit('promise', { name, promise }, { root: true });
 
@@ -69,13 +64,13 @@ export default {
   },
 
   startBuild({ commit }, payload) {
-    const promise = api.post('extranet/build', payload);
+    const promise = api('devops').post('extranet/build', payload);
     promise.catch(error => commit('error', error, { root: true }));
     return promise;
   },
 
   removeBuild({ commit }, id) {
-    const promise = api.delete(`extranet/build/${id}`);
+    const promise = api('devops').delete(`extranet/build/${id}`);
     promise
       .then(() => commit('removeBuild', id))
       .catch(error => commit('error', error, { root: true }));
@@ -89,7 +84,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api.get('extranet/configurations');
+    const promise = api('devops').get('extranet/configurations');
 
     commit('promise', { name, promise }, { root: true });
 
@@ -100,7 +95,7 @@ export default {
   },
 
   createConfiguration({ commit }, payload) {
-    const promise = api.post('extranet/configurations', payload);
+    const promise = api('devops').post('extranet/configurations', payload);
 
     promise
       .then(response => commit('createConfiguration', response.data.data))
@@ -110,13 +105,13 @@ export default {
   },
 
   buildConfiguration({ commit }, { id, payload }) {
-    const promise = api.post(`extranet/configurations/${id}/build`, payload);
+    const promise = api('devops').post(`extranet/configurations/${id}/build`, payload);
     promise.catch(error => commit('error', error, { root: true }));
     return promise;
   },
 
   updateConfiguration({ commit }, payload) {
-    const promise = api.put(`extranet/configurations/${payload.id}`, payload);
+    const promise = api('devops').put(`extranet/configurations/${payload.id}`, payload);
 
     promise
       .then(response => commit('updateConfiguration', response.data.data))
@@ -126,7 +121,7 @@ export default {
   },
 
   deleteConfiguration({ commit }, id) {
-    const promise = api.delete(`extranet/configurations/${id}`);
+    const promise = api('devops').delete(`extranet/configurations/${id}`);
 
     promise
       .then(() => commit('deleteConfiguration', id))

@@ -5,15 +5,15 @@
         <h4>{{ branch }}</h4>
       </div>
     </div>
-    <Builds :containers="containers" :builds="builds"/>
+    <Builds ref="builds" :branch="branch" module="imx_fe"/>
     <br>
-    <Build />
+    <Build @created="() => this.$refs.builds.getBuilds()"/>
   </div>
 </template>
 
 <script>
-import Build from '@/views/imx-fe/components/Build';
-import Builds from '@/components/Builds';
+import Build from './components/Build';
+import Builds from '../../components/Builds';
 
 export default {
   components: {
@@ -23,12 +23,6 @@ export default {
   computed: {
     branch() {
       return decodeURIComponent(this.$route.params.branch);
-    },
-    containers() {
-      return this.$store.getters['imx_fe/getContainersByBranch'](this.branch);
-    },
-    builds() {
-      return this.$store.getters['builds/getForBranch']('branch-builds', this.branch);
     },
   },
 };

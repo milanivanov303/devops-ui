@@ -1,11 +1,20 @@
 <template>
-  <div>
+  <div class="row">
+    <div class="input-field col s12 m6 l3 right">
+      <i class="material-icons prefix">timelapse</i>
+      <select class="select" multiple v-model="status">
+        <option value="active">Active</option>
+        <option value="removed">Removed</option>
+        <option value="failed">Failed</option>
+      </select>
+    </div>
+
     <table ref="builds">
       <thead>
       <tr>
         <th>#</th>
         <th>Name</th>
-        <th v-if="showModule">Module</th>
+        <th v-if="!module">Module</th>
         <th>Created By</th>
         <th>Created On</th>
         <th>Status</th>
@@ -14,10 +23,10 @@
       </thead>
       <tbody>
       <tr v-for="(build, index) in builds" :key="index">
-        <td>{{ index + 1 }}</td>
-        <td>{{ getName(build) }}</td>
-        <td v-if="showModule">{{ build.module }}</td>
-        <td>{{ build.details.created_by }}</td>
+        <td>{{ (page - 1) * perPage.value + index + 1 }}</td>
+        <td>{{ build.name }}</td>
+        <td v-if="!module">{{ build.module }}</td>
+        <td>{{ build.created_by }}</td>
         <td>{{ $date(build.created_on).toHuman() }}</td>
         <td v-html="getStatusText(build)"></td>
         <td class="quick-actions">
@@ -58,6 +67,15 @@
               <i class="material-icons">error_outline</i>
             </a>
             <a
+              @click="openProgressModal(build)"
+              target="_blank"
+              data-tooltip="Progress"
+              class="tooltipped"
+              v-if="build.status === 'building'"
+            >
+              <i class="material-icons">update</i>
+            </a>
+            <a
               :href="getWebssh2Url(build)"
               target="_blank"
               data-tooltip="Open terminal"
@@ -67,7 +85,7 @@
               <i class="material-icons">wysiwyg</i>
             </a>
             <a
-              v-if="canRemove(build)"
+              v-if="canRemove(build) && (build.status === 'running' || build.status === 'stopped')"
               @click="openRemoveModal(build)"
               data-tooltip="Remove"
               class="red-text tooltipped"
@@ -78,10 +96,38 @@
         </td>
       </tr>
       <tr v-if="builds.length === 0">
-        <td colspan="6">There are no builds yet</td>
+        <td colspan="7">There are no builds yet</td>
       </tr>
       </tbody>
     </table>
+
+    <div class="col s12 m6 right" id="perPage">
+      <div class="input-field col s12 l4 right">
+        <Select class="col s12"
+                v-if="builds.length"
+                displayed="value"
+                v-model="perPage"
+                :options="perPageOptions"
+        />
+      </div>
+      <p v-if="builds.length" class="col s12 l8 right right-align">Items per page:</p>
+    </div>
+    <div class="col s12 m6">
+      <paginate
+        v-if="builds.length && lastPage > 1"
+        v-model="page"
+        :page-count="lastPage"
+        :click-handler="selectedPage"
+        :prev-class="'material-icons'"
+        :prev-text="'chevron_left'"
+        :next-class="'material-icons'"
+        :next-text="'chevron_right'"
+        :container-class="'pagination'"
+        :page-class="'waves-effect'"
+        :disabled-class="'disabled'"
+        :active-class="'active'">
+      </paginate>
+    </div>
 
     <Modal v-if="showInfoModal" @close="closeInfoModal()" class="right-sheet">
       <template v-slot:header>{{ selectedBuild.name }}</template>
@@ -159,6 +205,32 @@
               </label>
             </div>
           </div>
+          <div class="row" v-if="selectedBuild.removed_on">
+            <div class="input-field col s12">
+              <i class="material-icons prefix">event</i>
+              <input
+                class="readonly"
+                type="text"
+                id="removed_on"
+                v-model="selectedBuild.removed_on">
+              <label :class="{active: selectedBuild.removed_on}"
+                     for="created_on">Removed on
+              </label>
+            </div>
+          </div>
+          <div class="row" v-if="selectedBuild.status === 'removed'" >
+            <div class="input-field col s12">
+              <i class="material-icons prefix">person</i>
+              <input
+                class="readonly"
+                type="text"
+                id="removed_by"
+                v-model="selectedBuild.removed_by">
+              <label :class="{active: selectedBuild.removed_by}" for="removed_by">
+                Removed by
+              </label>
+            </div>
+          </div>
           <div class="row">
             <div class="col s12">
               <ul class="tabs col s12 center">
@@ -228,7 +300,7 @@
       <template v-slot:content>
         <div v-if="removing" class="center" >
           <Preloader class="big"></Preloader>
-          <p>Removing build <b>{{ getName(selectedBuild) }}</b> ... </p>
+          <p>Removing build <b>{{ selectedBuild.name }}</b> ... </p>
         </div>
         <div v-else-if="removed" class="center" >
           <i class="material-icons large green-text">check_circle_outline</i>
@@ -239,7 +311,7 @@
           <p>{{ error }}</p>
         </div>
         <div v-else>
-          Are you sure you what to remove <b>{{ getName(selectedBuild) }}</b> build?
+          Are you sure you what to remove <b>{{ selectedBuild.name }}</b> build?
         </div>
       </template>
       <template v-slot:footer>
@@ -252,35 +324,104 @@
         </button>
       </template>
     </Modal>
+
+    <Modal v-if="showProgressModal" @close="showProgressModal = false" class="right-sheet">
+      <template v-slot:header>{{ selectedBuild.name }}</template>
+      <template v-slot:content>
+        <BuildProgress :broadcast="broadcast"></BuildProgress>
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script>
-
+import Paginate from 'vuejs-paginate/src/components/Paginate';
 import config from '../config';
+import BuildProgress from '@/components/BuildProgress';
+import EventBus from '@/event-bus';
 
 export default {
   props: {
-    builds: Array,
-    showModule: {
-      type: Boolean,
-      default: false,
+    module: {
+      type: String,
+    },
+    branch: {
+      type: String,
+    },
+    user: {
+      type: String,
     },
   },
-
+  components: {
+    Paginate,
+    BuildProgress,
+  },
   data() {
     return {
-      selectedBuild: {},
+      broadcast: '',
+      showModal: false,
+      builds: [],
+      paginationData: {},
+      status: ['active'],
+      selectedBuild: {
+        log: null,
+      },
       showInfoModal: false,
       showRemoveModal: false,
+      showProgressModal: false,
       updating: false,
       removing: false,
       removed: false,
       error: null,
+      page: 1,
+      perPage: {
+        value: 10,
+      },
+      lastPage: 0,
+      perPageOptions: [
+        {
+          value: 10,
+        },
+        {
+          value: 20,
+        },
+        {
+          value: 30,
+        },
+        {
+          value: 50,
+        },
+      ],
     };
   },
-
   methods: {
+    getBuilds() {
+      const loader = this.$loading.show({ container: this.$refs.builds });
+
+      this.$store.dispatch('builds/getBuildsByStatus', {
+        branch: this.branch,
+        module: this.module,
+        status: this.getStatus(),
+        user: this.user,
+        perPage: this.perPage.value,
+        page: this.page,
+      })
+        .then((response) => {
+          this.builds = response.data.data;
+          this.paginationData = response.data.meta;
+          this.setLastPage();
+        })
+        .finally(() => loader.hide());
+    },
+
+    getStatus() {
+      if (this.status.indexOf('active') !== -1) {
+        return this.status.concat(['running', 'building', 'stopped']);
+      }
+
+      return this.status;
+    },
+
     getPublishedPort(build, port) {
       try {
         return build.details.service.Endpoint.Ports
@@ -291,23 +432,7 @@ export default {
     },
 
     getUrl(build) {
-      const { host } = this.$store.state[build.module];
-      try {
-        let port;
-        try {
-          port = build.details.container.NetworkSettings.Ports['8080/tcp'][0].HostPort;
-          return `http://${host}:${port}/${this.getName(build)}/`;
-        } catch (e) {
-          port = build.details.container.NetworkSettings.Ports['8591/tcp'][0].HostPort;
-          return `http://${host}:${port}/${this.getName(build)}/`;
-        }
-      } catch (e) {
-        const port = this.getPublishedPort(build, 8080);
-        if (port) {
-          return `http://${host}:${port}/${this.getName(build)}/`;
-        }
-        return null;
-      }
+      return `/${build.name}`;
     },
 
     getWebssh2Url(build) {
@@ -320,27 +445,12 @@ export default {
       return null;
     },
 
-    getName(build) {
-      try {
-        return build.details.container.Config.Labels.build;
-      } catch (e) {
-        return build.details.service.Spec.TaskTemplate.ContainerSpec.Env.reduce((env) => {
-          if (env.match(/^EXTRANET_BUILD_DIR=/)) {
-            return env.split('=').slice(-1).toString().split('/')
-              .slice(-1)
-              .toString();
-          }
-          return 'could-not-get-build-name';
-        });
-      }
-    },
-
     getStatusText(build) {
       if (build.status === 'running') {
         return `<span class="new badge green" data-badge-caption="">${build.status}</span>`;
       }
 
-      if (build.status === 'stopped') {
+      if (build.status === 'stopped' || build.status === 'failed') {
         return `<span class="new badge red" data-badge-caption="">${build.status}</span>`;
       }
       return `<span class="new badge" data-badge-caption="">${build.status}</span>`;
@@ -349,40 +459,42 @@ export default {
     openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild.name = this.getName(build);
-      this.selectedBuild.created_by = build.details.created_by;
+      this.selectedBuild = build;
+
       this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
-      this.selectedBuild.branch = build.details.branch;
+
       if (build.details.fe_branch) {
         this.selectedBuild.fe_branch = build.details.fe_branch.name;
       }
-      this.selectedBuild.instance = build.details.instance.name;
-      this.selectedBuild.java_version = build.details.java_version;
-
-      try {
-        this.selectedBuild.ports = [];
-        Object.keys(build.details.container.NetworkSettings.Ports).forEach((port) => {
-          this.selectedBuild.ports.push(
-            {
-              TargetPort: port.split('/')[0],
-              PublishedPort: build.details.container.NetworkSettings.Ports[port][0].HostPort,
-              Protocol: port.split('/')[1],
-            },
-          );
-        });
-      } catch (e) {
-        this.selectedBuild.ports = build.details.service.Endpoint.Ports;
+      if (build.removed_on) {
+        this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
       }
 
-      this.selectedBuild.host = this.$store.state[build.module].host;
+      if (!build.removed_by) {
+        this.selectedBuild.removed_by = 'auto-removed';
+      }
 
+      this.selectedBuild.instance = build.details.instance.name;
+      this.selectedBuild.java_version = build.details.java_version;
+      if (typeof build.details.service !== 'undefined') {
+        this.selectedBuild.ports = build.details.service.Endpoint.Ports;
+      }
+      this.selectedBuild.host = this.$store.state[build.module].host;
       this.selectedBuild.user = 'enterprise';
       this.selectedBuild.pass = 'Sofphia';
     },
 
+    openProgressModal(build) {
+      this.selectedBuild = build;
+      this.broadcast = build.details.broadcast;
+      this.showProgressModal = true;
+    },
+
     closeInfoModal() {
       this.showInfoModal = false;
-      this.selectedBuild = {};
+      this.selectedBuild = {
+        log: null,
+      };
     },
 
     canRemove(build) {
@@ -390,7 +502,7 @@ export default {
         return true;
       }
 
-      return this.$auth.getUser().username === build.details.created_by;
+      return this.$auth.getUser().username === build.created_by;
     },
 
     openRemoveModal(build) {
@@ -411,6 +523,7 @@ export default {
       this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/start', build.id)
+        .then(() => { build.status = 'running'; })
         .finally(() => { this.updating = false; });
     },
 
@@ -418,6 +531,7 @@ export default {
       this.updating = build.id;
       this.initTooltips();
       this.$store.dispatch('builds/stop', build.id)
+        .then(() => { build.status = 'stopped'; })
         .finally(() => { this.updating = false; });
     },
 
@@ -426,7 +540,8 @@ export default {
       this.$store.dispatch(`${build.module}/removeBuild`, build.id)
         .then(() => {
           this.removed = true;
-          this.$store.dispatch('builds/getActive');
+          this.$store.commit('builds/remove', build.id);
+          this.builds = this.builds.filter(_build => _build.id !== build.id);
         })
         .catch((error) => {
           if (error.response.status === 403) {
@@ -437,6 +552,25 @@ export default {
         })
         .finally(() => { this.removing = false; });
     },
+
+    selectedPage(page) {
+      this.page = page;
+      this.getBuilds();
+    },
+
+    setLastPage() {
+      this.lastPage = Math.ceil(this.paginationData.total / this.perPage.value);
+    },
+  },
+
+  watch: {
+    status() {
+      this.page = 1;
+      this.getBuilds();
+    },
+    perPage() {
+      this.getBuilds();
+    },
   },
 
   updated() {
@@ -445,10 +579,17 @@ export default {
 
   mounted() {
     this.initTooltips();
+    this.getBuilds();
+    this.$M.FormSelect.init(document.querySelector('select'));
+  },
+
+  created() {
+    EventBus.$on('build.created', () => this.getBuilds());
   },
 };
 </script>
-<style scoped>
+
+<style scoped lang='scss'>
   input:read-only {
     color: black !important;
     border-bottom: 1px solid #9e9e9e !important;
@@ -457,6 +598,14 @@ export default {
     margin-bottom: 25px;
   }
   .quick-actions a {
-      margin: 0px 2.5px;
+    margin: 0px 2.5px;
+  }
+  #perPage {
+    > div {
+      padding: 0;
+    }
+    p {
+      padding: 13px 0 0 0;
+    }
   }
 </style>

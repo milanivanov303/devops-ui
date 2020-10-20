@@ -3,8 +3,8 @@
     <div class="col s12 l8">
       <div class="card" ref="my_builds">
         <div class="card-content">
-          <span class="card-title">My active builds</span>
-          <Builds :builds="userBuilds" :show-module="true"></Builds>
+          <span class="card-title">My builds</span>
+          <Builds :user="this.$auth.getUser().username"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
@@ -19,26 +19,27 @@
             </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>1</td>
+              <tr v-for="(build, index) in activeBuildsGroupedByModule" :key="index">
+                <td>{{ index + 1 }}</td>
                 <td>
-                  <router-link to="/extranet/dashboard">Extranet</router-link>
+                  <router-link :to="'/' + build.module +'/dashboard'">
+                    {{ capitalize(build.module) }}
+                  </router-link>
                 </td>
-                <td>{{ extranetBuildsCount }}</td>
-              </tr>
-              <tr>
-                <td>2</td>
                 <td>
-                  <router-link to="/debiteur/dashboard">Debiteur</router-link>
+                  <span v-if="build.builds.building"
+                        class="new badge blue"
+                        data-badge-caption="building">{{ build.builds.building }}
+                  </span>
+                  <span v-if="build.builds.running"
+                        class="new badge green"
+                        data-badge-caption="running">{{ build.builds.running }}
+                  </span>
+                  <span v-if="build.builds.stopped"
+                        class="new badge red"
+                        data-badge-caption="stopped">{{ build.builds.stopped }}
+                  </span>
                 </td>
-                <td>{{ debiteurBuildsCount }}</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>
-                  <router-link to="/imx-fe/dashboard">iMX FE</router-link>
-                </td>
-                <td>{{ imxFeBuildsCount }}</td>
               </tr>
             </tbody>
           </table>
@@ -85,6 +86,7 @@
 <script>
 import BarChart from '@/components/BarChart';
 import Builds from '@/components/Builds';
+import EventBus from '@/event-bus';
 
 
 export default {
@@ -120,17 +122,8 @@ export default {
     };
   },
   computed: {
-    userBuilds() {
-      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username);
-    },
-    extranetBuildsCount() {
-      return this.$store.state.builds.active.filter(build => build.module === 'extranet').length;
-    },
-    debiteurBuildsCount() {
-      return this.$store.state.builds.active.filter(build => build.module === 'debiteur').length;
-    },
-    imxFeBuildsCount() {
-      return this.$store.state.builds.active.filter(build => build.module === 'imx_fe').length;
+    activeBuildsGroupedByModule() {
+      return this.$store.getters['builds/getActiveGroupedByModule'];
     },
     modulesChartData() {
       const builds = this.$store.getters['builds/getByModule']('module-builds');
@@ -152,8 +145,8 @@ export default {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_module });
       const promise1 = this.$store.dispatch('builds/getActive');
-      const promise2 = this.$store.dispatch('extranet/getServices');
-      const promise3 = this.$store.dispatch('debiteur/getServices');
+      const promise2 = this.$store.dispatch('extranet/getHost');
+      const promise3 = this.$store.dispatch('debiteur/getHost');
       const promise4 = this.$store.dispatch('imx_fe/getContainers');
 
       Promise.all([promise1, promise2, promise3, promise4]).finally(() => {
@@ -188,6 +181,10 @@ export default {
 
       return Math.round(new Date(newDate).getTime() / 1000);
     },
+    capitalize(string) {
+      if (typeof string !== 'string') return '';
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
   },
   watch: {
     userStatisticsDays() {
@@ -201,6 +198,14 @@ export default {
     this.getBuilds();
     this.getModuleStatistics();
     this.getUserStatistics();
+  },
+
+  created() {
+    EventBus.$on('build.created', () => {
+      this.getBuilds();
+      this.getModuleStatistics();
+      this.getUserStatistics();
+    });
   },
 };
 </script>
