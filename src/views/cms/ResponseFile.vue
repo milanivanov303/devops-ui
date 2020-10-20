@@ -24,7 +24,7 @@
       </form>
       <Table
         v-if="$store.getters['cms/getRspVariables'].length"
-        :request="getVariables"
+        :data="getVariables"
         :pagination="false"
         @add="isClicked = true"
         sort-by="name"
@@ -32,12 +32,19 @@
         :export-btn="false"
         :view-btn="false"
         :add-btn="false"
-        :edit-btn="false"
-        :delete-btn="false">
-        <Column v-for="(column, key) in getVariables.columns"
+        :edit-btn="true"
+        :delete-btn="false"
+        @edit="row => details(row, 'details')">
+        <Column show="id"/>
+        <Column show="name"/>
+        <Column 
+          label="Default Variable" 
+          :show="row => row.default_variable ? row.default_variable.value : ''"
+        />
+        <Column class="custom-size" v-for="(instance, key) in this.$store.state.cms.instances"
           v-bind:key="key"
-          :label="key"
-          :show="key"
+          :label="instance.name"
+          :show="row => getInstanceValue(row, instance)"
         />
         <template v-slot:buttons="{ data }">
           <a @click="details(data, 'details')" title="details">
@@ -143,12 +150,8 @@
   </div>
 </template>
 <script>
-// import Table from '@/components/partials/Table';
 
 export default {
-  // components: {
-  //   Table,
-  // },
   mounted() {
     this.loadProjects();
     this.$store.subscribe((mutation) => {
@@ -196,22 +199,7 @@ export default {
       // this.$store.state.cms.selectedDeliveryChain,
     },
     getVariables() {
-      const variables = {
-        data: 'cms/getRspVariables',
-        columns: {
-          id: '',
-          name: '',
-          default_variable: 'value',
-        },
-        action: true,
-        searchable: true,
-      };
-      // creating columns with instances names
-      this.$store.state.cms.instances.map(a => a.name).forEach((e) => {
-        variables.columns[e] = 'value';
-        return variables.columns[e];
-      });
-      return variables;
+      return this.$store.getters['cms/getRspVariables'];
     },
     isDisabled() {
       // enable when a variable is selected
@@ -219,6 +207,9 @@ export default {
     },
   },
   methods: {
+    getInstanceValue(row, instance) {
+      return row[instance.name] ? row[instance.name].value : '';
+    },
     loadVariables() {
       const loader = this.$loading.show({ container: this.$el });
       const payload = {
@@ -316,3 +307,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+  .custom-size{
+      word-break: break-word;
+  }
+</style>
