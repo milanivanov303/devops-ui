@@ -44,7 +44,7 @@
           </template>
           <template v-slot:content>
             <form class=" col s12 l11">
-              <div class="row">
+              <!-- <div class="row">
                 <Select
                   class="col s12"
                   label="Codix Team"
@@ -74,9 +74,9 @@
                   :options="submodules"
                   :class="{readonly: action === 'edit'}"
                 />
-              </div>
+              </div> -->
               <div class="row">
-                <div v-if="action === 'create'" class="input-field col s3">
+                <!-- <div v-if="action === 'create'" class="input-field col s3">
                   <i class="material-icons prefix">label_outline</i>
                   <input
                     type="text"
@@ -84,9 +84,9 @@
                     v-model="abbrevName"
                     :class="{readonly: action === 'edit'}">
                   <label :class="{active: abbrevName}" for="abbrevName">Abbrev</label>
-                </div>
-                <div class="input-field col s7" :class="{invalid: $v.selectedVariable.name.$error, m4: action === 'create'}">
-                  <i v-if="action === 'edit'" class="material-icons prefix">label_outline</i>
+                </div> -->
+                <div class="input-field col s6" :class="{invalid: $v.selectedVariable.name.$error}">
+                  <i class="material-icons prefix">label_outline</i>
                   <input
                     type="text"
                     id="name"
@@ -101,7 +101,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="input-field col s5" :class="{invalid: $v.selectedVariable.value.$error}">
+                <div class="input-field col s6" :class="{invalid: $v.selectedVariable.value.$error}">
                   <input
                     type="text"
                     id="value"
@@ -258,7 +258,7 @@ export default {
       selectedVariable: {},
       action: '',
       error: '',
-      abbrev: {},
+      // abbrev: {},
       instance: {},
       templates: {},
       commitMsg: {},
@@ -285,9 +285,9 @@ export default {
           if (this.selectedVariable.name === '') {
             return true;
           }
-          if (this.abbrevName) {
-            return this.$store.getters['cms/variableNameIsUnique'](this.abbrevName.concat(this.selectedVariable.name));
-          }
+          // if (this.abbrevName) {
+          //   return this.$store.getters['cms/variableNameIsUnique'](this.abbrevName.concat(this.selectedVariable.name));
+          // }
 
           return this.$store.getters['cms/variableNameIsUnique'](this.selectedVariable.name);
         },
@@ -316,31 +316,31 @@ export default {
     defaultVariables() {
       return this.$store.state.cms.variables;
     },
-    codixTeams() {
-      return this.$store.state.cms.codixTeams;
-    },
-    imxModules() {
-      return this.$store.state.cms.modules;
-    }, 
-    submodules() {
-      if (this.abbrev.imxModule) {
-        return this.abbrev.imxModule.submodules || [];
-      }
-      return [];
-    },
-    abbrevName() {
-      let abbrevName = '';
-      if (this.selectedVariable.codix_team) {
-        abbrevName = `${this.selectedVariable.codix_team.abbreviation}_`;
-        if (this.abbrev.imxModule) {
-          abbrevName += `${this.abbrev.imxModule.abbreviation}_`;
-          if (this.abbrev.submodule) {
-            abbrevName += `${this.abbrev.submodule.abbreviation}_`;
-          }
-        }
-      }
-      return abbrevName;
-    },
+    // codixTeams() {
+    //   return this.$store.state.cms.codixTeams;
+    // },
+    // imxModules() {
+    //   return this.$store.state.cms.modules;
+    // }, 
+    // submodules() {
+    //   if (this.abbrev.imxModule) {
+    //     return this.abbrev.imxModule.submodules || [];
+    //   }
+    //   return [];
+    // },
+    // abbrevName() {
+    //   let abbrevName = '';
+    //   if (this.selectedVariable.codix_team) {
+    //     abbrevName = `${this.selectedVariable.codix_team.abbreviation}_`;
+    //     if (this.abbrev.imxModule) {
+    //       abbrevName += `${this.abbrev.imxModule.abbreviation}_`;
+    //       if (this.abbrev.submodule) {
+    //         abbrevName += `${this.abbrev.submodule.abbreviation}_`;
+    //       }
+    //     }
+    //   }
+    //   return abbrevName;
+    // },
 
     instances() {
       return this.$store.state.mmpi.devInstances;
@@ -353,11 +353,11 @@ export default {
       this.selectedVariable = { ...variable};
       this.action = action;
 
-      if (this.selectedVariable.codix_team_id) {
-        this.selectedVariable.codix_team = this.codixTeams.find(
-          codixTeam => codixTeam.id === this.selectedVariable.codix_team_id,
-        );
-      }
+      // if (this.selectedVariable.codix_team_id) {
+      //   this.selectedVariable.codix_team = this.codixTeams.find(
+      //     codixTeam => codixTeam.id === this.selectedVariable.codix_team_id,
+      //   );
+      // }
     },
     closeAddEditVariableModal() {
       this.showAddEditVariableModal = false;
@@ -385,16 +385,17 @@ export default {
         .then(() => {
           loader.hide();
         });
-      this.$store.dispatch('cms/getCodixTeams');
+      // this.$store.dispatch('cms/getCodixTeams');
     },
-    getInstances() {
-      this.$store.dispatch('mmpi/getDevInstances');
-    },
-    getImxModules() {
-      this.$store.dispatch('cms/getImxModules');
-    },
+    // getInstances() {
+    //   this.$store.dispatch('mmpi/getDevInstances');
+    // },
+    // getImxModules() {
+    //   this.$store.dispatch('cms/getImxModules');
+    // },
 
     saveVariable() {
+      debugger;
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
@@ -404,13 +405,13 @@ export default {
         variable: this.selectedVariable,
       };
 
-      payload.variable.codix_team_id = this.selectedVariable.codix_team.id;
+      // payload.variable.codix_team_id = this.selectedVariable.codix_team.id;
 
       if(this.action === 'create') {
         payload.commitMsg = this.commitMsg;
-        if (this.abbrevName) {
-          payload.variable.name = this.abbrevName.concat(this.selectedVariable.name);
-        }
+        // if (this.abbrevName) {
+        //   payload.variable.name = this.abbrevName.concat(this.selectedVariable.name);
+        // }
       }
 
       this.$store.dispatch('cms/submitVariable', payload)
@@ -462,8 +463,8 @@ export default {
   
   mounted() { 
     this.getDefaultVariables();
-    this.getInstances();
-    this.getImxModules();
+    // this.getInstances();
+    // this.getImxModules();
   },
 };
 </script>
