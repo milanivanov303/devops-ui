@@ -112,7 +112,6 @@ export default {
       instances = Object.keys(payload.instances)
         .map(item => payload.instances[item]);
     }
-    console.log(instances);
     commit('instances', instances);
   },
 
@@ -291,7 +290,7 @@ export default {
       headers: { 'content-type': 'multipart/form-data' },
     };
     try {
-      await api.post('response-variables/uploadRspFile', payload, headers);
+      await api('cms').post('response-variables/uploadRspFile', payload, headers);
     } catch (error) {
       console.log(error);
       commit('error', error);
