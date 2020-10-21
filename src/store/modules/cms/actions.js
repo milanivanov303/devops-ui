@@ -1,10 +1,4 @@
 // https://vuex.vuejs.org/en/actions.html
-// import Api from '../../../plugins/api-sdk/api';
-// import config from '../../../config';
-
-// const api = new Api(config.cms.url, config.cms.code);
-// const apiMMPI = new Api(config.mmpi.url, config.mmpi.code);
-
 export default {
   getVariables({ commit }) {
     const name = 'config-defaults';
@@ -82,37 +76,25 @@ export default {
     return promise;
   
   },
+  getRspVariables({ commit }, payload) {
 
+    const name = 'rsp-variables';
 
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
 
+    const promise = api('cms').get('response-variables', payload);
 
-  getTemplates({ commit }, payload) {
-    const promise = api.get('cms/run-commands', payload);
-    console.log("Get Templates");
-    console.log(promise);
+    commit('promise', { name, promise }, { root: true });
+
     promise
-      .catch(error => commit('error', error));
+      .then(response => commit('rspVariables', response.data.data))
+      .catch(() => commit('error', 'Could not get response-variables list', { root: true }));
     return promise;
   },
-  async getRspVariables({ commit }, payload) {
-    commit('rspVariables', '');
-    if (payload) {
-      try {
-        const result = await api.get('response-variables', payload);
-        commit('rspVariables', result.data.data);
-      } catch (error) {
-        console.log(error);
-        commit('error', error);
-      }
-    }
-  },
-  getSelectedInstance({ commit }, payload) {
-    commit('selectedInstance', payload);
-  },
-  getSelectedProject({ commit }, payload) {
-    commit('selectedProject', payload);
-  },
   getInstances({ commit }, payload) {
+    debugger;
     let instances = '';
     if (payload) {
       // convert instances to indexed array
@@ -121,6 +103,26 @@ export default {
     }
     commit('instances', instances);
   },
+
+
+
+  getSelectedInstance({ commit }, payload) {
+    commit('selectedInstance', payload);
+  },
+  getSelectedProject({ commit }, payload) {
+    commit('selectedProject', payload);
+  },
+
+
+  getTemplates({ commit }, payload) {
+    const promise = api('cms').get('cms/run-commands', payload);
+    console.log("Get Templates");
+    console.log(promise);
+    promise
+      .catch(error => commit('error', error));
+    return promise;
+  },
+
   getDeliveryChains({ commit }, payload) {
     // convert delivery chains to indexed array
     commit('deliveryChains', Object.keys(payload.delivery_chains)
@@ -130,7 +132,7 @@ export default {
     commit('selectedDeliveryChain', payload);
   },
   async getUniqueInstancesId(payload) {
-    const resp = await api.get('response-variables/unique-instances-id', payload);
+    const resp = await api('cms').get('response-variables/unique-instances-id', payload);
     return resp.data.map(el => el.instance_id);
   },
   async getProjects({ commit, state, dispatch }) {
@@ -139,7 +141,7 @@ export default {
       try {
         // get specific instances->delivery_chains->projects by instance id
         // covnert it to projects->delivery_chains->instances
-        const resp = await apiMMPI.get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
+        const resp = await api('mmpi').get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
         const projects = [];
         resp.data.data.forEach((instance) => {
           instance.delivery_chains.forEach((deliveryChain) => {
@@ -163,13 +165,12 @@ export default {
             });
           });
         });
-
         // convert projects to indexed array
         commit('projects', Object.keys(projects)
           .map(item => projects[item])
           .sort((a, b) => a.name.localeCompare(b.name)));
-
-        await apiMMPI.get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
+          
+        await api('mmpi').get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
       } catch (error) {
         console.log(error);
         commit('error', error);
@@ -178,7 +179,7 @@ export default {
   },
   async getTemplatesMMPI({ commit }, payload) {
     try {
-      const resp = await apiMMPI.get('sources', payload);
+      const resp = await api('mmpi').get('sources', payload);
       // cannot access url if template name contains %
       const result = resp.data.data.reduce((acc, source) => {
         if (source.source_name.indexOf('%') === -1) {
@@ -201,7 +202,7 @@ export default {
   },
   async getTemplateContent({ commit }, payload) {
     try {
-      const result = await api.get('templates/template-content', payload);
+      const result = await api('cms').get('templates/template-content', payload);
       commit('templateContent', result.data);
     } catch (error) {
       console.log(error);
@@ -247,7 +248,7 @@ export default {
           },
         }),
       };
-      await apiMMPI.get('issues', payload).then((resp) => {
+      await api('mmpi').get('issues', payload).then((resp) => {
         const [issue] = resp.data.data;
         if (issue) {
           commit('issue', issue);
@@ -261,7 +262,7 @@ export default {
   async getInstanceStatus({ commit, state }) {
     if (!state.instanceStatus) {
       try {
-        await apiMMPI.get('enum-values', { type: 'instance_status' }).then((resp) => {
+        await api('mmpi').get('enum-values', { type: 'instance_status' }).then((resp) => {
           commit('instanceStatus', resp.data.data);
         });
       } catch (error) {
@@ -271,7 +272,7 @@ export default {
   },
   async checkVariableTemplates({ commit }, payload) {
     const name = 'cms-list-template';
-    const promise = await api.get('cms/run-commands', payload);
+    const promise = await api('cms').get('cms/run-commands', payload);
     commit('promise', { name, promise }, { root: true });
     return promise.data;
   },
@@ -289,7 +290,7 @@ export default {
 
   async updateRspVariable({ commit }, payload) {
     try {
-      const result = await api.put(`response-variables/${payload.id}`, payload);
+      const result = await api('cms').put(`response-variables/${payload.id}`, payload);
       commit('updateRspVariable', result.data.data);
     } catch (error) {
       console.log(error);
@@ -299,7 +300,7 @@ export default {
     
   async submitTemplate({ state }, payload) {
     try {
-      const response = await api.put('templates/template-content',
+      const response = await api('cms').put('templates/template-content',
         {
           path: state.selectedTemplate.source_path,
           name: state.selectedTemplate.source_name,
@@ -316,7 +317,7 @@ export default {
 
   async firstInstanceVariables({ commit }, payload) {
     try {
-      const resp = await api.get(`response-variables?instance_id=${payload.id}`);
+      const resp = await api('cms').get(`response-variables?instance_id=${payload.id}`);
       commit('firstInstanceVariables', resp.data.data);
     } catch (error) {
       console.log(error);
@@ -325,7 +326,7 @@ export default {
   },
   async secondInstanceVariables({ commit }, payload) {
     try {
-      const resp = await api.get(`response-variables?instance_id=${payload.id}`);
+      const resp = await api('cms').get(`response-variables?instance_id=${payload.id}`);
       commit('secondInstanceVariables', resp.data.data);
     } catch (error) {
       console.log(error);
@@ -344,7 +345,7 @@ export default {
       // } else if (payload.type_id === 'cms') {
       //   uri = 'cms';
       // }
-      const response = await apiMMPI.post(`modifications/cms`, payload);
+      const response = await api('mmpi').post(`modifications/cms`, payload);
       return response.data.data;
     } catch (error) {
       console.log(error);
