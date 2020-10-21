@@ -76,26 +76,25 @@ export default {
     return promise;
   
   },
-  getRspVariables({ commit }, payload) {
+  // getRspVariables({ commit }, payload) {
+  //   debugger
+  //   const name = 'rsp-variables';
 
-    const name = 'rsp-variables';
+  //   if (this.state.promises[name]) {
+  //     return this.state.promises[name];
+  //   }
 
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
+  //   const promise = api('cms').get('response-variables', payload);
 
-    const promise = api('cms').get('response-variables', payload);
+  //   commit('promise', { name, promise }, { root: true });
 
-    commit('promise', { name, promise }, { root: true });
-
-    promise
-      .then(response => commit('rspVariables', response.data.data))
-      .catch(() => commit('error', 'Could not get response-variables list', { root: true }));
-    return promise;
-  },
-  getInstances({ commit }, payload) {
-    debugger;
-    let instances = '';
+  //   promise
+  //     .then(response => commit('rspVariables', response.data.data))
+  //     .catch(() => commit('error', 'Could not get response-variables list', { root: true }));
+  //   return promise;
+  // },
+  async getRspVariables({ commit }, payload) {
+    commit('rspVariables', '');
     if (payload) {
       try {
         const result = await api('cms').get('response-variables', payload);
@@ -105,18 +104,25 @@ export default {
         commit('error', error);
       }
     }
+  },
+  getInstances({ commit }, payload) {
+    let instances = '';
+    if (payload) {
+      // convert instances to indexed array
+      instances = Object.keys(payload.instances)
+        .map(item => payload.instances[item]);
+    }
+    console.log(instances);
     commit('instances', instances);
   },
-
-
 
   getSelectedInstance({ commit }, payload) {
     commit('selectedInstance', payload);
   },
+
   getSelectedProject({ commit }, payload) {
     commit('selectedProject', payload);
   },
-
 
   getTemplates({ commit }, payload) {
     const promise = api('cms').get('cms/run-commands', payload);

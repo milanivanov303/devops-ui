@@ -7,7 +7,6 @@ export default {
   variableNameIsUnique: state => name => !state.variables
     .some(a => a.name === name),
   getRspVariables: (state) => {
-    debugger
     if (state.rspVariables.length > 0) {
       return state.rspVariables.slice().reduce((acc, variable) => {
         const found = acc.find(a => a.name === variable.name);

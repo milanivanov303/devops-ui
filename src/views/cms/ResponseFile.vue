@@ -194,7 +194,6 @@ export default {
       // this.$store.state.cms.selectedDeliveryChain,
     },
     getVariables() {
-      debugger;
       return this.$store.getters['cms/getRspVariables'];
     },
     isDisabled() {
@@ -231,7 +230,6 @@ export default {
       });
     },
     selectedDeliveryChain(value) {
-      debugger
       this.$store.dispatch('cms/getSelectedDeliveryChain', value);
       this.$store.dispatch('cms/getInstances', value);
       this.$store.dispatch('cms/getRspVariables', '');
