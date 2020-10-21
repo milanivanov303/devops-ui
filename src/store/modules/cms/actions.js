@@ -97,9 +97,13 @@ export default {
     debugger;
     let instances = '';
     if (payload) {
-      // convert instances to indexed array
-      instances = Object.keys(payload.instances)
-        .map(item => payload.instances[item]);
+      try {
+        const result = await api('cms').get('response-variables', payload);
+        commit('rspVariables', result.data.data);
+      } catch (error) {
+        console.log(error);
+        commit('error', error);
+      }
     }
     commit('instances', instances);
   },
