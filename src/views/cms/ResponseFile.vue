@@ -29,7 +29,7 @@
         <Table
           v-if="$store.getters['cms/getRspVariables'].length"
           :data="getVariables"
-          :pagination="false"
+          :pagination="true"
           @add="isClicked = true"
           sort-by="name"
           sort-dir="asc"
@@ -228,11 +228,7 @@ export default {
     },
     details(value) {
       this.modalData.name = value.name;
-      if (value.instance_id) {
-        this.instance = this.getInstances.find(
-          instance => instance.id === value.instance_id,
-        );
-      }
+
       if (value.default_variable) {
         this.modalData.default_variable.value = value.default_variable.value;
         this.modalData.default_variable.description = value.default_variable.description;
@@ -272,7 +268,6 @@ export default {
       const loader = this.$loading.show({ container: this.$refs['rsp-info'] });
       await this.$store.dispatch('cms/updateRspVariable', payload);
       this.modalIsOpen = false;
-      this.$M.Modal.init(this.$refs['rsp-info']).close();
       this.resetForm();
       loader.hide();
     },
