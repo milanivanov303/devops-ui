@@ -46,11 +46,6 @@
           :label="instance.name"
           :show="row => getInstanceValue(row, instance)"
         />
-        <template v-slot:buttons="{ data }">
-          <a @click="details(data, 'details')" title="details">
-            <i class="material-icons right">settings</i>
-          </a>
-        </template>
       </Table>
       <div @submit.prevent="onSubmit" id="action" ref="rsp-info" class="modal right-sheet">
         <div class="frame">
@@ -199,6 +194,7 @@ export default {
       // this.$store.state.cms.selectedDeliveryChain,
     },
     getVariables() {
+      debugger;
       return this.$store.getters['cms/getRspVariables'];
     },
     isDisabled() {
@@ -235,6 +231,7 @@ export default {
       });
     },
     selectedDeliveryChain(value) {
+      debugger
       this.$store.dispatch('cms/getSelectedDeliveryChain', value);
       this.$store.dispatch('cms/getInstances', value);
       this.$store.dispatch('cms/getRspVariables', '');

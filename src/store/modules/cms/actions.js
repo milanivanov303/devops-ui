@@ -98,7 +98,7 @@ export default {
     commit('rspVariables', '');
     if (payload) {
       try {
-        const result = await api.get('response-variables', payload);
+        const result = await api('cms').get('response-variables', payload);
         commit('rspVariables', result.data.data);
       } catch (error) {
         console.log(error);
@@ -130,7 +130,7 @@ export default {
     commit('selectedDeliveryChain', payload);
   },
   async getUniqueInstancesId(payload) {
-    const resp = await api.get('response-variables/unique-instances-id', payload);
+    const resp = await api('cms').get('response-variables/unique-instances-id', payload);
     return resp.data.map(el => el.instance_id);
   },
   async getProjects({ commit, state, dispatch }) {
@@ -139,7 +139,7 @@ export default {
       try {
         // get specific instances->delivery_chains->projects by instance id
         // covnert it to projects->delivery_chains->instances
-        const resp = await apiMMPI.get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
+        const resp = await api('mmpi').get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
         const projects = [];
         resp.data.data.forEach((instance) => {
           instance.delivery_chains.forEach((deliveryChain) => {
@@ -168,8 +168,8 @@ export default {
         commit('projects', Object.keys(projects)
           .map(item => projects[item])
           .sort((a, b) => a.name.localeCompare(b.name)));
-
-        await apiMMPI.get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
+          
+        await api('mmpi').get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
       } catch (error) {
         console.log(error);
         commit('error', error);
@@ -201,7 +201,7 @@ export default {
   },
   async getTemplateContent({ commit }, payload) {
     try {
-      const result = await api.get('templates/template-content', payload);
+      const result = await api('cms').get('templates/template-content', payload);
       commit('templateContent', result.data);
     } catch (error) {
       console.log(error);
@@ -271,7 +271,7 @@ export default {
   },
   async checkVariableTemplates({ commit }, payload) {
     const name = 'cms-list-template';
-    const promise = await api.get('cms/run-commands', payload);
+    const promise = await api('cms').get('cms/run-commands', payload);
     commit('promise', { name, promise }, { root: true });
     return promise.data;
   },
@@ -289,7 +289,7 @@ export default {
 
   async updateRspVariable({ commit }, payload) {
     try {
-      const result = await api.put(`response-variables/${payload.id}`, payload);
+      const result = await api('cms').put(`response-variables/${payload.id}`, payload);
       commit('updateRspVariable', result.data.data);
     } catch (error) {
       console.log(error);
@@ -316,7 +316,7 @@ export default {
 
   async firstInstanceVariables({ commit }, payload) {
     try {
-      const resp = await api.get(`response-variables?instance_id=${payload.id}`);
+      const resp = await api('cms').get(`response-variables?instance_id=${payload.id}`);
       commit('firstInstanceVariables', resp.data.data);
     } catch (error) {
       console.log(error);
@@ -325,7 +325,7 @@ export default {
   },
   async secondInstanceVariables({ commit }, payload) {
     try {
-      const resp = await api.get(`response-variables?instance_id=${payload.id}`);
+      const resp = await api('cms').get(`response-variables?instance_id=${payload.id}`);
       commit('secondInstanceVariables', resp.data.data);
     } catch (error) {
       console.log(error);
@@ -344,7 +344,7 @@ export default {
       // } else if (payload.type_id === 'cms') {
       //   uri = 'cms';
       // }
-      const response = await apiMMPI.post(`modifications/cms`, payload);
+      const response = await api('mmpi').post(`modifications/cms`, payload);
       return response.data.data;
     } catch (error) {
       console.log(error);
