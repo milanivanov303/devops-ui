@@ -44,6 +44,7 @@
           </template>
           <template v-slot:content>
             <form class=" col s12 l11">
+              <Alert v-if="error !== ''" v-bind:msg="error"/>
               <!-- <div class="row">
                 <Select
                   class="col s12"
