@@ -81,6 +81,43 @@
             </ul>
           </div>
         </li>
+        <li :class="{ active: isActive('cms') }">
+          <a class="collapsible-header">
+            <i class="material-icons">apps</i> CMS
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li :class="{ active: isActive('cms/config-defaults') }">
+                <router-link to="/cms/config-defaults">
+                  Config Defaults
+                </router-link>
+              </li>
+              <li :class="{ active: isActive('cms/response-file') }">
+                <router-link to="/cms/response-file">
+                  Response Files
+                </router-link>
+              </li>
+              <li v-if="environment !== 'production'"
+                  :class="{ active: isActive('cms/templates') }">
+                <router-link to="/cms/templates">
+                   Templates
+                </router-link>
+              <li v-if="environment !== 'production'"
+                  :class="{ active: isActive('cms/inventory') }">
+                <router-link to="/cms/inventory">
+                   Inventory
+                </router-link>
+              </li>
+              <li :class="{ active: isActive('cms/modification') }">
+                <router-link to="/cms/modification">
+                  Modification
+                </router-link>
+              </li>
+              <li><div class="divider"></div></li>
+            </ul>
+          </div>
+        </li>
         <li
           v-if="$auth.can('can-manage-authorizations')"
           :class="{ active: isActive('administration') }"
@@ -111,6 +148,11 @@
 
 <script>
 export default {
+  data() {
+    return {
+      environment: process.env.VUE_APP_ENV,
+    };
+  },
   methods: {
     isActive(path) {
       const regexp = RegExp(`^/${path}`);
