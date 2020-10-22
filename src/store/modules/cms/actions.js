@@ -17,7 +17,6 @@ export default {
       .then(response => commit('variables', response.data.data))
       .catch(() => commit('error', 'Could not get config-defaults list', { root: true }));
     return promise;
-
   },
   getImxModules({ commit }) {
     const name = 'imx-modules';
@@ -54,19 +53,18 @@ export default {
     return promise;
   },
   submitVariable({ commit }, payload) {
-
-    var promise;
+    let promise;
 
     if (payload.commitMsg) {
-      promise = api('cms').post(`default-variables/${payload.commitMsg.ttsKey}/` + 
-                         `${payload.commitMsg.techChanges}/${payload.commitMsg.funcChanges}`,
-                          payload.variable);
+      promise = api('cms').post(`default-variables/${payload.commitMsg.ttsKey}/`
+                         + `${payload.commitMsg.techChanges}/${payload.commitMsg.funcChanges}`,
+      payload.variable);
 
       promise
         .then(response => commit('createVariable', response.data.data))
         .catch(error => commit('error', error, { root: true }));
-      return promise;   
-    } 
+      return promise;
+    }
 
     promise = api('cms').put(`default-variables/${payload.variable.id}`, payload.variable);
 
@@ -74,7 +72,6 @@ export default {
       .then(response => commit('updateVariable', response.data.data))
       .catch(error => commit('error', error, { root: true }));
     return promise;
-  
   },
   // getRspVariables({ commit }, payload) {
   //   debugger
@@ -125,7 +122,7 @@ export default {
 
   getTemplates({ commit }, payload) {
     const promise = api('cms').get('cms/run-commands', payload);
-    console.log("Get Templates");
+    console.log('Get Templates');
     console.log(promise);
     promise
       .catch(error => commit('error', error));
@@ -178,7 +175,7 @@ export default {
         commit('projects', Object.keys(projects)
           .map(item => projects[item])
           .sort((a, b) => a.name.localeCompare(b.name)));
-          
+
         await api('mmpi').get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
       } catch (error) {
         console.log(error);
@@ -235,8 +232,8 @@ export default {
   getSecondSelectedInstance({ commit }, payload) {
     commit('secondSelectedInstance', payload);
   },
-  //get issue for CMS/Modification tab
-  async getIssue({ commit, state }, ttsId) {
+  // get issue for CMS/Modification tab
+  async getIssue({ commit }, ttsId) {
     try {
       const payload = {
         tts_id: ttsId,
@@ -267,7 +264,7 @@ export default {
       commit('error', error);
     }
   },
-  //Get instanse status of CMS/Modification tab
+  // Get instanse status of CMS/Modification tab
   async getInstanceStatus({ commit, state }) {
     if (!state.instanceStatus) {
       try {
@@ -306,7 +303,7 @@ export default {
       commit('error', error);
     }
   },
-    
+
   async submitTemplate({ state }, payload) {
     try {
       const response = await api('cms').put('templates/template-content',
@@ -342,10 +339,11 @@ export default {
       commit('error', error);
     }
   },
-  //Add modification in CMS/Modification tab
+  // Add modification in CMS/Modification tab
   async addModification({ commit }, payload) {
     try {
-      //Commented rows below, because work just on page cms/modification other two pages are not currently functional
+      // Commented rows below, because work just on page cms/modification other two pages are not
+      // currently functional
       // let uri = '';
       // if (payload.type_id === 'binary') {
       //   uri = 'binaries';
@@ -354,7 +352,7 @@ export default {
       // } else if (payload.type_id === 'cms') {
       //   uri = 'cms';
       // }
-      const response = await api('mmpi').post(`modifications/cms`, payload);
+      const response = await api('mmpi').post('modifications/cms', payload);
       return response.data.data;
     } catch (error) {
       console.log(error);

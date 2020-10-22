@@ -41,8 +41,8 @@
           @edit="row => details(row, 'details')">
           <Column show="id"/>
           <Column show="name"/>
-          <Column 
-            label="Default Variable" 
+          <Column
+            label="Default Variable"
             :show="row => row.default_variable ? row.default_variable.value : ''"
           />
           <Column class="custom-size" v-for="(instance, key) in this.$store.state.cms.instances"
@@ -132,7 +132,7 @@
                         :value="modalData.codix_team.name">
                 </div>
               </div>
-            </form>            
+            </form>
           </template>
           <template v-slot:footer>
             <button

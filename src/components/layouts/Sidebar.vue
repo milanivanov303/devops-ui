@@ -93,16 +93,18 @@
                   Config Defaults
                 </router-link>
               </li>
-              <li v-if="environment !== 'production'" :class="{ active: isActive('cms/response-file') }">
+              <li :class="{ active: isActive('cms/response-file') }">
                 <router-link to="/cms/response-file">
                   Response Files
                 </router-link>
               </li>
-              <li v-if="environment !== 'production'" :class="{ active: isActive('cms/templates') }">
+              <li v-if="environment !== 'production'"
+                  :class="{ active: isActive('cms/templates') }">
                 <router-link to="/cms/templates">
                    Templates
                 </router-link>
-              <li v-if="environment !== 'production'" :class="{ active: isActive('cms/inventory') }">
+              <li v-if="environment !== 'production'"
+                  :class="{ active: isActive('cms/inventory') }">
                 <router-link to="/cms/inventory">
                    Inventory
                 </router-link>
@@ -148,7 +150,7 @@
 export default {
   data() {
     return {
-      environment: process.env.VUE_APP_ENV
+      environment: process.env.VUE_APP_ENV,
     };
   },
   methods: {

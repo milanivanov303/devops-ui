@@ -121,7 +121,7 @@ export default {
     },
     revisions: {
       required,
-    }
+    },
   },
   methods: {
     checkTemplate() {

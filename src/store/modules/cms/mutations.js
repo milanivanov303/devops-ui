@@ -86,7 +86,7 @@ export default {
   secondInstanceVariables(state, secondInstanceVariables) {
     state.secondInstanceVariables = secondInstanceVariables;
   },
-  //Change issue/issues state in CMS/modification tab
+  // Change issue/issues state in CMS/modification tab
   issue(state, issue) {
     state.issue = issue;
   },

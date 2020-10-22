@@ -261,7 +261,7 @@ export default {
     },
     instance: {
       required,
-    }
+    },
   },
   computed: {
     issue() {
@@ -286,12 +286,12 @@ export default {
       if (this.$store.state.cms.issue) {
         return this.$store.state.cms.issue.project.delivery_chains;
       }
-       return [];
-    }
+      return [];
+    },
   },
   methods: {
     async getInstances(deliveryChain) {
-      console.log("Get INSTANCES - delivery_chain.dc_role");
+      console.log('Get INSTANCES - delivery_chain.dc_role');
       console.log(deliveryChain);
       if (deliveryChain.dc_role) {
         switch (deliveryChain.dc_role.key) {
@@ -317,8 +317,8 @@ export default {
             break;
         }
       }
-      console.log("INSTANCES");
-        console.log(this.instances);
+      console.log('INSTANCES');
+      console.log(this.instances);
     },
     filterChains(roles, type) {
       return this.deliveryChains.reduce((acc, chain) => {
@@ -362,8 +362,6 @@ export default {
             key: 'cms_cmd',
           },
         });
-      } else {
-
       }
     },
     addVariable() {
@@ -377,10 +375,9 @@ export default {
         });
         this.currentVariable = {};
         this.templates = [];
-      }
-       else {
-         this.$v.currentVariable.$touch();
-         this.$v.instance.$touch();
+      } else {
+        this.$v.currentVariable.$touch();
+        this.$v.instance.$touch();
       }
     },
     selectIssue() {
@@ -422,7 +419,9 @@ export default {
       this.$v.instanceStatus.$touch();
       this.$v.currentVariable.$reset();
       this.$v.instance.$reset();
-      if (this.$v.deliveryChain.$invalid || this.$v.modifications.$invalid || this.$v.instanceStatus.$invalid) {
+      if (this.$v.deliveryChain.$invalid
+          || this.$v.modifications.$invalid
+          || this.$v.instanceStatus.$invalid) {
         return;
       }
       this.$store.state.cms.error = '';

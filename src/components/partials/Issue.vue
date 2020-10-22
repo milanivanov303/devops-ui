@@ -90,9 +90,9 @@ export default {
         loader.hide();
       });
 
-      const issue = this.$store.state.cms.issue;
+      const { issue } = this.$store.state.cms;
 
-      if (!issue || (this.formData.ttsKey != issue.tts_id)) {
+      if (!issue || (this.formData.ttsKey !== issue.tts_id)) {
         this.submitStatus = 'ERROR';
         this.$router.push(`/cms/${this.$route.meta.name}`);
         return;

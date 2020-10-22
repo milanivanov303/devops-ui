@@ -89,7 +89,7 @@ export default {
     getSecondInstances() {
       return this.$store.getters['cms/getInventoryInstances'](this.$store.state.cms.firstSelectedInstance);
     },
-    getVariables() {  
+    getVariables() {
       const variables = {
         data: 'cms/getFilteredVariables',
         columns: {
@@ -115,7 +115,7 @@ export default {
         inactive: 0,
         order_by: 'name asc',
       });
-      //await this.$store.dispatch('mmpi/getDeliveryChainsCMS');
+      // await this.$store.dispatch('mmpi/getDeliveryChainsCMS');
       loader.hide();
     },
     selectedProject(value) {
