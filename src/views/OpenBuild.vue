@@ -103,6 +103,19 @@ export default {
 
         [this.build] = response.data.data;
 
+        if (this.build.status === 'removed') {
+          this.reload = false;
+          
+          document.getElementById('tomcatProgress').classList.add('hidden');
+          document.getElementById('autostart_builds').classList.add('fail');
+
+          this.icon = 'cancel';
+          this.header = '- This build has been removed -';
+          this.message = `on ${this.$date(this.build.removed_on).toHuman()} by ${this.build.removed_by}`;
+
+          return;
+        }
+
         if (this.build.status === 'running') {
           this.reload = false;
         }
