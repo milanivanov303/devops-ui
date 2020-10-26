@@ -65,6 +65,11 @@ export default {
       promise
         .then(response => commit('createVariable', response.data.data))
         .catch(error => commit('error', error, { root: true }));
+
+        console.log("Tuk sum!");
+        console.log(this.state.error);
+        console.log(this.state.error.message);
+        console.log(this.state.error.code);
       return promise;   
     } 
 
@@ -112,7 +117,6 @@ export default {
       instances = Object.keys(payload.instances)
         .map(item => payload.instances[item]);
     }
-    console.log(instances);
     commit('instances', instances);
   },
 
@@ -291,7 +295,7 @@ export default {
       headers: { 'content-type': 'multipart/form-data' },
     };
     try {
-      await api.post('response-variables/uploadRspFile', payload, headers);
+      await api('cms').post('response-variables/uploadRspFile', payload, headers);
     } catch (error) {
       console.log(error);
       commit('error', error);
@@ -363,5 +367,4 @@ export default {
       return error;
     }
   },
-
 };

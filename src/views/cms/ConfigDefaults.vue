@@ -190,6 +190,9 @@
                   </div>
                 </div>
               </div>
+              <div class="row" v-if="error != ''">
+                <div class="red-text" style="font-weight: 900;">{{ error }}</div>
+            </div>
             </form>
           </template>
           <template v-slot:footer>
@@ -412,7 +415,6 @@ export default {
           payload.variable.name = this.abbrevName.concat(this.selectedVariable.name);
         }
       }
-
       this.$store.dispatch('cms/submitVariable', payload)
         .then(() => {
           this.closeAddEditVariableModal();
@@ -423,7 +425,9 @@ export default {
           this.$M.toast({ html: 'The variable has been updated!', classes: 'toast-seccess' });
         })
         .catch((error) => {
-          this.error = error;
+          if (error.message === 'Request failed with status code 401') {
+            return this.error = 'Sorry, but you are unauthorized to create new variable!';
+          }
           return error;
         });
     },

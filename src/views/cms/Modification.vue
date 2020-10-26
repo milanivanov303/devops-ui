@@ -291,8 +291,6 @@ export default {
   },
   methods: {
     async getInstances(deliveryChain) {
-      console.log("Get INSTANCES - delivery_chain.dc_role");
-      console.log(deliveryChain);
       if (deliveryChain.dc_role) {
         switch (deliveryChain.dc_role.key) {
           case 'dc_rel':
@@ -317,8 +315,6 @@ export default {
             break;
         }
       }
-      console.log("INSTANCES");
-        console.log(this.instances);
     },
     filterChains(roles, type) {
       return this.deliveryChains.reduce((acc, chain) => {

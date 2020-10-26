@@ -45,16 +45,16 @@
 }
 </style>
 <script>
-// import CommitMsg from '@/components/cms/CommitMsg';
-// import SearchTemplate from '@/components/cms/SearchTemplate';
-// import CustomConfirm from '@/components/partials/CustomConfirm';
+import CommitMsg from '@/components/cms/CommitMsg';
+import SearchTemplate from '@/components/cms/SearchTemplate';
+import CustomConfirm from '@/components/partials/CustomConfirm';
 
 export default {
-  // components: {
-  //   'commit-msg': CommitMsg,
-  //   'custom-confirm': CustomConfirm,
-  //   'search-tmp': SearchTemplate,
-  // },
+  components: {
+    'commit-msg': CommitMsg,
+    'custom-confirm': CustomConfirm,
+    'search-tmp': SearchTemplate,
+  },
   data() {
     return {
       loader: '',
@@ -129,5 +129,5 @@ export default {
       this.$store.state.cms.revisions = [];
     },
   },
-};
+}
 </script>
