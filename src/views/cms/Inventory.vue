@@ -113,12 +113,6 @@ export default {
     getVariables() {
       return this.$store.getters['cms/getFilteredVariables'];
     },
-    // getFirstInstanceName() {
-    //   return this.$store.state.cms.firstSelectedInstance.name;
-    // },
-    // getSecondInstanceName() {
-    //   return this.$store.state.cms.secondSelectedInstance.name;
-    // },
   },
   methods: {
     async loadProjects() {
@@ -127,7 +121,7 @@ export default {
         inactive: 0,
         order_by: 'name asc',
       });
-      //await this.$store.dispatch('mmpi/getDeliveryChainsCMS');
+      // await this.$store.dispatch('mmpi/getDeliveryChainsCMS');
       loader.hide();
     },
     selectedProject(value) {

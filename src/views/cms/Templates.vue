@@ -9,7 +9,7 @@
     </div>
     <commit-msg v-if="showMsg"
                 @selectedVal="setCommitMsg"/>
-    <div class="card" v-show="content">
+    <div class="card-templates" v-show="content">
       <div class="card-content">
         <div class="container">
           <h6 class="center-align">{{contentTitle}}</h6>

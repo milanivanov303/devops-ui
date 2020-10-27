@@ -1,61 +1,70 @@
 <template>
-  <div class="col s12 l12">
-    <h1 class="card-title center-align">Response File</h1>
-    <div class="frame">
-      <form @submit.prevent="submitted">
+  <div class="row">
+    <div class="col s12">
+      <div class="data-table">
         <div class="row">
-          <Select
-            class="col s6"
-            label="Projects"
-            icon="laptop_mac"
-            displayed="name"
-            :options="getProjects"
-            @change="selectedProject"
-          />
-          <Select
-            class="col s6"
-            label="Delivery chains"
-            icon="linear_scale"
-            displayed="title"
-            :options="getDeliveryChains"
-            @change="selectedDeliveryChain"
-          />
+          <h1 class="center-align col s12">Response Files</h1>
         </div>
-      </form>
-      <Table
-        v-if="$store.getters['cms/getRspVariables'].length"
-        :data="getVariables"
-        :pagination="false"
-        @add="isClicked = true"
-        sort-by="name"
-        sort-dir="asc"
-        :export-btn="false"
-        :view-btn="false"
-        :add-btn="false"
-        :edit-btn="true"
-        :delete-btn="false"
-        @edit="row => details(row, 'details')">
-        <Column show="id"/>
-        <Column show="name"/>
-        <Column 
-          label="Default Variable" 
-          :show="row => row.default_variable ? row.default_variable.value : ''"
-        />
-        <Column class="custom-size" v-for="(instance, key) in this.$store.state.cms.instances"
-          v-bind:key="key"
-          :label="instance.name"
-          :show="row => getInstanceValue(row, instance)"
-        />
-      </Table>
-      <div @submit.prevent="onSubmit" id="action" ref="rsp-info" class="modal right-sheet">
-        <div class="frame">
-          <div class="modal-content">
-            <h3 class="center">Variable Information</h3>
-            <form>
+        <form @submit.prevent="submitted">
+          <div class="row">
+            <Select
+              class="col s6"
+              label="Projects"
+              icon="laptop_mac"
+              displayed="name"
+              :options="getProjects"
+              @change="selectedProject"
+            />
+            <Select
+              class="col s6"
+              label="Delivery chains"
+              icon="linear_scale"
+              displayed="title"
+              :options="getDeliveryChains"
+              @change="selectedDeliveryChain"
+            />
+          </div>
+        </form>
+
+        <Table
+          v-if="$store.getters['cms/getRspVariables'].length"
+          :data="getVariables"
+          :pagination="true"
+          @add="isClicked = true"
+          sort-by="name"
+          sort-dir="asc"
+          :export-btn="false"
+          :view-btn="false"
+          :add-btn="false"
+          :edit-btn="true"
+          :delete-btn="false"
+          @edit="row => details(row, 'details')">
+          <Column show="id"/>
+          <Column show="name"/>
+          <Column
+            label="Default Variable"
+            :show="row => row.default_variable ? row.default_variable.value : ''"
+          />
+          <Column class="custom-size" v-for="(instance, key) in this.$store.state.cms.instances"
+            v-bind:key="key"
+            :label="instance.name"
+            :show="row => getInstanceValue(row, instance)"
+          />
+        </Table>
+
+        <Modal v-if="modalIsOpen"
+               @close="cancel()"
+               class="right-sheet"
+               >
+          <template v-slot:header>
+            <div>{{modalData.name}} information</div>
+          </template>
+          <template v-slot:content>
+            <form class=" col s12 l11">
               <div class="row">
                 <div class="input-field col s12">
                   <i class="material-icons prefix">label_outline</i>
-                  <input disabled
+                  <input class="read-only"
                         id="variable_name"
                         type="text"
                         :value="modalData.name">
@@ -123,23 +132,19 @@
                         :value="modalData.codix_team.name">
                 </div>
               </div>
-              <div class="row">
-              <div class="input-field col s12 m6 l6">
-                <button class="btn waves-effect waves-light right"
-                        type="submit"
-                        name="action"
-                        :disabled="isDisabled">
-                        Update </button>
-              </div>
-              <div class="input-field col s12 m6 l6">
-                <a href="#!"
-                  @click="cancel"
-                  class="modal-close waves-effect waves-blue btn-flat left">Close</a>
-              </div>
-            </div>
             </form>
-          </div>
-        </div>
+          </template>
+          <template v-slot:footer>
+            <button
+              class="btn waves-effect waves-light"
+              type="submit"
+              name="action"
+              @click="onSubmit()"
+            >
+              Save
+            </button>
+          </template>
+        </Modal>
       </div>
     </div>
   </div>
@@ -147,20 +152,6 @@
 <script>
 
 export default {
-  mounted() {
-    this.loadProjects();
-    this.$store.subscribe((mutation) => {
-      if (mutation.type === 'cms/updateVariable') {
-        this.$store.state.cms.rspVariables
-          .filter(a => a.name === mutation.payload.name)
-          .map((a) => {
-            a.default_variable = mutation.payload;
-            return a.default_variable;
-          });
-      }
-    });
-    this.$store.dispatch('cms/getCodixTeams');
-  },
   data() {
     return {
       instance: {},
@@ -237,6 +228,7 @@ export default {
     },
     details(value) {
       this.modalData.name = value.name;
+
       if (value.default_variable) {
         this.modalData.default_variable.value = value.default_variable.value;
         this.modalData.default_variable.description = value.default_variable.description;
@@ -264,7 +256,6 @@ export default {
       }
     },
     cancel() {
-      this.$M.Modal.init(this.$refs['rsp-info']).close();
       this.instance = {};
       this.modalIsOpen = false;
       this.resetForm();
@@ -277,7 +268,6 @@ export default {
       const loader = this.$loading.show({ container: this.$refs['rsp-info'] });
       await this.$store.dispatch('cms/updateRspVariable', payload);
       this.modalIsOpen = false;
-      this.$M.Modal.init(this.$refs['rsp-info']).close();
       this.resetForm();
       loader.hide();
     },
@@ -299,6 +289,20 @@ export default {
       // remove overflow
       document.body.removeAttribute('style');
     },
+  },
+  mounted() {
+    this.loadProjects();
+    this.$store.subscribe((mutation) => {
+      if (mutation.type === 'cms/updateVariable') {
+        this.$store.state.cms.rspVariables
+          .filter(a => a.name === mutation.payload.name)
+          .map((a) => {
+            a.default_variable = mutation.payload;
+            return a.default_variable;
+          });
+      }
+    });
+    this.$store.dispatch('cms/getCodixTeams');
   },
 };
 </script>
