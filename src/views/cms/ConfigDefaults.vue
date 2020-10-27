@@ -366,7 +366,8 @@ export default {
       this.showAddEditVariableModal = false;
       this.name = {};
       this.commitMsg = {},
-
+      this.error = '',
+      this.abbrev = {},
       this.$v.$reset();    
     },
     openInterfacesModal(variable) {
