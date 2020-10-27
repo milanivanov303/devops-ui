@@ -65,11 +65,6 @@ export default {
       promise
         .then(response => commit('createVariable', response.data.data))
         .catch(error => commit('error', error, { root: true }));
-
-        console.log("Tuk sum!");
-        console.log(this.state.error);
-        console.log(this.state.error.message);
-        console.log(this.state.error.code);
       return promise;   
     } 
 

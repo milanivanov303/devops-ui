@@ -425,8 +425,11 @@ export default {
           this.$M.toast({ html: 'The variable has been updated!', classes: 'toast-seccess' });
         })
         .catch((error) => {
-          if (error.message === 'Request failed with status code 401') {
-            return this.error = 'Sorry, but you are unauthorized to create new variable!';
+          if (error.message === 'Request failed with status code 403') {
+            return this.error = 'Sorry, but you have no rights to create new variable!';
+          }
+          if (error.message === 'Request failed with status code 422') {
+            return this.error = 'Sorry, but variable name are already registered!';
           }
           return error;
         });
