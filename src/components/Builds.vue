@@ -1,5 +1,9 @@
 <template>
   <div class="row">
+    <div class="input-field col s12 m6 l6">
+      <i class="material-icons prefix">search</i>
+      <input type="text" placeholder="Search..." v-model="searchBuild"/>
+    </div>
     <div class="input-field col s12 m6 l3 right">
       <i class="material-icons prefix">timelapse</i>
       <select class="select" multiple v-model="status">
@@ -22,7 +26,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(build, index) in builds" :key="index">
+      <tr v-for="(build, index) in filteredBuilds" :key="index">
         <td>{{ (page - 1) * perPage.value + index + 1 }}</td>
         <td>{{ build.name }}</td>
         <td v-if="!module">{{ build.module }}</td>
@@ -95,8 +99,8 @@
           </div>
         </td>
       </tr>
-      <tr v-if="builds.length === 0">
-        <td colspan="7">There are no builds yet</td>
+      <tr v-if="filteredBuilds.length === 0">
+        <td colspan="7">There are no builds</td>
       </tr>
       </tbody>
     </table>
@@ -104,17 +108,17 @@
     <div class="col s12 m6 right" id="perPage">
       <div class="input-field col s12 l4 right">
         <Select class="col s12"
-                v-if="builds.length"
+                v-if="filteredBuilds.length"
                 displayed="value"
                 v-model="perPage"
                 :options="perPageOptions"
         />
       </div>
-      <p v-if="builds.length" class="col s12 l8 right right-align">Items per page:</p>
+      <p v-if="filteredBuilds.length" class="col s12 l8 right right-align">Items per page:</p>
     </div>
     <div class="col s12 m6">
       <paginate
-        v-if="builds.length && lastPage > 1"
+        v-if="filteredBuilds.length && lastPage > 1"
         v-model="page"
         :page-count="lastPage"
         :click-handler="selectedPage"
@@ -358,6 +362,7 @@ export default {
   },
   data() {
     return {
+      searchBuild: this.$route.query.searchBuild,
       broadcast: '',
       showModal: false,
       builds: [],
@@ -393,6 +398,16 @@ export default {
         },
       ],
     };
+  },
+  computed: {
+    filteredBuilds() {
+      if (!this.searchBuild) {
+        return this.builds;
+      }
+
+      const regexp = new RegExp(this.searchBuild, 'i');
+      return this.builds.filter(build => build.name.match(regexp));
+    }
   },
   methods: {
     getBuilds() {
@@ -567,6 +582,13 @@ export default {
     status() {
       this.page = 1;
       this.getBuilds();
+    },
+    searchBuild(value) {
+      let query = {};
+      if (value) {
+        query = { searchBuild: value };
+      }
+      this.$router.push({ query });
     },
     perPage() {
       this.getBuilds();
