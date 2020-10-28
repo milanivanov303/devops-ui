@@ -378,9 +378,9 @@ export default {
     closeAddEditVariableModal() {
       this.showAddEditVariableModal = false;
       this.name = {};
-      this.commitMsg = {};
-
-      this.$v.$reset();
+      this.commitMsg = {},
+      this.error = '',
+      this.$v.$reset();    
     },
     openInterfacesModal(variable) {
       this.showInterfacesModal = true;
@@ -411,7 +411,6 @@ export default {
     // },
 
     saveVariable() {
-      debugger;
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
@@ -429,7 +428,6 @@ export default {
         //   payload.variable.name = this.abbrevName.concat(this.selectedVariable.name);
         // }
       }
-
       this.$store.dispatch('cms/submitVariable', payload)
         .then(() => {
           this.closeAddEditVariableModal();
@@ -440,7 +438,12 @@ export default {
           this.$M.toast({ html: 'The variable has been updated!', classes: 'toast-seccess' });
         })
         .catch((error) => {
-          this.error = error;
+          if (error.message === 'Request failed with status code 403') {
+            return this.error = 'Sorry, but you have no rights to create new variable!';
+          }
+          if (error.message === 'Request failed with status code 422') {
+            return this.error = 'Sorry, but variable name are already registered!';
+          }
           return error;
         });
     },

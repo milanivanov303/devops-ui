@@ -29,6 +29,7 @@
             label="First instance"
             icon="storage"
             displayed="name"
+            v-model="firstInstance"
             :options="getFirstInstances"
             @change="firstSelectedInstance"
           />
@@ -37,6 +38,7 @@
             label="Second instance"
             icon="storage"
             displayed="name"
+            v-model="secondInstance"
             :options="getSecondInstances"
             @change="secondSelectedInstance"
           />
@@ -49,20 +51,37 @@
         v-if="openModal"
         @return="openModal = false"/>
       <Table
-        v-if="$store.getters['cms/getFilteredVariables'].length"
-        :request="getVariables"
-        @add="openModal = true"/>
+        v-if="getVariables.length"
+        :data="getVariables"
+        :pagination="true"
+        @add="openModal = true"
+        sort-by="variable_name"
+        sort-dir="asc"
+        :export-btn="false"
+        :view-btn="false"
+        :add-btn="true"
+        :edit-btn="false"
+        :delete-btn="false">
+        <Column show="id"/>
+        <Column show="variable_name"/>
+        <Column
+          :show="this.$store.state.cms.firstSelectedInstance.name"
+        />
+        <Column
+          :show="this.$store.state.cms.secondSelectedInstance.name"
+        />
+      </Table>
     </div>
   </div>
 </template>
 <script>
-// import AddRspFile from '@/components/cms/AddRspFile';
-// import Table from '@/components/partials/Table';
+import AddRspFile from '@/components/cms/AddRspFile';
+import SelectModel from '@/components/partials/SelectModel';
 
 export default {
   components: {
-    // 'add-rsp-modal': AddRspFile,
-    // Table,
+    SelectModel,
+    'add-rsp-modal': AddRspFile,
   },
   mounted() {
     this.loadProjects();
@@ -74,6 +93,8 @@ export default {
       getDeliveryChains: [],
       loader: '',
       openModal: false,
+      firstInstance: [],
+      secondInstance: [],
     };
   },
   computed: {
@@ -81,7 +102,7 @@ export default {
       return this.$store.state.mmpi.projects;
     },
     // getDeliveryChains() {
-    //   return this.$store.getters['mmpi/deliveryChains']('');
+    //   return this.$store.getters['mmpi/deliveryChains'];
     // },
     getFirstInstances() {
       return this.$store.getters['cms/getInventoryInstances']('');
@@ -90,22 +111,7 @@ export default {
       return this.$store.getters['cms/getInventoryInstances'](this.$store.state.cms.firstSelectedInstance);
     },
     getVariables() {
-      const variables = {
-        data: 'cms/getFilteredVariables',
-        columns: {
-          id: '',
-          variable_name: '',
-        },
-        searchable: true,
-        add: true,
-      };
-      const firstInstance = this.$store.state.cms.firstSelectedInstance;
-      const secondInstance = this.$store.state.cms.secondSelectedInstance;
-
-      variables.columns[firstInstance.name] = '';
-      variables.columns[secondInstance.name] = '';
-
-      return variables;
+      return this.$store.getters['cms/getFilteredVariables'];
     },
   },
   methods: {
@@ -120,11 +126,20 @@ export default {
     },
     selectedProject(value) {
       this.resetInstances();
+      this.deliveryChain = '';
       this.$store.state.cms.inventoryInstances = [];
-      this.$store.dispatch('mmpi/getDeliveryChainsCMS', value);
+      this.loader = this.$loading.show({ container: this.$el });
+      this.$store.dispatch('mmpi/getDeliveryChainsCMS')
+        .then((rsp) => {
+          this.getDeliveryChains = value.delivery_chains;
+          this.loader.hide();
+        });
+      
     },
     selectedDeliveryChain(value) {
       this.resetInstances();
+      this.firstInstance = '';
+      this.secondInstance = '';
       this.loadInstances(value.instances);
     },
     loadInstances(instances) {
@@ -134,13 +149,20 @@ export default {
       });
     },
     firstSelectedInstance(value) {
+      if (this.getVariables.length) {
+        this.secondInstance = '';
+        this.$store.dispatch('cms/secondInstanceVariables', '');
+      }
       this.loader = this.$loading.show({ container: this.$el });
       this.$store.dispatch('cms/getFirstSelectedInstance', value);
       this.$store.dispatch('cms/firstInstanceVariables', value).then(() => {
         this.loader.hide();
       });
     },
-    secondSelectedInstance(value) {
+    async secondSelectedInstance(value) {
+      if (this.getVariables.length) {
+        await this.$store.dispatch('cms/secondInstanceVariables', '');
+      }
       this.loader = this.$loading.show({ container: this.$el });
       this.$store.dispatch('cms/getSecondSelectedInstance', value);
       this.$store.dispatch('cms/secondInstanceVariables', value).then(() => {

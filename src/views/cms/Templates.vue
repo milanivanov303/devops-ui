@@ -9,7 +9,7 @@
     </div>
     <commit-msg v-if="showMsg"
                 @selectedVal="setCommitMsg"/>
-    <div class="card" v-show="content">
+    <div class="card-templates" v-show="content">
       <div class="card-content">
         <div class="container">
           <h6 class="center-align">{{contentTitle}}</h6>
@@ -45,16 +45,16 @@
 }
 </style>
 <script>
-// import CommitMsg from '@/components/cms/CommitMsg';
-// import SearchTemplate from '@/components/cms/SearchTemplate';
-// import CustomConfirm from '@/components/partials/CustomConfirm';
+import CommitMsg from '@/components/cms/CommitMsg';
+import SearchTemplate from '@/components/cms/SearchTemplate';
+import CustomConfirm from '@/components/partials/CustomConfirm';
 
 export default {
-  // components: {
-  //   'commit-msg': CommitMsg,
-  //   'custom-confirm': CustomConfirm,
-  //   'search-tmp': SearchTemplate,
-  // },
+  components: {
+    'commit-msg': CommitMsg,
+    'custom-confirm': CustomConfirm,
+    'search-tmp': SearchTemplate,
+  },
   data() {
     return {
       loader: '',
@@ -129,5 +129,5 @@ export default {
       this.$store.state.cms.revisions = [];
     },
   },
-};
+}
 </script>
