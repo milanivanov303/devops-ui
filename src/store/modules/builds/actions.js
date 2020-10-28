@@ -10,7 +10,7 @@ export default {
             },
           },
         ],
-      }),
+      }), 
     });
 
     promise
@@ -74,7 +74,7 @@ export default {
   },
 
   getBuildsByStatus({ commit }, {
-    branch, module, status, user, perPage, page,
+    branch, module, status, user, perPage, page, search
   }) {
     const promise = api('devops').get('builds', {
 
@@ -84,6 +84,12 @@ export default {
             status: {
               operator: 'in',
               value: status,
+            },
+          },
+          {
+            name: {
+              operator: 'like',
+              value: ''.concat('%', search, '%'),
             },
           },
           {

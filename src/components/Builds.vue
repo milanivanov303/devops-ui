@@ -1,12 +1,12 @@
 <template>
   <div class="row">
-    <!-- <div class="input-field col s12 m6">
+    <div class="input-field col s12 m6">
       <i class="material-icons prefix">search</i>
       <input type="text" placeholder="Search..." v-model="searchBuild"/>
-    </div> -->
-    <a class="col s12 m1 right tooltipped" data-tooltip="Show all builds">
+    </div>
+    <!-- <a class="col s12 m1 right tooltipped" data-tooltip="Show all builds">
       <i class="material-icons"  @click="openAllBuildsModal()">dehaze</i>
-    </a>
+    </a> -->
     <div class="input-field col s12 m3 right">
       <i class="material-icons prefix">timelapse</i>
       <select class="select" multiple v-model="status">
@@ -339,7 +339,7 @@
       </template>
     </Modal>
 
-    <Modal v-if="showBuildsModal" @close="showBuildsModal = false">
+    <!-- <Modal v-if="showBuildsModal" @close="showBuildsModal = false">
       <template v-slot:header>All {{ branch }} builds</template>
       <template v-slot:content>
         <div class="row">
@@ -441,7 +441,7 @@
           </tbody>
         </table>  
       </template>
-    </Modal>
+    </Modal> -->
 
   </div>
 </template>
@@ -470,8 +470,8 @@ export default {
   },
   data() {
     return {
-      searchBuild: this.$route.query.searchBuild,
-      searchAllBuild: '',
+      searchBuild: this.$route.query.searchBuild || '',
+      // searchAllBuild: '',
       broadcast: '',
       showModal: false,
       allBuilds: [],
@@ -510,36 +510,34 @@ export default {
       ],
     };
   },
-  computed: {
-    // filteredBuilds() {
-    //   if (!this.searchBuild) {
-    //     return this.builds;
-    //   }
+  // computed: {
+  //   filteredAllBuilds() {
+  //     if (!this.searchAllBuild) {
+  //       return this.allBuilds;
+  //     }
 
-    //   const regexp = new RegExp(this.searchBuild, 'i');
-    //   return this.builds.filter(build => build.name.match(regexp));
-    // },
-    filteredAllBuilds() {
-      if (!this.searchAllBuild) {
-        return this.allBuilds;
-      }
-
-      const regexp = new RegExp(this.searchAllBuild, 'i');
-      return this.allBuilds.filter(build => build.name.match(regexp));
-    }
-  },
+  //     const regexp = new RegExp(this.searchAllBuild, 'i');
+  //     return this.allBuilds.filter(build => build.name.match(regexp));
+  //   }
+  // },
   methods: {
     getBuilds() {
       const loader = this.$loading.show({ container: this.$refs.builds });
 
-      this.$store.dispatch('builds/getBuildsByStatus', {
+      const payload = { 
         branch: this.branch,
         module: this.module,
         status: this.getStatus(this.status),
         user: this.user,
         perPage: this.perPage.value,
         page: this.page,
-      })
+      }
+      
+      if (typeof this.searchBuild !== 'undefined') {
+        payload.search = this.searchBuild;
+      }
+
+      this.$store.dispatch('builds/getBuildsByStatus', payload)
         .then((response) => {
           this.builds = response.data.data;
           this.paginationData = response.data.meta;
@@ -548,20 +546,20 @@ export default {
         .finally(() => loader.hide());
     },
 
-    getAllBuilds() {
-      const loader = this.$loading.show({ container: this.$refs.allBuilds });
+    // getAllBuilds() {
+    //   const loader = this.$loading.show({ container: this.$refs.allBuilds });
 
-      this.$store.dispatch('builds/getBuildsByStatus', {
-        branch: this.branch,
-        module: this.module,
-        status: this.getStatus(),
-        user: this.user
-      })
-        .then((response) => {
-          this.allBuilds = response.data.data;
-        })
-        .finally(() => loader.hide());
-    },
+    //   this.$store.dispatch('builds/getBuildsByStatus', {
+    //     branch: this.branch,
+    //     module: this.module,
+    //     status: this.getStatus(),
+    //     user: this.user
+    //   })
+    //     .then((response) => {
+    //       this.allBuilds = response.data.data;
+    //     })
+    //     .finally(() => loader.hide());
+    // },
 
     getStatus() {
       if (this.status.indexOf('active') !== -1) {
@@ -632,10 +630,10 @@ export default {
       this.selectedBuild.user = 'enterprise';
       this.selectedBuild.pass = 'Sofphia';
     },
-    openAllBuildsModal() {
-      this.showBuildsModal = true;
-      this.getAllBuilds();
-    },
+    // openAllBuildsModal() {
+    //   this.showBuildsModal = true;
+    //   this.getAllBuilds();
+    // },
 
     openProgressModal(build) {
       this.selectedBuild = build;
@@ -721,13 +719,14 @@ export default {
       this.page = 1;
       this.getBuilds();
     },
-    searchBuild(value) {
-      let query = {};
-      if (value) {
-        query = { searchBuild: value };
-      }
-      this.$router.push({ query });
-    },
+    // searchBuild(value) {
+    //   let query = {};
+    //   if (value) {
+    //     query = { searchBuild: value };
+    //   }
+    //   this.$router.push({ query });
+    //   this.getBuilds();
+    // },
     perPage() {
       this.getBuilds();
     },
