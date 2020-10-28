@@ -23,7 +23,7 @@
               <tr v-for="(build, index) in activeBuildsGroupedByBranch" :key="index">
                 <td>{{ index + 1 }}</td>
                 <td>
-                  <router-link :to="'/imx-fe/branches/' + encodeURIComponent(build.branch)">
+                  <router-link :to="'/imx_fe/branches/' + encodeURIComponent(build.branch)">
                     {{ build.branch }}
                   </router-link>
                 </td>
@@ -159,7 +159,7 @@ export default {
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_branch });
 
       const promise1 = this.$store.dispatch('builds/getActive');
-      const promise2 = this.$store.dispatch('imx_fe/getContainers');
+      const promise2 = this.$store.dispatch('imx_fe/getHost');
 
       Promise.all([promise1, promise2]).finally(() => {
         loader1.hide();

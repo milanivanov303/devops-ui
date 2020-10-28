@@ -432,7 +432,7 @@ export default {
     },
 
     getUrl(build) {
-      return `/${build.name}`;
+      return `/${build.name}/`;
     },
 
     getWebssh2Url(build) {

@@ -2,7 +2,5 @@
 
 export default {
   branches: [],
-  containers: [],
-  builds: [],
   host: '',
 };
