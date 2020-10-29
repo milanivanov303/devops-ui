@@ -3,7 +3,8 @@
   <div class="container">
     <h6 class="row center">Opening build <b>{{ $route.params.name }}</b></h6>
     <div ref="autostart_builds">
-      <div id="autostart_builds" class="row center">
+      <div v-bind:class="{ fail: build.status === 'removed'}" id="autostart_builds"
+           class="row center">
         <i class="material-icons">{{ icon }}</i>
       </div>
       <div class="row center">
@@ -15,7 +16,8 @@
         <h3 class="center">{{ header }}</h3>
         <h5 class="center">{{ message }}</h5>
         <div class="row">
-          <div id="tomcatProgress" class="progress col s8 offset-s2 m4 offset-m4 hidden">
+          <div v-bind:class="{ hidden: build.status === 'removed' }" id="tomcatProgress"
+               class="progress col s8 offset-s2 m4 offset-m4 hidden">
             <div class="indeterminate"></div>
           </div>
         </div>
@@ -102,6 +104,17 @@ export default {
         }
 
         [this.build] = response.data.data;
+
+        if (this.build.status === 'removed') {
+          this.reload = false;
+
+          this.icon = 'cancel';
+          this.header = '- This build has been removed -';
+          this.message = `on ${this.$date(this.build.removed_on).toHuman()} by 
+                          ${this.build.removed_by || 'automatic process'}`;
+
+          return;
+        }
 
         if (this.build.status === 'running') {
           this.reload = false;

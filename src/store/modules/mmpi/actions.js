@@ -102,9 +102,29 @@ export default {
           {
             inactive: 0,
           },
+          {
+            delivery_chains: {
+              allOf: [
+                {
+                  status: {
+                    allOf: [
+                      {
+                        active: 1,
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
         ],
       }),
-      with: JSON.stringify({ delivery_chains: { instances: ['environment_type'] } }),
+      with: JSON.stringify({
+        delivery_chains: {
+          instances: ['environment_type'],
+          status: [], 
+        }
+      }),
       orders: JSON.stringify({
         name: 'asc',
       }),
@@ -141,7 +161,7 @@ export default {
 
     return promise;
   },
-
+  
   /**
    * Get Dev Instances for CMS tab
    */
@@ -212,6 +232,46 @@ export default {
         commit('devInstances', response.data.data);
       })
       .catch(() => commit('error', 'Could not get instances list'));
+
+    return promise;
+  },
+  //Delivery Chanins for CMS Inventory page
+  getDeliveryChainsCMS({ commit }) {
+    const name = 'deliveryChainsCMS';
+    const payload = {
+      limit: 5000,
+      orders: JSON.stringify({
+        title: 'asc',
+      }),
+      filters: JSON.stringify({
+        allOf: [
+          {
+            status: {
+              allOf: [
+                {
+                  active: 1,
+                },
+              ],
+            },
+          },
+        ],
+      }),
+      fields: JSON.stringify({
+      }),
+      with: JSON.stringify({
+        projects: {},
+        status: {},
+      }),
+    };
+
+    const promise = api('mmpi').get('delivery-chains', payload);
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((resp) => {
+        commit('deliveryChainsCMS', resp.data.data);
+      })
+      .catch(() => commit('error', 'Could not get delivery chains'));
 
     return promise;
   },

@@ -27,4 +27,8 @@ export default {
   devInstances(state, devInstances) {
     state.devInstances = devInstances;
   },
+  //Delivery Chanins for CMS Inventory page
+  deliveryChainsCMS(state, deliveryChains) {
+    state.deliveryChains = deliveryChains;
+  },
 };
