@@ -23,6 +23,11 @@ export default {
 
   getBuildsForPeriod({ commit }, { startDate, stateName }) {
     const promise = api('devops').get('builds', {
+      fields: JSON.stringify([
+        'module',
+        'created_by',
+        'details'
+      ]),
       filters: JSON.stringify({
         allOf: [
           {
