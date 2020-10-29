@@ -122,8 +122,8 @@ export default {
       with: JSON.stringify({
         delivery_chains: {
           instances: ['environment_type'],
-          status: [], 
-        }
+          status: [],
+        },
       }),
       orders: JSON.stringify({
         name: 'asc',
@@ -161,7 +161,7 @@ export default {
 
     return promise;
   },
-  
+
   /**
    * Get Dev Instances for CMS tab
    */
@@ -235,7 +235,7 @@ export default {
 
     return promise;
   },
-  //Delivery Chanins for CMS Inventory page
+  // Delivery Chanins for CMS Inventory page
   getDeliveryChainsCMS({ commit }) {
     const name = 'deliveryChainsCMS';
     const payload = {
