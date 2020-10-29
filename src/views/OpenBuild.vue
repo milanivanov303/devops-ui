@@ -110,7 +110,7 @@ export default {
 
           this.icon = 'cancel';
           this.header = '- This build has been removed -';
-          this.message = `on ${this.$date(this.build.removed_on).toHuman()} by ${this.build.removed_by}`;
+          this.message = `on ${this.$date(this.build.removed_on).toHuman()} by ${this.build.removed_by || 'automatic process'}`;
 
           return;
         }
