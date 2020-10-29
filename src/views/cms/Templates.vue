@@ -24,7 +24,7 @@
                           v-model.trim="content"></textarea>
               </div>
             </div>
-            <div class="row">
+            <!-- <div class="row">
               <div class="input-field col s12 center-align">
                 <a href="#!"
                   @click="showMsg = `true`"
@@ -32,7 +32,7 @@
                   style="data-original-height: 0"
                   :disabled="disable">Update</a>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -129,5 +129,5 @@ export default {
       this.$store.state.cms.revisions = [];
     },
   },
-}
+};
 </script>
