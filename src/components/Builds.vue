@@ -2,11 +2,11 @@
   <div class="row">
     <div class="input-field col s12 m6">
       <i class="material-icons prefix">search</i>
-      <input type="text" placeholder="Search..." v-model="searchBuild"/>
+      <input type="text" placeholder="Search..." v-model="search" id="search"/>
     </div>
-    <!-- <a class="col s12 m1 right tooltipped" data-tooltip="Show all builds">
+    <a class="col s12 m1 right tooltipped" data-tooltip="Show all builds">
       <i class="material-icons"  @click="openAllBuildsModal()">dehaze</i>
-    </a> -->
+    </a>
     <div class="input-field col s12 m3 right">
       <i class="material-icons prefix">timelapse</i>
       <select class="select" multiple v-model="status">
@@ -238,6 +238,66 @@
               </label>
             </div>
           </div>
+          <div class="row">
+            <div class="col s12">
+              <ul class="tabs col s12 center">
+                <li class="tab col s12"><a>Container's Details</a></li>
+              </ul>
+              <div class="row">
+                <div class="input-field col s6">
+                  <i class="material-icons prefix">account_circle</i>
+                  <input
+                    readonly
+                    type="text"
+                    id="user"
+                    v-model="selectedBuild.user">
+                  <label :class="{active: selectedBuild.user}" for="user">User</label>
+                </div>
+                <div class="input-field col s6">
+                  <i class="material-icons prefix">lock</i>
+                  <input
+                    readonly
+                    type="text"
+                    id="pass"
+                    v-model="selectedBuild.pass">
+                  <label :class="{active: selectedBuild.pass}" for="pass">Pass</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <i class="material-icons prefix">storage</i>
+                  <input
+                    readonly
+                    type="text"
+                    id="host"
+                    v-model="selectedBuild.host">
+                  <label :class="{active: selectedBuild.host}" for="host">Host</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s12" >
+                  <table ref="builds">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Private Port</th>
+                      <th>Public Port</th>
+                      <th>Type</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(port, index) in selectedBuild.ports" :key="index">
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ port.TargetPort }}</td>
+                        <td>{{ port.PublishedPort }}</td>
+                        <td>{{ port.Protocol }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </template>
       <template v-slot:footer></template>
@@ -279,13 +339,13 @@
       </template>
     </Modal>
 
-    <!-- <Modal v-if="showBuildsModal" @close="showBuildsModal = false">
-      <template v-slot:header>All {{ branch }} builds</template>
+    <Modal v-if="showBuildsModal" @close="showBuildsModal = false">
+      <template v-slot:header>All {{ branch }} {{ status.toString() }} builds</template>
       <template v-slot:content>
         <div class="row">
           <div class="input-field col s12 m6 l6">
             <i class="material-icons prefix">search</i>
-            <input type="text" placeholder="Search..." v-model="searchAllBuild"/>
+            <input type="text" placeholder="Search..." v-model="searchAll"/>
           </div>
         </div>
 
@@ -381,7 +441,7 @@
           </tbody>
         </table>  
       </template>
-    </Modal> -->
+    </Modal>
 
   </div>
 </template>
@@ -410,8 +470,8 @@ export default {
   },
   data() {
     return {
-      searchBuild: this.$route.query.searchBuild || '',
-      // searchAllBuild: '',
+      search: this.$route.query.build,
+      searchAll: '',
       broadcast: '',
       showModal: false,
       allBuilds: [],
@@ -450,34 +510,29 @@ export default {
       ],
     };
   },
-  // computed: {
-  //   filteredAllBuilds() {
-  //     if (!this.searchAllBuild) {
-  //       return this.allBuilds;
-  //     }
+  computed: {
+    filteredAllBuilds() {
+      if (!this.searchAll) {
+        return this.allBuilds;
+      }
 
-  //     const regexp = new RegExp(this.searchAllBuild, 'i');
-  //     return this.allBuilds.filter(build => build.name.match(regexp));
-  //   }
-  // },
+      const regexp = new RegExp(this.searchAll, 'i');
+      return this.allBuilds.filter(build => build.name.match(regexp));
+    }
+  },
   methods: {
     getBuilds() {
-      const loader = this.$loading.show({ container: this.$refs.builds });
+      const loader = this.$loading.show({ container: this.$refs.builds });      
 
-      const payload = { 
+      this.$store.dispatch('builds/getBuildsByStatus', { 
         branch: this.branch,
         module: this.module,
-        status: this.getStatus(this.status),
+        status: this.getStatus(),
         user: this.user,
         perPage: this.perPage.value,
         page: this.page,
-      }
-      
-      if (typeof this.searchBuild !== 'undefined') {
-        payload.search = this.searchBuild;
-      }
-
-      this.$store.dispatch('builds/getBuildsByStatus', payload)
+        search: this.search
+      })
         .then((response) => {
           this.builds = response.data.data;
           this.paginationData = response.data.meta;
@@ -486,20 +541,20 @@ export default {
         .finally(() => loader.hide());
     },
 
-    // getAllBuilds() {
-    //   const loader = this.$loading.show({ container: this.$refs.allBuilds });
+    getAllBuilds() {
+      const loader = this.$loading.show({ container: this.$refs.allBuilds });
 
-    //   this.$store.dispatch('builds/getBuildsByStatus', {
-    //     branch: this.branch,
-    //     module: this.module,
-    //     status: this.getStatus(),
-    //     user: this.user
-    //   })
-    //     .then((response) => {
-    //       this.allBuilds = response.data.data;
-    //     })
-    //     .finally(() => loader.hide());
-    // },
+      this.$store.dispatch('builds/getBuildsByStatus', {
+        branch: this.branch,
+        module: this.module,
+        status: this.getStatus(),
+        user: this.user
+      })
+        .then((response) => {
+          this.allBuilds = response.data.data;
+        })
+        .finally(() => loader.hide());
+    },
 
     getStatus() {
       if (this.status.indexOf('active') !== -1) {
@@ -563,11 +618,18 @@ export default {
 
       this.selectedBuild.instance = build.details.instance.name;
       this.selectedBuild.java_version = build.details.java_version;
+      if (typeof build.details.service !== 'undefined') {
+        this.selectedBuild.ports = build.details.service.Endpoint.Ports;
+      }
+      this.selectedBuild.host = this.$store.state[build.module].host;
+      this.selectedBuild.user = 'enterprise';
+      this.selectedBuild.pass = 'Sofphia';
     },
-    // openAllBuildsModal() {
-    //   this.showBuildsModal = true;
-    //   this.getAllBuilds();
-    // },
+    
+    openAllBuildsModal() {
+      this.showBuildsModal = true;
+      this.getAllBuilds();
+    },
 
     openProgressModal(build) {
       this.selectedBuild = build;
@@ -646,6 +708,11 @@ export default {
     setLastPage() {
       this.lastPage = Math.ceil(this.paginationData.total / this.perPage.value);
     },
+    
+    onStopTyping() {
+      window.setTimeout(() => this.getBuilds(), 1000);
+    }
+    
   },
 
   watch: {
@@ -653,14 +720,15 @@ export default {
       this.page = 1;
       this.getBuilds();
     },
-    // searchBuild(value) {
-    //   let query = {};
-    //   if (value) {
-    //     query = { searchBuild: value };
-    //   }
-    //   this.$router.push({ query });
-    //   this.getBuilds();
-    // },
+    search(value) {
+      let query = {};
+      if (value) {
+        query = { build: value };
+      }
+      this.$router.push({ query });
+
+      document.getElementById('search').addEventListener('keyup', this.onStopTyping);
+    },
     perPage() {
       this.getBuilds();
     },

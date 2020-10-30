@@ -79,7 +79,7 @@ export default {
   },
 
   getBuildsByStatus({ commit }, {
-    branch, module, status, user, perPage, page, search
+    branch, module, status, user, perPage, page, search = ''
   }) {
     const promise = api('devops').get('builds', {
 
