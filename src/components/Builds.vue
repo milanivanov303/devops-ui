@@ -3,8 +3,7 @@
     <div class="input-field col s12 m6 l3 right">
       <i class="material-icons prefix">timelapse</i>
       <select class="select" multiple v-model="status">
-        <option value="running">Running</option>
-        <option value="stopped">Stopped</option>
+        <option value="active">Active</option>
         <option value="removed">Removed</option>
         <option value="failed">Failed</option>
       </select>
@@ -68,6 +67,15 @@
               <i class="material-icons">error_outline</i>
             </a>
             <a
+              @click="openProgressModal(build)"
+              target="_blank"
+              data-tooltip="Progress"
+              class="tooltipped"
+              v-if="build.status === 'building'"
+            >
+              <i class="material-icons">update</i>
+            </a>
+            <a
               :href="getWebssh2Url(build)"
               target="_blank"
               data-tooltip="Open terminal"
@@ -88,10 +96,11 @@
         </td>
       </tr>
       <tr v-if="builds.length === 0">
-        <td colspan="6">There are no builds yet</td>
+        <td colspan="7">There are no builds yet</td>
       </tr>
       </tbody>
     </table>
+
     <div class="col s12 m6 right" id="perPage">
       <div class="input-field col s12 l4 right">
         <Select class="col s12"
@@ -119,6 +128,7 @@
         :active-class="'active'">
       </paginate>
     </div>
+
     <Modal v-if="showInfoModal" @close="closeInfoModal()" class="right-sheet">
       <template v-slot:header>{{ selectedBuild.name }}</template>
       <template v-slot:content>
@@ -216,69 +226,9 @@
                 type="text"
                 id="removed_by"
                 v-model="selectedBuild.removed_by">
-              <label :class="{active: selectedBuild.removed_by}"
-                      for="removed_by">Removed by
+              <label :class="{active: selectedBuild.removed_by}" for="removed_by">
+                Removed by
               </label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s12">
-              <ul class="tabs col s12 center">
-                <li class="tab col s12"><a>Container's Details</a></li>
-              </ul>
-              <div class="row">
-                <div class="input-field col s6">
-                  <i class="material-icons prefix">account_circle</i>
-                  <input
-                    readonly
-                    type="text"
-                    id="user"
-                    v-model="selectedBuild.user">
-                  <label :class="{active: selectedBuild.user}" for="user">User</label>
-                </div>
-                <div class="input-field col s6">
-                  <i class="material-icons prefix">lock</i>
-                  <input
-                    readonly
-                    type="text"
-                    id="pass"
-                    v-model="selectedBuild.pass">
-                  <label :class="{active: selectedBuild.pass}" for="pass">Pass</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="input-field col s12">
-                  <i class="material-icons prefix">storage</i>
-                  <input
-                    readonly
-                    type="text"
-                    id="host"
-                    v-model="selectedBuild.host">
-                  <label :class="{active: selectedBuild.host}" for="host">Host</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12" >
-                  <table ref="builds">
-                    <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Private Port</th>
-                      <th>Public Port</th>
-                      <th>Type</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(port, index) in selectedBuild.ports" :key="index">
-                        <td>{{ index + 1 }}</td>
-                        <td>{{ port.TargetPort }}</td>
-                        <td>{{ port.PublishedPort }}</td>
-                        <td>{{ port.Protocol }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -314,12 +264,21 @@
         </button>
       </template>
     </Modal>
+
+    <Modal v-if="showProgressModal" @close="showProgressModal = false" class="right-sheet">
+      <template v-slot:header>{{ selectedBuild.name }}</template>
+      <template v-slot:content>
+        <BuildProgress :broadcast="broadcast"></BuildProgress>
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
 import config from '../config';
+import BuildProgress from '@/components/BuildProgress';
+import EventBus from '@/event-bus';
 
 export default {
   props: {
@@ -335,15 +294,21 @@ export default {
   },
   components: {
     Paginate,
+    BuildProgress,
   },
   data() {
     return {
+      broadcast: '',
+      showModal: false,
       builds: [],
       paginationData: {},
-      status: ['running', 'stopped'],
-      selectedBuild: {},
+      status: ['active'],
+      selectedBuild: {
+        log: null,
+      },
       showInfoModal: false,
       showRemoveModal: false,
+      showProgressModal: false,
       updating: false,
       removing: false,
       removed: false,
@@ -376,7 +341,7 @@ export default {
       this.$store.dispatch('builds/getBuildsByStatus', {
         branch: this.branch,
         module: this.module,
-        status: this.status,
+        status: this.getStatus(),
         user: this.user,
         perPage: this.perPage.value,
         page: this.page,
@@ -387,6 +352,14 @@ export default {
           this.setLastPage();
         })
         .finally(() => loader.hide());
+    },
+
+    getStatus() {
+      if (this.status.indexOf('active') !== -1) {
+        return this.status.concat(['running', 'building', 'stopped']);
+      }
+
+      return this.status;
     },
 
     getPublishedPort(build, port) {
@@ -426,31 +399,36 @@ export default {
     openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild.status = build.status;
-      this.selectedBuild.created_by = build.created_by;
+      this.selectedBuild = build;
+
       this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
-      this.selectedBuild.branch = build.details.branch;
+
       if (build.details.fe_branch) {
         this.selectedBuild.fe_branch = build.details.fe_branch.name;
       }
       if (build.removed_on) {
         this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
       }
-      this.selectedBuild.removed_by = 'auto-removed';
-      if (build.removed_by) {
-        this.selectedBuild.removed_by = build.removed_by;
+
+      if (!build.removed_by) {
+        this.selectedBuild.removed_by = 'auto-removed';
       }
+
       this.selectedBuild.instance = build.details.instance.name;
       this.selectedBuild.java_version = build.details.java_version;
-      this.selectedBuild.ports = build.details.service.Endpoint.Ports;
-      this.selectedBuild.host = this.$store.state[build.module].host;
-      this.selectedBuild.user = 'enterprise';
-      this.selectedBuild.pass = 'Sofphia';
+    },
+
+    openProgressModal(build) {
+      this.selectedBuild = build;
+      this.broadcast = build.details.broadcast;
+      this.showProgressModal = true;
     },
 
     closeInfoModal() {
       this.showInfoModal = false;
-      this.selectedBuild = {};
+      this.selectedBuild = {
+        log: null,
+      };
     },
 
     canRemove(build) {
@@ -518,6 +496,7 @@ export default {
       this.lastPage = Math.ceil(this.paginationData.total / this.perPage.value);
     },
   },
+
   watch: {
     status() {
       this.page = 1;
@@ -538,6 +517,9 @@ export default {
     this.$M.FormSelect.init(document.querySelector('select'));
   },
 
+  created() {
+    EventBus.$on('build.created', () => this.getBuilds());
+  },
 };
 </script>
 

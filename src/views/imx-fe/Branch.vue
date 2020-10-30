@@ -5,7 +5,7 @@
         <h4>{{ branch }}</h4>
       </div>
     </div>
-    <Builds ref="builds" :branch="branch" module="imx-fe"/>
+    <Builds ref="builds" :branch="branch" module="imx_fe"/>
     <br>
     <Build @created="() => this.$refs.builds.getBuilds()"/>
   </div>

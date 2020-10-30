@@ -466,3 +466,34 @@ a{
   .badge {
     margin-right: 5px;
   }
+
+.card-templates {
+    .card-title {
+        font-weight: normal;
+    }
+    // min-height: 7rem;
+    .card-header {
+        @extend .card-content;
+        padding: 0 5rem !important;
+    }
+}
+
+.container {
+    width: 100%;
+    max-width: 1600px;
+    display: block;
+    margin: 0px;
+    
+    .row {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 1rem !important;
+    }
+
+    .modal {
+        h4 {
+            margin-bottom: 2em;
+            text-align: center;
+        }
+    }
+}

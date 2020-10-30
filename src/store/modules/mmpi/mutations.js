@@ -16,4 +16,19 @@ export default {
   error(state, error) {
     state.error = error;
   },
+  updateProject(state, project) {
+    state.projects.map((p) => {
+      if (p.id === project.id) {
+        Object.assign(p, project);
+      }
+      return state.projects;
+    });
+  },
+  devInstances(state, devInstances) {
+    state.devInstances = devInstances;
+  },
+  // Delivery Chanins for CMS Inventory page
+  deliveryChainsCMS(state, deliveryChains) {
+    state.deliveryChains = deliveryChains;
+  },
 };
