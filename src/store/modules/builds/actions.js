@@ -26,7 +26,7 @@ export default {
       fields: JSON.stringify([
         'module',
         'created_by',
-        'details'
+        'details',
       ]),
       filters: JSON.stringify({
         allOf: [

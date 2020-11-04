@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Loading from 'vue-loading-overlay';
 import Vuelidate from 'vuelidate';
+import VueParticles from 'vue-particles';
 import * as M from 'materialize-css/dist/js/materialize';
 import * as vuEaCore from 'vue-ea-core';
 import App from './App';
@@ -21,6 +22,7 @@ import WebSocket from './plugins/ws';
 Vue.use(vuEaCore, { store, config, api: api('um') });
 Vue.use(Loading);
 Vue.use(Vuelidate);
+Vue.use(VueParticles);
 
 Vue.prototype.$M = M;
 Vue.prototype.$auth = auth;
