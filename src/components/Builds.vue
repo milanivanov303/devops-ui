@@ -4,9 +4,6 @@
       <i class="material-icons prefix">search</i>
       <input type="text" placeholder="Search..." v-model="search" id="search"/>
     </div>
-    <a class="col s12 m1 right tooltipped" data-tooltip="Show all builds">
-      <i class="material-icons"  @click="openAllBuildsModal()">dehaze</i>
-    </a>
     <div class="input-field col s12 m3 right">
       <i class="material-icons prefix">timelapse</i>
       <select class="select" multiple v-model="status">
@@ -541,21 +538,6 @@ export default {
         .finally(() => loader.hide());
     },
 
-    getAllBuilds() {
-      const loader = this.$loading.show({ container: this.$refs.allBuilds });
-
-      this.$store.dispatch('builds/getBuildsByStatus', {
-        branch: this.branch,
-        module: this.module,
-        status: this.getStatus(),
-        user: this.user
-      })
-        .then((response) => {
-          this.allBuilds = response.data.data;
-        })
-        .finally(() => loader.hide());
-    },
-
     getStatus() {
       if (this.status.indexOf('active') !== -1) {
         return this.status.concat(['running', 'building', 'stopped']);
@@ -626,11 +608,6 @@ export default {
       this.selectedBuild.pass = 'Sofphia';
     },
     
-    openAllBuildsModal() {
-      this.showBuildsModal = true;
-      this.getAllBuilds();
-    },
-
     openProgressModal(build) {
       this.selectedBuild = build;
       this.broadcast = build.details.broadcast;
