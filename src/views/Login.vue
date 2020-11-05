@@ -48,11 +48,9 @@
           </div>
           <div v-else>
             <Preloader v-if="gettingSSOUser" class="small" />
-            <a v-else class="waves-effect waves-light pwbtn sso-btn"
-               @click="loginSSO()"
-               href="#">
-              <div class="chip">Quick login with <b>User Management (SSO)</b></div>
-            </a>
+            <div v-else class="chip sso-btn" @click="loginSSO()">
+              Quick login with <b>User Management (SSO)</b>
+            </div>
           </div>
           <Preloader v-if="loggingInSSO" class="preloader-wrapper small" />
         </div>
@@ -92,7 +90,7 @@ export default {
         });
     },
     loginAnotherUser() {
-      window.location.href = `${auth.url}/../logout?redirect_url=${encodeURIComponent(`${auth.getSsoUrl()}`)}`;
+      window.location.href = `${auth.url}/../logout?redirect_url=${encodeURIComponent(`${auth.getSsoUrl()}&code=${auth.code}`)}`;
     },
     getLoggedInSSOUser() {
       this.gettingSSOUser = true;
