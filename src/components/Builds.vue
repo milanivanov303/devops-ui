@@ -2,7 +2,8 @@
   <div class="row">
     <div class="input-field col s12 m6">
       <i class="material-icons prefix">search</i>
-      <input type="text" placeholder="Search..." v-model="search" id="search"/>
+      <input v-if="showBuilds" type="text" placeholder="Search..." v-model="search" id="search"/>
+      <input v-else type="text" placeholder="Search..." v-model="searchAll" id="searchAll"/>
     </div>
     <div class="input-field col s12 m3 right">
       <i class="material-icons prefix">timelapse</i>
@@ -12,8 +13,8 @@
         <option value="failed">Failed</option>
       </select>
     </div>
-    
-    <table ref="builds">
+
+    <table ref="builds" v-if="currentShowBuilds">
       <thead>
       <tr>
         <th>#</th>
@@ -336,110 +337,6 @@
       </template>
     </Modal>
 
-    <Modal v-if="showBuildsModal" @close="showBuildsModal = false">
-      <template v-slot:header>All {{ branch }} {{ status.toString() }} builds</template>
-      <template v-slot:content>
-        <div class="row">
-          <div class="input-field col s12 m6 l6">
-            <i class="material-icons prefix">search</i>
-            <input type="text" placeholder="Search..." v-model="searchAll"/>
-          </div>
-        </div>
-
-        <table ref="allBuilds">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th v-if="!module">Module</th>
-              <th>Created By</th>
-              <th>Created On</th>
-              <th>Status</th>
-              <th>Quick Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(build, index) in filteredAllBuilds" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>{{ build.name }}</td>
-              <td v-if="!module">{{ build.module }}</td>
-              <td>{{ build.created_by }}</td>
-              <td>{{ $date(build.created_on).toHuman() }}</td>
-              <td v-html="getStatusText(build)"></td>
-              <td class="quick-actions">
-                <Progress v-if="updating === build.id"/>
-                <div v-else>
-                  <a
-                    @click="start(build)"
-                    target="_blank"
-                    data-tooltip="Start"
-                    class="green-text tooltipped"
-                    v-if="build.status === 'stopped'"
-                  >
-                    <i class="material-icons">play_arrow</i>
-                  </a>
-                  <a
-                    @click="stop(build)"
-                    target="_blank"
-                    data-tooltip="Stop"
-                    class="red-text tooltipped"
-                    v-if="build.status === 'running'"
-                  >
-                    <i class="material-icons">stop</i>
-                  </a>
-                  <a
-                    :href="getUrl(build)"
-                    target="_blank"
-                    data-tooltip="Open"
-                    class="green-text tooltipped"
-                    v-if="build.status === 'running'"
-                  >
-                    <i class="material-icons">launch</i>
-                  </a>
-                  <a
-                    @click="openInfoModal(build)"
-                    data-tooltip="Details"
-                    class="blue-text tooltipped"
-                  >
-                    <i class="material-icons">error_outline</i>
-                  </a>
-                  <a
-                    @click="openProgressModal(build)"
-                    target="_blank"
-                    data-tooltip="Progress"
-                    class="tooltipped"
-                    v-if="build.status === 'building'"
-                  >
-                    <i class="material-icons">update</i>
-                  </a>
-                  <a
-                    :href="getWebssh2Url(build)"
-                    target="_blank"
-                    data-tooltip="Open terminal"
-                    class="tooltipped"
-                    v-if="build.status === 'running'"
-                  >
-                    <i class="material-icons">wysiwyg</i>
-                  </a>
-                  <a
-                    v-if="canRemove(build) && (build.status === 'running' || build.status === 'stopped')"
-                    @click="openRemoveModal(build)"
-                    data-tooltip="Remove"
-                    class="red-text tooltipped"
-                  >
-                    <i class="material-icons">delete</i>
-                  </a>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="filteredAllBuilds.length === 0">
-              <td colspan="7">There are no builds</td>
-            </tr>
-          </tbody>
-        </table>  
-      </template>
-    </Modal>
-
   </div>
 </template>
 
@@ -460,6 +357,10 @@ export default {
     user: {
       type: String,
     },
+    showBuilds: {
+      type: Boolean,
+      default: true,
+    },
   },
   components: {
     Paginate,
@@ -467,11 +368,11 @@ export default {
   },
   data() {
     return {
-      search: this.$route.query.build,
+      search: '',
       searchAll: '',
       broadcast: '',
+      currentShowBuilds: this.showBuilds,
       showModal: false,
-      allBuilds: [],
       builds: [],
       paginationData: {},
       status: ['active'],
@@ -481,7 +382,6 @@ export default {
       showInfoModal: false,
       showRemoveModal: false,
       showProgressModal: false,
-      showBuildsModal: false,
       updating: false,
       removing: false,
       removed: false,
@@ -507,35 +407,27 @@ export default {
       ],
     };
   },
-  computed: {
-    filteredAllBuilds() {
-      if (!this.searchAll) {
-        return this.allBuilds;
-      }
-
-      const regexp = new RegExp(this.searchAll, 'i');
-      return this.allBuilds.filter(build => build.name.match(regexp));
-    }
-  },
   methods: {
     getBuilds() {
-      const loader = this.$loading.show({ container: this.$refs.builds });      
+      if (this.currentShowBuilds) {
+        const loader = this.$loading.show({ container: this.$refs.builds });
 
-      this.$store.dispatch('builds/getBuildsByStatus', { 
-        branch: this.branch,
-        module: this.module,
-        status: this.getStatus(),
-        user: this.user,
-        perPage: this.perPage.value,
-        page: this.page,
-        search: this.search
-      })
-        .then((response) => {
-          this.builds = response.data.data;
-          this.paginationData = response.data.meta;
-          this.setLastPage();
+        this.$store.dispatch('builds/getBuildsByStatus', {
+          branch: this.branch,
+          module: this.module,
+          status: this.getStatus(),
+          user: this.user,
+          perPage: this.perPage.value,
+          page: this.page,
+          search: this.showBuilds ? this.search : this.searchAll,
         })
-        .finally(() => loader.hide());
+          .then((response) => {
+            this.builds = response.data.data;
+            this.paginationData = response.data.meta;
+            this.setLastPage();
+          })
+          .finally(() => loader.hide());
+      }
     },
 
     getStatus() {
@@ -607,7 +499,7 @@ export default {
       this.selectedBuild.user = 'enterprise';
       this.selectedBuild.pass = 'Sofphia';
     },
-    
+
     openProgressModal(build) {
       this.selectedBuild = build;
       this.broadcast = build.details.broadcast;
@@ -637,15 +529,18 @@ export default {
       this.error = null;
     },
 
-    initTooltips() {
+    init() {
       this.$M.Tooltip.init(
         this.$el.querySelectorAll('.tooltipped'),
+      );
+      this.$M.FormSelect.init(
+        this.$el.querySelectorAll('select'),
       );
     },
 
     start(build) {
       this.updating = build.id;
-      this.initTooltips();
+      this.init();
       this.$store.dispatch('builds/start', build.id)
         .then(() => { build.status = 'running'; })
         .finally(() => { this.updating = false; });
@@ -653,7 +548,7 @@ export default {
 
     stop(build) {
       this.updating = build.id;
-      this.initTooltips();
+      this.init();
       this.$store.dispatch('builds/stop', build.id)
         .then(() => { build.status = 'stopped'; })
         .finally(() => { this.updating = false; });
@@ -685,11 +580,11 @@ export default {
     setLastPage() {
       this.lastPage = Math.ceil(this.paginationData.total / this.perPage.value);
     },
-    
+
     onStopTyping() {
-      window.setTimeout(() => this.getBuilds(), 1000);
-    }
-    
+      window.setTimeout(() => this.getBuilds(), 500);
+    },
+
   },
 
   watch: {
@@ -697,14 +592,17 @@ export default {
       this.page = 1;
       this.getBuilds();
     },
-    search(value) {
-      let query = {};
-      if (value) {
-        query = { build: value };
-      }
-      this.$router.push({ query });
-
+    search() {
       document.getElementById('search').addEventListener('keyup', this.onStopTyping);
+    },
+    searchAll(value) {
+      if (value) {
+        this.currentShowBuilds = true;
+        document.getElementById('searchAll').addEventListener('keyup', this.onStopTyping);
+        return;
+      }
+      this.builds = [];
+      this.currentShowBuilds = false;
     },
     perPage() {
       this.getBuilds();
@@ -712,13 +610,12 @@ export default {
   },
 
   updated() {
-    this.initTooltips();
+    this.init();
   },
 
   mounted() {
-    this.initTooltips();
+    this.init();
     this.getBuilds();
-    this.$M.FormSelect.init(document.querySelector('select'));
   },
 
   created() {

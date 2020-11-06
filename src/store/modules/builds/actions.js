@@ -10,7 +10,7 @@ export default {
             },
           },
         ],
-      }), 
+      }),
     });
 
     promise
@@ -26,7 +26,7 @@ export default {
       fields: JSON.stringify([
         'module',
         'created_by',
-        'details'
+        'details',
       ]),
       filters: JSON.stringify({
         allOf: [
@@ -79,7 +79,7 @@ export default {
   },
 
   getBuildsByStatus({ commit }, {
-    branch, module, status, user, perPage, page, search = ''
+    branch, module, status, user, perPage, page, search,
   }) {
     const promise = api('devops').get('builds', {
 
