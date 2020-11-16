@@ -30,10 +30,9 @@
       <Alert v-if="error !== ''" v-bind:msg="error" />
       <div class="description">
         <span>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-          ex ea commodo consequat. Duis aute irure dolor in reprehenderit
+          The DevOps Management system aims to shorten and facilitate the system development lifecycle,
+          automate various processes and workflows related to continuous integration and continuos delivery practices,
+          and store various configurations related to it.
         </span>
       </div>
       <div class="login-btn">
