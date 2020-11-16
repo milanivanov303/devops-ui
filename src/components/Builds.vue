@@ -2,8 +2,12 @@
   <div class="row">
     <div class="input-field col s12 m6">
       <i class="material-icons prefix">search</i>
-      <input v-if="showBuilds" type="text" placeholder="Search..." v-model="search" id="search"/>
-      <input v-else type="text" placeholder="Search..." v-model="searchAll" id="searchAll"/>
+      <input id="search"
+             type="text"
+             v-model="search"
+             placeholder="Search..."
+             v-on:keyup="onStopTyping"
+      />
     </div>
     <div class="input-field col s12 m3 right">
       <i class="material-icons prefix">timelapse</i>
@@ -366,10 +370,23 @@ export default {
     Paginate,
     BuildProgress,
   },
+  computed: {
+    searchLoaded() {
+      if (this.showBuilds) {
+        return this.search;
+      }
+      return null;
+    },
+    searchAll() {
+      if (!this.showBuilds) {
+        return this.search;
+      }
+      return null;
+    },
+  },
   data() {
     return {
       search: '',
-      searchAll: '',
       broadcast: '',
       currentShowBuilds: this.showBuilds,
       showModal: false,
@@ -409,25 +426,23 @@ export default {
   },
   methods: {
     getBuilds() {
-      if (this.currentShowBuilds) {
-        const loader = this.$loading.show({ container: this.$refs.builds });
+      const loader = this.$loading.show({ container: this.$refs.builds });
 
-        this.$store.dispatch('builds/getBuildsByStatus', {
-          branch: this.branch,
-          module: this.module,
-          status: this.getStatus(),
-          user: this.user,
-          perPage: this.perPage.value,
-          page: this.page,
-          search: this.showBuilds ? this.search : this.searchAll,
+      this.$store.dispatch('builds/getBuildsByStatus', {
+        branch: this.branch,
+        module: this.module,
+        status: this.getStatus(),
+        user: this.user,
+        perPage: this.perPage.value,
+        page: this.page,
+        search: this.showBuilds ? this.searchLoaded : this.searchAll,
+      })
+        .then((response) => {
+          this.builds = response.data.data;
+          this.paginationData = response.data.meta;
+          this.setLastPage();
         })
-          .then((response) => {
-            this.builds = response.data.data;
-            this.paginationData = response.data.meta;
-            this.setLastPage();
-          })
-          .finally(() => loader.hide());
-      }
+        .finally(() => loader.hide());
     },
 
     getStatus() {
@@ -582,7 +597,11 @@ export default {
     },
 
     onStopTyping() {
-      window.setTimeout(() => this.getBuilds(), 500);
+      window.setTimeout(() => {
+        if (this.currentShowBuilds) {
+          this.getBuilds();
+        }
+      }, 500);
     },
 
   },
@@ -590,21 +609,20 @@ export default {
   watch: {
     status() {
       this.page = 1;
-      this.getBuilds();
-    },
-    search() {
-      document.getElementById('search').addEventListener('keyup', this.onStopTyping);
+      if (this.currentShowBuilds) {
+        this.getBuilds();
+      }
     },
     searchAll(value) {
       if (value) {
         this.currentShowBuilds = true;
-        document.getElementById('searchAll').addEventListener('keyup', this.onStopTyping);
         return;
       }
       this.builds = [];
       this.currentShowBuilds = false;
     },
     perPage() {
+      this.page = 1;
       this.getBuilds();
     },
   },
@@ -615,7 +633,9 @@ export default {
 
   mounted() {
     this.init();
-    this.getBuilds();
+    if (this.currentShowBuilds) {
+      this.getBuilds();
+    }
   },
 
   created() {
