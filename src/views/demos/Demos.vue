@@ -66,7 +66,6 @@
             <div class="validator col s12 offset-l1 offset-m1">
               <div class="red-text" v-if="$v.demo.name.$error">
                 <p v-if="!$v.demo.name.required">Name field must not be empty.</p>
-                <p v-if="!$v.demo.name.minLen">Name must contain at least 6 charaters.</p>
               </div>
             </div>
           </div>
@@ -232,7 +231,7 @@
 import { Datetime } from 'vue-datetime';
 import { DateTime } from 'luxon';
 import {
-  required, email, numeric, minLength,
+  required, email, numeric,
 } from 'vuelidate/lib/validators';
 import 'vue-datetime/dist/vue-datetime.css';
 import { Table, Column } from '@/components/table';
@@ -291,7 +290,6 @@ export default {
       demo: {
         name: {
           required,
-          minLen: minLength(6),
         },
         email: {
           required,
