@@ -48,7 +48,7 @@
           <div v-else>
             <Preloader v-if="gettingSSOUser" class="small" />
             <div v-else class="chip sso-btn" @click="loginSSO()">
-              Quick login with <b>User Management (SSO)</b>
+              Login with <b>User Management (SSO)</b>
             </div>
           </div>
           <Preloader v-if="loggingInSSO" class="preloader-wrapper small" />
@@ -60,6 +60,10 @@
 
 <script>
 import Loading from '../components/layouts/Loading';
+import Vue from 'vue';
+import VueParticles from 'vue-particles';
+Vue.use(VueParticles);
+
 
 export default {
   components: {
