@@ -435,7 +435,7 @@ export default {
         user: this.user,
         perPage: this.perPage.value,
         page: this.page,
-        search: this.showBuilds ? this.searchLoaded : this.searchAll,
+        search: this.showBuilds ? trim(this.searchLoaded) : trim(this.searchAll),
       })
         .then((response) => {
           this.builds = response.data.data;
