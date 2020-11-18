@@ -70,7 +70,13 @@ class Auth {
   }
 
   login(username, password) {
-    const promise = this.axios.post('auth/login', { username, password, code: this.code });
+    let query = [];
+    this.applications.forEach((appCode) => {
+      query.push(`applications[]=${appCode}`);
+    });
+    query = query.join('&');
+
+    const promise = this.axios.post(`auth/login?${query}`, { username, password });
 
     promise
       .then((response) => {
@@ -110,13 +116,13 @@ class Auth {
   }
 
   getIdentity() {
-    let request = '';
-
+    let query = [];
     this.applications.forEach((appCode) => {
-      request = request.concat('applications[]=', appCode, '&');
+      query.push(`applications[]=${appCode}`);
     });
-    request = request.slice(0, -1);
-    const promise = this.axios.get(`auth/identity?${request}`);
+    query = query.join('&');
+
+    const promise = this.axios.get(`auth/identity?${query}`);
     promise.then(response => this.storage.set('user', response.data));
     return promise;
   }
