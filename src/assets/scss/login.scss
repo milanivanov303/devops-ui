@@ -27,23 +27,70 @@
             }
         }
     }
-    .card {
-
-        box-shadow: 10px 10px 10px rgba(255, 255, 255, 0.4);
-        margin-top: 100px;
+    .chip {
+        cursor: pointer;
+        padding-top: 9px;
+        height: 50px;
+        border-radius: 25px;
+        box-shadow: 0px 0px 20px 0.01px #fff;
+        img {
+            margin-top: -9px;
+            height: 50px;
+            width: 50px
+        }
     }
-    button{
-        background-color:$button-color;
+    .title {
+        margin-top: 50px;
+        color: white;
+        display:block;
     }
-   .sso-btn{
-       i{
-            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4);
-            color: $button-color;
-            font-size: 9em;
-       }
-   }
+    .description {
+        padding: 50px 80px 0 80px;
+        min-height: 300px;
+        font-size: 18px;
+        text-align: justify;
+        color: white; 
+        display:block;
+    }
+    .login-btn {
+        p {
+            color:white;
+            a {
+                color:white; 
+                text-decoration: underline
+            }
+        }
+    }
+    //on large
+    @media screen and (min-width : 993px) {
+        .title {
+            margin-top: 180px;
+        }
+        .description {
+            padding-top: 100px ;
+        }
+        .logo {
+            padding-top: 300px;
+            width: 200px;
+            margin-left: 40%;
+        }
+    }
+    //on medium
+    @media screen and (min-width : 601px) and (max-width : 992px) {
+        .logo {
+            width: 150px;
+            margin-left: 40%;
+        }
+    }
+    //on small
+    @media screen and (max-width : 600px) {
+        .description {
+            font-size: 15px;
+        }
+        .logo {
+            width: 100px;
+            margin-left: 35%;
+        }
+    }
 
-   img{
-       width: 200px;
-   }
 }

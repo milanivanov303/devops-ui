@@ -1,72 +1,69 @@
 <template>
- <main>
-    <Loading v-if="loggingInSSO"/>
-    <div v-else class="row">
-      <div class="col s10 offset-s1 m8 offset-m2 l6 offset-l3 xl4 offset-xl4">
-        <div class="card">
-          <div class="card-content">
-            <span class="card-title center">DevOps Management</span>
-            <Alert v-if="error !== ''" v-bind:msg="error" />
-            <div class="row">
-              <div class="col s12 m8">
-                <form>
-                  <div class="row">
-                    <div class="input-field col s12">
-                      <i class="material-icons prefix">account_circle</i>
-                      <input type="text" id="username-input" v-model="username" />
-                      <label for="username-input">Username</label>
-                    </div>
-                    <div class="input-field col s12">
-                      <i class="material-icons prefix">lock</i>
-                      <input
-                        type="password"
-                        id="password-input"
-                        v-model="password"
-                      />
-                      <label for="password-input">Password</label>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col s12 center">
-                      <button
-                      id="login-btn"
-                        v-if="!loggingIn"
-                        @click="login()"
-                        class="btn waves-effect waves-light w-100"
-                      >
-                        Login
-                      </button>
-                      <Preloader v-else class="small" />
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div class="col s12 m4 center">
-                <div v-if="ssoUser">
-                  <a class="sso-btn" href="#" @click="loginSSO()">
-                    <i class="large material-icons col s12">person_pin</i>
-                  </a>
-                  <p>Continue as <b>{{ ssoUser.name }}</b></p>
-                </div>
-                <div v-else>
-                  <a class="sso-btn" href="#" @click="loginSSO()">
-                    <i class="large material-icons col s12">person_pin</i>
-                  </a>
-                  <Preloader v-if="gettingSSOUser" class="small" />
-                  <p v-else>Quick login with <b>User Management (SSO)</b></p>
-                </div>
-                <Preloader v-if="loggingInSSO" class="preloader-wrapper small" />
-              </div>
+  <Loading v-if="loggingInSSO"/>
+  <div v-else class="row">
+    <div class="col s12 l7">
+      <div class="col l7 animation">
+        <vue-particles
+          color="#cfd2da"
+          :particleOpacity="0.7"
+          :particlesNumber="90"
+          shapeType="circle"
+          :particleSize="3"
+          linesColor="#cfd2da"
+          :linesWidth="1"
+          :lineLinked="true"
+          :lineOpacity="0.3"
+          :linesDistance="150"
+          :moveSpeed="3"
+          :hoverEffect="true"
+          hoverMode="grab"
+          :clickEffect="true"
+          clickMode="push">
+        </vue-particles>
+      </div>
+      <img class="col  logo" src="../assets/images/do-icon-100px.png" alt="DevOps Management"/>
+    </div>
+    <div class="col s12 l5">
+      <div class="title">
+        <h4 class="center">Welcome to DevOps Management</h4>
+      </div>
+      <Alert v-if="error !== ''" v-bind:msg="error" />
+      <div class="description">
+        <span>
+          The DevOps Management system aims to shorten and facilitate the system development lifecycle,
+          automate various processes and workflows related to continuous integration and continuos delivery practices,
+          and store various configurations related to it.
+        </span>
+      </div>
+      <div class="login-btn">
+        <div class="center">
+          <div v-if="ssoUser">
+            <p>Continue as</p>
+            <div class="chip" @click="loginSSO()">
+              <img :src="userImg()" alt="User"/>
+              {{ ssoUser.name }}
+            </div>
+            <p><a @click="loginAnotherUser()">or log with another user</a></p>
+          </div>
+          <div v-else>
+            <Preloader v-if="gettingSSOUser" class="small" />
+            <div v-else class="chip sso-btn" @click="loginSSO()">
+              Login with <b>User Management (SSO)</b>
             </div>
           </div>
+          <Preloader v-if="loggingInSSO" class="preloader-wrapper small" />
         </div>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <script>
 import Loading from '../components/layouts/Loading';
+import Vue from 'vue';
+import VueParticles from 'vue-particles';
+Vue.use(VueParticles);
+
 
 export default {
   components: {
@@ -75,7 +72,6 @@ export default {
   data() {
     return {
       username: '',
-      password: '',
       returnUri: '/',
       loggingIn: false,
       loggingInSSO: false,
@@ -85,23 +81,6 @@ export default {
     };
   },
   methods: {
-    login() {
-      this.loggingIn = true;
-      this.error = '';
-
-      this.$auth.login(this.username, this.password)
-        .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
-        .catch((error) => {
-          if (error.response.status === 401) {
-            this.error = 'Incorrect username or password';
-          } else {
-            this.error = 'Could not login. Please contact phpid';
-          }
-        })
-        .finally(() => {
-          this.loggingIn = false;
-        });
-    },
     loginSSO() {
       this.loggingInSSO = true;
       this.error = '';
@@ -112,6 +91,9 @@ export default {
           this.loggingInSSO = false;
           this.error = 'Could not login with SSO, Please contact phpid';
         });
+    },
+    loginAnotherUser() {
+      window.location.href = `${auth.url}/../logout?redirect_url=${encodeURIComponent(`${auth.getSsoUrl()}&code=${auth.code}`)}`;
     },
     getLoggedInSSOUser() {
       this.gettingSSOUser = true;
@@ -137,6 +119,9 @@ export default {
 
       this.$el.appendChild(iframe);
     },
+    userImg() {
+      return `http://kubrat.codixfr.private/phones/images/${this.ssoUser.username}.jpg`;
+    },
   },
   created() {
     if (this.$route.query.sso_login) {
@@ -151,4 +136,10 @@ export default {
 
 <style lang="scss">
   @import "../assets/scss/login";
+  .animation {
+    canvas{
+        height: calc(95vh - 100px) !important;
+    }
+    position: absolute;
+  }
 </style>
