@@ -30,9 +30,9 @@
       <Alert v-if="error !== ''" v-bind:msg="error" />
       <div class="description">
         <span>
-          The DevOps Management system aims to shorten and facilitate the system development lifecycle,
-          automate various processes and workflows related to continuous integration and continuos delivery practices,
-          and store various configurations related to it.
+          The DevOps Management system aims to shorten and facilitate the system development
+          lifecycle, automate various processes and workflows related to continuous integration and
+          continuos delivery practices, and store various configurations related to it.
         </span>
       </div>
       <div class="login-btn">
@@ -59,9 +59,10 @@
 </template>
 
 <script>
-import Loading from '../components/layouts/Loading';
 import Vue from 'vue';
 import VueParticles from 'vue-particles';
+import Loading from '../components/layouts/Loading';
+
 Vue.use(VueParticles);
 
 
