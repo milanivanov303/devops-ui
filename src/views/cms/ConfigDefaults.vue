@@ -378,9 +378,9 @@ export default {
     closeAddEditVariableModal() {
       this.showAddEditVariableModal = false;
       this.name = {};
-      this.commitMsg = {},
-      this.error = '',
-      this.$v.$reset();    
+      this.commitMsg = {};
+      this.error = '';
+      this.$v.$reset();
     },
     openInterfacesModal(variable) {
       this.showInterfacesModal = true;
@@ -439,10 +439,12 @@ export default {
         })
         .catch((error) => {
           if (error.message === 'Request failed with status code 403') {
-            return this.error = 'Sorry, but you have no rights to create new variable!';
+            this.error = 'Sorry, but you have no rights to create new variable!';
+            return this.error;
           }
           if (error.message === 'Request failed with status code 422') {
-            return this.error = 'Sorry, but variable name are already registered!';
+            this.error = 'Sorry, but variable name are already registered!';
+            return this.error;
           }
           return error;
         });

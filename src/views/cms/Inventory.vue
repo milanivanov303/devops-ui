@@ -76,11 +76,11 @@
 </template>
 <script>
 import AddRspFile from '@/components/cms/AddRspFile';
-import SelectModel from '@/components/partials/SelectModel';
+// import SelectModel from '@/components/partials/SelectModel';
 
 export default {
   components: {
-    SelectModel,
+    // SelectModel,
     'add-rsp-modal': AddRspFile,
   },
   mounted() {
@@ -130,11 +130,10 @@ export default {
       this.$store.state.cms.inventoryInstances = [];
       this.loader = this.$loading.show({ container: this.$el });
       this.$store.dispatch('mmpi/getDeliveryChainsCMS')
-        .then((rsp) => {
+        .then(() => {
           this.getDeliveryChains = value.delivery_chains;
           this.loader.hide();
         });
-      
     },
     selectedDeliveryChain(value) {
       this.resetInstances();
