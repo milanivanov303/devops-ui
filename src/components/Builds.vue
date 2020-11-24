@@ -399,7 +399,7 @@ export default {
     openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild.name = build.name
+      this.selectedBuild.name = build.name;
       this.selectedBuild.branch = build.details.branch;
 
       if (build.details.fe_branch) {
@@ -417,8 +417,7 @@ export default {
 
       if (build.removed_on && !build.removed_by) {
         this.selectedBuild.removed_by = 'auto-removed';
-      }      
-      
+      }
     },
 
     openProgressModal(build) {
