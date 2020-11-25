@@ -481,7 +481,11 @@ export default {
       this.$store.dispatch(`demo/${this.action}Demo`, payload)
         .then(() => {
           this.showAddEditDemoModal = false;
-          this.$M.toast({ html: 'The demo has been created!', classes: 'toast-seccess' });
+          if (this.action === 'create') {
+            this.$M.toast({ html: 'The demo has been created!', classes: 'toast-seccess' });
+            return;
+          }
+          this.$M.toast({ html: `The demo has been ${payload.status}!`, classes: 'toast-seccess' });
         })
         .catch((error) => {
           this.error = error;
