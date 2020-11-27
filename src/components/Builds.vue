@@ -505,6 +505,7 @@ export default {
       this.getBuilds();
     },
     perPage() {
+      this.page = 1;
       this.getBuilds();
     },
   },
