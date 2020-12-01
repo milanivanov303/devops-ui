@@ -73,7 +73,7 @@ export default {
           setTimeout(() => window.location.reload(), 2000);
         })
         .catch(() => {
-          if (this.checkTimer >= 5 * 60 /* 5 minutes */) {
+          if (this.checkTimer >= 10 * 60 /* 10 minutes */) {
             document.getElementById('tomcatProgress').classList.add('hidden');
             document.getElementById('autostart_builds').classList.add('fail');
 
@@ -110,7 +110,7 @@ export default {
 
           this.icon = 'cancel';
           this.header = '- This build has been removed -';
-          this.message = `on ${this.$date(this.build.removed_on).toHuman()} by 
+          this.message = `on ${this.$date(this.build.removed_on).toHuman()} by
                           ${this.build.removed_by || 'automatic process'}`;
 
           return;

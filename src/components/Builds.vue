@@ -399,23 +399,25 @@ export default {
     openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild = build;
-
-      this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
+      this.selectedBuild.name = build.name;
+      this.selectedBuild.branch = build.details.branch;
 
       if (build.details.fe_branch) {
         this.selectedBuild.fe_branch = build.details.fe_branch.name;
       }
+
+      this.selectedBuild.instance = build.details.instance.name;
+      this.selectedBuild.java_version = build.details.java_version;
+      this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
+      this.selectedBuild.created_by = build.created_by;
+
       if (build.removed_on) {
         this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
       }
 
-      if (!build.removed_by) {
+      if (build.removed_on && !build.removed_by) {
         this.selectedBuild.removed_by = 'auto-removed';
       }
-
-      this.selectedBuild.instance = build.details.instance.name;
-      this.selectedBuild.java_version = build.details.java_version;
     },
 
     openProgressModal(build) {
@@ -503,6 +505,7 @@ export default {
       this.getBuilds();
     },
     perPage() {
+      this.page = 1;
       this.getBuilds();
     },
   },
