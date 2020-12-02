@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+
+  # web:
+  #   build:
+  #     context: ./
+  #     target: web
+  #   ports:
+  #     - ${NGINX_CONTAINER_HTTP_PORT:-8088}:80
+  #     - ${NGINX_CONTAINER_UI_PORT:-8000}:8000
+  #     - ${NGINX_CONTAINER_HTTPS_PORT:-4438}:443
+  #   restart: always
+
+  webssh2:
+    build:
+      context: ./
+      target: webssh2
+    ports:
+      - ${VUE_APP_WEBSSH2_PORT:-8024}:2222
