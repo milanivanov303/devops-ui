@@ -4,25 +4,22 @@ services:
   web:
     image: ${WEB_CONTAINER_IMAGE:-gitlab.codixfr.private:5005/enterpriseapps/devops-ui:local}
     ports:
-      - ${NGINX_CONTAINER_IP:-0.0.0.0}:${NGINX_CONTAINER_HTTP_PORT:-8088}:80
-      - ${NGINX_CONTAINER_IP:-0.0.0.0}:${NGINX_CONTAINER_HTTPS_PORT:-8000}:8000
-      - ${NGINX_CONTAINER_IP:-0.0.0.0}:${NGINX_CONTAINER_HTTPS_PORT:-4438}:443
+      - ${NGINX_CONTAINER_IP:-0.0.0.0}:${NGINX_CONTAINER_HTTP_PORT:-8080}:80
+      - ${NGINX_CONTAINER_IP:-0.0.0.0}:${NGINX_CONTAINER_HTTPS_PORT:-4434}:443
     restart: always
     # volumes:
-    #   - ${APACHE_CONTAINER_VOLUME}:/var/www/html
-    #   - proxy_config:/usr/local/apache2/conf/proxy
+    #   - proxy_config:/etc/nginx/conf.d/proxy
 
+  webssh2:
+    build:
+      context: ./
+      target: webssh2
+    ports:
+      - ${VUE_APP_WEBSSH2_PORT:-8024}:2222
 
-#   webssh2:
-#       image: ${WEBSSH2_CONTAINER_IMAGE}
-#       container_name: ${WEBSSH2_CONTAINER_NAME}
-#       build: docker/webssh2
-#       ports:
-#           - ${APACHE_CONTAINER_IP}:${VUE_APP_WEBSSH2_PORT}:2222
-
-# volumes:
-#   proxy_config:
-#       driver_opts:
-#           type: "nfs"
-#           o: "addr=${NFS_HOST},vers=4,port=${NFS_PORT}"
-#           device: ":/proxy_config"
+volumes:
+  proxy_config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NFS_HOST},vers=4,port=${NFS_PORT}"
+      device: ":/proxy_config"

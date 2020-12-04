@@ -4,6 +4,7 @@ FROM gitlab.codixfr.private:5005/enterpriseapps/images/nodejs:1.0 AS builder
 RUN apk add --no-cache --virtual .gyp python make g++
 
 COPY --chown=node:node .npmrc ./package*.json ./
+COPY --chown=node:node .env.dev ./.env
 
 RUN npm set progress=false \
   && npm config set depth 0 \
@@ -19,7 +20,12 @@ RUN npm run lint \
 # ---------- Web ----------
 FROM gitlab.codixfr.private:5005/enterpriseapps/images/nginx:1.0 AS web
 
+#RUN apk add --no-cache cron
+
 COPY --from=builder --chown=nginx:nginx /app/dist ./public
+COPY --from=builder --chown=nginx:nginx /app/docker/nginx/ /etc/nginx/conf.d
+
+RUN crontab /etc/nginx/conf.d/nginx_graceful_cron
 
 CMD ["nginx", "-g", "daemon off;"]
 
