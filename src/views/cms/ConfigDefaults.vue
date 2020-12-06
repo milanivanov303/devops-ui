@@ -403,9 +403,9 @@ export default {
         });
       // this.$store.dispatch('cms/getCodixTeams');
     },
-    // getInstances() {
-    //   this.$store.dispatch('mmpi/getDevInstances');
-    // },
+    getInstances() {
+      this.$store.dispatch('mmpi/getDevInstances');
+    },
     // getImxModules() {
     //   this.$store.dispatch('cms/getImxModules');
     // },
@@ -484,7 +484,7 @@ export default {
 
   mounted() {
     this.getDefaultVariables();
-    // this.getInstances();
+    this.getInstances();
     // this.getImxModules();
   },
 };

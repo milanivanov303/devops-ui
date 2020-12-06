@@ -109,7 +109,6 @@
             displayed="name"
             v-model="instance"
             :options="instances"
-            :customOption="customOptions.instances"
           />
           <div class="validator red-text" v-if="$v.instance.$error">
             <span v-if="!$v.instance.required">Field is required!</span>
@@ -220,12 +219,6 @@ export default {
       deliveryChain: {},
       instanceStatus: {},
       instanceStatuses: [],
-      customOptions: {
-        instances: {
-          text: 'All',
-          value: 'All',
-        },
-      },
       instance: {},
       instances: [],
       submitStatus: 'PENDING',
@@ -291,7 +284,7 @@ export default {
   },
   methods: {
     async getInstances(deliveryChain) {
-      if (deliveryChain.dc_role) {
+      if (deliveryChain.dc_role && deliveryChain.dc_role !== null) {
         switch (deliveryChain.dc_role.key) {
           case 'dc_rel':
             this.instances = this.filterChains(
@@ -311,10 +304,13 @@ export default {
               deliveryChain.type.type,
             );
             break;
-          default:
-            break;
         }
       }
+      this.instances = [
+        { name: 'All' },
+        ...this.instances,
+      ];
+      this.instance = this.instances.find(is => is.name === 'All');
     },
     filterChains(roles, type) {
       return this.deliveryChains.reduce((acc, chain) => {
@@ -367,7 +363,7 @@ export default {
           subtype: {
             key: 'cms_cmd',
           },
-          contents: this.instance === 'All' ? 'All' : this.instance.id.toString(),
+          contents: this.instance.name === 'All' ? 'All' : this.instance.id.toString(),
         });
         this.currentVariable = {};
         this.templates = [];
