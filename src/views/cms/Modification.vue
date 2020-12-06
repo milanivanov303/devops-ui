@@ -304,6 +304,9 @@ export default {
               deliveryChain.type.type,
             );
             break;
+          default:
+            this.instances = [];
+            break;
         }
       }
       this.instances = [
