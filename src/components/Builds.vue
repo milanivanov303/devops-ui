@@ -231,66 +231,6 @@
               </label>
             </div>
           </div>
-          <div class="row">
-            <div class="col s12">
-              <ul class="tabs col s12 center">
-                <li class="tab col s12"><a>Container's Details</a></li>
-              </ul>
-              <div class="row">
-                <div class="input-field col s6">
-                  <i class="material-icons prefix">account_circle</i>
-                  <input
-                    readonly
-                    type="text"
-                    id="user"
-                    v-model="selectedBuild.user">
-                  <label :class="{active: selectedBuild.user}" for="user">User</label>
-                </div>
-                <div class="input-field col s6">
-                  <i class="material-icons prefix">lock</i>
-                  <input
-                    readonly
-                    type="text"
-                    id="pass"
-                    v-model="selectedBuild.pass">
-                  <label :class="{active: selectedBuild.pass}" for="pass">Pass</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="input-field col s12">
-                  <i class="material-icons prefix">storage</i>
-                  <input
-                    readonly
-                    type="text"
-                    id="host"
-                    v-model="selectedBuild.host">
-                  <label :class="{active: selectedBuild.host}" for="host">Host</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12" >
-                  <table ref="builds">
-                    <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Private Port</th>
-                      <th>Public Port</th>
-                      <th>Type</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(port, index) in selectedBuild.ports" :key="index">
-                        <td>{{ index + 1 }}</td>
-                        <td>{{ port.TargetPort }}</td>
-                        <td>{{ port.PublishedPort }}</td>
-                        <td>{{ port.Protocol }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </template>
       <template v-slot:footer></template>
@@ -459,29 +399,25 @@ export default {
     openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild = build;
-
-      this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
+      this.selectedBuild.name = build.name;
+      this.selectedBuild.branch = build.details.branch;
 
       if (build.details.fe_branch) {
         this.selectedBuild.fe_branch = build.details.fe_branch.name;
       }
+
+      this.selectedBuild.instance = build.details.instance.name;
+      this.selectedBuild.java_version = build.details.java_version;
+      this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
+      this.selectedBuild.created_by = build.created_by;
+
       if (build.removed_on) {
         this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
       }
 
-      if (!build.removed_by) {
+      if (build.removed_on && !build.removed_by) {
         this.selectedBuild.removed_by = 'auto-removed';
       }
-
-      this.selectedBuild.instance = build.details.instance.name;
-      this.selectedBuild.java_version = build.details.java_version;
-      if (typeof build.details.service !== 'undefined') {
-        this.selectedBuild.ports = build.details.service.Endpoint.Ports;
-      }
-      this.selectedBuild.host = this.$store.state[build.module].host;
-      this.selectedBuild.user = 'enterprise';
-      this.selectedBuild.pass = 'Sofphia';
     },
 
     openProgressModal(build) {
@@ -569,6 +505,7 @@ export default {
       this.getBuilds();
     },
     perPage() {
+      this.page = 1;
       this.getBuilds();
     },
   },

@@ -172,7 +172,7 @@ export default {
           startDate: this.getStartDate(this.branchStatisticsDays.value || this.startDate),
           stateName: 'debiteur-branch-builds',
         },
-      ).then(() => loader.hide());
+      ).finally(() => loader.hide());
     },
     getUserStatistics() {
       const loader = this.$loading.show({ container: this.$refs.stats_by_user });
@@ -182,7 +182,7 @@ export default {
           startDate: this.getStartDate(this.userStatisticsDays.value || this.startDate),
           stateName: 'debiteur-users-builds',
         },
-      ).then(() => loader.hide());
+      ).finally(() => loader.hide());
     },
     getStartDate(value) {
       const newDate = new Date(

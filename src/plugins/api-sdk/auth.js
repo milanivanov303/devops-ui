@@ -1,6 +1,7 @@
 /* eslint class-methods-use-this: ["error", { "exceptMethods": ["getExpire"] }] */
 
 import Axios from 'axios';
+import config from '../../config';
 import Storage from './storage';
 import { deleteParam, getParam, getReturnUri } from './helpers';
 
@@ -8,6 +9,7 @@ class Auth {
   constructor(url, code, options = {}) {
     this.url = url;
     this.code = code;
+    this.applications = config.auth.applications.split(',');
 
     this.storage = new Storage(options.session_name || 'app_session');
     this.expire = this.getExpire(options.session_expire || '1 hour');
@@ -68,7 +70,13 @@ class Auth {
   }
 
   login(username, password) {
-    const promise = this.axios.post('auth/login', { username, password, code: this.code });
+    let query = [];
+    this.applications.forEach((appCode) => {
+      query.push(`applications[]=${appCode}`);
+    });
+    query = query.join('&');
+
+    const promise = this.axios.post(`auth/login?${query}`, { username, password });
 
     promise
       .then((response) => {
@@ -108,7 +116,13 @@ class Auth {
   }
 
   getIdentity() {
-    const promise = this.axios.get(`auth/identity?code=${this.code}`);
+    let query = [];
+    this.applications.forEach((appCode) => {
+      query.push(`applications[]=${appCode}`);
+    });
+    query = query.join('&');
+
+    const promise = this.axios.get(`auth/identity?${query}`);
     promise.then(response => this.storage.set('user', response.data));
     return promise;
   }
@@ -140,18 +154,16 @@ class Auth {
     return this.storage.get('user');
   }
 
-  can(action) {
+  can(action, code = this.code) {
     const user = this.getUser();
 
     if (!user || typeof user.permissions === 'undefined') {
       return false;
     }
-
-    if (user.permissions === '*') {
+    if (user.permissions[code] === '*') {
       return true;
     }
-
-    return user.permissions.indexOf(action) !== -1;
+    return user.permissions[code].indexOf(action) !== -1;
   }
 }
 

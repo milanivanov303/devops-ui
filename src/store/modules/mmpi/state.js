@@ -5,5 +5,7 @@ export default {
   deploy_instances: [],
   projects: [],
   delivery_chains: [],
+  devInstances: [],
+  deliveryChains: [],
   error: '',
 };
