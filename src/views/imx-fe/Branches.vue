@@ -126,7 +126,6 @@ export default {
   methods: {
     getActiveBuilds() {
       this.$store.dispatch('builds/getActive');
-      this.$store.dispatch('imx_fe/getHost');
     },
     selectedPage(page) {
       this.page = page;
