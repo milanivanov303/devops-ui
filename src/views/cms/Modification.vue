@@ -291,7 +291,7 @@ export default {
   },
   methods: {
     async getInstances(deliveryChain) {
-      if (deliveryChain.dc_role) {
+      if (deliveryChain.dc_role && deliveryChain.dc_role !== null) {
         switch (deliveryChain.dc_role.key) {
           case 'dc_rel':
             this.instances = this.filterChains(
@@ -312,9 +312,15 @@ export default {
             );
             break;
           default:
+            this.instances = [];
             break;
         }
       }
+      this.instances = [
+        { name: 'All' },
+        ...this.instances,
+      ];
+      this.instance = this.instances.find(is => is.name === 'All');
     },
     filterChains(roles, type) {
       return this.deliveryChains.reduce((acc, chain) => {
@@ -367,7 +373,7 @@ export default {
           subtype: {
             key: 'cms_cmd',
           },
-          contents: this.instance === 'All' ? 'All' : this.instance.id.toString(),
+          contents: this.instance.name === 'All' ? 'All' : this.instance.id.toString(),
         });
         this.currentVariable = {};
         this.templates = [];
