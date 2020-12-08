@@ -5,7 +5,11 @@
         <div class="row">
           <h1 class="center-align col s12">Config Defaults</h1>
         </div>
+        <div v-if="loading || defaultVariables.length === 0" class="center" >
+          <Preloader class="big"/>
+        </div>
         <Table
+          v-else
           :data="defaultVariables"
           sort-by="name"
           sort-dir="asc"
@@ -34,10 +38,10 @@
           :selectedVariable="selectedVariable"
           :action="action"/>
 
-        <Modal v-if="showInterfacesModal"
-               @close="closeInterfacesModal()"
-               class="right-sheet"
-               >
+        <Modal
+          v-if="showInterfacesModal"
+          @close="closeInterfacesModal()"
+          class="right-sheet">
           <template v-slot:header>
             <div>Check variable <b>{{selectedVariable.name}}</b> in templates from instance</div>
           </template>
@@ -88,6 +92,8 @@ export default {
       action: '',
       error: '',
       instance: {},
+      templates: {},
+      loading: false,
     };
   },
   computed: {
@@ -104,12 +110,6 @@ export default {
       this.showAddEditVariableModal = true;
       this.selectedVariable = { ...variable };
       this.action = action;
-
-      if (this.selectedVariable.codix_team_id) {
-        this.selectedVariable.codix_team = this.codixTeams.find(
-          codixTeam => codixTeam.id === this.selectedVariable.codix_team_id,
-        );
-      }
     },
     closeAddEditVariableModal() {
       this.showAddEditVariableModal = false;
@@ -156,7 +156,11 @@ export default {
   },
 
   created() {
-    this.$store.dispatch('cms/getVariables');
+    this.loading = true;
+    this.$store.dispatch('cms/getVariables')
+      .then(() => {
+        this.loading = false;
+      });
     this.$store.dispatch('mmpi/getDevInstances');
   },
 };
