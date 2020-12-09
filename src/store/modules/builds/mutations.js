@@ -9,6 +9,15 @@ export default {
     Vue.set(state.statistics, name, data);
   },
 
+  updateBuild(state, build) {
+    state.active.map((a) => {
+      if (a.id === build.id) {
+        a.details = build.details;
+      }
+      return state.active;
+    });
+    console.log(state.active);
+  },
   start(state, id) {
     state.active.map((a) => {
       if (a.id === id) {
