@@ -47,18 +47,18 @@
             </ul>
           </div>
         </li>
-        <li :class="{ active: isActive('imx-fe') }">
+        <li :class="{ active: isActive('imx_fe') }">
           <a class="collapsible-header">
             <i class="material-icons">devices</i> iMX FE
             <i class="material-icons right">arrow_drop_down</i>
           </a>
           <div class="collapsible-body">
             <ul>
-              <li :class="{ active: isActive('imx-fe/dashboard') }">
-                <router-link to="/imx-fe/dashboard"> Dashboard</router-link>
+              <li :class="{ active: isActive('imx_fe/dashboard') }">
+                <router-link to="/imx_fe/dashboard"> Dashboard</router-link>
               </li>
-              <li :class="{ active: isActive('imx-fe/branches') }">
-                <router-link to="/imx-fe/branches"> Branches</router-link>
+              <li :class="{ active: isActive('imx_fe/branches') }">
+                <router-link to="/imx_fe/branches"> Branches</router-link>
               </li>
               <li><div class="divider"></div></li>
             </ul>

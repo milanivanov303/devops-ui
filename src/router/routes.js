@@ -161,7 +161,7 @@ export default [
     ],
   },
   {
-    path: '/imx-fe',
+    path: '/imx_fe',
     meta: {
       requiresAuth: true,
       name: 'imx-fe',
@@ -183,7 +183,7 @@ export default [
     ],
   },
   {
-    path: '/imx-fe/branches',
+    path: '/imx_fe/branches',
     meta: {
       requiresAuth: true,
       name: 'imx-fe-branches',

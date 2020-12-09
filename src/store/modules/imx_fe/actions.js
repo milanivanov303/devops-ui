@@ -17,23 +17,24 @@ export default {
 
     return promise;
   },
-  getContainers({ commit }) {
-    const promise = api('devops').get('imx-fe/containers');
+
+  getHost({ commit }) {
+    const promise = api('devops').get('imx-fe/host');
 
     promise
       .then((response) => {
-        commit('containers', response.data.data);
-        commit('host', response.data.meta.host);
+        commit('host', response.data.host);
       })
-      .catch(() => commit('error', 'Could not get containers list'));
-
+      .catch(() => commit('error', 'Could not get host name', { root: true }));
     return promise;
   },
+
   startBuild({ commit }, payload) {
     const promise = api('devops').post('imx-fe/build', payload);
     promise.catch(error => commit('error', error));
     return promise;
   },
+
   removeBuild({ commit }, id) {
     const promise = api('devops').delete(`imx-fe/build/${id}`);
     promise

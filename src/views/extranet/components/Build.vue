@@ -208,12 +208,6 @@ export default {
         })
         .finally(() => { this.build.started = true; });
     },
-    scrollLogContainer() {
-      setTimeout(() => {
-        const container = this.$el.querySelector('.log');
-        container.scrollTop = container.scrollHeight;
-      }, 100);
-    },
   },
   mounted() {
     this.getClients();
