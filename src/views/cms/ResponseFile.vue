@@ -47,6 +47,10 @@
             label="Default Variable"
             :show="row => row.default_variable ? row.default_variable.value : ''"
           />
+          <Column
+            label="Last synchronization"
+            :show="row => row.made_on"
+          />
           <Column class="custom-size" v-for="(instance, key) in this.$store.state.cms.instances"
             v-bind:key="key"
             :label="instance.name"

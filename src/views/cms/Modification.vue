@@ -43,24 +43,27 @@
             <span v-if="!$v.deliveryChain.required">Delivery chain field is required.</span>
           </div>
         </div>
-        <div class="col s6">
-          <Select
-            label="Instance status"
-            icon="power_settings_new"
-            displayed="value"
-            v-model="instanceStatus"
-            :options="instanceStatuses"
-            :invalid="$v.instanceStatus.$error"
-            @blur="$v.instanceStatus.$touch()"
-            @change="selectedInstanceStatus"
-          />
-          <div class="validator red-text" v-if="$v.instanceStatus.$error">
-            <span v-if="!$v.instanceStatus.required">Instance status field is required.</span>
+        <div class="col s6" v-if="form.delivery_chain_id">
+          <div class="col s6">
+            <button
+              class="btn waves-effect waves-light col s12"
+              type="button"
+              name="action"
+              @click="showAddEditVariableModal = true">Add Variable
+            </button>
+          </div>
+          <div class="col s6">
+            <button
+              class="btn waves-effect waves-light col s12"
+              type="button"
+              name="action"
+              @click="showAddEditVariableModal = true">Add Template
+            </button>
           </div>
         </div>
       </div>
       <div class="row">
-        <div class="col s3">
+        <div class="col s4">
           <div class="input-field">
             <i class="material-icons prefix">label_outline</i>
             <label for="name" class="active">Variable Name</label>
@@ -79,7 +82,7 @@
             <span v-if="!$v.currentVariable.name.required">Field is required!</span>
           </div>
         </div>
-        <div class="input-field col s1">
+        <!-- <div class="input-field col s1">
           <a
             class="btn-floating btn-small waves-effect waves-light tooltipped"
             data-position="right"
@@ -88,7 +91,7 @@
             @click="checkVariable()">
             <i class="material-icons">cached</i>
           </a>
-        </div>
+        </div> -->
         <div class="col s3">
           <div class="input-field">
             <i class="material-icons prefix">label_outline</i>
@@ -180,13 +183,14 @@
                   name="action"
                   @click="onSubmit">Add</button>
         </div>
-        <div class="input-field col s12 m6 l6">
-          <a href="#!"
-              class="modal-close waves-effect waves-blue btn-flat left">Close</a>
-        </div>
       </div>
     </form>
     <Issue ref="issue"/>
+    <CreateConfigDefault
+      v-if="showAddEditVariableModal"
+      @close="closeAddEditVariableModal()"
+      :selectedVariable="selectedVariable"
+      :action="action"/>
   </div>
 </template>
 <script>
@@ -196,6 +200,7 @@ import CustomConfirm from '@/components/partials/CustomConfirm';
 import config from '@/config';
 import Inserts from '@/components/partials/Inserts';
 import SearchTemplate from '@/components/cms/SearchTemplate';
+import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
 
 export default {
   components: {
@@ -203,12 +208,16 @@ export default {
     'custom-confirm': CustomConfirm,
     inserts: Inserts,
     'search-tmp': SearchTemplate,
+    CreateConfigDefault,
   },
-  mounted() {
+  created() {
     this.loadData();
   },
   data() {
     return {
+      showAddEditVariableModal: false,
+      selectedVariable: {},
+      action: '',
       form: {
         type_id: 'cms',
         issue_id: '',
@@ -218,7 +227,6 @@ export default {
         instance_status: '',
       },
       deliveryChain: {},
-      instanceStatus: {},
       instanceStatuses: [],
       customOptions: {
         instances: {
@@ -243,9 +251,6 @@ export default {
   },
   validations: {
     deliveryChain: {
-      required,
-    },
-    instanceStatus: {
       required,
     },
     modifications: {
@@ -290,6 +295,9 @@ export default {
     },
   },
   methods: {
+    closeAddEditVariableModal() {
+      this.showAddEditVariableModal = false;
+    },
     async getInstances(deliveryChain) {
       if (deliveryChain.dc_role && deliveryChain.dc_role !== null) {
         switch (deliveryChain.dc_role.key) {
@@ -334,8 +342,11 @@ export default {
       }, []);
     },
     async loadData() {
+      const loader = this.$loading.show({ container: this.$el });
       await this.getIssue();
-      await this.getInstanceStatus();
+      this.getInstanceStatus();
+      this.$store.dispatch('cms/getVariables');
+      loader.hide();
     },
     resetCurrentVariable() {
       this.currentVariable.status = '';
@@ -366,7 +377,16 @@ export default {
         });
       }
     },
+    async checkVariable() {
+      const configDefaultsVariable = this.$store.state.cms.variables
+        .find(v => v.name === this.currentVariable.name);
+      if (typeof configDefaultsVariable === 'undefined') {
+        this.action = 'create';
+        this.showAddEditVariableModal = true;
+      }
+    },
     addVariable() {
+      this.checkVariable();
       if (this.currentVariable.name && this.currentVariable.value) {
         this.modifications.push({
           name: `cms set_variable ${this.currentVariable.name.toUpperCase()}='${this.currentVariable.value}'`,
@@ -390,40 +410,30 @@ export default {
       if (this.$store.state.cms.issue) {
         this.form.issue_id = this.$store.state.cms.issue.id;
       } else if (this.$route.params.issue) { // when the issue is send as param in the url
-        const loader = this.$loading.show({ container: this.$el });
 
         await this.$store.dispatch('cms/getIssue', this.$route.params.issue);
         this.form.issue_id = this.$store.state.cms.issue.id;
-        loader.hide();
       } else { // open modal to select Issue
         this.selectIssue();
       }
     },
     async getInstanceStatus() {
-      const loader = this.$loading.show({ container: this.$el });
       this.$M.Tooltip.init(this.$refs.tooltip);
       await this.$store.dispatch('cms/getInstanceStatus');
       this.instanceStatuses = this.$store.state.cms.instanceStatus;
-      this.instanceStatus = this.instanceStatuses.find(is => is.value === 'Installer decision');
-      this.selectedInstanceStatus(this.instanceStatus);
-      loader.hide();
+      this.form.instance_status = this.instanceStatuses.find(is => is.value === 'Installer decision').id;
     },
     selectedDeliveryChain(value) {
       this.form.delivery_chain_id = value.id;
       this.getInstances(value);
     },
-    selectedInstanceStatus(value) {
-      this.form.instance_status = value.id;
-    },
     onSubmit() {
       this.$v.deliveryChain.$touch();
       this.$v.modifications.$touch();
-      this.$v.instanceStatus.$touch();
       this.$v.currentVariable.$reset();
       this.$v.instance.$reset();
       if (this.$v.deliveryChain.$invalid
-          || this.$v.modifications.$invalid
-          || this.$v.instanceStatus.$invalid) {
+          || this.$v.modifications.$invalid) {
         return;
       }
       this.$store.state.cms.error = '';
@@ -443,39 +453,39 @@ export default {
         });
       }
     },
-    async checkVariable() {
-      // don't check if the field is empty
-      if (this.currentVariable.name) {
-        const variable = this.currentVariable.name
-          .replace(/[^\w\s]/gi, '')
-          .toUpperCase();
-        this.resetCurrentVariable();
-        this.currentVariable.status = 'PENDING';
-        this.$store.dispatch('cms/getTemplates',
-          {
-            param: variable,
-            commands: [
-              'list_template',
-              'get_variable_default',
-            ],
-          })
-          .then((resp) => {
-            const { data } = resp;
-            if (data.list_template.length) {
-              this.templates = data.list_template.map(t => t.replace('/app/imx/', ''));
-            }
-            if (data.get_variable_default.length) {
-              this.currentVariable.defaultValue = data.get_variable_default;
-            }
-            this.currentVariable.status = 'OK';
-          })
-          .catch(() => {
-            this.currentVariable.status = 'ERROR';
-          });
-      } else {
-        this.$v.currentVariable.name.$touch();
-      }
-    },
+    // async checkVariable() {
+    //   // don't check if the field is empty
+    //   if (this.currentVariable.name) {
+    //     const variable = this.currentVariable.name
+    //       .replace(/[^\w\s]/gi, '')
+    //       .toUpperCase();
+    //     this.resetCurrentVariable();
+    //     this.currentVariable.status = 'PENDING';
+    //     this.$store.dispatch('cms/getTemplates',
+    //       {
+    //         param: variable,
+    //         commands: [
+    //           'list_template',
+    //           'get_variable_default',
+    //         ],
+    //       })
+    //       .then((resp) => {
+    //         const { data } = resp;
+    //         if (data.list_template.length) {
+    //           this.templates = data.list_template.map(t => t.replace('/app/imx/', ''));
+    //         }
+    //         if (data.get_variable_default.length) {
+    //           this.currentVariable.defaultValue = data.get_variable_default;
+    //         }
+    //         this.currentVariable.status = 'OK';
+    //       })
+    //       .catch(() => {
+    //         this.currentVariable.status = 'ERROR';
+    //       });
+    //   } else {
+    //     this.$v.currentVariable.name.$touch();
+    //   }
+    // },
     customConfirm(value) {
       if (value) {
         window.location.href = `${config.mmpi.web}/issue/${this.$route.params.issue}`;
