@@ -16,7 +16,6 @@ export default {
       }
       return state.active;
     });
-    console.log(state.active);
   },
   start(state, id) {
     state.active.map((a) => {
