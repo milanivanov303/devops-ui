@@ -12,7 +12,7 @@
     </template>
     <template v-slot:content>
       <form class=" col s12 l11" ref="config-add">
-        <Alert v-if="error !== ''" v-bind:msg="error"/>
+        <Alert v-if="error !== ''" :msg="error"/>
         <div class="row">
           <div class="col s12 m4" v-if="action === 'create'">
             <Select
@@ -204,7 +204,7 @@
         </div>
       </form>
     </template>
-    <template v-if="loading" v-slot:footer>
+    <template v-if="!loading" v-slot:footer>
       <button
         class="btn waves-effect waves-light"
         type="submit"
@@ -228,17 +228,23 @@ export default {
       type: String,
       required: true,
     },
+    issue: {
+      type: String,
+    },
+    msg: {
+      type: String,
+    },
   },
   data() {
     return {
-      error: '',
+      error: this.msg || '',
       name: '',
       loading: false,
       variable: {},
       codixTeam: {},
       module: {},
       commitMsg: {
-        ttsKey: '',
+        ttsKey: this.issue,
         techChanges: '',
         funcChanges: '',
       },
@@ -381,14 +387,15 @@ export default {
       }
       this.loading = true;
       this.$store.dispatch('cms/submitVariable', payload)
-        .then(() => {
-          this.closeModal();
+        .then((response) => {
           if (this.action === 'create') {
             this.$M.toast({ html: 'The variable is created!', classes: 'toast-seccess' });
             return;
           }
           this.loading = false;
           this.$M.toast({ html: 'The variable has been updated!', classes: 'toast-seccess' });
+          this.$emit('addedVariable', response.data);
+          this.closeModal();
         })
         .catch((error) => {
           this.loading = false;
