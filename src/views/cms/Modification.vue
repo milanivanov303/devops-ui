@@ -1,10 +1,7 @@
 <template>
   <div class="row">
     <h1 class="center">CMS Modification</h1>
-    <custom-confirm
-      ref="custom-confirm"
-      :message="confirmMsg"
-      @selectedVal="customConfirm"/>
+    <Alert v-if="error !== ''" :msg="error"/>
     <form>
       <div class="row">
         <div class="input-field col s5">
@@ -66,13 +63,11 @@
             </button>
             <AddTemplateModif
               v-if="showAddModifTemplateModal"
+              @addTemplate="addTemplate"
               @close="closeModal('add-template-variable')"/>
           </div>
         </div>
       </div>
-      <!-- <div class="row">
-        <search-tmp :data="searchTemplate" @return="addTemplate" class="col s12"/>
-      </div> -->
       <div v-if="modifications.length">
         <inserts :modifications="modifications"/>
         <div class="validator red-text" v-if="$v.modifications.$error">
@@ -108,15 +103,32 @@
       :selectedVariable="selectedVariable"
       :msg="varMsg"
       :action="'create'"/>
+    <Modal v-if="showConfirmModal" @close="showConfirmModal = false" class="confirm">
+      <template v-slot:content>
+        <div v-if="error" class="center">
+          <i class="material-icons large red-text">error_outline</i>
+          <p>{{ error }}</p>
+        </div>
+        <div v-else>
+          <div v-html="confirmMsg"></div>
+        </div>
+      </template>
+      <template v-slot:footer>
+        <button
+          v-if="error === ''"
+          class="waves-effect btn"
+          @click="customConfirm()">
+          <i class="material-icons left">link</i> Go to MMPI
+        </button>
+      </template>
+    </Modal>
   </div>
 </template>
 <script>
 import { required } from 'vuelidate/lib/validators';
 import Issue from '@/components/partials/Issue';
-import CustomConfirm from '@/components/partials/CustomConfirm';
 import config from '@/config';
 import Inserts from '@/components/partials/Inserts';
-// import SearchTemplate from '@/components/cms/SearchTemplate';
 import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
 import AddVariableModif from '@/components/cms/AddVariableModif';
 import AddTemplateModif from '@/components/cms/AddTemplateModif';
@@ -124,9 +136,7 @@ import AddTemplateModif from '@/components/cms/AddTemplateModif';
 export default {
   components: {
     Issue,
-    'custom-confirm': CustomConfirm,
     inserts: Inserts,
-    // 'search-tmp': SearchTemplate,
     AddVariableModif,
     CreateConfigDefault,
     AddTemplateModif,
@@ -139,11 +149,13 @@ export default {
   },
   data() {
     return {
+      showConfirmModal: false,
       showAddEditVariableModal: false,
       showAddModifVariableModal: false,
       showAddModifTemplateModal: false,
       selectedVariable: {},
       notAddedVariable: {},
+      error: '',
       varMsg: '',
       action: '',
       form: {
@@ -156,10 +168,9 @@ export default {
       },
       deliveryChain: {},
       instanceStatuses: [],
-      instance: {},
       instances: [],
       submitStatus: 'PENDING',
-      confirmMsg: [],
+      confirmMsg: '',
       modifications: [],
       selectedTemplate: null,
     };
@@ -272,13 +283,13 @@ export default {
           },
         });
         this.modifications.push({
-          name: `cms resolve_template ${template.template.source_name}`,
+          name: 'cms resolve_template', // ${template.template.source_name}`,
           subtype: {
             key: 'cms_cmd',
           },
         });
         this.modifications.push({
-          name: `cms deploy_config ${template.template.source_name}`,
+          name: 'cms deploy_config', // ${template.template.source_name}`,
           subtype: {
             key: 'cms_cmd',
           },
@@ -327,37 +338,29 @@ export default {
       this.getInstances(value);
     },
     onSubmit() {
-      this.$v.deliveryChain.$touch();
-      this.$v.modifications.$touch();
-      this.$v.currentVariable.$reset();
-      this.$v.instance.$reset();
-      if (this.$v.deliveryChain.$invalid
-          || this.$v.modifications.$invalid) {
+      this.$v.$touch();
+      if (this.$v.$invalid) {
         return;
       }
       this.$store.state.cms.error = '';
       const loader = this.$loading.show({ container: this.$el });
-      if (this.currentVariable.status !== 'ERROR') {
-        this.modifications.reduce(async (previousPromise, m) => {
-          await previousPromise;
-          return this.$store.dispatch('cms/addModification', { ...this.form, ...m });
-        }, Promise.resolve()).then(() => {
-          if (this.$store.state.cms.error) {
-            this.confirmMsg = ['Could not create modification!'];
-          } else {
-            this.confirmMsg = ['Modification has been successfully created!', 'Do you want to proceed to MMPI?'];
-          }
-          this.$refs['custom-confirm'].openModal();
-          loader.hide();
-        });
-      }
+      this.modifications.reduce(async (previousPromise, m) => {
+        await previousPromise;
+        return this.$store.dispatch('cms/addModification', { ...this.form, ...m });
+      }, Promise.resolve()).then(() => {
+        if (this.$store.state.cms.error) {
+          this.error = this.$store.state.cms.error;
+          this.confirmMsg = 'Could not create modification';
+        } else {
+          this.confirmMsg = 'Modification has been successfully created! Do you want to proceed to MMPI?';
+          this.showConfirmModal = true;
+        }
+        loader.hide();
+      });
     },
-    customConfirm(value) {
-      if (value) {
-        window.location.href = `${config.mmpi.web}/issue/${this.$route.params.issue}`;
-      } else {
-        this.confirmMsg = '';
-      }
+    customConfirm() {
+      window.location.href = `${config.mmpi.web}/issue/${this.$route.params.issue}`;
+      this.confirmMsg = '';
     },
   },
 };

@@ -105,7 +105,7 @@
         type="button"
         name="action"
         @click="addVariable()">
-        Save
+        Add
       </button>
     </template>
   </Modal>
@@ -164,6 +164,7 @@ export default {
         status: '',
         defaultValue: '',
       };
+      this.templates = [];
       this.error = '';
       this.$v.$reset();
       this.$emit('close');
@@ -203,27 +204,20 @@ export default {
     },
     async addVariable() {
       await this.checkVariable();
-      if (this.currentVariable.name && this.currentVariable.value) {
-        this.variableModif = {
-          name: `cms set_variable ${this.currentVariable.name.toUpperCase()}='${this.currentVariable.value}'`,
-          subtype: {
-            key: 'cms_cmd',
-          },
-          contents: this.instance.name === 'All' ? 'All' : this.instance.id.toString(),
-        };
-        this.$emit('addVariable', this.variableModif, this.currentVariable);
-        this.currentVariable = {};
-        this.templates = [];
-        this.closeModal();
-      } else {
-        this.$v.currentVariable.$touch();
-        this.$v.instance.$touch();
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        return;
       }
+      this.variableModif = {
+        name: `cms set_variable ${this.currentVariable.name.toUpperCase()}='${this.currentVariable.value}'`,
+        subtype: {
+          key: 'cms_cmd',
+        },
+        contents: this.instance.name === 'All' ? 'All' : this.instance.id.toString(),
+      };
+      this.$emit('addVariable', this.variableModif, this.currentVariable);
+      this.closeModal();
     },
   },
 };
 </script>
-
-<style lang="scss" scoped>
-
-</style>

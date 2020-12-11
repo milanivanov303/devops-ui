@@ -9,7 +9,7 @@
     </template>
     <template v-slot:content>
       <div class="row">
-        <div class="input-field col s5">
+        <div class="input-field col s6">
           <i class="material-icons prefix">label_outline</i>
           <input id="source_path"
                 type="text"
@@ -37,7 +37,7 @@
             <span v-if="!$v.template.source_name.required">Field is required!</span>
           </div>
         </div>
-        <div class="input-field col s2">
+        <div class="input-field col s1">
           <a class="btn-floating btn-small waves-effect waves-light tooltipped"
             data-position="right"
             data-tooltip="Check Artifact"
@@ -57,11 +57,12 @@
             label="Revisions"
             icon="filter_1"
             displayed="revision"
+            v-model="revision"
             :options="revisions"
             @change="selectedRevision"
           />
-          <div class="validator red-text" v-if="$v.revisions.$error">
-            <span v-if="!$v.revisions.required">Field is required!</span>
+          <div class="validator red-text" v-if="$v.revision.$error">
+            <span v-if="!$v.revision.required">Field is required!</span>
           </div>
         </div>
       </div>
@@ -79,15 +80,22 @@
             <tr v-for="(option, key) in templates"
                 v-bind:key="key"
                 @click="selectedTemplate(option)"
-                class="content"
-                @mouseover="active = key"
-                @mouseleave="active = null">
+                class="content">
                 <td class="icon">
-                  <i v-if="active === key" class="material-icons">fiber_manual_record</i>
-                  <i v-else class="material-icons">radio_button_unchecked</i>
+                  <label>
+                    <input
+                      :checked="active === option.source_id ? true : false"
+                      :id="option.source_id"
+                      name="templates"
+                      type="radio" />
+                    <span></span>
+                  </label>
                 </td>
-                <td v-for="(value, key) in templateCol"
-                    v-bind:key="key">{{option[value]}}</td>
+                <td
+                  v-for="(value, key) in templateCol"
+                  v-bind:key="key">
+                  {{option[value]}}
+                </td>
             </tr>
           </tbody>
         </table>
@@ -99,7 +107,7 @@
         type="button"
         name="action"
         @click="addTemplate()">
-        Save
+        Add
       </button>
     </template>
   </Modal>
@@ -111,21 +119,18 @@ import { required } from 'vuelidate/lib/validators';
 export default {
   data() {
     return {
+      active: '',
       loader: '',
       templateStatus: '',
       template: {
         source_path: '',
         source_name: '',
       },
+      templates: [],
+      revision: {},
       revisions: [],
       templateCol: ['source_name', 'source_path'],
     };
-  },
-  watch: {
-    data(data) {
-      this.template = data.selectedTemplate;
-      this.checkTemplate();
-    },
   },
   filters: {
     capitalize(str) {
@@ -142,25 +147,11 @@ export default {
         required,
       },
     },
-    revisions: {
+    revision: {
       required,
     },
   },
-  computed: {
-    templates() {
-      return this.$store.getters['cms/getTemplates'];
-    },
-  },
   methods: {
-    async selectedTemplate(value) {
-      if (value) {
-        // changing input values won't affect store
-        this.template = value;
-        await this.$store.dispatch('cms/getRevisions', value);
-        this.revisions = this.$store.state.cms.revisions;
-        this.showModal = false;
-      }
-    },
     checkTemplate() {
       // don't check if the fields are empty
       if (this.template.source_name || this.template.source_path) {
@@ -206,21 +197,24 @@ export default {
           }),
         };
 
-        this.$store.dispatch('cms/getTemplatesMMPI', payload).then(() => {
-          this.templateStatus = '';
-          if (!this.$store.state.cms.templates.length === 0) {
-            this.templateStatus = 'ERROR';
-          }
-          this.template.source_name = '';
-          this.template.source_path = '';
-          this.loader.hide();
-        });
+        this.$store.dispatch('cms/getTemplatesMMPI', payload)
+          .then(() => {
+            this.templateStatus = '';
+            if (!this.$store.state.cms.templates.length === 0) {
+              this.templateStatus = 'ERROR';
+            }
+            this.templates = this.$store.getters['cms/getTemplates'];
+            this.template.source_name = '';
+            this.template.source_path = '';
+            this.loader.hide();
+          });
       } else {
         this.$v.template.$touch();
       }
     },
     async selectedTemplate(value) {
       if (value) {
+        this.active = value.source_id;
         // changing input values won't affect store
         this.template = value;
         await this.$store.dispatch('cms/getRevisions', value);
@@ -228,32 +222,27 @@ export default {
       }
     },
     selectedRevision(value) {
-      this.revisions.selected = value;
-      // if there is no add button, emit value immediately after revision is selected
-      if (!this.data || !this.data.add) {
-        this.$emit('return', { template: this.template, revision: value });
-      }
+      this.revision = value;
     },
     addTemplate() {
-      if (this.template.path_and_name && this.revisions.selected.revision) {
-        this.$emit('return', { template: this.template, revision: this.revisions.selected });
-
-        this.template = {
-          source_path: '',
-          source_name: '',
-        };
-
-        this.revisions.selected = {};
-        this.revisions.options = [];
-      } else {
-        this.$v.template.$touch();
-        this.$v.revisions.$touch();
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        return;
       }
+      this.$emit('addTemplate', { template: this.template, revision: this.revision });
+      this.closeModal();
+    },
+    closeModal() {
+      this.template = {
+        source_path: '',
+        source_name: '',
+      };
+      this.revision = {};
+      this.revisions = [];
+      this.templates = [];
+      this.$v.$reset();
+      this.$emit('close');
     },
   },
 };
 </script>
-
-<style lang="scss" scoped>
-
-</style>
