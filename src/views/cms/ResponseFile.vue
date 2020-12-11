@@ -177,8 +177,6 @@ export default {
         },
         description: '',
       },
-      project: {},
-      deliveryChain: {},
       modalIsOpen: false,
     };
   },
