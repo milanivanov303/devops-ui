@@ -102,7 +102,7 @@
       :issue="issue.tts_id"
       :selectedVariable="selectedVariable"
       :msg="varMsg"
-      :action="'create'"/>
+      :action="varAction"/>
     <Modal v-if="showConfirmModal" @close="showConfirmModal = false" class="confirm">
       <template v-slot:content>
         <div v-if="error" class="center">
@@ -155,6 +155,8 @@ export default {
       showAddModifTemplateModal: false,
       selectedVariable: {},
       notAddedVariable: {},
+      notAddedVariableVal: '',
+      varAction: '',
       error: '',
       varMsg: '',
       action: '',
@@ -297,21 +299,29 @@ export default {
       }
     },
     addVariable(value, variable) {
-      if (variable.defaultValue) {
-        return this.modifications.push(value);
-      }
-      this.varMsg = 'Varible not found in config defaults, please add it.';
       this.notAddedVariable = value;
-      this.selectedVariable = {
-        name: variable.name.toUpperCase(),
-        value: variable.value,
-      };
+      this.selectedVariable.name = variable.name.toUpperCase();
+      this.notAddedVariableVal = variable.value;
+
+      if (variable.defaultValue) {
+        if (variable.currDbData.description) {
+          return this.modifications.push(value);
+        }
+        this.selectedVariable.value = variable.currDbData.value;
+        this.varMsg = 'Varible does not have description, please add it.';
+        this.varAction = 'edit';
+      } else {
+        this.selectedVariable.value = variable.value;
+        this.varAction = 'create';
+        this.varMsg = 'Varible not found in config defaults, please add it.';
+      }
       this.showAddEditVariableModal = true;
       return this.showAddEditVariableModal;
     },
     addNewVariable(value) {
-      this.notAddedVariable.name = `cms set_variable ${value.data.name}='${value.data.value}'`;
+      this.notAddedVariable.name = `cms set_variable ${value.data.name}='${this.notAddedVariableVal}'`;
       this.modifications.push(this.notAddedVariable);
+      this.notAddedVariable = '';
     },
     selectIssue() {
       return this.$refs.issue.openModal();

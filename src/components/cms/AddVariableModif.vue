@@ -16,7 +16,7 @@
             <input
               id="name"
               type="text"
-              v-model="currentVariable.name"
+              v-model.trim="currentVariable.name"
               @change="resetCurrentVariable">
           </div>
           <div class="validator">
@@ -60,7 +60,7 @@
             <input
               id="name"
               type="text"
-              v-model="currentVariable.value">
+              v-model.trim="currentVariable.value">
           </div>
           <div class="validator red-text" v-if="$v.currentVariable.value.$error">
             <span v-if="!$v.currentVariable.value.required">Field is required!</span>
@@ -177,6 +177,13 @@ export default {
           .toUpperCase();
         this.resetCurrentVariable();
         this.currentVariable.status = 'PENDING';
+        await this.$store.dispatch('cms/getOneVariable', variable)
+          .then((resp) => {
+            this.currentVariable.currDbData = resp.data.data;
+          })
+          .catch(() => {
+            this.currentVariable.status = 'ERROR';
+          });
         await this.$store.dispatch('cms/getTemplates',
           {
             param: variable,

@@ -11,10 +11,11 @@
       </div>
     </template>
     <template v-slot:content>
+      <Alert v-if="error !== ''" :msg="error"/>
+      <br>
       <form class=" col s12 l11" ref="config-add">
-        <Alert v-if="error !== ''" :msg="error"/>
-        <div class="row">
-          <div class="col s12 m4" v-if="action === 'create'">
+        <div class="row" v-if="action === 'create'">
+          <div class="col s12 m4">
             <Select
               label="Codix Team"
               icon="people"
@@ -30,7 +31,7 @@
               <p v-if="!$v.selectedVariable.codix_team.required">Team must not be empty.</p>
             </div>
           </div>
-          <div class="col s12 m4" v-if="action === 'create'">
+          <div class="col s12 m4">
             <Select
               label="IMX Module"
               icon="memory"
@@ -46,7 +47,7 @@
               <p v-if="!$v.abbrev.imxModule.required">iMX module must not be empty.</p>
             </div>
           </div>
-          <div class="col s12 m4" v-if="action === 'create'">
+          <div class="col s12 m4">
             <Select
               label="Submodule"
               icon="settings_input_composite"
@@ -112,7 +113,7 @@
                 s6: action === 'edit',
                 readonly: action === 'edit'
               }">
-            <label :class="{active: selectedVariable.value}" for="value">Value</label>
+            <label :class="{active: selectedVariable.value}" for="value">Default Value</label>
             <div
               class="col s12 validator red-text"
               v-if="$v.selectedVariable.value.$error">
