@@ -58,42 +58,21 @@ export default {
     return promise;
   },
 
-  updateBuild({ commit }, id) {
-    const promise = api('devops').get('builds', {
-      fields: JSON.stringify([
-        'module',
-        'created_by',
-        'details',
-      ]),
-      filters: JSON.stringify({
-        allOf: [
-          {
-            id,
-          },
-        ],
-      }),
-    });
-
+  start({ commit }, id) {
+    const promise = api('devops').post(`builds/${id}/start`);
+  
     promise
-      .then(response => commit('updateBuild', response.data.data))
-      .catch(() => commit('error', 'Could not update build', { root: true }));
+      .then((response) => commit('update', response.data.data))
+      .catch(() => commit('error', 'Could not start build', { root: true }));
 
     return promise;
-  },
-  start({ dispatch, commit }, id) {
-    const promise1 = api('devops').post(`builds/${id}/start`);
-    const promise2 = dispatch('updateBuild', id);
-
-    return Promise.all([promise1, promise2])
-      .then(() => commit('start', id))
-      .catch(() => commit('error', 'Could not start build', { root: true }));
   },
 
   stop({ commit }, id) {
     const promise = api('devops').post(`builds/${id}/stop`);
 
     promise
-      .then(() => commit('stop', id))
+      .then((response) => commit('update', response.data.data))
       .catch(() => commit('error', 'Could not stop build', { root: true }));
 
     return promise;
