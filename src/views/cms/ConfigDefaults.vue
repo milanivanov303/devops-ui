@@ -5,7 +5,11 @@
         <div class="row">
           <h1 class="center-align col s12">Config Defaults</h1>
         </div>
+        <div v-if="loading || defaultVariables.length === 0" class="center" >
+          <Preloader class="big"/>
+        </div>
         <Table
+          v-else
           :data="defaultVariables"
           sort-by="name"
           sort-dir="asc"
@@ -17,8 +21,7 @@
           :edit-btn="$auth.can('can-manage-config-defaults')"
           :delete-btn="false"
           :pagination="false"
-          :perPage="5000"
-        >
+          :perPage="5000">
           <Column show="id" />
           <Column show="name" />
           <Column show="value" />
@@ -29,200 +32,17 @@
             </a>
           </template>
         </Table>
+        <CreateConfigDefault
+          v-if="showAddEditVariableModal"
+          @close="closeModal()"
+          @addedVariable="closeModal()"
+          :selectedVariable="selectedVariable"
+          :action="action"/>
 
         <Modal
-          v-if="showAddEditVariableModal"
-          @close="closeAddEditVariableModal()"
+          v-if="showInterfacesModal"
+          @close="closeInterfacesModal()"
           class="right-sheet">
-          <template v-slot:header>
-            <div v-if="action === 'create'">
-              Create variable
-            </div>
-            <div v-else>
-              Update {{selectedVariable.name}}
-            </div>
-          </template>
-          <template v-slot:content>
-            <form class=" col s12 l11">
-              <Alert v-if="error !== ''" v-bind:msg="error"/>
-              <!-- <div class="row">
-                <Select
-                  class="col s12"
-                  label="Codix Team"
-                  icon="business_center"
-                  displayed="name"
-                  v-model="selectedVariable.codix_team"
-                  :options="codixTeams"
-                  :class="{m4: action === 'create'}"
-                />
-                <Select
-                  v-if="action === 'create'"
-                  class="col s12 m4"
-                  label="IMX Module"
-                  icon="business_center"
-                  displayed="name"
-                  v-model="abbrev.imxModule"
-                  :options="imxModules"
-                  :class="{readonly: action === 'edit'}"
-                />
-                <Select
-                  v-if="action === 'create'"
-                  class="col s12 m4"
-                  label="Submodule"
-                  icon="business_center"
-                  displayed="name"
-                  v-model="abbrev.submodule"
-                  :options="submodules"
-                  :class="{readonly: action === 'edit'}"
-                />
-              </div> -->
-              <div class="row">
-                <!-- <div v-if="action === 'create'" class="input-field col s3">
-                  <i class="material-icons prefix">label_outline</i>
-                  <input
-                    type="text"
-                    id="abbrevName"
-                    v-model="abbrevName"
-                    :class="{readonly: action === 'edit'}">
-                  <label :class="{active: abbrevName}" for="abbrevName">Abbrev</label>
-                </div> -->
-                <div class="input-field col s6"
-                    :class="{invalid: $v.selectedVariable.name.$error}">
-                  <i class="material-icons prefix">label_outline</i>
-                  <input
-                    type="text"
-                    id="name"
-                    @blur="$v.selectedVariable.name.$touch()"
-                    v-model="selectedVariable.name"
-                    :class="{readonly: action === 'edit'}">
-                  <label :class="{active: selectedVariable.name}" for="name">Name</label>
-                  <div class="validator col s12 offset-m1">
-                    <div class="red-text" v-if="$v.selectedVariable.name.$error">
-                      <p v-if="!$v.selectedVariable.name.required">
-                        Name field must not be empty.
-                      </p>
-                      <p v-if="!$v.selectedVariable.name.isUnique">
-                        The variable name already exists.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="input-field col s6"
-                    :class="{invalid: $v.selectedVariable.value.$error}">
-                  <input
-                    type="text"
-                    id="value"
-                    @blur="$v.selectedVariable.value.$touch()"
-                    v-model="selectedVariable.value"
-                    :class="{readonly: action === 'edit'}">
-                  <label :class="{active: selectedVariable.value}" for="value">Value</label>
-                  <div class="validator col s12 offset-m1">
-                    <div class="red-text" v-if="$v.selectedVariable.value.$error">
-                      <p v-if="!$v.selectedVariable.value.required">
-                        Value field must not be empty.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="input-field col s12"
-                    :class="{invalid: $v.selectedVariable.description.$error}">
-                  <i class="material-icons prefix">menu</i>
-                  <input
-                    type="text"
-                    id="description"
-                    @blur="$v.selectedVariable.description.$touch()"
-                    v-model="selectedVariable.description">
-                  <label :class="{active: selectedVariable.description}"
-                         for="description">Description</label>
-                </div>
-                <div class="validator col s12 offset-m1">
-                  <div class="red-text" v-if="$v.selectedVariable.description.$error">
-                    <p v-if="!$v.selectedVariable.description.required">
-                      Description field must not be empty.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div v-if="action === 'create'">
-                <h6 class="center">COMMIT MESSAGE</h6>
-                <div class="row">
-                  <div class="input-field col s12"
-                      :class="{invalid: $v.commitMsg.ttsKey.$error}">
-                    <i class="material-icons prefix">label_outline</i>
-                    <input id="tts_key"
-                           type="text"
-                           v-model="commitMsg.ttsKey"
-                           @blur="$v.commitMsg.ttsKey.$touch()">
-                    <label :class="{active: commitMsg.ttsKey}" for="tts_key">TTS Key</label>
-                  </div>
-                  <div class="validator col s12 offset-l1 offset-m1">
-                    <div class="red-text" v-if="$v.commitMsg.ttsKey.$error">
-                      <p v-if="!$v.commitMsg.ttsKey.required">Field is required!</p>
-                      <!-- <p v-if="!$v.commitMsg.ttsKey.validKey">Not a valid TTS key.</p> -->
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col s6">
-                    <div class="row">
-                      <div class="input-field col s12"
-                          :class="{invalid: $v.commitMsg.funcChanges.$error}">
-                        <i class="material-icons prefix">label_outline</i>
-                        <input id="func_changes"
-                              type="text"
-                              v-model="commitMsg.funcChanges"
-                              @blur="$v.commitMsg.funcChanges.$touch()">
-                        <label for="func_changes"
-                               :class="{active: commitMsg.funcChanges}">Func Changes</label>
-                      </div>
-                      <div class="validator col s12 offset-l2 offset-m2">
-                        <div class="red-text" v-if="$v.commitMsg.funcChanges.$error">
-                          <p v-if="!$v.commitMsg.funcChanges.required">Field is required!</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col s6">
-                    <div class="row">
-                      <div class="input-field col s12"
-                          :class="{invalid: $v.commitMsg.techChanges.$error}">
-                        <i class="material-icons prefix">label_outline</i>
-                        <input id="tech_changes"
-                              type="text"
-                              v-model="commitMsg.techChanges"
-                              @blur="$v.commitMsg.techChanges.$touch()">
-                        <label for="tech_changes"
-                               :class="{active: commitMsg.techChanges}">Tech Changes</label>
-                      </div>
-                      <div class="validator col s12 offset-l2 offset-m2">
-                        <div class="red-text" v-if="$v.commitMsg.techChanges.$error">
-                          <p v-if="!$v.commitMsg.techChanges.required">Field is required!</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </template>
-          <template v-slot:footer>
-            <button
-              class="btn waves-effect waves-light"
-              type="submit"
-              name="action"
-              @click="saveVariable()"
-            >
-              Save
-            </button>
-          </template>
-        </Modal>
-
-        <Modal v-if="showInterfacesModal"
-               @close="closeInterfacesModal()"
-               class="right-sheet"
-               >
           <template v-slot:header>
             <div>Check variable <b>{{selectedVariable.name}}</b> in templates from instance</div>
           </template>
@@ -257,14 +77,13 @@
 </template>
 
 <script>
-
-
-import { required } from 'vuelidate/lib/validators';
+import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
 import SwitchBox from '@/components/partials/SwitchBox';
 
 export default {
   components: {
     SwitchBox,
+    CreateConfigDefault,
   },
   data() {
     return {
@@ -273,91 +92,15 @@ export default {
       selectedVariable: {},
       action: '',
       error: '',
-      // abbrev: {},
       instance: {},
       templates: {},
-      commitMsg: {},
+      loading: false,
     };
-  },
-  validations() {
-    const validations = {
-      selectedVariable: {
-        name: {
-          required,
-        },
-        value: {
-          required,
-        },
-        description: {
-          required,
-        },
-      },
-    };
-
-    if (this.action === 'create') {
-      validations.selectedVariable.name = {
-        isUnique() {
-          if (this.selectedVariable.name === '') {
-            return true;
-          }
-          // if (this.abbrevName) {
-          //   return this.$store.getters['cms/variableNameIsUnique'](this.abbrevName
-          //         .concat(this.selectedVariable.name));
-          // }
-
-          return this.$store.getters['cms/variableNameIsUnique'](this.selectedVariable.name);
-        },
-        required,
-      };
-
-      validations.commitMsg = {
-        ttsKey: {
-          required,
-          validKey(value) {
-            return /^[A-Z]+-[0-9]+$/.test(value);
-          },
-        },
-        funcChanges: {
-          required,
-        },
-        techChanges: {
-          required,
-        },
-      };
-    }
-
-    return validations;
   },
   computed: {
     defaultVariables() {
       return this.$store.state.cms.variables;
     },
-    // codixTeams() {
-    //   return this.$store.state.cms.codixTeams;
-    // },
-    // imxModules() {
-    //   return this.$store.state.cms.modules;
-    // },
-    // submodules() {
-    //   if (this.abbrev.imxModule) {
-    //     return this.abbrev.imxModule.submodules || [];
-    //   }
-    //   return [];
-    // },
-    // abbrevName() {
-    //   let abbrevName = '';
-    //   if (this.selectedVariable.codix_team) {
-    //     abbrevName = `${this.selectedVariable.codix_team.abbreviation}_`;
-    //     if (this.abbrev.imxModule) {
-    //       abbrevName += `${this.abbrev.imxModule.abbreviation}_`;
-    //       if (this.abbrev.submodule) {
-    //         abbrevName += `${this.abbrev.submodule.abbreviation}_`;
-    //       }
-    //     }
-    //   }
-    //   return abbrevName;
-    // },
-
     instances() {
       return this.$store.state.mmpi.devInstances;
     },
@@ -368,19 +111,9 @@ export default {
       this.showAddEditVariableModal = true;
       this.selectedVariable = { ...variable };
       this.action = action;
-
-      // if (this.selectedVariable.codix_team_id) {
-      //   this.selectedVariable.codix_team = this.codixTeams.find(
-      //     codixTeam => codixTeam.id === this.selectedVariable.codix_team_id,
-      //   );
-      // }
     },
-    closeAddEditVariableModal() {
+    closeModal() {
       this.showAddEditVariableModal = false;
-      this.name = {};
-      this.commitMsg = {};
-      this.error = '';
-      this.$v.$reset();
     },
     openInterfacesModal(variable) {
       this.showInterfacesModal = true;
@@ -392,64 +125,6 @@ export default {
       this.templates = {};
       this.error = '';
     },
-
-
-    getDefaultVariables() {
-      const loader = this.$loading.show({ container: this.$el });
-
-      this.$store.dispatch('cms/getVariables')
-        .then(() => {
-          loader.hide();
-        });
-      // this.$store.dispatch('cms/getCodixTeams');
-    },
-    getInstances() {
-      this.$store.dispatch('mmpi/getDevInstances');
-    },
-    // getImxModules() {
-    //   this.$store.dispatch('cms/getImxModules');
-    // },
-
-    saveVariable() {
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        return;
-      }
-
-      const payload = {
-        variable: this.selectedVariable,
-      };
-
-      // payload.variable.codix_team_id = this.selectedVariable.codix_team.id;
-
-      if (this.action === 'create') {
-        payload.commitMsg = this.commitMsg;
-        // if (this.abbrevName) {
-        //   payload.variable.name = this.abbrevName.concat(this.selectedVariable.name);
-        // }
-      }
-      this.$store.dispatch('cms/submitVariable', payload)
-        .then(() => {
-          this.closeAddEditVariableModal();
-          if (this.action === 'create') {
-            this.$M.toast({ html: 'The variable is created!', classes: 'toast-seccess' });
-            return;
-          }
-          this.$M.toast({ html: 'The variable has been updated!', classes: 'toast-seccess' });
-        })
-        .catch((error) => {
-          if (error.message === 'Request failed with status code 403') {
-            this.error = 'Sorry, but you have no rights to create new variable!';
-            return this.error;
-          }
-          if (error.message === 'Request failed with status code 422') {
-            this.error = 'Sorry, but variable name are already registered!';
-            return this.error;
-          }
-          return error;
-        });
-    },
-
     checkInTemplates(instance) {
       this.error = '';
       const loader = this.$loading.show({ container: this.$refs.interfaces });
@@ -479,13 +154,15 @@ export default {
           this.error = `${error}: Could not connect to ${instance.name}`;
         });
     },
-
   },
 
-  mounted() {
-    this.getDefaultVariables();
-    this.getInstances();
-    // this.getImxModules();
+  created() {
+    this.loading = true;
+    this.$store.dispatch('cms/getVariables')
+      .then(() => {
+        this.loading = false;
+      });
+    this.$store.dispatch('mmpi/getDevInstances');
   },
 };
 </script>
