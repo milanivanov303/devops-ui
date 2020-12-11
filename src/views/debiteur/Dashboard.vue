@@ -128,9 +128,6 @@ export default {
     };
   },
   computed: {
-    host() {
-      return this.$store.state.debiteur.host;
-    },
     userActiveBuilds() {
       return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'debiteur');
     },
@@ -156,10 +153,8 @@ export default {
     getBuilds() {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_branch });
-      const promise1 = this.$store.dispatch('builds/getActive');
-      const promise2 = this.$store.dispatch('debiteur/getHost');
 
-      Promise.all([promise1, promise2]).finally(() => {
+      this.$store.dispatch('builds/getActive').finally(() => {
         loader1.hide();
         loader2.hide();
       });

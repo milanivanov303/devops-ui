@@ -207,7 +207,7 @@
     <template v-if="!loading" v-slot:footer>
       <button
         class="btn waves-effect waves-light"
-        type="submit"
+        type="button"
         name="action"
         @click="saveVariable()">
         Save
@@ -367,7 +367,7 @@ export default {
       this.submodules.options = value.submodules;
       this.submodule = '';
     },
-    saveVariable() {
+    async saveVariable() {
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
@@ -386,19 +386,16 @@ export default {
         }
       }
       this.loading = true;
-      this.$store.dispatch('cms/submitVariable', payload)
+      await this.$store.dispatch('cms/submitVariable', payload)
         .then((response) => {
           if (this.action === 'create') {
             this.$M.toast({ html: 'The variable is created!', classes: 'toast-seccess' });
             return;
           }
-          this.loading = false;
           this.$M.toast({ html: 'The variable has been updated!', classes: 'toast-seccess' });
           this.$emit('addedVariable', response.data);
-          this.closeModal();
         })
         .catch((error) => {
-          this.loading = false;
           if (error.message === 'Request failed with status code 403') {
             this.error = 'Sorry, but you have no rights to create new variable!';
             return this.error;
@@ -409,6 +406,8 @@ export default {
           }
           return error;
         });
+      this.loading = false;
+      this.closeModal();
     },
   },
   created() {

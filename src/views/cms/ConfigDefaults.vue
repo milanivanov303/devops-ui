@@ -34,7 +34,8 @@
         </Table>
         <CreateConfigDefault
           v-if="showAddEditVariableModal"
-          @close="closeAddEditVariableModal()"
+          @close="closeModal()"
+          @addedVariable="closeModal()"
           :selectedVariable="selectedVariable"
           :action="action"/>
 
@@ -111,7 +112,7 @@ export default {
       this.selectedVariable = { ...variable };
       this.action = action;
     },
-    closeAddEditVariableModal() {
+    closeModal() {
       this.showAddEditVariableModal = false;
     },
     openInterfacesModal(variable) {

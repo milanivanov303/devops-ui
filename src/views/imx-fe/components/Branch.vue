@@ -20,7 +20,7 @@ export default {
   methods: {
     getRoute(branch) {
       return {
-        path: `/imx-fe/branches/${encodeURIComponent(branch)}`,
+        path: `/imx_fe/branches/${encodeURIComponent(branch)}`,
         query: this.$route.query,
       };
     },

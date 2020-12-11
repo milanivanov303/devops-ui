@@ -162,6 +162,8 @@ export default {
   data() {
     return {
       instance: {},
+      project: {},
+      deliveryChain: {},
       modalData: {
         id: '',
         name: '',
