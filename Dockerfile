@@ -6,6 +6,7 @@ RUN apk add --no-cache --virtual .gyp python make g++
 FROM base AS builder
 
 COPY --chown=node:node .npmrc ./package*.json ./
+RUN chmod 777 ./reload.sh
 COPY --chown=node:node .env.dev ./.env
 
 RUN npm set progress=false \
