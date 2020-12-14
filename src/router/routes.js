@@ -330,7 +330,7 @@ export default [
     component: LoggedInSSOUser,
   },
   {
-    path: '/:name(.*_\\d+)/:uri(.*)?',
+    path: '/builds/:name(.*_\\d+)/:uri(.*)?',
     meta: {
       layout: 'basic',
       requiresAuth: false,
