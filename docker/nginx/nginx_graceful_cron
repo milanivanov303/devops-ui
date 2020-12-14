@@ -1,3 +1,6 @@
 * * * * * /etc/nginx/conf.d/reload.sh
+* * * * * ( sleep 10; /etc/nginx/conf.d/reload.sh )
 * * * * * ( sleep 20; /etc/nginx/conf.d/reload.sh )
+* * * * * ( sleep 30; /etc/nginx/conf.d/reload.sh )
 * * * * * ( sleep 40; /etc/nginx/conf.d/reload.sh )
+* * * * * ( sleep 50; /etc/nginx/conf.d/reload.sh )
