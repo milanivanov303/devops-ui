@@ -42,6 +42,7 @@ build for prod:
   stage: build
   environment: prod
   script:
+    - export IMAGE=$IMAGE_TAG
     - *build-script
   only:
     - tags

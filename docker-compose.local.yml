@@ -5,7 +5,7 @@ services:
   web:
     build:
       context: .
-      target: base
+      target: web
     tty: true
-    volumes:
-      - .:/app
+    #volumes:
+    #  - .:/app
