@@ -22,7 +22,7 @@ RUN npm run lint \
 # ---------- Web ----------
 FROM gitlab.codixfr.private:5005/enterpriseapps/images/nginx:1.0 AS web
 
-#RUN apk add --no-cache cron
+RUN apk add --no-cache cron
 
 COPY --from=builder --chown=nginx:nginx /app/dist ./public
 COPY --from=builder --chown=nginx:nginx /app/docker/nginx/ /etc/nginx/conf.d
