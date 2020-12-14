@@ -6,7 +6,6 @@ RUN apk add --no-cache --virtual .gyp python make g++
 FROM base AS builder
 
 COPY --chown=node:node .npmrc ./package*.json ./
-RUN chmod 777 ./reload.sh
 COPY --chown=node:node .env.dev ./.env
 
 RUN npm set progress=false \
@@ -27,6 +26,7 @@ FROM gitlab.codixfr.private:5005/enterpriseapps/images/nginx:1.0 AS web
 
 COPY --from=builder --chown=nginx:nginx /app/dist ./public
 COPY --from=builder --chown=nginx:nginx /app/docker/nginx/ /etc/nginx/conf.d
+RUN chmod 777 /etc/nginx/conf.d/reload.sh
 
 RUN crontab /etc/nginx/conf.d/nginx_graceful_cron
 
