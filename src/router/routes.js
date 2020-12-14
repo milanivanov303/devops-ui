@@ -338,6 +338,14 @@ export default [
     component: OpenBuild,
   },
   {
+    path: '/:name(.*_\\d+)/:uri(.*)?',
+    meta: {
+      layout: 'basic',
+      requiresAuth: false,
+    },
+    redirect: (to) => `/builds/${to.path}`,
+  },
+  {
     path: '*',
     meta: {
       name: 'dashboard',
