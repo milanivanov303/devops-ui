@@ -2,3 +2,6 @@
 .cache
 .env.local
 node_modules
+docker-compose.yml
+docker-compose.local.yml
+Dockerfile

@@ -7,5 +7,15 @@ module.exports = {
   },
   devServer: {
     disableHostCheck: true,
+    port: 80,
+    proxy: {
+      "^/ssh": {
+        target: "http://webssh:2222",
+        changeOrigin: true,
+        secure:false,
+        pathRewrite: {'^/ssh': '/ssh'},
+        logLevel: 'debug'
+      },
+    },
   },
 };

@@ -34,7 +34,6 @@ done
 
 export DOCKER_COMPOSE_FILE="docker-compose.yml"
 export DOCKER_COMPOSE_LOCAL_FILE="docker-compose.local.yml"
-export TARGET=local
 
 
 if [[ ! -f $DOCKER_COMPOSE_FILE ]]; then

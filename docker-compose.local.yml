@@ -6,3 +6,6 @@ services:
     build:
       context: .
       target: web
+    tty: true
+    #volumes:
+    #  - .:/app
