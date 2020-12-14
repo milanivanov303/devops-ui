@@ -53,7 +53,8 @@ export default {
         acc.push({
           id: a.id,
           variable_name: a.name,
-          [state.firstSelectedInstance.name]: a.value,
+          [state.firstSelectedInstance.name]:
+            `${a.value} <span data-badge-caption="" class="new badge red">${a.made_on}</span>`,
           [state.secondSelectedInstance.name]: 'NOT REGISTERED',
         });
       }
@@ -61,8 +62,10 @@ export default {
         acc.push({
           id: a.id,
           variable_name: a.name,
-          [state.firstSelectedInstance.name]: a.value,
-          [state.secondSelectedInstance.name]: found.value,
+          [state.firstSelectedInstance.name]:
+            `${a.value} <span data-badge-caption="" class="new badge red">${a.made_on}</span>`,
+          [state.secondSelectedInstance.name]:
+            `${found.value} <span data-badge-caption="" class="new badge red">${a.made_on}</span>`,
         });
       }
       return acc;
@@ -73,7 +76,8 @@ export default {
         acc.push({
           id: a.id,
           variable_name: a.name,
-          [state.secondSelectedInstance.name]: a.value,
+          [state.secondSelectedInstance.name]:
+            `${a.value} <span data-badge-caption="" class="new badge red">${a.made_on}</span>`,
           [state.firstSelectedInstance.name]: 'NOT REGISTERED',
         });
       }

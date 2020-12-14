@@ -276,7 +276,6 @@
 
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
-import config from '../config';
 import BuildProgress from '@/components/BuildProgress';
 import EventBus from '@/event-bus';
 
@@ -372,17 +371,14 @@ export default {
     },
 
     getUrl(build) {
-      return `/${build.name}`;
+      return `/builds/${build.name}/`;
     },
 
     getWebssh2Url(build) {
       const { host } = this.$store.state[build.module];
       const port = this.getPublishedPort(build, 22);
 
-      if (host && port) {
-        return `http://${window.location.hostname}:${config.webssh2_port}/ssh/host/${host}?port=${port}`;
-      }
-      return null;
+      return `/ssh/host/${host}?port=${port}`;
     },
 
     getStatusText(build) {

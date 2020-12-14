@@ -23,7 +23,7 @@
               <tr v-for="(build, index) in activeBuildsGroupedByBranch" :key="index">
                 <td>{{ index + 1 }}</td>
                 <td>
-                  <router-link :to="'/imx-fe/branches/' + encodeURIComponent(build.branch)">
+                  <router-link :to="'/imx_fe/branches/' + encodeURIComponent(build.branch)">
                     {{ build.branch }}
                   </router-link>
                 </td>
@@ -127,9 +127,6 @@ export default {
     };
   },
   computed: {
-    host() {
-      return this.$store.state.imx_fe.host;
-    },
     userActiveBuilds() {
       return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'imx_fe');
     },
@@ -158,10 +155,7 @@ export default {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
       const loader2 = this.$loading.show({ container: this.$refs.builds_by_branch });
 
-      const promise1 = this.$store.dispatch('builds/getActive');
-      const promise2 = this.$store.dispatch('imx_fe/getContainers');
-
-      Promise.all([promise1, promise2]).finally(() => {
+      this.$store.dispatch('builds/getActive').finally(() => {
         loader1.hide();
         loader2.hide();
       });

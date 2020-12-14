@@ -18,6 +18,14 @@ export default {
       .catch(() => commit('error', 'Could not get config-defaults list', { root: true }));
     return promise;
   },
+  getOneVariable({ commit }, variable) {
+    const promise = api('cms').get(`default-variables/${variable}`);
+
+    promise
+      .then(response => response.data.data)
+      .catch(() => commit('error', 'Could not get config-defaults variable', { root: true }));
+    return promise;
+  },
   getImxModules({ commit }) {
     const name = 'imx-modules';
 
@@ -66,7 +74,7 @@ export default {
       return promise;
     }
 
-    promise = api('cms').put(`default-variables/${payload.variable.id}`, payload.variable);
+    promise = api('cms').put(`default-variables/${payload.variable.name}`, payload.variable);
 
     promise
       .then(response => commit('updateVariable', response.data.data))
@@ -122,8 +130,6 @@ export default {
 
   getTemplates({ commit }, payload) {
     const promise = api('cms').get('cms/run-commands', payload);
-    console.log('Get Templates');
-    console.log(promise);
     promise
       .catch(error => commit('error', error));
     return promise;

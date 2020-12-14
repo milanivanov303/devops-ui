@@ -1,10 +1,7 @@
 <template>
   <div class="row">
     <h1 class="center">CMS Modification</h1>
-    <custom-confirm
-      ref="custom-confirm"
-      :message="confirmMsg"
-      @selectedVal="customConfirm"/>
+    <Alert v-if="error !== ''" :msg="error"/>
     <form>
       <div class="row">
         <div class="input-field col s5">
@@ -43,172 +40,126 @@
             <span v-if="!$v.deliveryChain.required">Delivery chain field is required.</span>
           </div>
         </div>
-        <div class="col s6">
-          <Select
-            label="Instance status"
-            icon="power_settings_new"
-            displayed="value"
-            v-model="instanceStatus"
-            :options="instanceStatuses"
-            :invalid="$v.instanceStatus.$error"
-            @blur="$v.instanceStatus.$touch()"
-            @change="selectedInstanceStatus"
-          />
-          <div class="validator red-text" v-if="$v.instanceStatus.$error">
-            <span v-if="!$v.instanceStatus.required">Instance status field is required.</span>
+        <div class="col s6" v-if="form.delivery_chain_id">
+          <div class="col s6">
+            <button
+              class="btn waves-effect waves-light col s12"
+              type="button"
+              name="action"
+              @click="showAddModifVariableModal = true">Add Variable
+            </button>
+            <AddVariableModif
+              v-if="showAddModifVariableModal"
+              :instances="instances"
+              @addVariable="addVariable"
+              @close="closeModal('add-modif-variable')"/>
+          </div>
+          <div class="col s6">
+            <button
+              class="btn waves-effect waves-light col s12"
+              type="button"
+              name="action"
+              @click="showAddModifTemplateModal = true">Add Template
+            </button>
+            <AddTemplateModif
+              v-if="showAddModifTemplateModal"
+              @addTemplate="addTemplate"
+              @close="closeModal('add-template-variable')"/>
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col s3">
-          <div class="input-field">
-            <i class="material-icons prefix">label_outline</i>
-            <label for="name" class="active">Variable Name</label>
-            <input
-              id="name"
-              type="text"
-              v-model="currentVariable.name"
-              @change="resetCurrentVariable">
-          </div>
-          <div class="validator">
-            <div class="silver-text" v-if="currentVariable.status === 'PENDING'">
-                <p>Loading...</p>
+      <div v-if="modifications.length">
+        <inserts :modifications="modifications"/>
+        <div class="validator red-text" v-if="$v.modifications.$error">
+          <p v-if="!$v.modifications.required">There are no added modifications!</p>
+        </div>
+        <div class="row">
+          <div class="col s12 center">
+            <div class="red-text" v-if="submitStatus === 'ERROR'">
+              <p>CMS Modification cannot be created!</p>
+            </div>
+            <div class="green-text center"
+                  v-if="submitStatus === 'OK' && cmdSubmitStatus === 'OK'">
+              <p>Modification has been successfully created.</p>
             </div>
           </div>
-          <div class="validator red-text" v-if="$v.currentVariable.name.$error">
-            <span v-if="!$v.currentVariable.name.required">Field is required!</span>
-          </div>
         </div>
-        <div class="input-field col s1">
-          <a
-            class="btn-floating btn-small waves-effect waves-light tooltipped"
-            data-position="right"
-            data-tooltip="Check in templates"
-            ref="tooltip"
-            @click="checkVariable()">
-            <i class="material-icons">cached</i>
-          </a>
-        </div>
-        <div class="col s3">
-          <div class="input-field">
-            <i class="material-icons prefix">label_outline</i>
-            <label for="name" class="active">Variable Value</label>
-            <input
-              id="name"
-              type="text"
-              v-model="currentVariable.value">
+        <div class="row">
+          <div class="input-field col s12 center">
+            <button class="btn waves-effect waves-light"
+                    type="button"
+                    name="action"
+                    @click="onSubmit">Add Modifications</button>
           </div>
-          <div class="validator red-text" v-if="$v.currentVariable.value.$error">
-            <span v-if="!$v.currentVariable.value.required">Field is required!</span>
-          </div>
-        </div>
-        <div class="col s4">
-          <Select
-            label="Instances"
-            icon="storage"
-            displayed="name"
-            v-model="instance"
-            :options="instances"
-            :customOption="customOptions.instances"
-          />
-          <div class="validator red-text" v-if="$v.instance.$error">
-            <span v-if="!$v.instance.required">Field is required!</span>
-          </div>
-        </div>
-        <div class="input-field col s1">
-          <a class="btn-floating btn-small waves-effect waves-light tooltipped"
-              data-position="right"
-              data-tooltip="Add"
-              ref="tooltip"
-              @click="addVariable()"><i class="material-icons">add</i></a>
-        </div>
-        <div class="validator col s10">
-          <div class="red-text"
-                v-if="!currentVariable.defaultValue && currentVariable.status === 'OK'">
-            <span>Variable does not exist in config.defaults</span>
-          </div>
-          <div class="red-text"
-                v-if="!templates.length && currentVariable.status === 'OK'">
-            <span>Variable does not exist in any template</span>
-          </div>
-          <div class="red-text" v-if="currentVariable.status === 'ERROR'">
-            <span>Something went wrong</span>
-          </div>
-        </div>
-      </div>
-      <div v-if="templates.length" class="row">
-        <table class="responsive-table striped col s8 offset-s2">
-          <thead>
-            <tr>
-              <th>Varible was found in these templates:</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="click" v-for="(template, key) in templates"
-                  v-bind:key="key"
-                  @click="selectedTemplate = template">
-              <td>{{template}}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="row">
-        <search-tmp :data="searchTemplate" @return="addTemplate" class="col s12"/>
-      </div>
-      <inserts
-        v-if="modifications"
-        :modifications="modifications"/>
-      <div class="validator red-text" v-if="$v.modifications.$error">
-        <p v-if="!$v.modifications.required">There are no added modifications!</p>
-      </div>
-      <div class="row">
-        <div class="col s12 center">
-          <div class="red-text" v-if="submitStatus === 'ERROR'">
-            <p>CMS Modification cannot be created!</p>
-          </div>
-          <div class="green-text center"
-                v-if="submitStatus === 'OK' && cmdSubmitStatus === 'OK'">
-            <p>Modification has been successfully created.</p>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12 m6 l6">
-          <button class="btn waves-effect waves-light right"
-                  type="button"
-                  name="action"
-                  @click="onSubmit">Add</button>
-        </div>
-        <div class="input-field col s12 m6 l6">
-          <a href="#!"
-              class="modal-close waves-effect waves-blue btn-flat left">Close</a>
         </div>
       </div>
     </form>
     <Issue ref="issue"/>
+    <CreateConfigDefault
+      v-if="showAddEditVariableModal"
+      @close="closeModal('add-new-variable')"
+      @addedVariable="addNewVariable"
+      :issue="issue.tts_id"
+      :selectedVariable="selectedVariable"
+      :msg="varMsg"
+      :action="varAction"/>
+    <Modal v-if="showConfirmModal" @close="showConfirmModal = false" class="confirm">
+      <template v-slot:content>
+        <div v-if="error" class="center">
+          <i class="material-icons large red-text">error_outline</i>
+          <p>{{ error }}</p>
+        </div>
+        <div v-else>
+          <div v-html="confirmMsg"></div>
+        </div>
+      </template>
+      <template v-slot:footer>
+        <button
+          v-if="error === ''"
+          class="waves-effect btn"
+          @click="customConfirm()">
+          <i class="material-icons left">link</i> Go to MMPI
+        </button>
+      </template>
+    </Modal>
   </div>
 </template>
 <script>
 import { required } from 'vuelidate/lib/validators';
 import Issue from '@/components/partials/Issue';
-import CustomConfirm from '@/components/partials/CustomConfirm';
 import config from '@/config';
 import Inserts from '@/components/partials/Inserts';
-import SearchTemplate from '@/components/cms/SearchTemplate';
+import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
+import AddVariableModif from '@/components/cms/AddVariableModif';
+import AddTemplateModif from '@/components/cms/AddTemplateModif';
 
 export default {
   components: {
     Issue,
-    'custom-confirm': CustomConfirm,
     inserts: Inserts,
-    'search-tmp': SearchTemplate,
+    AddVariableModif,
+    CreateConfigDefault,
+    AddTemplateModif,
+  },
+  created() {
+    this.loadData();
   },
   mounted() {
-    this.loadData();
+    this.getIssue();
   },
   data() {
     return {
+      showConfirmModal: false,
+      showAddEditVariableModal: false,
+      showAddModifVariableModal: false,
+      showAddModifTemplateModal: false,
+      selectedVariable: {},
+      notAddedVariable: {},
+      notAddedVariableVal: '',
+      varAction: '',
+      error: '',
+      varMsg: '',
+      action: '',
       form: {
         type_id: 'cms',
         issue_id: '',
@@ -218,26 +169,11 @@ export default {
         instance_status: '',
       },
       deliveryChain: {},
-      instanceStatus: {},
       instanceStatuses: [],
-      customOptions: {
-        instances: {
-          text: 'All',
-          value: 'All',
-        },
-      },
-      instance: {},
       instances: [],
       submitStatus: 'PENDING',
-      confirmMsg: [],
-      templates: [],
+      confirmMsg: '',
       modifications: [],
-      currentVariable: {
-        name: '',
-        value: '',
-        status: '',
-        defaultValue: '',
-      },
       selectedTemplate: null,
     };
   },
@@ -245,21 +181,7 @@ export default {
     deliveryChain: {
       required,
     },
-    instanceStatus: {
-      required,
-    },
     modifications: {
-      required,
-    },
-    currentVariable: {
-      name: {
-        required,
-      },
-      value: {
-        required,
-      },
-    },
-    instance: {
       required,
     },
   },
@@ -273,7 +195,6 @@ export default {
       if (this.selectedTemplate !== null) {
         const regex = /(.+)(?:\/)(.+(_tpl)|(_bin))/;
         [this.selectedTemplate, sourcePath, sourceName] = this.selectedTemplate.match(regex);
-
         // remove '/' char from the beginning or end of the address
         sourcePath = sourcePath.replace(/^\/|\/$/, '');
       }
@@ -290,8 +211,24 @@ export default {
     },
   },
   methods: {
+    closeModal(modal) {
+      switch (modal) {
+        case 'add-modif-variable':
+          this.showAddModifVariableModal = false;
+          break;
+        case 'add-new-variable':
+          this.varMsg = '';
+          this.showAddEditVariableModal = false;
+          break;
+        case 'add-template-variable':
+          this.showAddModifTemplateModal = false;
+          break;
+        default:
+          break;
+      }
+    },
     async getInstances(deliveryChain) {
-      if (deliveryChain.dc_role) {
+      if (deliveryChain.dc_role && deliveryChain.dc_role !== null) {
         switch (deliveryChain.dc_role.key) {
           case 'dc_rel':
             this.instances = this.filterChains(
@@ -312,9 +249,14 @@ export default {
             );
             break;
           default:
+            this.instances = [];
             break;
         }
       }
+      this.instances = [
+        { name: 'All' },
+        ...this.instances,
+      ];
     },
     filterChains(roles, type) {
       return this.deliveryChains.reduce((acc, chain) => {
@@ -328,14 +270,10 @@ export default {
       }, []);
     },
     async loadData() {
-      await this.getIssue();
-      await this.getInstanceStatus();
+      this.getInstanceStatus();
+      this.$store.dispatch('cms/getVariables');
     },
-    resetCurrentVariable() {
-      this.currentVariable.status = '';
-      this.currentVariable.defaultValue = '';
-      this.templates = [];
-    },
+
     addTemplate(template) {
       if (template) {
         this.modifications.push({
@@ -347,34 +285,43 @@ export default {
           },
         });
         this.modifications.push({
-          name: `cms resolve_template ${template.template.source_name}`,
+          name: 'cms resolve_template', // ${template.template.source_name}`,
           subtype: {
             key: 'cms_cmd',
           },
         });
         this.modifications.push({
-          name: `cms deploy_config ${template.template.source_name}`,
+          name: 'cms deploy_config', // ${template.template.source_name}`,
           subtype: {
             key: 'cms_cmd',
           },
         });
       }
     },
-    addVariable() {
-      if (this.currentVariable.name && this.currentVariable.value) {
-        this.modifications.push({
-          name: `cms set_variable ${this.currentVariable.name.toUpperCase()}='${this.currentVariable.value}'`,
-          subtype: {
-            key: 'cms_cmd',
-          },
-          contents: this.instance === 'All' ? 'All' : this.instance.id.toString(),
-        });
-        this.currentVariable = {};
-        this.templates = [];
+    addVariable(value, variable) {
+      this.notAddedVariable = value;
+      this.selectedVariable.name = variable.name.toUpperCase();
+      this.notAddedVariableVal = variable.value;
+
+      if (variable.defaultValue) {
+        if (variable.currDbData.description) {
+          return this.modifications.push(value);
+        }
+        this.selectedVariable.value = variable.currDbData.value;
+        this.varMsg = 'Varible does not have description, please add it.';
+        this.varAction = 'edit';
       } else {
-        this.$v.currentVariable.$touch();
-        this.$v.instance.$touch();
+        this.selectedVariable.value = variable.value;
+        this.varAction = 'create';
+        this.varMsg = 'Varible not found in config defaults, please add it.';
       }
+      this.showAddEditVariableModal = true;
+      return this.showAddEditVariableModal;
+    },
+    addNewVariable(value) {
+      this.notAddedVariable.name = `cms set_variable ${value.data.name}='${this.notAddedVariableVal}'`;
+      this.modifications.push(this.notAddedVariable);
+      this.notAddedVariable = '';
     },
     selectIssue() {
       return this.$refs.issue.openModal();
@@ -384,98 +331,46 @@ export default {
       if (this.$store.state.cms.issue) {
         this.form.issue_id = this.$store.state.cms.issue.id;
       } else if (this.$route.params.issue) { // when the issue is send as param in the url
-        const loader = this.$loading.show({ container: this.$el });
-
         await this.$store.dispatch('cms/getIssue', this.$route.params.issue);
         this.form.issue_id = this.$store.state.cms.issue.id;
-        loader.hide();
       } else { // open modal to select Issue
         this.selectIssue();
       }
     },
     async getInstanceStatus() {
-      const loader = this.$loading.show({ container: this.$el });
       this.$M.Tooltip.init(this.$refs.tooltip);
       await this.$store.dispatch('cms/getInstanceStatus');
       this.instanceStatuses = this.$store.state.cms.instanceStatus;
-      this.instanceStatus = this.instanceStatuses.find(is => is.value === 'Installer decision');
-      this.selectedInstanceStatus(this.instanceStatus);
-      loader.hide();
+      this.form.instance_status = this.instanceStatuses.find(is => is.value === 'Installer decision').id;
     },
     selectedDeliveryChain(value) {
       this.form.delivery_chain_id = value.id;
       this.getInstances(value);
     },
-    selectedInstanceStatus(value) {
-      this.form.instance_status = value.id;
-    },
     onSubmit() {
-      this.$v.deliveryChain.$touch();
-      this.$v.modifications.$touch();
-      this.$v.instanceStatus.$touch();
-      this.$v.currentVariable.$reset();
-      this.$v.instance.$reset();
-      if (this.$v.deliveryChain.$invalid
-          || this.$v.modifications.$invalid
-          || this.$v.instanceStatus.$invalid) {
+      this.$v.$touch();
+      if (this.$v.$invalid) {
         return;
       }
       this.$store.state.cms.error = '';
       const loader = this.$loading.show({ container: this.$el });
-      if (this.currentVariable.status !== 'ERROR') {
-        this.modifications.reduce(async (previousPromise, m) => {
-          await previousPromise;
-          return this.$store.dispatch('cms/addModification', { ...this.form, ...m });
-        }, Promise.resolve()).then(() => {
-          if (this.$store.state.cms.error) {
-            this.confirmMsg = ['Could not create modification!'];
-          } else {
-            this.confirmMsg = ['Modification has been successfully created!', 'Do you want to proceed to MMPI?'];
-          }
-          this.$refs['custom-confirm'].openModal();
-          loader.hide();
-        });
-      }
+      this.modifications.reduce(async (previousPromise, m) => {
+        await previousPromise;
+        return this.$store.dispatch('cms/addModification', { ...this.form, ...m });
+      }, Promise.resolve()).then(() => {
+        if (this.$store.state.cms.error) {
+          this.error = this.$store.state.cms.error;
+          this.confirmMsg = 'Could not create modification';
+        } else {
+          this.confirmMsg = 'Modification has been successfully created! Do you want to proceed to MMPI?';
+          this.showConfirmModal = true;
+        }
+        loader.hide();
+      });
     },
-    async checkVariable() {
-      // don't check if the field is empty
-      if (this.currentVariable.name) {
-        const variable = this.currentVariable.name
-          .replace(/[^\w\s]/gi, '')
-          .toUpperCase();
-        this.resetCurrentVariable();
-        this.currentVariable.status = 'PENDING';
-        this.$store.dispatch('cms/getTemplates',
-          {
-            param: variable,
-            commands: [
-              'list_template',
-              'get_variable_default',
-            ],
-          })
-          .then((resp) => {
-            const { data } = resp;
-            if (data.list_template.length) {
-              this.templates = data.list_template.map(t => t.replace('/app/imx/', ''));
-            }
-            if (data.get_variable_default.length) {
-              this.currentVariable.defaultValue = data.get_variable_default;
-            }
-            this.currentVariable.status = 'OK';
-          })
-          .catch(() => {
-            this.currentVariable.status = 'ERROR';
-          });
-      } else {
-        this.$v.currentVariable.name.$touch();
-      }
-    },
-    customConfirm(value) {
-      if (value) {
-        window.location.href = `${config.mmpi.web}/issue/${this.$route.params.issue}`;
-      } else {
-        this.confirmMsg = '';
-      }
+    customConfirm() {
+      window.location.href = `${config.mmpi.web}/issue/${this.$route.params.issue}`;
+      this.confirmMsg = '';
     },
   },
 };

@@ -161,7 +161,7 @@ export default [
     ],
   },
   {
-    path: '/imx-fe',
+    path: '/imx_fe',
     meta: {
       requiresAuth: true,
       name: 'imx-fe',
@@ -183,7 +183,7 @@ export default [
     ],
   },
   {
-    path: '/imx-fe/branches',
+    path: '/imx_fe/branches',
     meta: {
       requiresAuth: true,
       name: 'imx-fe-branches',
@@ -330,12 +330,20 @@ export default [
     component: LoggedInSSOUser,
   },
   {
-    path: '/:name(.*_\\d+)/:uri(.*)?',
+    path: '/builds/:name(.*_\\d+)/:uri(.*)?',
     meta: {
       layout: 'basic',
       requiresAuth: false,
     },
     component: OpenBuild,
+  },
+  {
+    path: '/:name(.*_\\d+)/:uri(.*)?',
+    meta: {
+      layout: 'basic',
+      requiresAuth: false,
+    },
+    redirect: (to) => `/builds/${to.path}`,
   },
   {
     path: '*',

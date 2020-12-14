@@ -1,9 +1,10 @@
 <template>
   <div class="row">
+    <h2 class="center modifications">Commands and Templates</h2>
     <table class="col s12 effort-table centered striped">
       <thead>
         <tr>
-          <th>Commands and Templates</th>
+          <th></th>
           <th></th>
         </tr>
       </thead>
@@ -58,5 +59,8 @@ export default {
   .left-align {
     text-align: left !important;
     padding-left: 1em;
+  }
+  .modifications {
+    font-size: 1.5rem;
   }
 </style>

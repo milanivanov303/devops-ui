@@ -71,6 +71,10 @@
           :show="this.$store.state.cms.secondSelectedInstance.name"
         />
       </Table>
+      <div class="row">
+        <span data-badge-caption="" class="left new badge red">Last synchronization date</span>:
+        The red date tag corresponds to last synchronization date from instance.rsp file.
+      </div>
     </div>
   </div>
 </template>

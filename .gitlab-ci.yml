@@ -1,0 +1,60 @@
+image: gitlab.codixfr.private:5005/enterpriseapps/images/docker:1.0
+
+before_script:
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  - export IMAGE=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  - export IMAGE_TAG=$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+  - cp .env.$CI_ENVIRONMENT_NAME .env
+
+.build-script: &build-script
+  - docker build --pull --tag $IMAGE-$CI_ENVIRONMENT_NAME .
+  - docker push $IMAGE-$CI_ENVIRONMENT_NAME
+
+.deploy-script: &deploy-script
+  - apk add docker-compose
+  - export WEB_CONTAINER_IMAGE=$IMAGE-$CI_ENVIRONMENT_NAME
+  - docker-compose --host $DEPLOY_HOST pull
+  - docker-compose --host $DEPLOY_HOST up --no-build --detach
+
+stages:
+  - build
+  - deploy
+
+build for dev:
+  stage: build
+  environment: dev
+  script:
+    - *build-script
+  only:
+    - develop
+
+deploy on dev:
+  stage: deploy
+  environment: dev
+  script:
+    - *deploy-script
+  dependencies:
+    - build for dev
+  only:
+    - develop
+
+build for prod:
+  stage: build
+  environment: prod
+  script:
+    - export IMAGE=$IMAGE_TAG
+    - *build-script
+  only:
+    - tags
+
+deploy on prod:
+  stage: deploy
+  environment: prod
+  script:
+    - export IMAGE=$IMAGE_TAG
+    - *deploy-script
+  only:
+    - tags
+  dependencies:
+    - build for prod
+  when: manual
