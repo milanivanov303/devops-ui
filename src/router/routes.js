@@ -343,7 +343,7 @@ export default [
       layout: 'basic',
       requiresAuth: false,
     },
-    redirect: (to) => `/builds/${to.path}`,
+    redirect: (to) => `/builds${to.path}`,
   },
   {
     path: '*',

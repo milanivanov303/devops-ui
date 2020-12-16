@@ -10,7 +10,7 @@ module.exports = {
     port: 80,
     proxy: {
       "^/ssh": {
-        target: "http://webssh:2222",
+        target: "http://webssh2",
         changeOrigin: true,
         secure:false,
         pathRewrite: {'^/ssh': '/ssh'},
