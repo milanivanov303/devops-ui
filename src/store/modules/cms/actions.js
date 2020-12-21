@@ -288,16 +288,16 @@ export default {
     commit('promise', { name, promise }, { root: true });
     return promise.data;
   },
-  async uploadRspFile({ commit }, payload) {
+  uploadRspFile({ commit }, payload) {
     const headers = {
       headers: { 'content-type': 'multipart/form-data' },
     };
-    try {
-      await api('cms').post('response-variables/uploadRspFile', payload, headers);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
+    const promise = api('cms').post('response-variables/uploadRspFile', payload, headers);
+    promise
+      .then()
+      .catch(() => commit('error', 'Could not get delivery chains'));
+
+    return promise;
   },
 
   async updateRspVariable({ commit }, payload) {

@@ -3,31 +3,28 @@
     <div class="frame">
       <div class="modal-content">
         <h3 class="center">Upload instance.rsp file</h3>
+        <Alert v-if="error !== ''" :msg="error"/>
         <form>
           <div class="row">
-            <SelectModel
-              class="col s12"
-              label="Projects"
-              icon="laptop_mac"
-              displayed="name"
-              v-model="project"
-              :options="projects"
-              :invalid="$v.project.$error"
-              @blur="$v.project.$touch()"
-              @change="selectedProject"
-            />
-            <div class="validator red-text" v-if="$v.project.$error">
-              <p v-if="!$v.project.required">Field is required!</p>
+            <div class="input-field col s12">
+              <i class="material-icons prefix">laptop_mac</i>
+              <input
+                readonly
+                autocomplete="off"
+                type="text"
+                id="project"
+                v-model="project.name">
+              <label :class="{active: project.name}" for="project">Project</label>
             </div>
           </div>
           <div class="row">
-            <SelectModel
+            <Select
               class="col s12"
               label="Delivery chains"
               icon="linear_scale"
               displayed="title"
               v-model="deliveryChain"
-              :options="chains"
+              :options="projectChains"
               :invalid="$v.deliveryChain.$error"
               @blur="$v.deliveryChain.$touch()"
             />
@@ -36,7 +33,7 @@
             </div>
           </div>
           <div class="row">
-            <SelectModel
+            <Select
               class="col s12"
               label="Instance"
               icon="storage"
@@ -86,12 +83,8 @@
 </template>
 <script>
 import { required } from 'vuelidate/lib/validators';
-import SelectModel from '@/components/partials/SelectModel';
 
 export default {
-  components: {
-    SelectModel,
-  },
   mounted() {
     this.$M.Modal.init(this.$refs['upload-rsp-file'], {
       dismissible: false,
@@ -99,31 +92,20 @@ export default {
     }).open();
   },
   props: {
-    projects: {
-      type: Array,
-      required: true,
-    },
-    chains: {
-      type: Array,
-      required: true,
-    },
-    selected: {
+    project: {
       type: Object,
       required: true,
     },
   },
   data() {
     return {
+      error: '',
       file: '',
       instance: {},
-      project: this.selected.project,
-      deliveryChain: this.selected.deliveryChain,
+      deliveryChain: {},
     };
   },
   validations: {
-    project: {
-      required,
-    },
     deliveryChain: {
       required,
     },
@@ -138,21 +120,11 @@ export default {
     getInstances() {
       return this.deliveryChain.instances || [];
     },
+    projectChains() {
+      return this.$store.getters['mmpi/deliveryChainsByProject'](this.project);
+    },
   },
   methods: {
-    selectedProject(value) {
-      const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('mmpi/getDeliveryChainsCMS', {
-        project: value.id,
-        status: 'active',
-        order_by: 'title asc',
-        with: JSON.stringify({
-          instances: {},
-        }),
-      }).then(() => {
-        loader.hide();
-      });
-    },
     cancel() {
       this.$M.Modal.init(this.$refs['upload-rsp-file']).close();
       this.$emit('return', false);
@@ -164,13 +136,18 @@ export default {
       formData.append('instance_id', this.instance.id);
       formData.append('instance_name', this.instance.name);
 
-      this.$store.dispatch('cms/uploadRspFile', formData).then(() => {
-        // update instances
-        this.$store.dispatch('cms/getInventoryInstances', this.deliveryChain.instances).then(() => {
+      this.$store.dispatch('cms/uploadRspFile', formData)
+        .then(() => {
+          // update instances
+          this.$store.dispatch('cms/getInventoryInstances', this.deliveryChain.instances).then(() => {
+            loader.hide();
+            this.cancel();
+          });
+        })
+        .catch((error) => {
           loader.hide();
-          this.cancel();
+          this.error = error;
         });
-      });
     },
     handleFileUpload() {
       [this.file] = this.$refs.file.files;
