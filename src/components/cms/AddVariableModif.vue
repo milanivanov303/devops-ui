@@ -133,6 +133,7 @@ export default {
         defaultValue: '',
       },
       variableModif: [],
+      error: '',
     };
   },
   validations: {
@@ -181,8 +182,8 @@ export default {
           .then((resp) => {
             this.currentVariable.currDbData = resp.data.data;
           })
-          .catch(() => {
-            this.currentVariable.status = 'ERROR';
+          .catch((error) => {
+            this.error = error;
           });
         await this.$store.dispatch('cms/getTemplates',
           {

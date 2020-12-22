@@ -257,9 +257,34 @@ export default {
         ],
       }),
       fields: JSON.stringify({
+        id: [],
+        title: [],
+        type_id: [],
+        patch_directory_name: [],
+        dc_role: [],
+        dc_version: [],
+        dlvry_type: [],
+        status: {
+          id: [],
+          active: [],
+          key: [],
+        },
+        projects: {
+          id: [],
+          name: [],
+        },
+        instances: {
+          id: [],
+          environment_type_id: [],
+          instance_type_id: [],
+          name: [],
+        },
+        type: [],
       }),
       with: JSON.stringify({
+        type: {},
         projects: {},
+        instances: {},
         status: {},
       }),
     };

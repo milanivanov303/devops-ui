@@ -17,7 +17,7 @@ export default {
       return state.active;
     });
   },
-  
+
   remove(state, id) {
     state.active.splice(
       state.active.findIndex(build => build.id === id),
