@@ -1,6 +1,15 @@
 export default {
   getActive({ commit }) {
     const promise = api('devops').get('builds', {
+      fields: JSON.stringify([
+        'id',
+        'name',
+        'module',
+        'status',
+        'created_on',
+        'created_by',
+        'details',
+      ]),
       filters: JSON.stringify({
         anyOf: [
           {
@@ -53,7 +62,7 @@ export default {
     const promise = api('devops').post(`builds/${id}/start`);
 
     promise
-      .then(() => commit('start', id))
+      .then(response => commit('update', response.data.data))
       .catch(() => commit('error', 'Could not start build', { root: true }));
 
     return promise;
@@ -63,7 +72,7 @@ export default {
     const promise = api('devops').post(`builds/${id}/stop`);
 
     promise
-      .then(() => commit('stop', id))
+      .then(response => commit('update', response.data.data))
       .catch(() => commit('error', 'Could not stop build', { root: true }));
 
     return promise;

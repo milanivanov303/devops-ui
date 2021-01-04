@@ -346,7 +346,6 @@
 
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
-import config from '../config';
 import BuildProgress from '@/components/BuildProgress';
 import EventBus from '@/event-bus';
 
@@ -463,17 +462,14 @@ export default {
     },
 
     getUrl(build) {
-      return `/${build.name}`;
+      return `/builds/${build.name}/`;
     },
 
     getWebssh2Url(build) {
       const { host } = this.$store.state[build.module];
       const port = this.getPublishedPort(build, 22);
 
-      if (host && port) {
-        return `http://${window.location.hostname}:${config.webssh2_port}/ssh/host/${host}?port=${port}`;
-      }
-      return null;
+      return `/ssh/host/${host}?port=${port}`;
     },
 
     getStatusText(build) {
@@ -490,29 +486,25 @@ export default {
     openInfoModal(build) {
       this.showInfoModal = true;
 
-      this.selectedBuild = build;
-
-      this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
+      this.selectedBuild.name = build.name;
+      this.selectedBuild.branch = build.details.branch;
 
       if (build.details.fe_branch) {
         this.selectedBuild.fe_branch = build.details.fe_branch.name;
       }
+
+      this.selectedBuild.instance = build.details.instance.name;
+      this.selectedBuild.java_version = build.details.java_version;
+      this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
+      this.selectedBuild.created_by = build.created_by;
+
       if (build.removed_on) {
         this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
       }
 
-      if (!build.removed_by) {
+      if (build.removed_on && !build.removed_by) {
         this.selectedBuild.removed_by = 'auto-removed';
       }
-
-      this.selectedBuild.instance = build.details.instance.name;
-      this.selectedBuild.java_version = build.details.java_version;
-      if (typeof build.details.service !== 'undefined') {
-        this.selectedBuild.ports = build.details.service.Endpoint.Ports;
-      }
-      this.selectedBuild.host = this.$store.state[build.module].host;
-      this.selectedBuild.user = 'enterprise';
-      this.selectedBuild.pass = 'Sofphia';
     },
 
     openProgressModal(build) {

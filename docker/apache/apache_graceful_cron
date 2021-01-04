@@ -1,3 +1,0 @@
-* * * * * /usr/local/bin/reload
-* * * * * ( sleep 20; /usr/local/bin/reload )
-* * * * * ( sleep 40; /usr/local/bin/reload )

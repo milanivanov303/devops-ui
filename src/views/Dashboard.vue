@@ -23,7 +23,7 @@
                 <td>{{ index + 1 }}</td>
                 <td>
                   <router-link :to="'/' + build.module +'/dashboard'">
-                    {{ capitalize(build.module) }}
+                    {{ build.module }}
                   </router-link>
                 </td>
                 <td>
@@ -157,7 +157,7 @@ export default {
       const promise1 = this.$store.dispatch('builds/getActive');
       const promise2 = this.$store.dispatch('extranet/getHost');
       const promise3 = this.$store.dispatch('debiteur/getHost');
-      const promise4 = this.$store.dispatch('imx_fe/getContainers');
+      const promise4 = this.$store.dispatch('imx_fe/getHost');
 
       Promise.all([promise1, promise2, promise3, promise4]).finally(() => {
         loader1.hide();

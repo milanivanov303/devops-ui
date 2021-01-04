@@ -13,6 +13,7 @@
               icon="laptop_mac"
               displayed="name"
               :options="getProjects"
+              v-model="project"
               @change="selectedProject"
             />
             <Select
@@ -21,11 +22,23 @@
               icon="linear_scale"
               displayed="title"
               :options="getDeliveryChains"
+              v-model="deliveryChain"
               @change="selectedDeliveryChain"
             />
           </div>
         </form>
-
+        <div class="row">
+          <add-rsp-modal
+            :project="project"
+            v-if="openAddRspModal"
+            @return="openAddRspModal = false"/>
+          <a
+            v-if="project.name"
+            class="waves-effect waves-light btn right"
+            @click="openAddRspModal = true">
+            import rsp file
+          </a>
+        </div>
         <Table
           v-if="$store.getters['cms/getRspVariables'].length"
           :data="getVariables"
@@ -45,6 +58,10 @@
             label="Default Variable"
             :show="row => row.default_variable ? row.default_variable.value : ''"
           />
+          <Column
+            label="Last change"
+            :show="row => row.made_on"
+          />
           <Column class="custom-size" v-for="(instance, key) in this.$store.state.cms.instances"
             v-bind:key="key"
             :label="instance.name"
@@ -52,10 +69,11 @@
           />
         </Table>
 
-        <Modal v-if="modalIsOpen"
-               @close="cancel()"
-               class="right-sheet"
-               >
+        <Modal
+          ref="rsp-info"
+          v-if="modalIsOpen"
+          @close="cancel()"
+          class="right-sheet">
           <template v-slot:header>
             <div>{{modalData.name}} information</div>
           </template>
@@ -150,11 +168,18 @@
   </div>
 </template>
 <script>
+import AddRspFile from '@/components/cms/AddRspFile';
 
 export default {
+  components: {
+    'add-rsp-modal': AddRspFile,
+  },
   data() {
     return {
+      openAddRspModal: false,
       instance: {},
+      project: {},
+      deliveryChain: {},
       modalData: {
         id: '',
         name: '',
@@ -237,10 +262,7 @@ export default {
         }
       }
       this.$store.dispatch('cms/getSelectedInstance', '');
-      this.$M.Modal.init(this.$refs['rsp-info'], {
-        dismissible: false,
-        onOpenStart: this.modalIsOpen = true,
-      }).open();
+      this.modalIsOpen = true;
     },
     selectedInstance(value) {
       this.$store.dispatch('cms/getSelectedInstance', value);

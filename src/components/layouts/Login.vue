@@ -1,14 +1,6 @@
 <template>
   <div class="page login">
-    <header>
-      <div class="row">
-        <div class="col s12">
-          <a href="\">
-            <img class="brand-logo" src="../../assets/logo.png" alt="DevOps Management">
-          </a>
-        </div>
-      </div>
-    </header>
+    <header></header>
     <main>
       <slot />
     </main>

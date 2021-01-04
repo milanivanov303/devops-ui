@@ -15,12 +15,12 @@
           />
           <Select
             class="col s6"
-            label="Delivery chains"
+            label="Delivery chain type"
             icon="linear_scale"
-            displayed="title"
-            v-model="deliveryChain"
-            :options="getDeliveryChains"
-            @change="selectedDeliveryChain"
+            displayed="type"
+            v-model="deliveryChainType"
+            :options="getDeliveryChainTypes"
+            @change="selectedDeliveryChainType"
           />
         </div>
         <div class="row">
@@ -45,21 +45,18 @@
         </div>
       </form>
       <add-rsp-modal
-        :selected="{project, deliveryChain}"
-        :projects="getProjects"
-        :chains="getDeliveryChains"
+        :project="project"
         v-if="openModal"
         @return="openModal = false"/>
       <Table
         v-if="getVariables.length"
         :data="getVariables"
         :pagination="true"
-        @add="openModal = true"
         sort-by="variable_name"
         sort-dir="asc"
         :export-btn="false"
         :view-btn="false"
-        :add-btn="true"
+        :add-btn="false"
         :edit-btn="false"
         :delete-btn="false">
         <Column show="id"/>
@@ -71,16 +68,24 @@
           :show="this.$store.state.cms.secondSelectedInstance.name"
         />
       </Table>
+      <div class="row">
+        <span data-badge-caption="" class="left new badge red">Last change date</span>:
+        The red date tag corresponds to last change date from instance.rsp file.
+        <a
+          v-if="project.name"
+          class="waves-effect waves-light btn right"
+          @click="openModal = true">
+          import rsp file
+        </a>
+      </div>
     </div>
   </div>
 </template>
 <script>
 import AddRspFile from '@/components/cms/AddRspFile';
-// import SelectModel from '@/components/partials/SelectModel';
 
 export default {
   components: {
-    // SelectModel,
     'add-rsp-modal': AddRspFile,
   },
   mounted() {
@@ -88,9 +93,9 @@ export default {
   },
   data() {
     return {
-      project: [],
-      deliveryChain: [],
-      getDeliveryChains: [],
+      project: {},
+      deliveryChainType: {},
+      getDeliveryChainTypes: [],
       loader: '',
       openModal: false,
       firstInstance: [],
@@ -101,7 +106,7 @@ export default {
     getProjects() {
       return this.$store.state.mmpi.projects;
     },
-    // getDeliveryChains() {
+    // getDeliveryChainTypes() {
     //   return this.$store.getters['mmpi/deliveryChains'];
     // },
     getFirstInstances() {
@@ -121,29 +126,24 @@ export default {
         inactive: 0,
         order_by: 'name asc',
       });
-      // await this.$store.dispatch('mmpi/getDeliveryChainsCMS');
+      await this.$store.dispatch('mmpi/getDeliveryChainsCMS');
       loader.hide();
     },
-    selectedProject(value) {
+    selectedProject() {
       this.resetInstances();
-      this.deliveryChain = '';
       this.$store.state.cms.inventoryInstances = [];
-      this.loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('mmpi/getDeliveryChainsCMS')
-        .then(() => {
-          this.getDeliveryChains = value.delivery_chains;
-          this.loader.hide();
-        });
+      this.getDeliveryChainTypes = this.$store.getters['mmpi/deliveryChainTypes'];
     },
-    selectedDeliveryChain(value) {
+    selectedDeliveryChainType(value) {
       this.resetInstances();
       this.firstInstance = '';
       this.secondInstance = '';
-      this.loadInstances(value.instances);
+      const instances = this.$store.getters['mmpi/instancesByTypeAndProject'](value, this.project);
+      this.loadInstances(instances);
     },
-    loadInstances(instances) {
+    loadInstances(instancesType) {
       this.loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('cms/getInventoryInstances', instances).then(() => {
+      this.$store.dispatch('cms/getInventoryInstances', instancesType).then(() => {
         this.loader.hide();
       });
     },

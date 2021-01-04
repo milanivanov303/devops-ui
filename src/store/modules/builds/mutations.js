@@ -9,22 +9,15 @@ export default {
     Vue.set(state.statistics, name, data);
   },
 
-  start(state, id) {
+  update(state, build) {
     state.active.map((a) => {
-      if (a.id === id) {
-        a.status = 'running';
+      if (a.id === build.id) {
+        Vue.set(state.active, state.active.indexOf(a), build);
       }
       return state.active;
     });
   },
-  stop(state, id) {
-    state.active.map((a) => {
-      if (a.id === id) {
-        a.status = 'stopped';
-      }
-      return state.active;
-    });
-  },
+
   remove(state, id) {
     state.active.splice(
       state.active.findIndex(build => build.id === id),

@@ -18,6 +18,14 @@ export default {
       .catch(() => commit('error', 'Could not get config-defaults list', { root: true }));
     return promise;
   },
+  getOneVariable({ commit }, variable) {
+    const promise = api('cms').get(`default-variables/${variable}`);
+
+    promise
+      .then(response => response.data.data)
+      .catch(() => commit('error', 'Could not get config-defaults variable', { root: true }));
+    return promise;
+  },
   getImxModules({ commit }) {
     const name = 'imx-modules';
 
@@ -66,7 +74,7 @@ export default {
       return promise;
     }
 
-    promise = api('cms').put(`default-variables/${payload.variable.id}`, payload.variable);
+    promise = api('cms').put(`default-variables/${payload.variable.name}`, payload.variable);
 
     promise
       .then(response => commit('updateVariable', response.data.data))
@@ -122,8 +130,6 @@ export default {
 
   getTemplates({ commit }, payload) {
     const promise = api('cms').get('cms/run-commands', payload);
-    console.log('Get Templates');
-    console.log(promise);
     promise
       .catch(error => commit('error', error));
     return promise;
@@ -282,16 +288,16 @@ export default {
     commit('promise', { name, promise }, { root: true });
     return promise.data;
   },
-  async uploadRspFile({ commit }, payload) {
+  uploadRspFile({ commit }, payload) {
     const headers = {
       headers: { 'content-type': 'multipart/form-data' },
     };
-    try {
-      await api('cms').post('response-variables/uploadRspFile', payload, headers);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
+    const promise = api('cms').post('response-variables/uploadRspFile', payload, headers);
+    promise
+      .then()
+      .catch(() => commit('error', 'Could not get delivery chains'));
+
+    return promise;
   },
 
   async updateRspVariable({ commit }, payload) {

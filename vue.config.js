@@ -5,4 +5,17 @@ module.exports = {
       .filename('js/[name].[hash:8].js')
       .chunkFilename('js/[name].[hash:8].js');
   },
+  devServer: {
+    disableHostCheck: true,
+    port: 80,
+    proxy: {
+      '^/ssh': {
+        target: 'http://webssh2',
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: { '^/ssh': '/ssh' },
+        logLevel: 'debug',
+      },
+    },
+  },
 };

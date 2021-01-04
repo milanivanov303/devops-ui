@@ -1,24 +1,28 @@
 <template>
 <main>
   <div class="container">
-    <h6 class="row center">Opening build <b>{{ $route.params.name }}</b></h6>
-    <div ref="autostart_builds">
-      <div v-bind:class="{ fail: build.status === 'removed'}" id="autostart_builds"
-           class="row center">
-        <i class="material-icons">{{ icon }}</i>
-      </div>
-      <div class="row center">
-        <div class="row">
-          <div id="buildProgress" class="progress col s12 m10 offset-m1 hidden">
-            <div class="indeterminate"></div>
+    <div class="row">
+      <div class="s12 center">
+        <h6>Opening build <b>{{ $route.params.name }}</b></h6>
+        <div ref="autostart_builds">
+          <div v-bind:class="{ fail: build.status === 'removed'}" id="autostart_builds"
+               class="row center">
+            <i class="material-icons">{{ icon }}</i>
           </div>
-        </div>
-        <h3 class="center">{{ header }}</h3>
-        <h5 class="center">{{ message }}</h5>
-        <div class="row">
-          <div v-bind:class="{ hidden: build.status === 'removed' }" id="tomcatProgress"
-               class="progress col s8 offset-s2 m4 offset-m4 hidden">
-            <div class="indeterminate"></div>
+          <div class="row center">
+            <div class="row">
+              <div id="buildProgress" class="progress col s12 m10 offset-m1 hidden">
+                <div class="indeterminate"></div>
+              </div>
+            </div>
+            <h3 class="center">{{ header }}</h3>
+            <h5 class="center">{{ message }}</h5>
+            <div class="row">
+              <div v-bind:class="{ hidden: build.status === 'removed' }" id="tomcatProgress"
+                   class="progress col s8 offset-s2 m4 offset-m4 hidden">
+                <div class="indeterminate"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -73,7 +77,7 @@ export default {
           setTimeout(() => window.location.reload(), 2000);
         })
         .catch(() => {
-          if (this.checkTimer >= 5 * 60 /* 5 minutes */) {
+          if (this.checkTimer >= 10 * 60 /* 10 minutes */) {
             document.getElementById('tomcatProgress').classList.add('hidden');
             document.getElementById('autostart_builds').classList.add('fail');
 
@@ -110,7 +114,7 @@ export default {
 
           this.icon = 'cancel';
           this.header = '- This build has been removed -';
-          this.message = `on ${this.$date(this.build.removed_on).toHuman()} by 
+          this.message = `on ${this.$date(this.build.removed_on).toHuman()} by
                           ${this.build.removed_by || 'automatic process'}`;
 
           return;

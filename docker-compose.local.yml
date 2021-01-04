@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+
+  web:
+    build:
+      context: .
+      target: base
+    tty: true
+    volumes:
+      - .:/app
