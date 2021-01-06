@@ -10,6 +10,7 @@ class Api {
       baseURL: url,
     });
 
+    this.axios.CancelToken = Axios.CancelToken;
     this.axios.interceptors.request.use(this.requestInterceptor.bind(this));
     this.axios.interceptors.response.use(null, this.errorInterceptor.bind(this));
   }

@@ -386,6 +386,7 @@ export default {
   data() {
     return {
       search: '',
+      searchTimeout: null,
       broadcast: '',
       currentShowBuilds: this.showBuilds,
       showModal: false,
@@ -434,7 +435,7 @@ export default {
         user: this.user,
         perPage: this.perPage.value,
         page: this.page,
-        search: this.showBuilds ? trim(this.searchLoaded) : trim(this.searchAll),
+        search: this.showBuilds ? this.searchLoaded.trim() : this.searchAll.trim(),
       })
         .then((response) => {
           this.builds = response.data.data;
@@ -589,7 +590,11 @@ export default {
     },
 
     onStopTyping() {
-      window.setTimeout(() => {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+
+      this.searchTimeout = setTimeout(() => {
         if (this.currentShowBuilds) {
           this.getBuilds();
         }
