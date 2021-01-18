@@ -1,6 +1,15 @@
 <template>
   <div class="row">
-    <div class="input-field col s12 m6 l3 right">
+    <div class="input-field col s12 m6">
+      <i class="material-icons prefix">search</i>
+      <input id="search"
+             type="text"
+             v-model="search"
+             placeholder="Search..."
+             v-on:keyup="onStopTyping"
+      />
+    </div>
+    <div class="input-field col s12 m3 right">
       <i class="material-icons prefix">timelapse</i>
       <select class="select" multiple v-model="status">
         <option value="active">Active</option>
@@ -9,7 +18,7 @@
       </select>
     </div>
 
-    <table ref="builds">
+    <table ref="builds" v-if="currentShowBuilds">
       <thead>
       <tr>
         <th>#</th>
@@ -96,7 +105,7 @@
         </td>
       </tr>
       <tr v-if="builds.length === 0">
-        <td colspan="7">There are no builds yet</td>
+        <td colspan="7">There are no builds</td>
       </tr>
       </tbody>
     </table>
@@ -231,6 +240,66 @@
               </label>
             </div>
           </div>
+          <div class="row">
+            <div class="col s12">
+              <ul class="tabs col s12 center">
+                <li class="tab col s12"><a>Container's Details</a></li>
+              </ul>
+              <div class="row">
+                <div class="input-field col s6">
+                  <i class="material-icons prefix">account_circle</i>
+                  <input
+                    readonly
+                    type="text"
+                    id="user"
+                    v-model="selectedBuild.user">
+                  <label :class="{active: selectedBuild.user}" for="user">User</label>
+                </div>
+                <div class="input-field col s6">
+                  <i class="material-icons prefix">lock</i>
+                  <input
+                    readonly
+                    type="text"
+                    id="pass"
+                    v-model="selectedBuild.pass">
+                  <label :class="{active: selectedBuild.pass}" for="pass">Pass</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <i class="material-icons prefix">storage</i>
+                  <input
+                    readonly
+                    type="text"
+                    id="host"
+                    v-model="selectedBuild.host">
+                  <label :class="{active: selectedBuild.host}" for="host">Host</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col s12" >
+                  <table ref="builds">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Private Port</th>
+                      <th>Public Port</th>
+                      <th>Type</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(port, index) in selectedBuild.ports" :key="index">
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ port.TargetPort }}</td>
+                        <td>{{ port.PublishedPort }}</td>
+                        <td>{{ port.Protocol }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </template>
       <template v-slot:footer></template>
@@ -271,6 +340,7 @@
         <BuildProgress :broadcast="broadcast"></BuildProgress>
       </template>
     </Modal>
+
   </div>
 </template>
 
@@ -290,14 +360,35 @@ export default {
     user: {
       type: String,
     },
+    showBuilds: {
+      type: Boolean,
+      default: true,
+    },
   },
   components: {
     Paginate,
     BuildProgress,
   },
+  computed: {
+    searchLoaded() {
+      if (this.showBuilds) {
+        return this.search;
+      }
+      return null;
+    },
+    searchAll() {
+      if (!this.showBuilds) {
+        return this.search;
+      }
+      return null;
+    },
+  },
   data() {
     return {
+      search: '',
+      searchTimeout: null,
       broadcast: '',
+      currentShowBuilds: this.showBuilds,
       showModal: false,
       builds: [],
       paginationData: {},
@@ -344,6 +435,7 @@ export default {
         user: this.user,
         perPage: this.perPage.value,
         page: this.page,
+        search: this.showBuilds ? this.searchLoaded.trim() : this.searchAll.trim(),
       })
         .then((response) => {
           this.builds = response.data.data;
@@ -445,15 +537,18 @@ export default {
       this.error = null;
     },
 
-    initTooltips() {
+    init() {
       this.$M.Tooltip.init(
         this.$el.querySelectorAll('.tooltipped'),
+      );
+      this.$M.FormSelect.init(
+        this.$el.querySelectorAll('select'),
       );
     },
 
     start(build) {
       this.updating = build.id;
-      this.initTooltips();
+      this.init();
       this.$store.dispatch('builds/start', build.id)
         .then(() => { build.status = 'running'; })
         .finally(() => { this.updating = false; });
@@ -461,7 +556,7 @@ export default {
 
     stop(build) {
       this.updating = build.id;
-      this.initTooltips();
+      this.init();
       this.$store.dispatch('builds/stop', build.id)
         .then(() => { build.status = 'stopped'; })
         .finally(() => { this.updating = false; });
@@ -493,12 +588,35 @@ export default {
     setLastPage() {
       this.lastPage = Math.ceil(this.paginationData.total / this.perPage.value);
     },
+
+    onStopTyping() {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+
+      this.searchTimeout = setTimeout(() => {
+        if (this.currentShowBuilds) {
+          this.getBuilds();
+        }
+      }, 500);
+    },
+
   },
 
   watch: {
     status() {
       this.page = 1;
-      this.getBuilds();
+      if (this.currentShowBuilds) {
+        this.getBuilds();
+      }
+    },
+    searchAll(value) {
+      if (value) {
+        this.currentShowBuilds = true;
+        return;
+      }
+      this.builds = [];
+      this.currentShowBuilds = false;
     },
     perPage() {
       this.page = 1;
@@ -507,13 +625,14 @@ export default {
   },
 
   updated() {
-    this.initTooltips();
+    this.init();
   },
 
   mounted() {
-    this.initTooltips();
-    this.getBuilds();
-    this.$M.FormSelect.init(document.querySelector('select'));
+    this.init();
+    if (this.currentShowBuilds) {
+      this.getBuilds();
+    }
   },
 
   created() {

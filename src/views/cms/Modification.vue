@@ -51,6 +51,7 @@
             <AddVariableModif
               v-if="showAddModifVariableModal"
               :instances="instances"
+              :chain="deliveryChain"
               @addVariable="addVariable"
               @close="closeModal('add-modif-variable')"/>
           </div>
@@ -94,7 +95,9 @@
         </div>
       </div>
     </form>
-    <Issue ref="issue"/>
+    <Issue
+      ref="issue"
+      @selectIssue="changeIssue"/>
     <CreateConfigDefault
       v-if="showAddEditVariableModal"
       @close="closeModal('add-new-variable')"
@@ -211,6 +214,11 @@ export default {
     },
   },
   methods: {
+    changeIssue() {
+      this.deliveryChain = {};
+      this.form.delivery_chain_id = '';
+      this.modifications = [];
+    },
     closeModal(modal) {
       switch (modal) {
         case 'add-modif-variable':
@@ -228,6 +236,7 @@ export default {
       }
     },
     async getInstances(deliveryChain) {
+      this.instances = [];
       if (deliveryChain.dc_role && deliveryChain.dc_role !== null) {
         switch (deliveryChain.dc_role.key) {
           case 'dc_rel':
@@ -284,25 +293,16 @@ export default {
             key: 'cms_source',
           },
         });
-        this.modifications.push({
-          name: 'cms resolve_template', // ${template.template.source_name}`,
-          subtype: {
-            key: 'cms_cmd',
-          },
-        });
-        this.modifications.push({
-          name: 'cms deploy_config', // ${template.template.source_name}`,
-          subtype: {
-            key: 'cms_cmd',
-          },
-        });
+        this.addCMSDeployCmd();
       }
     },
     addVariable(value, variable) {
       this.notAddedVariable = value;
       this.selectedVariable.name = variable.name.toUpperCase();
       this.notAddedVariableVal = variable.value;
-
+      if (variable.cmsDeployCmd) {
+        this.addCMSDeployCmd();
+      }
       if (variable.defaultValue) {
         if (variable.currDbData.description) {
           return this.modifications.push(value);
@@ -317,6 +317,20 @@ export default {
       }
       this.showAddEditVariableModal = true;
       return this.showAddEditVariableModal;
+    },
+    addCMSDeployCmd() {
+      this.modifications.push({
+        name: 'cms resolve_template', // ${template.template.source_name}`,
+        subtype: {
+          key: 'cms_cmd',
+        },
+      });
+      this.modifications.push({
+        name: 'cms deploy_config', // ${template.template.source_name}`,
+        subtype: {
+          key: 'cms_cmd',
+        },
+      });
     },
     addNewVariable(value) {
       this.notAddedVariable.name = `cms set_variable ${value.data.name}='${this.notAddedVariableVal}'`;

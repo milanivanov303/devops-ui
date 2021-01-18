@@ -45,6 +45,16 @@
           </table>
         </div>
       </div>
+      <div class="card" ref="search_build">
+        <div class="card-content">
+          <span class="card-title">Search build</span>
+          <div class="row">
+            <div class="col s12">
+              <Builds :showBuilds="false"></Builds>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="col s12 l4">
       <div class="card" ref="stats_by_user">
