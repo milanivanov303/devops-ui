@@ -51,6 +51,7 @@
             <AddVariableModif
               v-if="showAddModifVariableModal"
               :instances="instances"
+              :chain="deliveryChain"
               @addVariable="addVariable"
               @close="closeModal('add-modif-variable')"/>
           </div>
@@ -94,7 +95,9 @@
         </div>
       </div>
     </form>
-    <Issue ref="issue"/>
+    <Issue
+      ref="issue"
+      @selectIssue="form = {}"/>
     <CreateConfigDefault
       v-if="showAddEditVariableModal"
       @close="closeModal('add-new-variable')"
@@ -284,25 +287,16 @@ export default {
             key: 'cms_source',
           },
         });
-        this.modifications.push({
-          name: 'cms resolve_template', // ${template.template.source_name}`,
-          subtype: {
-            key: 'cms_cmd',
-          },
-        });
-        this.modifications.push({
-          name: 'cms deploy_config', // ${template.template.source_name}`,
-          subtype: {
-            key: 'cms_cmd',
-          },
-        });
+        this.addCMSDeployCmd();
       }
     },
     addVariable(value, variable) {
       this.notAddedVariable = value;
       this.selectedVariable.name = variable.name.toUpperCase();
       this.notAddedVariableVal = variable.value;
-
+      if (variable.cmsDeployCmd) {
+        this.addCMSDeployCmd();
+      }
       if (variable.defaultValue) {
         if (variable.currDbData.description) {
           return this.modifications.push(value);
@@ -317,6 +311,20 @@ export default {
       }
       this.showAddEditVariableModal = true;
       return this.showAddEditVariableModal;
+    },
+    addCMSDeployCmd() {
+      this.modifications.push({
+        name: 'cms resolve_template', // ${template.template.source_name}`,
+        subtype: {
+          key: 'cms_cmd',
+        },
+      });
+      this.modifications.push({
+        name: 'cms deploy_config', // ${template.template.source_name}`,
+        subtype: {
+          key: 'cms_cmd',
+        },
+      });
     },
     addNewVariable(value) {
       this.notAddedVariable.name = `cms set_variable ${value.data.name}='${this.notAddedVariableVal}'`;
