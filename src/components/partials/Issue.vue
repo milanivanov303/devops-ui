@@ -37,6 +37,7 @@
             <div class="input-field col s12 m6 l6">
               <button class="btn waves-effect waves-light right"
                       type="submit"
+                      @click="$emit('selectIssue');"
                       name="action">Select</button>
             </div>
             <div class="input-field col s12 m6 l6">

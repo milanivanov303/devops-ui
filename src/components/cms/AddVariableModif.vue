@@ -19,6 +19,7 @@
               v-model.trim="currentVariable.name"
               @change="resetCurrentVariable">
           </div>
+          <span class="helper-text">Check variable templates on: <b>{{devInstance.name}}</b></span>
           <div class="validator">
             <div class="silver-text" v-if="currentVariable.status === 'PENDING'">
                 <p>Loading...</p>
@@ -81,6 +82,17 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col s12">
+          <label>
+            <input
+              class="filled-in"
+              type="checkbox"
+              v-model="currentVariable.cmsDeployCmd"/>
+            <span>Add CMS deploy commands</span>
+          </label>
+        </div>
+      </div>
       <div v-if="templates.length" class="row">
         <table class="responsive-table striped col s12">
           <thead>
@@ -90,7 +102,8 @@
           </thead>
           <tbody>
             <tr
-              class="click" v-for="(template, key) in templates"
+              class="click"
+              v-for="(template, key) in templates"
               v-bind:key="key">
               <!-- @click="selectedTemplate = template"> -->
               <td>{{template}}</td>
@@ -119,6 +132,9 @@ export default {
     instances: {
       type: Array,
       required,
+    },
+    chain: {
+      type: Object,
     },
   },
   data() {
@@ -151,6 +167,15 @@ export default {
   },
   mounted() {
     this.$M.Tooltip.init(this.$refs.tooltip);
+  },
+  computed: {
+    devInstance() {
+      const [devInstance] = this.chain.instances
+        .filter(instance => instance.owner.key === 'codix')
+        .filter(instance => instance.instance_type_id === 'DEV')
+        .filter(instance => instance.instance_to_delivery_chain.instance_previous_id === null);
+      return devInstance || 'refbg2';
+    },
   },
   methods: {
     resetCurrentVariable() {
@@ -187,6 +212,8 @@ export default {
           });
         await this.$store.dispatch('cms/getTemplates',
           {
+            instance: this.devInstance.name,
+            instance_user: this.devInstance.user,
             param: variable,
             commands: [
               'list_template',
@@ -195,8 +222,8 @@ export default {
           })
           .then((resp) => {
             const { data } = resp;
-            if (data.list_template.length) {
-              this.templates = data.list_template.map(t => t.replace('/app/imx/', ''));
+            if (Object.values(data.list_template).length) {
+              this.templates = Object.values(data.list_template);
             }
             if (data.get_variable_default.length) {
               this.currentVariable.defaultValue = data.get_variable_default;
