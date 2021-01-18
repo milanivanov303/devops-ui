@@ -97,7 +97,7 @@
     </form>
     <Issue
       ref="issue"
-      @selectIssue="form = {}"/>
+      @selectIssue="changeIssue"/>
     <CreateConfigDefault
       v-if="showAddEditVariableModal"
       @close="closeModal('add-new-variable')"
@@ -214,6 +214,11 @@ export default {
     },
   },
   methods: {
+    changeIssue() {
+      this.deliveryChain = {};
+      this.form.delivery_chain_id = '';
+      this.modifications = [];
+    },
     closeModal(modal) {
       switch (modal) {
         case 'add-modif-variable':
@@ -231,6 +236,7 @@ export default {
       }
     },
     async getInstances(deliveryChain) {
+      this.instances = [];
       if (deliveryChain.dc_role && deliveryChain.dc_role !== null) {
         switch (deliveryChain.dc_role.key) {
           case 'dc_rel':
