@@ -14,14 +14,14 @@
             @blur="$v.ttsKey.$touch()"
             @change="$v.ttsKey.$touch()">
           <div class="validator"
-                v-if="$v.ttsKey.$anyError || submitStatus === 'ERROR'">
+                v-if="$v.ttsKey.$anyError || issueStatus === 'ERROR'">
             <div class="red-text" v-if="!$v.ttsKey.required">
               <p>Field is required</p>
             </div>
             <div class="red-text" v-if="!$v.ttsKey.validKey">
               <p>Not a valid TTS key.</p>
             </div>
-            <div class="red-text" v-if="submitStatus === 'ERROR'">
+            <div class="red-text" v-if="issueStatus === 'ERROR'">
               <p>TTS Key does not exist in MMPI!</p>
           </div>
           </div>
@@ -37,7 +37,11 @@
           </a>
         </div>
       </div>
-      <div class="row" v-if="deliveryChains.length && !$v.ttsKey.$anyError ">
+      <div
+        class="row"
+        v-if="deliveryChains.length
+          && !$v.ttsKey.$anyError
+          && issueStatus !== 'ERROR'">
         <div class="col s6">
           <Select
             label="Delivery chains"
@@ -160,7 +164,7 @@ export default {
   },
   watch: {
     ttsKey(key) {
-      this.submitStatus = '';
+      this.issueStatus = '';
       this.deliveryChains = [];
       this.$router.history.replace({ params: { issue: key } });
     },
@@ -190,6 +194,7 @@ export default {
       instanceStatuses: [],
       instances: [],
       submitStatus: 'PENDING',
+      issueStatus: '',
       confirmMsg: '',
       modifications: [],
       selectedTemplate: null,
@@ -232,7 +237,7 @@ export default {
   },
   methods: {
     changeIssue() {
-      this.submitStatus = '';
+      this.issueStatus = '';
       this.deliveryChains = [];
       this.deliveryChain = {};
       this.form.delivery_chain_id = '';
@@ -356,20 +361,22 @@ export default {
       this.notAddedVariable = '';
     },
     async getIssue() {
-      const loader = this.$loading.show({ container: this.$el });
       this.changeIssue();
-      await this.$store.dispatch('cms/getIssue', this.$route.params.issue)
-        .then(() => {
-          this.form.issue_id = this.$store.state.cms.issue.id;
-          if (this.$store.state.cms.issue) {
-            this.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
-          }
-          if (!this.$store.state.cms.issue
-            || (this.ttsKey !== this.$store.state.cms.issue.tts_id)) {
-            this.submitStatus = 'ERROR';
-          }
-          loader.hide();
-        });
+      if (this.$route.params.issue) {
+        const loader = this.$loading.show({ container: this.$el });
+        await this.$store.dispatch('cms/getIssue', this.$route.params.issue)
+          .then(() => {
+            this.form.issue_id = this.$store.state.cms.issue.id;
+            if (this.$store.state.cms.issue) {
+              this.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
+            }
+            if (!this.$store.state.cms.issue
+              || (this.ttsKey !== this.$store.state.cms.issue.tts_id)) {
+              this.issueStatus = 'ERROR';
+            }
+            loader.hide();
+          });
+      }
     },
     async getInstanceStatus() {
       this.$M.Tooltip.init(this.$refs.tooltip);
@@ -403,8 +410,10 @@ export default {
       });
     },
     customConfirm() {
-      window.location.href = `${config.mmpi.web}/issue/${this.$route.params.issue}`;
+      this.modifications = [];
+      this.showConfirmModal = false;
       this.confirmMsg = '';
+      window.open(`${config.mmpi.web}/issue/${this.$route.params.issue}`, '_blank');
     },
   },
 };
