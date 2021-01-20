@@ -5,13 +5,26 @@
     <form>
       <div class="row">
         <div class="input-field col s5">
-          <i class="material-icons prefix">settings_applications</i>
-          <label for="issue" class="active">Issue</label>
+          <i class="material-icons prefix">label_outline</i>
+          <label for="tts_key" class="active">TTS Key</label>
           <input
-            disabled
-            id="issue"
+            id="tts_key"
             type="text"
-            v-model="issue.tts_id">
+            v-model.trim="ttsKey"
+            @blur="$v.ttsKey.$touch()"
+            @change="$v.ttsKey.$touch()">
+          <div class="validator"
+                v-if="$v.ttsKey.$anyError || issueStatus === 'ERROR'">
+            <div class="red-text" v-if="!$v.ttsKey.required">
+              <p>Field is required</p>
+            </div>
+            <div class="red-text" v-if="!$v.ttsKey.validKey">
+              <p>Not a valid TTS key.</p>
+            </div>
+            <div class="red-text" v-if="issueStatus === 'ERROR'">
+              <p>TTS Key does not exist in MMPI!</p>
+          </div>
+          </div>
         </div>
         <div class="input-field col s1">
           <a
@@ -19,12 +32,16 @@
             data-position="right"
             data-tooltip="Change issue"
             ref="tooltip"
-            @click="selectIssue()">
+            @click="getIssue()">
             <i class="material-icons">cached</i>
           </a>
         </div>
       </div>
-      <div class="row">
+      <div
+        class="row"
+        v-if="deliveryChains.length
+          && !$v.ttsKey.$anyError
+          && issueStatus !== 'ERROR'">
         <div class="col s6">
           <Select
             label="Delivery chains"
@@ -95,9 +112,6 @@
         </div>
       </div>
     </form>
-    <Issue
-      ref="issue"
-      @selectIssue="changeIssue"/>
     <CreateConfigDefault
       v-if="showAddEditVariableModal"
       @close="closeModal('add-new-variable')"
@@ -129,7 +143,6 @@
 </template>
 <script>
 import { required } from 'vuelidate/lib/validators';
-import Issue from '@/components/partials/Issue';
 import config from '@/config';
 import Inserts from '@/components/partials/Inserts';
 import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
@@ -138,7 +151,6 @@ import AddTemplateModif from '@/components/cms/AddTemplateModif';
 
 export default {
   components: {
-    Issue,
     inserts: Inserts,
     AddVariableModif,
     CreateConfigDefault,
@@ -149,6 +161,13 @@ export default {
   },
   mounted() {
     this.getIssue();
+  },
+  watch: {
+    ttsKey(key) {
+      this.issueStatus = '';
+      this.deliveryChains = [];
+      this.$router.history.replace({ params: { issue: key } });
+    },
   },
   data() {
     return {
@@ -175,9 +194,12 @@ export default {
       instanceStatuses: [],
       instances: [],
       submitStatus: 'PENDING',
+      issueStatus: '',
       confirmMsg: '',
       modifications: [],
       selectedTemplate: null,
+      ttsKey: this.$route.params.issue,
+      deliveryChains: [],
     };
   },
   validations: {
@@ -186,6 +208,12 @@ export default {
     },
     modifications: {
       required,
+    },
+    ttsKey: {
+      required,
+      validKey(value) {
+        return /^[A-Z]+-[0-9]+$/.test(value);
+      },
     },
   },
   computed: {
@@ -206,15 +234,11 @@ export default {
         selectedTemplate: { source_path: sourcePath, source_name: sourceName },
       };
     },
-    deliveryChains() {
-      if (this.$store.state.cms.issue) {
-        return this.$store.state.cms.issue.project.delivery_chains;
-      }
-      return [];
-    },
   },
   methods: {
     changeIssue() {
+      this.issueStatus = '';
+      this.deliveryChains = [];
       this.deliveryChain = {};
       this.form.delivery_chain_id = '';
       this.modifications = [];
@@ -282,7 +306,6 @@ export default {
       this.getInstanceStatus();
       this.$store.dispatch('cms/getVariables');
     },
-
     addTemplate(template) {
       if (template) {
         this.modifications.push({
@@ -337,18 +360,22 @@ export default {
       this.modifications.push(this.notAddedVariable);
       this.notAddedVariable = '';
     },
-    selectIssue() {
-      return this.$refs.issue.openModal();
-    },
     async getIssue() {
-      // if issue exists
-      if (this.$store.state.cms.issue) {
-        this.form.issue_id = this.$store.state.cms.issue.id;
-      } else if (this.$route.params.issue) { // when the issue is send as param in the url
-        await this.$store.dispatch('cms/getIssue', this.$route.params.issue);
-        this.form.issue_id = this.$store.state.cms.issue.id;
-      } else { // open modal to select Issue
-        this.selectIssue();
+      this.changeIssue();
+      if (this.$route.params.issue) {
+        const loader = this.$loading.show({ container: this.$el });
+        await this.$store.dispatch('cms/getIssue', this.$route.params.issue)
+          .then(() => {
+            this.form.issue_id = this.$store.state.cms.issue.id;
+            if (this.$store.state.cms.issue) {
+              this.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
+            }
+            if (!this.$store.state.cms.issue
+              || (this.ttsKey !== this.$store.state.cms.issue.tts_id)) {
+              this.issueStatus = 'ERROR';
+            }
+            loader.hide();
+          });
       }
     },
     async getInstanceStatus() {
@@ -383,8 +410,10 @@ export default {
       });
     },
     customConfirm() {
-      window.location.href = `${config.mmpi.web}/issue/${this.$route.params.issue}`;
+      this.modifications = [];
+      this.showConfirmModal = false;
       this.confirmMsg = '';
+      window.open(`${config.mmpi.web}/issue/${this.$route.params.issue}`, '_blank');
     },
   },
 };
