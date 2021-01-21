@@ -48,7 +48,7 @@
           <a
             class="btn-floating btn-small waves-effect waves-light tooltipped"
             data-position="top"
-            data-tooltip="Check in templates"
+            data-tooltip="Check variable"
             ref="tooltip"
             @click="checkVariable()">
             <i class="material-icons">cached</i>
@@ -57,14 +57,11 @@
         <div class="col s6">
           <div class="input-field">
             <i class="material-icons prefix">label_outline</i>
-            <label for="name" class="active">Variable Value</label>
+            <label for="value" class="active">Variable Value</label>
             <input
-              id="name"
+              id="value"
               type="text"
               v-model.trim="currentVariable.value">
-          </div>
-          <div class="validator red-text" v-if="$v.currentVariable.value.$error">
-            <span v-if="!$v.currentVariable.value.required">Field is required!</span>
           </div>
         </div>
       </div>
@@ -112,7 +109,7 @@
         </table>
       </div>
     </template>
-    <template v-slot:footer v-if="currentVariable.status !== 'PENDING'">
+    <template v-slot:footer v-if="currentVariable.status === 'OK'">
       <button
         class="btn waves-effect waves-light"
         type="button"
@@ -155,9 +152,6 @@ export default {
   validations: {
     currentVariable: {
       name: {
-        required,
-      },
-      value: {
         required,
       },
     },
@@ -227,6 +221,9 @@ export default {
             }
             if (data.get_variable_default.length) {
               this.currentVariable.defaultValue = data.get_variable_default;
+              if (this.currentVariable.value === '') {
+                this.currentVariable.value = data.get_variable_default;
+              }
             }
             this.currentVariable.status = 'OK';
           })
@@ -238,7 +235,6 @@ export default {
       }
     },
     async addVariable() {
-      await this.checkVariable();
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
