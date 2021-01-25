@@ -1,4 +1,7 @@
+let cancelToken;
+
 export default {
+
   getActive({ commit }) {
     const promise = api('devops').get('builds', {
       fields: JSON.stringify([
@@ -60,9 +63,9 @@ export default {
 
   start({ commit }, id) {
     const promise = api('devops').post(`builds/${id}/start`);
-  
+
     promise
-      .then((response) => commit('update', response.data.data))
+      .then(response => commit('update', response.data.data))
       .catch(() => commit('error', 'Could not start build', { root: true }));
 
     return promise;
@@ -72,7 +75,7 @@ export default {
     const promise = api('devops').post(`builds/${id}/stop`);
 
     promise
-      .then((response) => commit('update', response.data.data))
+      .then(response => commit('update', response.data.data))
       .catch(() => commit('error', 'Could not stop build', { root: true }));
 
     return promise;
@@ -88,16 +91,29 @@ export default {
   },
 
   getBuildsByStatus({ commit }, {
-    branch, module, status, user, perPage, page,
+    branch, module, status, user, perPage, page, search
   }) {
-    const promise = api('devops').get('builds', {
+    const devopsApi = api('devops');
 
+    if (typeof cancelToken != 'undefined') {
+      cancelToken.cancel();
+    }
+    
+    cancelToken = devopsApi.axios.CancelToken.source();
+
+    const promise = devopsApi.get('builds', {
       filters: JSON.stringify({
         allOf: [
           {
             status: {
               operator: 'in',
               value: status,
+            },
+          },
+          {
+            name: {
+              operator: 'like',
+              value: ''.concat('%', search, '%'),
             },
           },
           {
@@ -116,6 +132,8 @@ export default {
       }),
       per_page: perPage,
       page,
+    }, {
+      cancelToken: cancelToken.token
     });
 
     promise

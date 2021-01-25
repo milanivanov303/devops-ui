@@ -239,36 +239,37 @@ export default {
     commit('secondSelectedInstance', payload);
   },
   // get issue for CMS/Modification tab
-  async getIssue({ commit }, ttsId) {
-    try {
-      const payload = {
-        tts_id: ttsId,
-        order_by: 'tts_id asc',
-        with: JSON.stringify({
-          project: {
-            delivery_chains: {
-              instances: {
-                owner: {},
-                status: {},
-              },
-              type: {},
-              branches: {
-                repo_type: {},
-              },
-              dc_role: {},
+  getIssue({ commit }, ttsId) {
+    const payload = {
+      tts_id: ttsId,
+      order_by: 'tts_id asc',
+      with: JSON.stringify({
+        project: {
+          delivery_chains: {
+            instances: {
+              owner: {},
+              status: {},
             },
+            type: {},
+            branches: {
+              repo_type: {},
+            },
+            dc_role: {},
           },
-        }),
-      };
-      await api('mmpi').get('issues', payload).then((resp) => {
+        },
+      }),
+    };
+    const promise = api('mmpi').get('issues', payload);
+    promise
+      .then((resp) => {
         const [issue] = resp.data.data;
         if (issue) {
           commit('issue', issue);
         }
-      });
-    } catch (error) {
-      commit('error', error);
-    }
+      })
+      .catch(() => commit('error', 'Could not get issue', { root: true }));
+
+    return promise;
   },
   // Get instanse status of CMS/Modification tab
   async getInstanceStatus({ commit, state }) {
@@ -288,16 +289,16 @@ export default {
     commit('promise', { name, promise }, { root: true });
     return promise.data;
   },
-  async uploadRspFile({ commit }, payload) {
+  uploadRspFile({ commit }, payload) {
     const headers = {
       headers: { 'content-type': 'multipart/form-data' },
     };
-    try {
-      await api('cms').post('response-variables/uploadRspFile', payload, headers);
-    } catch (error) {
-      console.log(error);
-      commit('error', error);
-    }
+    const promise = api('cms').post('response-variables/uploadRspFile', payload, headers);
+    promise
+      .then()
+      .catch(() => commit('error', 'Could not get delivery chains'));
+
+    return promise;
   },
 
   async updateRspVariable({ commit }, payload) {

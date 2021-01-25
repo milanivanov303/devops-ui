@@ -27,7 +27,18 @@
             />
           </div>
         </form>
-
+        <div class="row">
+          <add-rsp-modal
+            :project="project"
+            v-if="openAddRspModal"
+            @return="openAddRspModal = false"/>
+          <a
+            v-if="project.name"
+            class="waves-effect waves-light btn right"
+            @click="openAddRspModal = true">
+            import rsp file
+          </a>
+        </div>
         <Table
           v-if="$store.getters['cms/getRspVariables'].length"
           :data="getVariables"
@@ -48,7 +59,7 @@
             :show="row => row.default_variable ? row.default_variable.value : ''"
           />
           <Column
-            label="Last synchronization"
+            label="Last change"
             :show="row => row.made_on"
           />
           <Column class="custom-size" v-for="(instance, key) in this.$store.state.cms.instances"
@@ -157,10 +168,15 @@
   </div>
 </template>
 <script>
+import AddRspFile from '@/components/cms/AddRspFile';
 
 export default {
+  components: {
+    'add-rsp-modal': AddRspFile,
+  },
   data() {
     return {
+      openAddRspModal: false,
       instance: {},
       project: {},
       deliveryChain: {},

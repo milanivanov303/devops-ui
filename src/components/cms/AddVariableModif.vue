@@ -19,6 +19,7 @@
               v-model.trim="currentVariable.name"
               @change="resetCurrentVariable">
           </div>
+          <span class="helper-text">Check variable templates on: <b>{{devInstance.name}}</b></span>
           <div class="validator">
             <div class="silver-text" v-if="currentVariable.status === 'PENDING'">
                 <p>Loading...</p>
@@ -47,7 +48,7 @@
           <a
             class="btn-floating btn-small waves-effect waves-light tooltipped"
             data-position="top"
-            data-tooltip="Check in templates"
+            data-tooltip="Check variable"
             ref="tooltip"
             @click="checkVariable()">
             <i class="material-icons">cached</i>
@@ -56,14 +57,11 @@
         <div class="col s6">
           <div class="input-field">
             <i class="material-icons prefix">label_outline</i>
-            <label for="name" class="active">Variable Value</label>
+            <label for="value" class="active">Variable Value</label>
             <input
-              id="name"
+              id="value"
               type="text"
               v-model.trim="currentVariable.value">
-          </div>
-          <div class="validator red-text" v-if="$v.currentVariable.value.$error">
-            <span v-if="!$v.currentVariable.value.required">Field is required!</span>
           </div>
         </div>
       </div>
@@ -81,6 +79,17 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col s12">
+          <label>
+            <input
+              class="filled-in"
+              type="checkbox"
+              v-model="currentVariable.cmsDeployCmd"/>
+            <span>Add CMS deploy commands</span>
+          </label>
+        </div>
+      </div>
       <div v-if="templates.length" class="row">
         <table class="responsive-table striped col s12">
           <thead>
@@ -90,7 +99,8 @@
           </thead>
           <tbody>
             <tr
-              class="click" v-for="(template, key) in templates"
+              class="click"
+              v-for="(template, key) in templates"
               v-bind:key="key">
               <!-- @click="selectedTemplate = template"> -->
               <td>{{template}}</td>
@@ -99,7 +109,7 @@
         </table>
       </div>
     </template>
-    <template v-slot:footer v-if="currentVariable.status !== 'PENDING'">
+    <template v-slot:footer v-if="currentVariable.status === 'OK'">
       <button
         class="btn waves-effect waves-light"
         type="button"
@@ -120,6 +130,9 @@ export default {
       type: Array,
       required,
     },
+    chain: {
+      type: Object,
+    },
   },
   data() {
     return {
@@ -133,14 +146,12 @@ export default {
         defaultValue: '',
       },
       variableModif: [],
+      error: '',
     };
   },
   validations: {
     currentVariable: {
       name: {
-        required,
-      },
-      value: {
         required,
       },
     },
@@ -150,6 +161,15 @@ export default {
   },
   mounted() {
     this.$M.Tooltip.init(this.$refs.tooltip);
+  },
+  computed: {
+    devInstance() {
+      const [devInstance] = this.chain.instances
+        .filter(instance => instance.owner.key === 'codix')
+        .filter(instance => instance.instance_type_id === 'DEV')
+        .filter(instance => instance.instance_to_delivery_chain.instance_previous_id === null);
+      return devInstance || 'refbg2';
+    },
   },
   methods: {
     resetCurrentVariable() {
@@ -181,11 +201,13 @@ export default {
           .then((resp) => {
             this.currentVariable.currDbData = resp.data.data;
           })
-          .catch(() => {
-            this.currentVariable.status = 'ERROR';
+          .catch((error) => {
+            this.error = error;
           });
         await this.$store.dispatch('cms/getTemplates',
           {
+            instance: this.devInstance.name,
+            instance_user: this.devInstance.user,
             param: variable,
             commands: [
               'list_template',
@@ -194,11 +216,14 @@ export default {
           })
           .then((resp) => {
             const { data } = resp;
-            if (data.list_template.length) {
-              this.templates = data.list_template.map(t => t.replace('/app/imx/', ''));
+            if (Object.values(data.list_template).length) {
+              this.templates = Object.values(data.list_template);
             }
             if (data.get_variable_default.length) {
               this.currentVariable.defaultValue = data.get_variable_default;
+              if (this.currentVariable.value === '') {
+                this.currentVariable.value = data.get_variable_default;
+              }
             }
             this.currentVariable.status = 'OK';
           })
@@ -210,7 +235,6 @@ export default {
       }
     },
     async addVariable() {
-      await this.checkVariable();
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
