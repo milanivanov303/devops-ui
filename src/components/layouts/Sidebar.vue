@@ -126,13 +126,16 @@
           </a>
           <div class="collapsible-body">
             <ul>
-              <li :class="{ active: isActive('administration/users') }">
+              <li v-if="$auth.can('can-manage-authorizations')"
+                 :class="{ active: isActive('administration/users') }">
                 <router-link to="/administration/users"> Users</router-link>
               </li>
-              <li :class="{ active: isActive('administration/roles') }">
+              <li v-if="$auth.can('can-manage-authorizations')"
+                 :class="{ active: isActive('administration/roles') }">
                 <router-link to="/administration/roles"> Roles</router-link>
               </li>
-              <li :class="{ active: isActive('administration/actions') }">
+              <li v-if="$auth.can('isAdmin')"
+                 :class="{ active: isActive('administration/actions') }">
                 <router-link to="/administration/actions"> Actions</router-link>
               </li>
               <li><div class="divider"></div></li>

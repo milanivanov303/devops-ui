@@ -157,9 +157,10 @@ class Auth {
   can(action, code = this.code) {
     const user = this.getUser();
 
-    if (!user || typeof user.permissions === 'undefined') {
+    if (!user || typeof user.permissions === 'undefined' || typeof user.permissions[code] === 'undefined') {
       return false;
     }
+
     if (user.permissions[code] === '*') {
       return true;
     }
