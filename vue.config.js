@@ -1,4 +1,5 @@
 module.exports = {
+  publicPath: "/devops",
   lintOnSave: false,
   chainWebpack: (config) => {
     config.output
