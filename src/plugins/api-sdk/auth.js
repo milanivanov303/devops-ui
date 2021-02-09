@@ -3,7 +3,6 @@
 import Axios from 'axios';
 import config from '../../config';
 import Storage from './storage';
-import { deleteParam, getParam, getReturnUri } from './helpers';
 
 class Auth {
   constructor(url, code, options = {}) {
@@ -22,6 +21,8 @@ class Auth {
     });
     this.axios.interceptors.request.use(this.requestInterceptor.bind(this));
     this.axios.interceptors.response.use(null, this.errorInterceptor.bind(this));
+
+    this.promices = {};
   }
 
   requestInterceptor(config) {
@@ -87,32 +88,20 @@ class Auth {
     return promise;
   }
 
-  loginSSO() {
-    const token = getParam('token');
-    if (!token) {
-      window.location.href = `${this.getSsoUrl()}&code=${this.code}`;
-      return Promise.resolve();
-    }
-
-    this.storage.set('token', token);
-
-    // remove token param from URL and browser history
-    deleteParam('token');
-
-    return this.getIdentity();
-  }
-
-  getSsoUrl() {
-    let redirectUrl = `${window.location.origin}/login`;
-    const returnUri = getReturnUri();
-    if (returnUri) {
-      redirectUrl += `?sso_login=true&return_uri=${returnUri}`;
-    }
-    return `${this.url}/../login?redirect_url=${encodeURIComponent(redirectUrl)}`;
-  }
-
   logout() {
     this.storage.removeAll();
+  }
+
+  setUser(user) {
+    this.storage.set('user', user);
+  }
+
+  getUser() {
+    if (this.sessionExpired()) {
+      this.storage.removeAll();
+    }
+
+    return this.storage.get('user');
   }
 
   getIdentity() {
@@ -122,9 +111,7 @@ class Auth {
     });
     query = query.join('&');
 
-    const promise = this.axios.get(`auth/identity?${query}`);
-    promise.then(response => this.storage.set('user', response.data));
-    return promise;
+    return this.axios.get(`auth/identity?${query}`);
   }
 
   getApiToken(code) {
@@ -133,11 +120,7 @@ class Auth {
       return Promise.resolve(token);
     }
 
-    return this.getNewApiToken(code);
-  }
-
-  getNewApiToken(code) {
-    const promise = this.axios.get(`auth/token?code=${code}`);
+    const promise = this.getNewApiToken(code);
 
     promise.then(
       response => this.storage.set(`token.${code}`, response.data.token),
@@ -146,12 +129,18 @@ class Auth {
     return promise;
   }
 
-  getUser() {
-    if (this.sessionExpired()) {
-      this.storage.removeAll();
+  getNewApiToken(code) {
+    // if get token request for this code was already sent reuse it
+    if (this.promices[code]) {
+      return this.promices[code];
     }
 
-    return this.storage.get('user');
+    const promise = this.axios.get(`auth/token?code=${code}`)
+        .finally(() => delete this.promices[code]);
+
+    this.promices[code] = promise;
+
+    return promise;
   }
 
   can(action, code = this.code) {
