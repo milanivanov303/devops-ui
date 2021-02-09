@@ -29,6 +29,14 @@ stages:
   - build
   - deploy
 
+test:
+  stage: build
+  environment: dev
+  script:
+    - *build-script
+  only:
+    - merge_requests
+
 build for dev:
   stage: build
   environment: dev
