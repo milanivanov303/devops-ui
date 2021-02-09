@@ -18,7 +18,7 @@ before_script:
   - export SERVER=$(echo $DEPLOY_HOST | sed "s/:[0-9]*//g")
   - export PORT=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/.*://g")
   - |
-    curl
+    curl \
       --request POST $WEB_PROXY_URL \
       --header 'Content-Type: application/json' \
       --header 'Authorization: Bearer $WEB_PROXY_TOKEN' \
