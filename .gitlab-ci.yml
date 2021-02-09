@@ -20,10 +20,10 @@ before_script:
   - |
     curl \
       --request POST $WEB_PROXY_URL \
-      --header 'Content-Type: application/json' \
-      --header 'Authorization: Bearer $WEB_PROXY_TOKEN' \
+      --header "Content-Type: application/json" \
+      --header "Authorization: Bearer $WEB_PROXY_TOKEN" \
       --insecure \
-      --data-raw '{"path": "$DOMAIN", "servers": ["$SERVER:$PORT"]}'
+      --data-raw '{"path": "'$DOMAIN'", "servers": ["'$SERVER:$PORT'"]}'
 
 stages:
   - build
