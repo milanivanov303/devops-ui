@@ -15,7 +15,8 @@ before_script:
   - export WEB_CONTAINER_IMAGE=$IMAGE-$CI_ENVIRONMENT_NAME
   - docker-compose --host $DEPLOY_HOST pull
   - docker-compose --host $DEPLOY_HOST up --no-build --detach
-  - export SERVER=$(echo $DEPLOY_HOST | sed "s/:[0-9]*//g")
+  #- export SERVER=$(echo $DEPLOY_HOST | sed "s/:[0-9]*//g")
+  - export SERVER=$WEB_CONTAINER_IP
   - export PORT=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/.*://g")
   - |
     curl \
