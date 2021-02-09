@@ -1,5 +1,5 @@
 <template>
-  <Loading v-if="loggingInSSO"/>
+  <Loading v-if="loggingIn"/>
   <div v-else class="row">
     <div class="col s12 l7">
       <div class="col l7 animation">
@@ -27,7 +27,7 @@
       <div class="title">
         <h4 class="center">Welcome to DevOps Management</h4>
       </div>
-      <Alert v-if="error !== ''" v-bind:msg="error" />
+      <Alert v-if="error" v-bind:msg="error" />
       <div class="description">
         <span>
           The DevOps Management system aims to shorten and facilitate the system development
@@ -37,21 +37,21 @@
       </div>
       <div class="login-btn">
         <div class="center">
-          <div v-if="ssoUser">
+          <div v-if="user">
             <p>Continue as</p>
-            <div class="chip" @click="loginSSO()">
+            <div class="chip" @click="login()">
               <img :src="userImg()" alt="User"/>
-              {{ ssoUser.name }}
+              {{ user.name }}
             </div>
-            <p><a @click="loginAnotherUser()">or log with another user</a></p>
+            <p><a :href="getLoginWithAnotherUserUrl()">or log with another user</a></p>
           </div>
           <div v-else>
-            <Preloader v-if="gettingSSOUser" class="small" />
-            <div v-else class="chip sso-btn" @click="loginSSO()">
-              Login with <b>User Management (SSO)</b>
+            <Preloader v-if="gettingUser" class="small" />
+            <div v-else class="chip sso-btn">
+              <a :href="getLoginUrl()">Login with <b>User Management (SSO)</b></a>
             </div>
           </div>
-          <Preloader v-if="loggingInSSO" class="preloader-wrapper small" />
+          <Preloader v-if="loggingIn" class="preloader-wrapper small" />
         </div>
       </div>
     </div>
@@ -61,10 +61,10 @@
 <script>
 import Vue from 'vue';
 import VueParticles from 'vue-particles';
-import Loading from '../components/layouts/Loading';
+import Loading from '@/components/layouts/Loading';
+import config from "@/config";
 
 Vue.use(VueParticles);
-
 
 export default {
   components: {
@@ -72,65 +72,68 @@ export default {
   },
   data() {
     return {
-      username: '',
-      returnUri: '/',
+      user: null,
       loggingIn: false,
-      loggingInSSO: false,
-      gettingSSOUser: false,
+      gettingUser: false,
       error: '',
-      ssoUser: null,
     };
   },
   methods: {
-    loginSSO() {
-      this.loggingInSSO = true;
+    login() {
+      this.loggingIn = true;
       this.error = '';
 
-      this.$auth.loginSSO()
-        .then(() => this.$router.push(this.$route.query.return_uri || this.returnUri))
+      auth.getIdentity()
+        .then(response => {
+          auth.setUser(response.data);
+          this.$router.push(this.$route.query.return_uri || '/');
+        })
         .catch(() => {
-          this.loggingInSSO = false;
-          this.error = 'Could not login with SSO, Please contact phpid';
+          this.error = 'Could not login. Please contact phpid';
+        })
+        .finally(() => {
+          setTimeout(() => { this.loggingIn = false; }, 1000);
         });
+
     },
-    loginAnotherUser() {
-      window.location.href = `${auth.url}/../logout?redirect_url=${encodeURIComponent(`${auth.getSsoUrl()}&code=${auth.code}`)}`;
+
+    getLoginUrl() {
+      let redirectUrl = `/devops/login?sso_login=true`;
+
+      if (this.$route.query.return_uri) {
+        redirectUrl += `&return_uri=${this.$route.query.return_uri}`;
+      }
+
+      return `/login?redirect_url=${encodeURIComponent(redirectUrl)}&code=${config.auth.code}`;
     },
-    getLoggedInSSOUser() {
-      this.gettingSSOUser = true;
 
-      const iframe = document.createElement('iframe');
-      iframe.setAttribute('src', '/logged-in-sso-user');
-      iframe.setAttribute('hidden', true);
-
-      iframe.onload = (e) => {
-        this.gettingSSOUser = false;
-
-        if (!e.target.contentDocument) {
-          return;
-        }
-
-        const name = e.target.contentDocument.getElementById('name').innerText;
-        const username = e.target.contentDocument.getElementById('username').innerText;
-
-        if (name && username) {
-          this.ssoUser = { name, username };
-        }
-      };
-
-      this.$el.appendChild(iframe);
+    getLoginWithAnotherUserUrl() {
+      return `/logout?redirect_url=${encodeURIComponent(this.getLoginUrl())}`;
     },
+
+    getLoggedInUser() {
+      this.gettingUser = true;
+
+      auth.getIdentity().then(response => {
+        this.user = response.data;
+      })
+      .finally(() => { this.gettingUser = false; });
+    },
+
     userImg() {
-      return `http://kubrat.codixfr.private/phones/images/${this.ssoUser.username}.jpg`;
+      return `http://kubrat.codixfr.private/phones/images/${this.user.username}.jpg`;
     },
+
   },
   created() {
-    if (this.$route.query.sso_login) {
-      this.loginSSO();
-    }
+
   },
   mounted() {
-    this.getLoggedInSSOUser();
+    if (this.$route.query.sso_login) {
+      this.login();
+      return;
+    }
+    this.getLoggedInUser();
   },
 };
 </script>

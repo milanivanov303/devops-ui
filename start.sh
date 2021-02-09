@@ -77,8 +77,13 @@ printf "\n"
 
 if [[ ${EXIT_CODE} -eq 0 ]]; then
     printf "\n"
-    echo "App running on: http://${WEB_CONTAINER_IP}:${WEB_CONTAINER_HTTP_PORT}, https://${WEB_CONTAINER_IP}:${WEB_CONTAINER_HTTPS_PORT}"
+    echo "App running on: http://${WEB_CONTAINER_IP}/devops"
     printf "\n"
+
+    # Install dependencies and start npm development server
+    docker-compose -f $DOCKER_COMPOSE_FILE -f $DOCKER_COMPOSE_LOCAL_FILE exec web npm install
+    docker-compose -f $DOCKER_COMPOSE_FILE -f $DOCKER_COMPOSE_LOCAL_FILE exec web npm run serve
 fi
+
 
 exit ${EXIT_CODE}

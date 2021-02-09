@@ -463,14 +463,14 @@ export default {
     },
 
     getUrl(build) {
-      return `/builds/${build.name}/`;
+      return this.$router.resolve(`/builds/${build.name}/`).href;
     },
 
     getWebssh2Url(build) {
       const { host } = this.$store.state[build.module];
       const port = this.getPublishedPort(build, 22);
 
-      return `/ssh/host/${host}?port=${port}`;
+      return this.$router.resolve(`/ssh/host/${host}?port=${port}`).href;
     },
 
     getStatusText(build) {

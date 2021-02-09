@@ -27,6 +27,10 @@ class Api {
     if (error.response.status === 401) {
       return this.auth.getNewApiToken(this.code).then((response) => {
         error.config.headers.Authorization = `Bearer ${response.data.token}`;
+
+        // remove baseUrl from url as i makes a problem when relative URLs are used
+        error.config.url = error.config.url.replace(error.config.baseURL, '');
+
         return Axios.create().request(error.config);
       });
     }
