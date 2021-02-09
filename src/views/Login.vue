@@ -21,7 +21,7 @@
           clickMode="push">
         </vue-particles>
       </div>
-      <img class="col  logo" src="../assets/images/do-icon-100px.png" alt="DevOps Management"/>
+      <img class="col  logo" src="/applications/yTjvXuxGM5i/logo" alt="DevOps Management"/>
     </div>
     <div class="col s12 l5">
       <div class="title">
