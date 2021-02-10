@@ -16,7 +16,7 @@ before_script:
   - docker-compose --host $DEPLOY_HOST pull
   - docker-compose --host $DEPLOY_HOST up --no-build --detach
   #- export SERVER=$(echo $DEPLOY_HOST | sed "s/:[0-9]*//g")
-  - export SERVER=$(docker-compose --host http://agata.codixfr.private:2375 port web 80 | sed "s/:.*//g")
+  - export SERVER=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/:.*//g")
   - export PORT=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/.*://g")
   - |
     curl \
@@ -24,7 +24,7 @@ before_script:
       --header "Content-Type: application/json" \
       --header "Authorization: Bearer $WEB_PROXY_TOKEN" \
       --insecure \
-      --data-raw '{"path": "'$DOMAIN'", "servers": ["'$SERVER:$PORT'"]}'
+      --data-raw '{"path": "devops", "servers": ["'$SERVER:$PORT'"]}'
 
 stages:
   - build
