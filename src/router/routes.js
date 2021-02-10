@@ -6,6 +6,9 @@ const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '
 const DebiteurDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Dashboard.vue');
 const DebiteurBranches = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branches.vue');
 const DebiteurBranch = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branch.vue');
+const ImxBeDashboard = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Dashboard.vue');
+const ImxBeBranches = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branches.vue');
+const ImxBeBranch = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branch.vue');
 const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
 const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
@@ -157,6 +160,50 @@ export default [
           breadcrumb: params => params.branch,
         },
         component: DebiteurBranch,
+      },
+    ],
+  },
+  {
+    path: '/imx_be',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-be',
+      transitionName: 'slide',
+      title: 'iMX-BE Dashboard',
+    },
+    component: ImxBeDashboard,
+    children: [
+      {
+        path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+          name: 'imx-be',
+          transitionName: 'slide',
+          title: 'iMX-BE Dashboard',
+        },
+        component: ImxBeDashboard,
+      },
+    ],
+  },
+  {
+    path: '/imx_be/branches',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-be-branches',
+      transitionName: 'slide',
+      title: 'iMX-BE Branches',
+    },
+    component: ImxBeBranches,
+    children: [
+      {
+        path: ':branch',
+        meta: {
+          name: 'imx-be-branch',
+          requiresAuth: true,
+          transitionName: 'slide',
+          title: params => params.branch,
+        },
+        component: ImxBeBranch,
       },
     ],
   },
