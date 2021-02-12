@@ -11,11 +11,11 @@ module.exports = {
     disableHostCheck: true,
     port: 80,
     proxy: {
-      '^/ssh': {
+      '^/devops/ssh': {
         target: 'http://webssh2',
         changeOrigin: true,
         secure: false,
-        pathRewrite: { '^/ssh': '/ssh' },
+        pathRewrite: { '^/devops/ssh': '/devops/ssh' },
         logLevel: 'debug',
       },
     },

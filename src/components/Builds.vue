@@ -89,7 +89,11 @@
               target="_blank"
               data-tooltip="Open terminal"
               class="tooltipped"
-              v-if="build.status === 'running'"
+              v-if="
+                (build.module === 'extranet' || build.module === 'debiteur')
+                &&
+                build.status === 'running'
+              "
             >
               <i class="material-icons">wysiwyg</i>
             </a>
