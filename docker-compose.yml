@@ -11,7 +11,7 @@ services:
       - proxy_config:/etc/nginx/conf.d/proxy
 
   webssh2:
-    image: gitlab.codixfr.private:5005/enterpriseapps/images/webssh2:1.0
+    image: gitlab.codixfr.private:5005/enterpriseapps/devops-ui/webssh2:1.0
     environment:
       WEBSSH2_USERNAME: enterprise
       WEBSSH2_PASSWORD: Sofphia
