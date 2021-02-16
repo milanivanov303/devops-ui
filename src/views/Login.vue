@@ -62,7 +62,7 @@
 import Vue from 'vue';
 import VueParticles from 'vue-particles';
 import Loading from '@/components/layouts/Loading';
-import config from "@/config";
+import config from '@/config';
 
 Vue.use(VueParticles);
 
@@ -84,7 +84,7 @@ export default {
       this.error = '';
 
       auth.getIdentity()
-        .then(response => {
+        .then((response) => {
           auth.setUser(response.data);
           this.$router.push(this.$route.query.return_uri || '/');
         })
@@ -94,11 +94,10 @@ export default {
         .finally(() => {
           setTimeout(() => { this.loggingIn = false; }, 1000);
         });
-
     },
 
     getLoginUrl() {
-      let redirectUrl = `/devops/login?sso_login=true`;
+      let redirectUrl = '/devops/login?sso_login=true';
 
       if (this.$route.query.return_uri) {
         redirectUrl += `&return_uri=${this.$route.query.return_uri}`;
@@ -114,10 +113,10 @@ export default {
     getLoggedInUser() {
       this.gettingUser = true;
 
-      auth.getIdentity().then(response => {
+      auth.getIdentity().then((response) => {
         this.user = response.data;
       })
-      .finally(() => { this.gettingUser = false; });
+        .finally(() => { this.gettingUser = false; });
     },
 
     userImg() {

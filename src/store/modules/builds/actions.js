@@ -91,14 +91,14 @@ export default {
   },
 
   getBuildsByStatus({ commit }, {
-    branch, module, status, user, perPage, page, search
+    branch, module, status, user, perPage, page, search,
   }) {
     const devopsApi = api('devops');
 
-    if (typeof cancelToken != 'undefined') {
+    if (typeof cancelToken !== 'undefined') {
       cancelToken.cancel();
     }
-    
+
     cancelToken = devopsApi.axios.CancelToken.source();
 
     const promise = devopsApi.get('builds', {
@@ -133,7 +133,7 @@ export default {
       per_page: perPage,
       page,
     }, {
-      cancelToken: cancelToken.token
+      cancelToken: cancelToken.token,
     });
 
     promise

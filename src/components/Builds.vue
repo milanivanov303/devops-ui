@@ -526,7 +526,13 @@ export default {
     },
 
     canRemove(build) {
-      if (this.$auth.can('extranet.remove-builds')) {
+      if (build.module === 'extranet' || build.module === 'debiteur') {
+        if (this.$auth.can('extranet.remove-builds')) {
+          return true;
+        }
+      }
+
+      if (this.$auth.can(`${build.module}.remove-builds`)) {
         return true;
       }
 

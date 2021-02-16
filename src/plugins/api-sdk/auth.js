@@ -136,7 +136,7 @@ class Auth {
     }
 
     const promise = this.axios.get(`auth/token?code=${code}`)
-        .finally(() => delete this.promices[code]);
+      .finally(() => delete this.promices[code]);
 
     this.promices[code] = promise;
 
