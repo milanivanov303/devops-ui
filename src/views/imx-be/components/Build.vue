@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col s12" >
       <button
-        v-if="$auth.can('imx-be.create-builds')"
+        v-if="$auth.can('imx_be.create-builds')"
         class="btn"
         @click="open()">
         <i class="material-icons left">add</i> New build
