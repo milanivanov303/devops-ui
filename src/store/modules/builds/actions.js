@@ -14,14 +14,23 @@ export default {
         'details',
       ]),
       filters: JSON.stringify({
-        anyOf: [
+        allOf: [
           {
-            status: {
-              operator: 'in',
-              value: ['running', 'stopped', 'building'],
-            },
+            parent_id: null,
           },
+          {
+            anyOf: [
+              {
+                status: {
+                  operator: 'in',
+                  value: ['running', 'stopped', 'building'],
+                },
+              },
+            ],
+          },
+
         ],
+
       }),
     });
 
@@ -91,7 +100,7 @@ export default {
   },
 
   getBuildsByStatus({ commit }, {
-    branch, module, status, user, perPage, page, search,
+    branch, ttsKey, module, status, user, perPage, page, search,
   }) {
     const devopsApi = api('devops');
 
@@ -120,10 +129,16 @@ export default {
             module,
           },
           {
+            'details->tts_key': ttsKey,
+          },
+          {
             'details->branch': branch,
           },
           {
             created_by: user,
+          },
+          {
+            parent_id: null,
           },
         ],
       }),

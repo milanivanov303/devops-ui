@@ -81,6 +81,11 @@
             </ul>
           </div>
         </li>
+        <li :class="{ active: isActive('imx') }">
+          <router-link to="/imx">
+            <i class="material-icons">queue_play_next</i> iMX
+          </router-link>
+        </li>
         <li :class="{ active: isActive('demos') }">
           <a class="collapsible-header">
             <i class="material-icons">event</i> Demos
