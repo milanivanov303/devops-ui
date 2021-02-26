@@ -142,172 +142,11 @@
       </paginate>
     </div>
 
-    <Modal v-if="showInfoModal" @close="closeInfoModal()" class="right-sheet">
-      <template v-slot:header>{{ selectedBuild.name }}</template>
-      <template v-slot:content>
-        <div class="col s12 l11">
-          <div class="row">
-            <div class="input-field col s12">
-              <i class="material-icons prefix">business</i>
-              <input
-                readonly
-                type="text"
-                id="branch"
-                v-model="selectedBuild.branch">
-              <label :class="{active: selectedBuild.branch}" for="branch">Branch</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <i class="material-icons prefix">business</i>
-              <input
-                readonly
-                type="text"
-                id="fe_branch"
-                v-model="selectedBuild.fe_branch">
-              <label :class="{active: selectedBuild.fe_branch}" for="fe_branch">FE Branch</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <i class="material-icons prefix">dynamic_feed</i>
-              <input
-                readonly
-                type="text"
-                id="instance"
-                v-model="selectedBuild.instance">
-              <label :class="{active: selectedBuild.instance}" for="instance">Instance</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <i class="material-icons prefix">history</i>
-              <input
-                readonly
-                type="text"
-                id="java_version"
-                v-model="selectedBuild.java_version">
-              <label :class="{active: selectedBuild.java_version}"
-                     for="java_version">Java Version
-              </label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <i class="material-icons prefix">event</i>
-              <input
-                class="readonly"
-                type="text"
-                id="created_on"
-                v-model="selectedBuild.created_on">
-              <label :class="{active: selectedBuild.created_on}"
-                     for="created_on">Created on
-              </label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <i class="material-icons prefix">person</i>
-              <input
-                class="readonly"
-                type="text"
-                id="created_by"
-                v-model="selectedBuild.created_by">
-              <label :class="{active: selectedBuild.created_by}"
-                      for="created_by">Created by
-              </label>
-            </div>
-          </div>
-          <div class="row" v-if="selectedBuild.removed_on">
-            <div class="input-field col s12">
-              <i class="material-icons prefix">event</i>
-              <input
-                class="readonly"
-                type="text"
-                id="removed_on"
-                v-model="selectedBuild.removed_on">
-              <label :class="{active: selectedBuild.removed_on}"
-                     for="created_on">Removed on
-              </label>
-            </div>
-          </div>
-          <div class="row" v-if="selectedBuild.status === 'removed'" >
-            <div class="input-field col s12">
-              <i class="material-icons prefix">person</i>
-              <input
-                class="readonly"
-                type="text"
-                id="removed_by"
-                v-model="selectedBuild.removed_by">
-              <label :class="{active: selectedBuild.removed_by}" for="removed_by">
-                Removed by
-              </label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s12">
-              <ul class="tabs col s12 center">
-                <li class="tab col s12"><a>Container's Details</a></li>
-              </ul>
-              <div class="row">
-                <div class="input-field col s6">
-                  <i class="material-icons prefix">account_circle</i>
-                  <input
-                    readonly
-                    type="text"
-                    id="user"
-                    v-model="selectedBuild.user">
-                  <label :class="{active: selectedBuild.user}" for="user">User</label>
-                </div>
-                <div class="input-field col s6">
-                  <i class="material-icons prefix">lock</i>
-                  <input
-                    readonly
-                    type="text"
-                    id="pass"
-                    v-model="selectedBuild.pass">
-                  <label :class="{active: selectedBuild.pass}" for="pass">Pass</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="input-field col s12">
-                  <i class="material-icons prefix">storage</i>
-                  <input
-                    readonly
-                    type="text"
-                    id="host"
-                    v-model="selectedBuild.host">
-                  <label :class="{active: selectedBuild.host}" for="host">Host</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12" >
-                  <table ref="builds">
-                    <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Private Port</th>
-                      <th>Public Port</th>
-                      <th>Type</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(port, index) in selectedBuild.ports" :key="index">
-                        <td>{{ index + 1 }}</td>
-                        <td>{{ port.TargetPort }}</td>
-                        <td>{{ port.PublishedPort }}</td>
-                        <td>{{ port.Protocol }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
-      <template v-slot:footer></template>
-    </Modal>
+    <BuildInfo
+      v-if="showInfoModal"
+      :build="selectedBuild"
+      @close="closeInfoModal()"
+    />
 
     <Modal v-if="showRemoveModal" @close="showRemoveModal = false" class="confirm">
       <template v-slot:content>
@@ -352,6 +191,7 @@
 import Paginate from 'vuejs-paginate/src/components/Paginate';
 import BuildProgress from '@/components/BuildProgress';
 import EventBus from '@/event-bus';
+import BuildInfo from '@/components/BuildInfo';
 
 export default {
   props: {
@@ -359,6 +199,9 @@ export default {
       type: String,
     },
     branch: {
+      type: String,
+    },
+    tts_key: {
       type: String,
     },
     user: {
@@ -372,6 +215,7 @@ export default {
   components: {
     Paginate,
     BuildProgress,
+    BuildInfo,
   },
   computed: {
     searchLoaded() {
@@ -434,6 +278,7 @@ export default {
 
       this.$store.dispatch('builds/getBuildsByStatus', {
         branch: this.branch,
+        ttsKey: this.tts_key,
         module: this.module,
         status: this.getStatus(),
         user: this.user,
@@ -489,27 +334,8 @@ export default {
     },
 
     openInfoModal(build) {
+      this.selectedBuild = { ...build };
       this.showInfoModal = true;
-
-      this.selectedBuild.name = build.name;
-      this.selectedBuild.branch = build.details.branch;
-
-      if (build.details.fe_branch) {
-        this.selectedBuild.fe_branch = build.details.fe_branch.name;
-      }
-
-      this.selectedBuild.instance = build.details.instance.name;
-      this.selectedBuild.java_version = build.details.java_version;
-      this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
-      this.selectedBuild.created_by = build.created_by;
-
-      if (build.removed_on) {
-        this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
-      }
-
-      if (build.removed_on && !build.removed_by) {
-        this.selectedBuild.removed_by = 'auto-removed';
-      }
     },
 
     openProgressModal(build) {
