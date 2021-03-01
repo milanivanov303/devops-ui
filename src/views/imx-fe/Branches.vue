@@ -10,9 +10,9 @@
         <Branch
           class="col s12 m6 l4"
           v-for="branch in sorted"
-          :key="branch"
-          :branch="branch"
-          :count="getActiveBuildsCountByBranch(branch)"
+          :key="branch.name"
+          :branch="branch.name"
+          :count="getActiveBuildsCountByBranch(branch.name)"
         />
         <div class="col s12 m6 l2 right" id="perPage">
           <div class="input-field col s12 l4 right">
@@ -45,11 +45,11 @@
         <div class="col s12 m6 l5 scroll" ref="branches">
           <Branch
             v-for="branch in filteredBranches"
-            :key="branch"
-            :branch="branch"
-            :count="getActiveBuildsCountByBranch(branch)"
+            :key="branch.name"
+            :branch="branch.name"
+            :count="getActiveBuildsCountByBranch(branch.name)"
             :class="{
-              'selected-branch': $route.path === `/imx-fe/branches/${encodeURIComponent(branch)}`
+              'selected-branch': $route.path === `/imx-fe/branches/${encodeURIComponent(branch.name)}`
             }"
           />
         </div>
@@ -113,7 +113,7 @@ export default {
       }
 
       const regexp = new RegExp(this.search, 'i');
-      return this.branches.filter(branch => branch.match(regexp));
+      return this.branches.filter(branch => branch.name.match(regexp));
     },
     sorted() {
       const from = (this.page * this.perPage.value) - this.perPage.value;
@@ -139,7 +139,7 @@ export default {
     checkBranch(selected) {
       if (typeof selected !== 'undefined' && this.branches.length !== 0) {
         const branch = this.branches.find((branch) => {
-          if (branch === selected) {
+          if (branch.name === selected) {
             return true;
           }
           return false;
