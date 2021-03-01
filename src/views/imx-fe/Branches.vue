@@ -49,7 +49,8 @@
             :branch="branch.name"
             :count="getActiveBuildsCountByBranch(branch.name)"
             :class="{
-              'selected-branch': $route.path === `/imx-fe/branches/${encodeURIComponent(branch.name)}`
+              'selected-branch':
+                $route.path === `/imx-fe/branches/${encodeURIComponent(branch.name)}`
             }"
           />
         </div>
