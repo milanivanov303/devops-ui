@@ -82,9 +82,21 @@
           </div>
         </li>
         <li :class="{ active: isActive('imx') }">
-          <router-link to="/imx">
+          <a class="collapsible-header">
             <i class="material-icons">queue_play_next</i> iMX
-          </router-link>
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li :class="{ active: isActive('imx/dashboard') }">
+                <router-link to="/imx/dashboard"> Dashboard</router-link>
+              </li>
+              <li v-bind:class="{ active: isActive('imx/tts_keys') }">
+                <router-link to="/imx/tts_keys"> TTS Keys</router-link>
+              </li>
+              <li><div class="divider"></div></li>
+            </ul>
+          </div>
         </li>
         <li :class="{ active: isActive('demos') }">
           <a class="collapsible-header">

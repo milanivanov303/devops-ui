@@ -46,6 +46,16 @@ export default {
 
     return builds.sort((a, b) => b.builds - a.builds);
   },
+  getTTSkeysFromActiveBuilds: state => (module) => {
+    const ttsKeys = [];
+    state.active.filter(build => build.module === module)
+    .forEach((build) => {
+      if (!ttsKeys.includes(build.details.tts_key)) {
+        ttsKeys.push(build.details.tts_key);
+      }
+    });
+    return ttsKeys;
+  },
   getActiveGroupedByTTSkey: state => (module) => {
     const ttsKeys = {};
     state
@@ -91,6 +101,12 @@ export default {
       return [];
     }
     return state.active.filter(build => build.details.branch === branch);
+  },
+  getActiveByTTSkey: state => (key) => {
+    if (!state.active) {
+      return [];
+    }
+    return state.active.filter(build => build.details.tts_key === key);
   },
 
   getByModule: state => (stateName) => {

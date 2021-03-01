@@ -25,7 +25,7 @@
               <tr v-for="(build, index) in activeBuildsGroupedByTTSkey" :key="index">
                 <td>{{ index + 1 }}</td>
                 <td>
-                  <router-link :to="'/imx/' + encodeURIComponent(build.ttsKey)">
+                  <router-link :to="'/imx/tts_keys/' + encodeURIComponent(build.ttsKey)">
                   {{ build.ttsKey }}
                   </router-link>
                 </td>

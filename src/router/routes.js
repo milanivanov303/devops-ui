@@ -14,6 +14,7 @@ const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/im
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
 const ImxDashboard = () => import(/* webpackChunkName: "imx" */ '../views/imx/ImxDashboard.vue');
 const ImxTTSkeys = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkeys.vue');
+const ImxTTSkey = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkey.vue');
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard.vue');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos.vue');
 const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults.vue');
@@ -265,14 +266,36 @@ export default [
     component: ImxDashboard,
     children: [
       {
+        path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+          name: 'imx',
+          transitionName: 'slide',
+          title: 'iMX Dashboard',
+        },
+        component: ImxDashboard,
+      },
+    ],
+  },
+  {
+    path: '/imx/tts_keys',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-tts-keys',
+      transitionName: 'slide',
+      title: 'TTS keys',
+    },
+    component: ImxTTSkeys,
+    children: [
+      {
         path: ':key',
         meta: {
-          name: 'imx-TTSkey',
+          name: 'imx-tts-key',
           requiresAuth: true,
           transitionName: 'slide',
           title: params => params.key,
         },
-        component: ImxTTSkeys,
+        component: ImxTTSkey,
       },
     ],
   },
