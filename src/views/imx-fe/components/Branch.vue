@@ -4,7 +4,7 @@
       <div class="card-content">
         <div class="card-title">
             <span class="badge" v-if="count">{{ count }}</span>
-            {{ branch.name }}
+            {{ branch }}
         </div>
       </div>
     </div>

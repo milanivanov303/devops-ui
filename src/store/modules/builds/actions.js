@@ -19,18 +19,12 @@ export default {
             parent_id: null,
           },
           {
-            anyOf: [
-              {
-                status: {
-                  operator: 'in',
-                  value: ['running', 'stopped', 'building'],
-                },
-              },
-            ],
+            status: {
+              operator: 'in',
+              value: ['running', 'stopped', 'building'],
+            },
           },
-
         ],
-
       }),
     });
 

@@ -117,12 +117,12 @@ export default {
         },
       ],
       userStatisticsDays: {
-        name: 'Last 30 days',
-        value: 30,
+        name: 'Last 24 hours',
+        value: 1,
       },
       branchStatisticsDays: {
-        name: 'Last 30 days',
-        value: 30,
+        name: 'Last 24 hours',
+        value: 1,
       },
     };
   },

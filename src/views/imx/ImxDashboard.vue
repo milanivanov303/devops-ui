@@ -121,12 +121,12 @@ export default {
         },
       ],
       userStatisticsDays: {
-        name: 'Last 30 days',
-        value: 30,
+        name: 'Last 24 hours',
+        value: 1,
       },
       TTSkeyStatisticsDays: {
-        name: 'Last 30 days',
-        value: 30,
+        name: 'Last 24 hours',
+        value: 1,
       },
     };
   },

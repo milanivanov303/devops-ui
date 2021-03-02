@@ -49,11 +49,11 @@ export default {
   getTTSkeysFromActiveBuilds: state => (module) => {
     const ttsKeys = [];
     state.active.filter(build => build.module === module)
-    .forEach((build) => {
-      if (!ttsKeys.includes(build.details.tts_key)) {
-        ttsKeys.push(build.details.tts_key);
-      }
-    });
+      .forEach((build) => {
+        if (!ttsKeys.includes(build.details.tts_key)) {
+          ttsKeys.push(build.details.tts_key);
+        }
+      });
     return ttsKeys;
   },
   getActiveGroupedByTTSkey: state => (module) => {

@@ -44,7 +44,7 @@
             </paginate>
           </div>
         </div>
-       
+
       </div>
       <div v-else>
         <div class="col s12 m6 l5 scroll" ref="ttsKeys">
@@ -126,7 +126,7 @@ export default {
       return data.slice(from, to);
     },
   },
-    methods: {
+  methods: {
     getActiveBuilds() {
       this.$store.dispatch('builds/getActive');
     },
