@@ -142,8 +142,8 @@
       </paginate>
     </div>
 
-    <BuildInfo
-      v-if="showInfoModal"
+    <component v-bind:is="infoComponent"
+       v-if="showInfoModal"
       :build="selectedBuild"
       @close="closeInfoModal()"
     />
@@ -189,9 +189,14 @@
 
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
-import BuildProgress from '@/components/BuildProgress';
 import EventBus from '@/event-bus';
-import BuildInfo from '@/components/BuildInfo';
+
+const BuildProgress = () => import('@/components/BuildProgress');
+const extranetInfoModal = () => import('@/views/extranet/components/BuildInfo');
+const debiteurInfoModal = () => import('@/views/debiteur/components/BuildInfo');
+const imx_beInfoModal = () => import('@/views/imx-be/components/BuildInfo');
+const imx_feInfoModal = () => import('@/views/imx-fe/components/BuildInfo');
+const imxInfoModal = () => import('@/views/imx/components/BuildInfo');
 
 export default {
   props: {
@@ -215,7 +220,11 @@ export default {
   components: {
     Paginate,
     BuildProgress,
-    BuildInfo,
+    extranetInfoModal,
+    debiteurInfoModal,
+    imx_feInfoModal,
+    imx_beInfoModal,
+    imxInfoModal,
   },
   computed: {
     searchLoaded() {
@@ -233,6 +242,7 @@ export default {
   },
   data() {
     return {
+      infoComponent: '',
       search: '',
       searchTimeout: null,
       broadcast: '',
@@ -335,6 +345,17 @@ export default {
 
     openInfoModal(build) {
       this.selectedBuild = { ...build };
+      this.infoComponent = build.module.concat('InfoModal');
+      if (build.details.java_version) {
+        this.selectedBuild.details.java_version = build.details.java_version.toString();
+      }
+      this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
+      if (build.removed_on) {
+        this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
+      }
+      if (build.removed_on && !build.removed_by) {
+        this.selectedBuild.removed_by = 'auto-removed';
+      }
       this.showInfoModal = true;
     },
 
