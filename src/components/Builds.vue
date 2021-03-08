@@ -189,13 +189,14 @@
 
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
+import { camelCase } from 'lodash';
 import EventBus from '@/event-bus';
 
 const BuildProgress = () => import('@/components/BuildProgress');
 const extranetInfoModal = () => import('@/views/extranet/components/BuildInfo');
 const debiteurInfoModal = () => import('@/views/debiteur/components/BuildInfo');
-const imx_beInfoModal = () => import('@/views/imx-be/components/BuildInfo');
-const imx_feInfoModal = () => import('@/views/imx-fe/components/BuildInfo');
+const imxBeInfoModal = () => import('@/views/imx-be/components/BuildInfo');
+const imxFeInfoModal = () => import('@/views/imx-fe/components/BuildInfo');
 const imxInfoModal = () => import('@/views/imx/components/BuildInfo');
 
 export default {
@@ -222,8 +223,8 @@ export default {
     BuildProgress,
     extranetInfoModal,
     debiteurInfoModal,
-    imx_feInfoModal,
-    imx_beInfoModal,
+    imxBeInfoModal,
+    imxFeInfoModal,
     imxInfoModal,
   },
   computed: {
@@ -345,7 +346,7 @@ export default {
 
     openInfoModal(build) {
       this.selectedBuild = { ...build };
-      this.infoComponent = build.module.concat('InfoModal');
+      this.infoComponent = camelCase(build.module).concat('InfoModal');
       if (build.details.java_version) {
         this.selectedBuild.details.java_version = build.details.java_version.toString();
       }
