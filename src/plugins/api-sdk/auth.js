@@ -1,5 +1,3 @@
-/* eslint class-methods-use-this: ["error", { "exceptMethods": ["getExpire"] }] */
-
 import Axios from 'axios';
 import config from '../../config';
 import Storage from './storage';
@@ -11,7 +9,6 @@ class Auth {
     this.applications = config.auth.applications.split(',');
 
     this.storage = new Storage(options.session_name || 'app_session');
-    this.expire = this.getExpire(options.session_expire || '1 hour');
 
     this.username = options.username || null;
     this.password = options.password || null;
@@ -43,33 +40,6 @@ class Auth {
     return Promise.reject(error);
   }
 
-  sessionExpired() {
-    const lastActivity = this.storage.get('last-activity') || Date.now();
-
-    // update last activity
-    this.storage.set('last-activity', Date.now());
-
-    return (Date.now() - this.expire) > lastActivity;
-  }
-
-  getExpire(expire) {
-    const expireInt = parseInt(expire, 10);
-
-    if (expire.match('hour')) {
-      return expireInt * 60 * 60 * 1000;
-    }
-
-    if (expire.match('minute')) {
-      return expireInt * 60 * 1000;
-    }
-
-    if (expire.match('seconds')) {
-      return expireInt * 1000;
-    }
-
-    return expireInt;
-  }
-
   login(username, password) {
     let query = [];
     this.applications.forEach((appCode) => {
@@ -97,10 +67,6 @@ class Auth {
   }
 
   getUser() {
-    if (this.sessionExpired()) {
-      this.storage.removeAll();
-    }
-
     return this.storage.get('user');
   }
 
