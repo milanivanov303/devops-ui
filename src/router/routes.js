@@ -12,6 +12,9 @@ const ImxBeBranch = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-
 const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
 const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
+const ImxDashboard = () => import(/* webpackChunkName: "imx" */ '../views/imx/ImxDashboard.vue');
+const ImxTTSkeys = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkeys.vue');
+const ImxTTSkey = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkey.vue');
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard.vue');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos.vue');
 const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults.vue');
@@ -248,6 +251,51 @@ export default [
           title: params => params.branch,
         },
         component: ImxFeBranch,
+      },
+    ],
+  },
+  {
+    path: '/imx',
+    meta: {
+      requiresAuth: true,
+      name: 'imx',
+      transitionName: 'slide',
+      title: 'iMX Dashboard',
+      breadcrumb: 'Dashboard',
+    },
+    component: ImxDashboard,
+    children: [
+      {
+        path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+          name: 'imx',
+          transitionName: 'slide',
+          title: 'iMX Dashboard',
+        },
+        component: ImxDashboard,
+      },
+    ],
+  },
+  {
+    path: '/imx/tts_keys',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-tts-keys',
+      transitionName: 'slide',
+      title: 'TTS keys',
+    },
+    component: ImxTTSkeys,
+    children: [
+      {
+        path: ':key',
+        meta: {
+          name: 'imx-tts-key',
+          requiresAuth: true,
+          transitionName: 'slide',
+          title: params => params.key,
+        },
+        component: ImxTTSkey,
       },
     ],
   },

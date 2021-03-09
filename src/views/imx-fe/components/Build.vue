@@ -14,13 +14,14 @@
           <div v-if="build.started === false" class="col s12 l11" key="form" >
             <div class="row">
               <div class="col s12" >
-                <TextInput
+                <Autocomplete
                   label="Client"
                   icon="people"
+                  :items="clients"
                   v-model="form.client"
                   :invalid="$v.form.client.$error"
                   @blur="$v.form.client.$touch()"
-                />
+                  />
               </div>
               <div class="validator col s11 offset-s1 ">
                 <div class="red-text" v-if="$v.form.client.$error">
@@ -105,6 +106,9 @@ export default {
     branch() {
       return this.$route.params.branch;
     },
+    clients() {
+      return this.$store.state.extranet.clients;
+    },
   },
   validations: {
     form: {
@@ -117,6 +121,9 @@ export default {
     },
   },
   methods: {
+    getClients() {
+      this.$store.dispatch('extranet/getClients');
+    },
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
@@ -155,6 +162,9 @@ export default {
         })
         .finally(() => { this.build.started = true; });
     },
+  },
+  mounted() {
+    this.getClients();
   },
 };
 </script>

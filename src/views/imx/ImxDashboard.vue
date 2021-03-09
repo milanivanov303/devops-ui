@@ -1,16 +1,18 @@
 <template>
-  <div class="imx-fe">
-    <div v-if="$route.meta.name === 'imx-fe'">
+  <div class="imx-dashboard">
+    <div v-if="$route.meta.name === 'imx'">
       <div class="col s12 l8">
         <div class="card" ref="my_builds">
           <div class="card-content">
-            <span class="card-title">My IMX FE builds</span>
-            <Builds :user="this.$auth.getUser().username" module="imx_fe"></Builds>
+            <span class="card-title">My IMX builds</span>
+            <Builds :user="this.$auth.getUser().username" module="imx"></Builds>
+            <br>
+            <Build @created="() => this.$refs.builds.getBuilds()"/>
           </div>
         </div>
-        <div class="card" ref="builds_by_branch">
+        <div class="card" ref="builds_by_TTSkey">
           <div class="card-content">
-            <span class="card-title">Active iMX FE builds by branch</span>
+            <span class="card-title">Active iMX builds by TTS key</span>
             <table>
               <thead>
               <tr>
@@ -20,11 +22,11 @@
               </tr>
               </thead>
               <tbody>
-              <tr v-for="(build, index) in activeBuildsGroupedByBranch" :key="index">
+              <tr v-for="(build, index) in activeBuildsGroupedByTTSkey" :key="index">
                 <td>{{ index + 1 }}</td>
                 <td>
-                  <router-link :to="'/imx_fe/branches/' + encodeURIComponent(build.branch)">
-                    {{ build.branch }}
+                  <router-link :to="'/imx/tts_keys/' + encodeURIComponent(build.ttsKey)">
+                  {{ build.ttsKey }}
                   </router-link>
                 </td>
                 <td>
@@ -42,7 +44,7 @@
                   </span>
                 </td>
               </tr>
-              <tr v-if="activeBuildsGroupedByBranch.length === 0">
+              <tr v-if="activeBuildsGroupedByTTSkey.length === 0">
                 <td colspan="3">There are no builds</td>
               </tr>
               </tbody>
@@ -53,7 +55,7 @@
       <div class="col s12 l4">
         <div class="card" ref="stats_by_user">
           <div class="card-content">
-            <span class="card-title">iMX FE builds by user</span>
+            <span class="card-title">iMX builds by user</span>
             <div class="col s12 l6 right">
               <div class="input-field">
                 <Select class="col s12"
@@ -67,20 +69,20 @@
             <BarChart :data="usersChartData" :height="200"></BarChart>
           </div>
         </div>
-        <div class="card" ref="stats_by_branch">
+        <div class="card" ref="stats_by_TTSkey">
           <div class="card-content">
-            <span class="card-title">iMX FE builds by branch</span>
+            <span class="card-title">iMX builds by TTS key</span>
             <div class="col s12 l6 right">
               <div class="input-field">
                 <Select class="col s12"
                         icon="today"
                         displayed="name"
-                        v-model="branchStatisticsDays"
+                        v-model="TTSkeyStatisticsDays"
                         :options="dateOptions"
                 />
               </div>
             </div>
-            <BarChart :data="branchesChartData" :height="200"></BarChart>
+            <BarChart :data="TTSkeyChartData" :height="200"></BarChart>
           </div>
         </div>
       </div>
@@ -91,12 +93,14 @@
 
 <script>
 import BarChart from '@/components/BarChart';
+import Build from './components/Build';
 import Builds from '@/components/Builds';
 import EventBus from '@/event-bus';
 
 export default {
   components: {
     BarChart,
+    Build,
     Builds,
   },
   data() {
@@ -120,7 +124,7 @@ export default {
         name: 'Last 24 hours',
         value: 1,
       },
-      branchStatisticsDays: {
+      TTSkeyStatisticsDays: {
         name: 'Last 24 hours',
         value: 1,
       },
@@ -128,13 +132,13 @@ export default {
   },
   computed: {
     userActiveBuilds() {
-      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'imx_fe');
+      return this.$store.getters['builds/getActiveByUser'](this.$auth.getUser().username, 'imx');
     },
-    activeBuildsGroupedByBranch() {
-      return this.$store.getters['builds/getActiveGroupedByBranch']('imx_fe');
+    activeBuildsGroupedByTTSkey() {
+      return this.$store.getters['builds/getActiveGroupedByTTSkey']('imx');
     },
-    branchesChartData() {
-      const builds = this.$store.getters['builds/getByBranch']('imx-fe-branch-builds', 'imx_fe');
+    TTSkeyChartData() {
+      const builds = this.$store.getters['builds/getByTTSkey']('imx-TTSkey-builds', 'imx');
 
       return {
         labels: Object.keys(builds),
@@ -142,7 +146,7 @@ export default {
       };
     },
     usersChartData() {
-      const builds = this.$store.getters['builds/getByUser']('imx-fe-users-builds', 'imx_fe');
+      const builds = this.$store.getters['builds/getByUser']('imx-users-builds', 'imx');
 
       return {
         labels: Object.keys(builds),
@@ -153,20 +157,20 @@ export default {
   methods: {
     getBuilds() {
       const loader1 = this.$loading.show({ container: this.$refs.my_builds });
-      const loader2 = this.$loading.show({ container: this.$refs.builds_by_branch });
+      const loader2 = this.$loading.show({ container: this.$refs.builds_by_TTSkey });
 
       this.$store.dispatch('builds/getActive').finally(() => {
         loader1.hide();
         loader2.hide();
       });
     },
-    getBranchStatistics() {
-      const loader = this.$loading.show({ container: this.$refs.stats_by_branch });
+    getTTSkeyStatistics() {
+      const loader = this.$loading.show({ container: this.$refs.stats_by_TTSkey });
       this.$store.dispatch(
         'builds/getBuildsForPeriod',
         {
-          startDate: this.getStartDate(this.branchStatisticsDays.value || this.startDate),
-          stateName: 'imx-fe-branch-builds',
+          startDate: this.getStartDate(this.TTSkeyStatisticsDays.value || this.startDate),
+          stateName: 'imx-TTSkey-builds',
         },
       ).finally(() => loader.hide());
     },
@@ -176,7 +180,7 @@ export default {
         'builds/getBuildsForPeriod',
         {
           startDate: this.getStartDate(this.userStatisticsDays.value || this.startDate),
-          stateName: 'imx-fe-users-builds',
+          stateName: 'imx-users-builds',
         },
       ).finally(() => loader.hide());
     },
@@ -193,21 +197,21 @@ export default {
     userStatisticsDays() {
       this.getUserStatistics();
     },
-    branchStatisticsDays() {
-      this.getBranchStatistics();
+    TTSkeyStatisticsDays() {
+      this.getTTSkeyStatistics();
     },
   },
 
   mounted() {
     this.getBuilds();
-    this.getBranchStatistics();
+    this.getTTSkeyStatistics();
     this.getUserStatistics();
   },
 
   created() {
     EventBus.$on('build.created', () => {
       this.getBuilds();
-      this.getBranchStatistics();
+      this.getTTSkeyStatistics();
       this.getUserStatistics();
     });
   },
