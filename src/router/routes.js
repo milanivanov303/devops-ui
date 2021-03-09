@@ -16,6 +16,7 @@ const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/Re
 const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates.vue');
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory.vue');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification.vue');
+const Modules = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modules.vue');
 const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
 const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions.vue');
@@ -288,6 +289,16 @@ export default [
       breadcrumb: 'Modification',
     },
     component: Modification,
+  },
+  {
+    path: '/cms/modules/:id?',
+    meta: {
+      alias: '/modules',
+      name: 'modules',
+      requiresAuth: true,
+      breadcrumb: 'Modules',
+    },
+    component: Modules,
   },
   {
     path: '/administration/users/:username?',

@@ -112,6 +112,11 @@
                   Modification
                 </router-link>
               </li>
+               <li :class="{ active: isActive('cms/modules') }">
+                <router-link to="/cms/modules">
+                  Modules
+                </router-link>
+              </li>
               <li><div class="divider"></div></li>
             </ul>
           </div>
