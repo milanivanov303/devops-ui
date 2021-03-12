@@ -25,7 +25,7 @@
     "vue-chartjs": "^3.5.0",
     "vue-class-component": "^7.0.2",
     "vue-datetime": "^1.0.0-beta.10",
-    "vue-ea-core": "^3.1.6",
+    "vue-ea-core": "^3.1.7",
     "vue-loading-overlay": "^3.2.0",
     "vue-particles": "^1.0.9",
     "vue-property-decorator": "^8.1.0",
