@@ -120,9 +120,8 @@ export default {
     },
 
     userImg() {
-      return `http://kubrat.codixfr.private/phones/images/${this.user.username}.jpg`;
+      return `/users/${this.user.username}/photo`;
     },
-
   },
   created() {
 
