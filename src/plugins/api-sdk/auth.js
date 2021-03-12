@@ -9,6 +9,7 @@ class Auth {
     this.applications = config.auth.applications.split(',');
 
     this.storage = new Storage(options.session_name || 'app_session');
+    this.expire = config.auth.session_expire;
 
     this.username = options.username || null;
     this.password = options.password || null;

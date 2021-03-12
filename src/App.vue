@@ -3,18 +3,12 @@
     <component :is="layout">
       <router-view />
     </component>
-    <AutoLogout></AutoLogout>
+    <AutoLogout/>
   </div>
 </template>
 
 <script lang="js">
-
-import AutoLogout from "@/components/AutoLogout";
-
 export default {
-  components: {
-    AutoLogout
-  },
   data() {
     return {
       defaultTitle: document.title,
