@@ -7,7 +7,7 @@ class Storage {
   }
 
   loadData() {
-    const data = localStorage.getItem(this.name);
+    const data = sessionStorage.getItem(this.name);
     if (data) {
       return JSON.parse(data);
     }
@@ -16,7 +16,7 @@ class Storage {
   }
 
   saveData() {
-    localStorage.setItem(this.name, JSON.stringify(this.data));
+    sessionStorage.setItem(this.name, JSON.stringify(this.data));
   }
 
   set(key, value) {
@@ -34,7 +34,7 @@ class Storage {
   }
 
   removeAll() {
-    localStorage.removeItem(this.name);
+    sessionStorage.removeItem(this.name);
     this.data = {};
   }
 }
