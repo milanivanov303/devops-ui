@@ -1,8 +1,9 @@
-import ApiSdk from './api-sdk';
+import ApiSdk from '@enterpriseapps/ea-js-sdk';
 import config from '../../config';
 
 // Main api sdk instance. It is used for authentication and requests with logged in user
 const apiSdk = new ApiSdk(
+  config,
   config.um.url,
   config.auth.code,
   {
@@ -19,6 +20,7 @@ window.api = name => apiSdk.api(config[name].url, config[name].code);
 const apiSdkAuto = () => {
   if (!window.apiSdkAuto) {
     window.apiSdkAuto = new ApiSdk(
+      config,
       config.um.url,
       config.auth.code,
       {
