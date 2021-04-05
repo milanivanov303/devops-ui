@@ -359,7 +359,7 @@ export default {
       // } else if (payload.type_id === 'cms') {
       //   uri = 'cms';
       // }
-      const response = await api('mmpi').post('modifications/cms', payload);
+      const response = await api('mmpi').post('expert-system/cms', payload);
       return response.data.data;
     } catch (error) {
       console.log(error);

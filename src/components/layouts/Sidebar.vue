@@ -116,6 +116,22 @@
             </ul>
           </div>
         </li>
+        <li :class="{ active: isActive('expert-system/modification') }">
+          <a class="collapsible-header">
+            <i class="material-icons">assessment</i> Expert System
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li :class="{ active: isActive('expert-system') }">
+                <router-link to="/expert-system/modification">
+                  Modification
+                </router-link>
+              </li>
+              <li><div class="divider"></div></li>
+            </ul>
+          </div>
+        </li>
         <li
           v-if="$auth.can('can-manage-authorizations')"
           :class="{ active: isActive('administration') }"
