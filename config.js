@@ -8,7 +8,6 @@ module.exports = {
   auth_auto: {
     username: process.env.VUE_APP_AUTH_AUTO_USERNAME,
     password: process.env.VUE_APP_AUTH_AUTO_PASSWORD,
-    session_name: process.env.VUE_APP_AUTH_AUTO_SESSION_NAME,
   },
   um: {
     url: process.env.VUE_APP_USER_MANAGEMENT_API_URL,
