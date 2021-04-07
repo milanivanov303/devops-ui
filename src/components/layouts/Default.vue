@@ -11,6 +11,7 @@
       </div>
     </main>
     <Footer />
+    <AutoLogout/>
   </div>
 </template>
 

@@ -85,7 +85,13 @@ export default {
 
       auth.getIdentity()
         .then((response) => {
-          auth.setUser(response.data);
+          auth.setUser({
+            username: response.data.username,
+            name: response.data.name,
+            country: response.data.country,
+            permissions: response.data.permissions,
+          });
+          auth.setLastActiveTime();
           this.$router.push(this.$route.query.return_uri || '/');
         })
         .catch(() => {
