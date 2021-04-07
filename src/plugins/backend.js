@@ -6,7 +6,7 @@ const apiSdk = new ApiSdk({
   url: config.um.url,
   code: config.auth.code,
   applications: config.auth.applications,
-  session_name: config.auth_auto.session_name,
+  session_name: config.auth.session_name,
   session_expire: config.auth.session_expire,
 });
 
@@ -21,7 +21,7 @@ const apiSdkAuto = () => {
       url: config.um.url,
       code: config.auth.code,
       applications: config.auth.applications,
-      session_name: config.auth_auto.session_name,
+      session_name: config.auth.session_name.concat('_auto'),
       session_expire: config.auth.session_expire,
       username: config.auth_auto.username,
       password: config.auth_auto.password,
