@@ -41,4 +41,10 @@ export default {
     const configurations = state.configurations.filter(d => d.id !== id);
     Vue.set(state, 'configurations', configurations);
   },
+  apiDocumentation(state, api) {
+    state.apiDocumentation = api;
+  },
+  raml(state, raml) {
+    state.raml = raml;
+  },
 };

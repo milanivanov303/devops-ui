@@ -9,6 +9,7 @@ const DebiteurBranch = () => import(/* webpackChunkName: "extranet" */ '../views
 const ImxBeDashboard = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Dashboard.vue');
 const ImxBeBranches = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branches.vue');
 const ImxBeBranch = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branch.vue');
+const ImxBeBranchDoc = () => import(/* webpackChunkName: "imx-be-doc" */ '../components/ApiDocumentation.vue');
 const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
 const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
@@ -207,6 +208,18 @@ export default [
           title: params => params.branch,
         },
         component: ImxBeBranch,
+        children: [
+          {
+            path: 'doc/:title?/:type?',
+            meta: {
+              name: 'imx-be-branch-doc',
+              requiresAuth: true,
+              transitionName: 'slide',
+              title: params => `${params.branch}- Documentation `,
+            },
+            component: ImxBeBranchDoc,
+          },
+        ],
       },
     ],
   },
@@ -440,14 +453,14 @@ export default [
     },
     redirect: to => `/builds${to.path}`,
   },
-  {
-    path: '*',
-    meta: {
-      name: 'dashboard',
-      requiresAuth: true,
-    },
-    redirect: {
-      path: '/dashboard',
-    },
-  },
+  // {
+  //   path: '*',
+  //   meta: {
+  //     name: 'dashboard',
+  //     requiresAuth: true,
+  //   },
+  //   redirect: {
+  //     path: '/dashboard',
+  //   },
+  // },
 ];

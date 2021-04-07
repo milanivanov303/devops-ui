@@ -81,7 +81,7 @@
             </ul>
           </div>
         </li>
-        <li :class="{ active: isActive('imx') }">
+        <li :class="{ active: isActive('imx/dashboard') }">
           <a class="collapsible-header">
             <i class="material-icons">queue_play_next</i> iMX
             <i class="material-icons right">arrow_drop_down</i>
