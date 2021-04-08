@@ -129,22 +129,4 @@ export default {
 
     return promise;
   },
-
-  getApiDocumentation({ commit }, { branch, repo }) {
-    const promise = api('devops').get(`specs/?repo=${repo}&branch=${branch}`);
-
-    promise
-      .then(response => commit('apiDocumentation', response.data))
-      .catch(() => commit('error', 'Could not get apiDocumentationList', { root: true }));
-    return promise;
-  },
-
-  getRamlFile({ commit }, { branch, repo, file }) {
-    const promise = api('devops').get(`specs/?repo=${repo}&branch=${branch}&file=${file}`);
-
-    promise
-      .then(response => commit('raml', response.data))
-      .catch(() => commit('error', 'Could not get RAML file', { root: true }));
-    return promise;
-  },
 };

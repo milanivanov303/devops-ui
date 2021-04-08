@@ -5,7 +5,5 @@ export default {
   clients: [],
   feBranches: [],
   configurations: [],
-  apiDocumentation: [],
-  raml: '',
   host: '',
 };
