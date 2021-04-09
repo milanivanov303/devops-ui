@@ -465,14 +465,14 @@ export default [
     },
     redirect: to => `/builds${to.path}`,
   },
-  // {
-  //   path: '*',
-  //   meta: {
-  //     name: 'dashboard',
-  //     requiresAuth: true,
-  //   },
-  //   redirect: {
-  //     path: '/dashboard',
-  //   },
-  // },
+  {
+    path: '*',
+    meta: {
+      name: 'dashboard',
+      requiresAuth: true,
+    },
+    redirect: {
+      path: '/dashboard',
+    },
+  },
 ];
