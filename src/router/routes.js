@@ -29,6 +29,7 @@ const AdministrationActions = () => import(/* webpackChunkName: "administration-
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild.vue');
+const BranchDoc = () => import(/* webpackChunkName: "doc" */ '../components/ApiDocumentation.vue');
 
 export default [
   {
@@ -104,6 +105,18 @@ export default [
           breadcrumb: params => params.branch,
         },
         component: ExtranetBranch,
+        children: [
+          {
+            path: 'doc/:title?/:type?',
+            meta: {
+              name: 'extranet-branch-doc',
+              requiresAuth: true,
+              transitionName: 'slide',
+              title: params => `${params.branch}- Documentation `,
+            },
+            component: BranchDoc,
+          },
+        ],
       },
     ],
   },
@@ -207,6 +220,18 @@ export default [
           title: params => params.branch,
         },
         component: ImxBeBranch,
+        children: [
+          {
+            path: 'doc/:title?/:type?',
+            meta: {
+              name: 'imx-be-branch-doc',
+              requiresAuth: true,
+              transitionName: 'slide',
+              title: params => `${params.branch}- Documentation `,
+            },
+            component: BranchDoc,
+          },
+        ],
       },
     ],
   },
@@ -440,14 +465,14 @@ export default [
     },
     redirect: to => `/builds${to.path}`,
   },
-  {
-    path: '*',
-    meta: {
-      name: 'dashboard',
-      requiresAuth: true,
-    },
-    redirect: {
-      path: '/dashboard',
-    },
-  },
+  // {
+  //   path: '*',
+  //   meta: {
+  //     name: 'dashboard',
+  //     requiresAuth: true,
+  //   },
+  //   redirect: {
+  //     path: '/dashboard',
+  //   },
+  // },
 ];

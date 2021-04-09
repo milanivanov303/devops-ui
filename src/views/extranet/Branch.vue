@@ -3,6 +3,10 @@
     <div class="row" >
       <div class="col s12" >
         <h4>{{ branch }}</h4>
+        <router-link :to="'/extranet/branches/'+branch+'/doc'">
+          <i class="material-icons right">library_books</i>
+        </router-link>
+        <router-view :key="$route.path" repo="extranet"/>
       </div>
     </div>
     <Builds :branch="branch" module="extranet"/>
