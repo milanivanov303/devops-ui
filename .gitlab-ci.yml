@@ -41,8 +41,6 @@ build for dev:
   stage: build
   environment: dev
   script:
-    - export WEB_PROXY_URL=$WEB_PROXY_URL_DEV
-    - export WEB_PROXY_TOKEN=$WEB_PROXY_TOKEN_DEV
     - *build-script
   only:
     - develop
@@ -51,6 +49,8 @@ deploy on dev:
   stage: deploy
   environment: dev
   script:
+    - export WEB_PROXY_URL=$WEB_PROXY_URL_DEV
+    - export WEB_PROXY_TOKEN=$WEB_PROXY_TOKEN_DEV
     - *deploy-script
   dependencies:
     - build for dev
