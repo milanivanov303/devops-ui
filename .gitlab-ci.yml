@@ -11,11 +11,10 @@ before_script:
   - docker push $IMAGE-$CI_ENVIRONMENT_NAME
 
 .deploy-script: &deploy-script
-  - apk add docker-compose
   - export WEB_CONTAINER_IMAGE=$IMAGE-$CI_ENVIRONMENT_NAME
   - docker-compose --host $DEPLOY_HOST pull
   - docker-compose --host $DEPLOY_HOST up --no-build --detach
-  #- export SERVER=$(echo $DEPLOY_HOST | sed "s/:[0-9]*//g")
+  #- export SERVER=$(echo $DEPLOY_HOST | sed "s/http:\/\///g" | sed "s/:[0-9]*//g")
   - export SERVER=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/:.*//g")
   - export PORT=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/.*://g")
   - |
@@ -42,6 +41,8 @@ build for dev:
   stage: build
   environment: dev
   script:
+    - export WEB_PROXY_URL=$WEB_PROXY_URL_DEV
+    - export WEB_PROXY_TOKEN=$WEB_PROXY_TOKEN_DEV
     - *build-script
   only:
     - develop
@@ -70,6 +71,8 @@ deploy on prod:
   environment: prod
   script:
     - export IMAGE=$IMAGE_TAG
+    - export WEB_PROXY_URL=$WEB_PROXY_URL_PROD
+    - export WEB_PROXY_TOKEN=$WEB_PROXY_TOKEN_PROD
     - *deploy-script
   only:
     - tags

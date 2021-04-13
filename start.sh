@@ -18,13 +18,15 @@ display_usage()
    echo "-h|--help      Print this help"
    echo "-r|--recreate  Recreate containers"
    echo
+   exit 0;
 }
 
 while getopts "hr" option; do
     case "${option}"
         in
             r) RECREATE=true;;
-            h) display_usage
+            h) display_usage;;
+            *) echo "usage: $0 [-v] [-r]" >&2
                exit 0;;
     esac
 done
