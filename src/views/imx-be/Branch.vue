@@ -3,10 +3,10 @@
     <div class="row" >
       <div class="col s12">
         <h4>{{ branch }}</h4>
-        <router-link :to="'/imx_be/branches/'+branch+'/doc'">
+        <router-link :to="'/imx_be/branches/'+branch+'/documentation'">
           <i class="material-icons right">library_books</i>
         </router-link>
-        <router-view :key="$route.path" repo="imx_be"/>
+        <router-view :key="$route.path" repo="imx_be" :branch="branch"/>
       </div>
     </div>
     <Builds ref="builds" :branch="branch" module="imx_be"/>

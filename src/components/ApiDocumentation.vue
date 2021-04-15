@@ -37,7 +37,8 @@
                   :delete-btn="false"
                   queryPrefix="doc"
               >
-                  <Column label="API Title" :show="(row) => row.title"/>
+                  <Column label="API Title" :show="(row) => getTitle(row)"/>
+
                   <Column label="Screens - API documentation"
                       :show="(row) => getScreensTittle(row)"/>
                   <template v-slot:actions-before="{ row }">
@@ -77,6 +78,7 @@ import 'api-console/api-console';
 export default {
   props: {
     repo: String,
+    branch: String,
   },
   data() {
     return {
@@ -89,41 +91,52 @@ export default {
     };
   },
   methods: {
+    getTitle(api) {
+      if (!api.title) {
+        return `<span class="new badge red" data-badge-caption="">${api.error}</span>`;
+      }
+      return api.title;
+    },
     getScreensTittle(api) {
-      let screens = '';
-      api.documentation.forEach((i) => {
-        screens = `${screens.concat(i.title)}<br>`;
-      });
-      return screens;
+      if (api.documentation) {
+        let screens = '';
+        api.documentation.forEach((i) => {
+          screens = `${screens.concat(i.title)}<br>`;
+        });
+        return screens;
+      }
+      return '<span class="new badge red" data-badge-caption="">ERROR</span>';
     },
 
     getApiDocumentation() {
-      // $refs is empty
-      // const loader = this.$loading.show({ container: this.$refs.modal });
-
-      this.$store.dispatch('documentation/getApiDocumentation', {
-        branch: this.$route.params.branch,
+      const payload = {
+        branch: this.branch,
         repo: this.repo,
-      })
+      };
+      const promise1 = this.$store.dispatch('documentation/getApiDocumentation', payload);
+      const promise2 = this.$store.dispatch('documentation/getDocDetails', payload);
+
+      Promise.all([promise1, promise2])
         .then((response) => {
-          // loader.hide();
-          this.apiDocumentation = response.data;
-          if (this.$route.params.title && this.$route.params.type) {
-            const doc = this.apiDocumentation.find((d) => {
-              if (d.title === this.$route.params.title) {
+          this.apiDocumentation = response[0].data;
+          this.docDetails = response[1].data;
+
+          const queryParam = { ...this.$route.query };
+          if (queryParam) {
+            const doc = this.apiDocumentation.find((api) => {
+              if (api.title === queryParam.title) {
                 return true;
               }
               return false;
             });
-            this.getRamlDoc(doc, this.$route.params.type);
+
+            if (doc && queryParam.doc_type === 'raml') {
+              this.getRamlDoc(doc);
+              return;
+            }
+
+            this.getApiConsole(doc);
           }
-        });
-      this.$store.dispatch('documentation/getDocDetails', {
-        branch: this.$route.params.branch,
-        repo: this.repo,
-      })
-        .then((response) => {
-          this.docDetails = response.data;
         });
     },
 
@@ -141,18 +154,14 @@ export default {
         .then((response) => {
           loader.hide();
           this.raml = response.data;
-
-          // this.$router.push({ name: `${this.repo}-branch-doc`, params: {
-          //     branch: this.$route.params.branch,
-          //     title: row.title,
-          //     type: 'raml',
-          //   }
-          // });
-
-        // this.$router.push({
-        //   path: `doc/${row.title}/raml`,
-        // });
         });
+
+      this.$router.push({
+        query: {
+          title: row.title,
+          doc_type: 'raml',
+        },
+      });
     },
     async getApiConsole(row) {
       this.view = 'api-console';
@@ -181,12 +190,18 @@ export default {
       } catch (e) {
         console.error(e);
       }
+      this.$router.push({
+        query: {
+          title: row.title,
+          doc_type: 'api-console',
+        },
+      });
     },
 
     close() {
       this.view = 'table';
       this.apiDocumentation = [];
-      this.$router.push({
+      this.$router.history.replace({
         path: `/${this.repo}/branches/${this.$route.params.branch}`,
       });
     },
@@ -194,14 +209,46 @@ export default {
       this.view = 'table';
       this.raml = '';
 
-      // also removes doc
-      this.$router.history.replace({
-        path: `/${this.repo}/branches/${this.$route.params.branch}/doc`,
-      });
+      this.$router.push({ query: { } });
+    },
+
+    getFilterFromQueryParam(param) {
+      const queryParam = this.$route.query[param];
+
+      if (typeof queryParam !== 'undefined' && queryParam.includes('=')) {
+        const obj = {};
+
+        queryParam.split('&').forEach((query) => {
+          /* eslint prefer-destructuring: ["error", {VariableDeclarator: {object: false}}] */
+          obj[query.split('=')[0]] = query.split('=')[1];
+        });
+
+        if (obj.project) {
+          this.filter.project = this.projects.find((p) => {
+            if (p.id === parseInt(obj.project, 10) || p.name === 'all') {
+              return true;
+            }
+            return false;
+          });
+        }
+
+        if (obj.type) {
+          this.filter.type = this.tariffTypes.find(t => t.id === parseInt(obj.type, 10));
+        }
+
+        if (obj.category) {
+          this.filter.category = this.tariffTypes.find(c => c.id === parseInt(obj.category, 10));
+        }
+      }
+
+      this.$store.commit('kronos/filter', this.filter);
+      if (this.filter.project) {
+        this.getTariffs();
+      }
     },
   },
   created() {
-    if (this.$route.fullPath.includes('doc')) {
+    if (this.$route.fullPath.includes('documentation')) {
       this.getApiDocumentation();
     }
   },
