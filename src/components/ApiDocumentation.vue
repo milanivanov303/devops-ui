@@ -24,7 +24,7 @@
             <p class="col s12"><b>Commit: </b>{{ docDetails.commit }}</p>
             <p class="col s12"><b>Commited by: </b>{{ docDetails.username }}</p>
             <p class="col s12"><b>Commit message: </b>{{ docDetails.message }}</p>
-            <p class="col s12"><b>Commited on: </b>{{ $date(docDetails.time).toHuman() }}</p>
+            <p class="col s12"><b>Documentation date: </b>{{ $date(docDetails.time).toHuman() }}</p>
           </div>
           <div class="row">
             <Table
@@ -40,9 +40,9 @@
                 queryPrefix="doc"
             >
                 <Column label="API Title" :show="(row) => getTitle(row)"/>
-
                 <Column label="Screens - API documentation"
                     :show="(row) => getScreensTittle(row)"/>
+                <Column label="File" :show="(row) => getApiFile(row)"/>
                 <template v-slot:actions-before="{ row }">
                     <a @click="getRamlDoc(row)">
                         <span class="new badge" data-badge-caption="">RAML</span>
@@ -108,6 +108,12 @@ export default {
       }
       return '<span class="new badge red" data-badge-caption="">ERROR</span>';
     },
+    getApiFile(api) {
+      if (api.documentation) {
+        return api.file;
+      }
+      return `<span class="new badge red" data-badge-caption="">${api.file}</span>`;
+    },
 
     getApiDocumentation() {
       this.view = 'loading';
@@ -127,7 +133,7 @@ export default {
           if (this.$route.query) {
             const queryParam = { ...this.$route.query };
             const doc = this.apiDocumentation.find((api) => {
-              if (api.title === queryParam.title) {
+              if (api.file === queryParam.file) {
                 return true;
               }
               return false;
@@ -161,7 +167,7 @@ export default {
 
       this.$router.push({
         query: {
-          title: row.title,
+          file: row.file,
           doc_type: 'raml',
         },
       });
@@ -197,7 +203,7 @@ export default {
       }
       this.$router.push({
         query: {
-          title: row.title,
+          file: row.file,
           doc_type: 'api-console',
         },
       });
@@ -224,3 +230,12 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  .modal {
+    top: 0 !important;
+    max-height: 100%;
+    height: 100%;
+    width: 100%;
+  }
+</style>
