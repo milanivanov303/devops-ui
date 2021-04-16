@@ -1,73 +1,75 @@
 <template>
-  <div>
-    <Modal @close="close()">
-      <template v-slot:header>
-        API Documentation for <b>{{ $route.params.branch }}</b>
-        <div v-if="view === 'api-console'"><b>Console</b></div>
-        <div v-if="view === 'raml'"><b>RAML file</b></div>
-      </template>
-      <template v-slot:content>
-        <div class="row" v-if="view === 'table'">
-          <div class="col s12">
-            <div class="row right">
-              <div class="col s12 ">
-                <a @click="showDetails = !showDetails">
-                  <i v-if="!showDetails" class="material-icons right">expand_more</i>
-                  <i v-else class="material-icons right">expand_less</i>
-                  Show Details
-                </a>
-              </div>
-            </div>
-            <div class="row" v-if="showDetails">
-              <p class="col s12"><b>Commit: </b>{{ docDetails.commit }}</p>
-              <p class="col s12"><b>Commited by: </b>{{ docDetails.username }}</p>
-              <p class="col s12"><b>Commit message: </b>{{ docDetails.message }}</p>
-              <p class="col s12"><b>Commited on: </b>{{ $date(docDetails.time).toHuman() }}</p>
-            </div>
-            <div class="row">
-              <Table
-                  class="col s12"
-                  :data="apiDocumentation"
-                  sort-by="title"
-                  sort-dir="asc"
-                  :export-btn="false"
-                  :view-btn="false"
-                  :add-btn="false"
-                  :edit-btn="false"
-                  :delete-btn="false"
-                  queryPrefix="doc"
-              >
-                  <Column label="API Title" :show="(row) => row.title"/>
-                  <Column label="Screens - API documentation"
-                      :show="(row) => getScreensTittle(row)"/>
-                  <template v-slot:actions-before="{ row }">
-                      <a @click="getRamlDoc(row)">
-                          <span class="new badge" data-badge-caption="">RAML</span>
-                      </a>
-                      <a @click="getApiConsole(row)">
-                          <span class="new badge" data-badge-caption="">Api-Console</span>
-                      </a>
-                  </template>
-              </Table>
+  <Modal @close="close()">
+    <template v-slot:header>
+      API Documentation for <b>{{ $route.params.branch }}</b>
+      <div v-if="view === 'api-console'"><b>Console</b></div>
+      <div v-if="view === 'raml'"><b>RAML file</b></div>
+    </template>
+    <template v-slot:content>
+      <div class="center" v-if="view === 'loading'">
+        <Preloader class="big"></Preloader>
+      </div>
+      <div class="row" v-if="view === 'table'">
+        <div class="col s12">
+          <div class="row right">
+            <div class="col s12 ">
+              <a @click="showDetails = !showDetails">
+                <i v-if="!showDetails" class="material-icons right">expand_more</i>
+                <i v-else class="material-icons right">expand_less</i>
+                Show Details
+              </a>
             </div>
           </div>
+          <div class="row" v-if="showDetails">
+            <p class="col s12"><b>Commit: </b>{{ docDetails.commit }}</p>
+            <p class="col s12"><b>Commited by: </b>{{ docDetails.username }}</p>
+            <p class="col s12"><b>Commit message: </b>{{ docDetails.message }}</p>
+            <p class="col s12"><b>Documentation date: </b>{{ $date(docDetails.time).toHuman() }}</p>
+          </div>
+          <div class="row">
+            <Table
+                class="col s12"
+                :data="apiDocumentation"
+                sort-by="title"
+                sort-dir="asc"
+                :export-btn="false"
+                :view-btn="false"
+                :add-btn="false"
+                :edit-btn="false"
+                :delete-btn="false"
+                queryPrefix="doc"
+            >
+                <Column label="API Title" :show="(row) => getTitle(row)"/>
+                <Column label="Screens - API documentation"
+                    :show="(row) => getScreensTittle(row)"/>
+                <Column label="File" :show="(row) => getApiFile(row)"/>
+                <template v-slot:actions-before="{ row }">
+                    <a @click="getRamlDoc(row)">
+                        <span class="new badge" data-badge-caption="">RAML</span>
+                    </a>
+                    <a @click="getApiConsole(row)">
+                        <span class="new badge" data-badge-caption="">Api-Console</span>
+                    </a>
+                </template>
+            </Table>
+          </div>
         </div>
-        <div class="row" v-if="view === 'api-console'">
-           <api-console class="col s12"></api-console>
-        </div>
-        <div class="row" v-if="view === 'raml'">
-          <pre class="col s12">{{raml}}</pre>
-        </div>
-      </template>
-      <template v-slot:footer>
-        <button v-if="view !== 'table'"
-                class="waves-effect btn"
-                @click="goBack()">
-                Back
-        </button>
-      </template>
-    </Modal>
-  </div>
+      </div>
+      <div class="row" v-if="view === 'api-console'">
+          <api-console class="col s12"></api-console>
+      </div>
+      <div class="row" v-if="view === 'raml'">
+        <pre class="col s12">{{raml}}</pre>
+      </div>
+    </template>
+    <template v-slot:footer>
+      <button v-if="view == 'raml' || view == 'api-console'"
+              class="waves-effect btn"
+              @click="goBack()">
+              Back
+      </button>
+    </template>
+  </Modal>
 </template>
 
 <script>
@@ -77,10 +79,11 @@ import 'api-console/api-console';
 export default {
   props: {
     repo: String,
+    branch: String,
   },
   data() {
     return {
-      view: 'table',
+      view: '',
       type: 'RAML 1.0',
       apiDocumentation: [],
       docDetails: {},
@@ -89,47 +92,66 @@ export default {
     };
   },
   methods: {
+    getTitle(api) {
+      if (!api.title) {
+        return `<span class="new badge red" data-badge-caption="">${api.error}</span>`;
+      }
+      return api.title;
+    },
     getScreensTittle(api) {
-      let screens = '';
-      api.documentation.forEach((i) => {
-        screens = `${screens.concat(i.title)}<br>`;
-      });
-      return screens;
+      if (api.documentation) {
+        let screens = '';
+        api.documentation.forEach((i) => {
+          screens = `${screens.concat(i.title)}<br>`;
+        });
+        return screens;
+      }
+      return '<span class="new badge red" data-badge-caption="">ERROR</span>';
+    },
+    getApiFile(api) {
+      if (api.documentation) {
+        return api.file;
+      }
+      return `<span class="new badge red" data-badge-caption="">${api.file}</span>`;
     },
 
     getApiDocumentation() {
-      // $refs is empty
-      // const loader = this.$loading.show({ container: this.$refs.modal });
-
-      this.$store.dispatch('documentation/getApiDocumentation', {
-        branch: this.$route.params.branch,
+      this.view = 'loading';
+      const payload = {
+        branch: this.branch,
         repo: this.repo,
-      })
+      };
+      const promise1 = this.$store.dispatch('documentation/getApiDocumentation', payload);
+      const promise2 = this.$store.dispatch('documentation/getDocDetails', payload);
+
+      Promise.all([promise1, promise2])
         .then((response) => {
-          // loader.hide();
-          this.apiDocumentation = response.data;
-          if (this.$route.params.title && this.$route.params.type) {
-            const doc = this.apiDocumentation.find((d) => {
-              if (d.title === this.$route.params.title) {
+          this.view = 'table';
+          this.apiDocumentation = response[0].data;
+          this.docDetails = response[1].data;
+
+          if (this.$route.query) {
+            const queryParam = { ...this.$route.query };
+            const doc = this.apiDocumentation.find((api) => {
+              if (api.file === queryParam.file) {
                 return true;
               }
               return false;
             });
-            this.getRamlDoc(doc, this.$route.params.type);
+
+            if (doc && queryParam.doc_type === 'raml') {
+              this.getRamlDoc(doc);
+            }
+
+            if (doc && queryParam.doc_type === 'api-console') {
+              this.getApiConsole(doc);
+            }
           }
-        });
-      this.$store.dispatch('documentation/getDocDetails', {
-        branch: this.$route.params.branch,
-        repo: this.repo,
-      })
-        .then((response) => {
-          this.docDetails = response.data;
         });
     },
 
     getRamlDoc(row) {
-      this.view = 'raml';
-      const loader = this.$loading.show({ container: this.$refs.modal });
+      this.view = 'loading';
       this.$store.dispatch(
         'documentation/getRamlFile',
         {
@@ -139,23 +161,19 @@ export default {
         },
       )
         .then((response) => {
-          loader.hide();
+          this.view = 'raml';
           this.raml = response.data;
-
-          // this.$router.push({ name: `${this.repo}-branch-doc`, params: {
-          //     branch: this.$route.params.branch,
-          //     title: row.title,
-          //     type: 'raml',
-          //   }
-          // });
-
-        // this.$router.push({
-        //   path: `doc/${row.title}/raml`,
-        // });
         });
+
+      this.$router.push({
+        query: {
+          file: row.file,
+          doc_type: 'raml',
+        },
+      });
     },
     async getApiConsole(row) {
-      this.view = 'api-console';
+      this.view = 'loading';
 
       try {
         amf.plugins.document.WebApi.register();
@@ -169,9 +187,11 @@ export default {
         const resolver = amf.Core.resolver(this.type);
         const resolvedDoc = resolver.resolve(ramlDoc, 'editing');
         const generator = amf.Core.generator('AMF Graph', 'application/json');
+        this.view = 'api-console';
 
         const opts = amf.render.RenderOptions().withSourceMaps.withCompactUris;
         const model = await generator.generateString(resolvedDoc, opts);
+
 
         const apic = document.querySelector('api-console');
 
@@ -181,12 +201,18 @@ export default {
       } catch (e) {
         console.error(e);
       }
+      this.$router.push({
+        query: {
+          file: row.file,
+          doc_type: 'api-console',
+        },
+      });
     },
 
     close() {
-      this.view = 'table';
+      this.view = '';
       this.apiDocumentation = [];
-      this.$router.push({
+      this.$router.history.replace({
         path: `/${this.repo}/branches/${this.$route.params.branch}`,
       });
     },
@@ -194,16 +220,22 @@ export default {
       this.view = 'table';
       this.raml = '';
 
-      // also removes doc
-      this.$router.history.replace({
-        path: `/${this.repo}/branches/${this.$route.params.branch}/doc`,
-      });
+      this.$router.push({ query: { } });
     },
   },
   created() {
-    if (this.$route.fullPath.includes('doc')) {
+    if (this.$route.fullPath.includes('documentation')) {
       this.getApiDocumentation();
     }
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  .modal {
+    top: 0 !important;
+    max-height: 100%;
+    height: 100%;
+    width: 100%;
+  }
+</style>

@@ -107,9 +107,9 @@ export default [
         component: ExtranetBranch,
         children: [
           {
-            path: 'doc/:title?/:type?',
+            path: 'documenation',
             meta: {
-              name: 'extranet-branch-doc',
+              name: 'extranet-branch-documentation',
               requiresAuth: true,
               transitionName: 'slide',
               title: params => `${params.branch}- Documentation `,
@@ -222,9 +222,9 @@ export default [
         component: ImxBeBranch,
         children: [
           {
-            path: 'doc/:title?/:type?',
+            path: 'documentation',
             meta: {
-              name: 'imx-be-branch-doc',
+              name: 'imx-be-branch-documentation',
               requiresAuth: true,
               transitionName: 'slide',
               title: params => `${params.branch}- Documentation `,
