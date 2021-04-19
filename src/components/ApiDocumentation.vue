@@ -1,5 +1,5 @@
 <template>
-  <Modal @close="close()">
+  <Modal @close="$emit('close')">
     <template v-slot:header>
       API Documentation for <b>{{ $route.params.branch }}</b>
       <div v-if="view === 'api-console'"><b>Console</b></div>
@@ -20,12 +20,14 @@
               </a>
             </div>
           </div>
+
           <div class="row" v-if="showDetails">
             <p class="col s12"><b>Commit: </b>{{ docDetails.commit }}</p>
             <p class="col s12"><b>Commited by: </b>{{ docDetails.username }}</p>
             <p class="col s12"><b>Commit message: </b>{{ docDetails.message }}</p>
             <p class="col s12"><b>Documentation date: </b>{{ $date(docDetails.time).toHuman() }}</p>
           </div>
+
           <div class="row">
             <Table
                 class="col s12"
@@ -39,9 +41,11 @@
                 :delete-btn="false"
                 queryPrefix="doc"
             >
-                <Column label="API Title" :show="(row) => getTitle(row)"/>
-                <Column label="Screens - API documentation"
-                    :show="(row) => getScreensTittle(row)"/>
+                <Column  label="API Title" :show="(row) => getTitle(row)"/>
+                <Column
+                  label="Screens - API documentation"
+                  :show="(row) => getScreensTitle(row)"
+                />
                 <Column label="File" :show="(row) => getApiFile(row)"/>
                 <template v-slot:actions-before="{ row }">
                     <a @click="getRamlDoc(row)">
@@ -98,7 +102,8 @@ export default {
       }
       return api.title;
     },
-    getScreensTittle(api) {
+
+    getScreensTitle(api) {
       if (api.documentation) {
         let screens = '';
         api.documentation.forEach((i) => {
@@ -108,6 +113,7 @@ export default {
       }
       return '<span class="new badge red" data-badge-caption="">ERROR</span>';
     },
+
     getApiFile(api) {
       if (api.documentation) {
         return api.file;
@@ -117,37 +123,37 @@ export default {
 
     getApiDocumentation() {
       this.view = 'loading';
+
       const payload = {
         branch: this.branch,
         repo: this.repo,
       };
+
       const promise1 = this.$store.dispatch('documentation/getApiDocumentation', payload);
       const promise2 = this.$store.dispatch('documentation/getDocDetails', payload);
 
       Promise.all([promise1, promise2])
         .then((response) => {
-          this.view = 'table';
           this.apiDocumentation = response[0].data;
           this.docDetails = response[1].data;
 
           if (this.$route.query) {
-            const queryParam = { ...this.$route.query };
             const doc = this.apiDocumentation.find((api) => {
-              if (api.file === queryParam.file) {
+              if (api.file === this.$route.query.file) {
                 return true;
               }
               return false;
             });
 
-            if (doc && queryParam.doc_type === 'raml') {
+            if (doc && this.$route.query.doc_type === 'raml') {
               this.getRamlDoc(doc);
             }
 
-            if (doc && queryParam.doc_type === 'api-console') {
+            if (doc && this.$route.query.doc_type === 'api-console') {
               this.getApiConsole(doc);
             }
           }
-        });
+        }).finally(() => { this.view='table'; });
     },
 
     getRamlDoc(row) {
@@ -172,6 +178,7 @@ export default {
         },
       });
     },
+
     async getApiConsole(row) {
       this.view = 'loading';
 
@@ -192,6 +199,7 @@ export default {
         const opts = amf.render.RenderOptions().withSourceMaps.withCompactUris;
         const model = await generator.generateString(resolvedDoc, opts);
 
+        debugger;
 
         const apic = document.querySelector('api-console');
 
@@ -212,6 +220,7 @@ export default {
     close() {
       this.view = '';
       this.apiDocumentation = [];
+
       this.$router.history.replace({
         path: `/${this.repo}/branches/${this.$route.params.branch}`,
       });
@@ -224,9 +233,9 @@ export default {
     },
   },
   created() {
-    if (this.$route.fullPath.includes('documentation')) {
+    //if (this.$route.fullPath.includes('documentation')) {
       this.getApiDocumentation();
-    }
+    //}
   },
 };
 </script>

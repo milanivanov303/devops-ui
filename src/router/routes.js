@@ -202,38 +202,26 @@ export default [
     ],
   },
   {
-    path: '/imx_be/branches',
+    path: '/imx_be/branches/:branch?/:action?',
     meta: {
       requiresAuth: true,
       name: 'imx-be-branches',
       transitionName: 'slide',
-      title: 'iMX-BE Branches',
+      title: params => {
+        let title = 'iMX-BE Branches';
+
+        if (params.branch) {
+          title = `${params.branch} - ${title}`;
+        }
+
+        if (params.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
     },
     component: ImxBeBranches,
-    children: [
-      {
-        path: ':branch',
-        meta: {
-          name: 'imx-be-branch',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: params => params.branch,
-        },
-        component: ImxBeBranch,
-        children: [
-          {
-            path: 'documentation',
-            meta: {
-              name: 'imx-be-branch-documentation',
-              requiresAuth: true,
-              transitionName: 'slide',
-              title: params => `${params.branch}- Documentation `,
-            },
-            component: BranchDoc,
-          },
-        ],
-      },
-    ],
   },
   {
     path: '/imx_fe',
