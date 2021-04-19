@@ -1,6 +1,7 @@
 .git
 .cache
 .env.local
+.gitlab-ci.yml
 node_modules
 docker-compose.yml
 docker-compose.local.yml

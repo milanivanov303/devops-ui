@@ -14,7 +14,10 @@ export default {
         'details',
       ]),
       filters: JSON.stringify({
-        anyOf: [
+        allOf: [
+          {
+            parent_id: null,
+          },
           {
             status: {
               operator: 'in',
@@ -91,14 +94,14 @@ export default {
   },
 
   getBuildsByStatus({ commit }, {
-    branch, module, status, user, perPage, page, search
+    branch, ttsKey, module, status, user, perPage, page, search,
   }) {
     const devopsApi = api('devops');
 
-    if (typeof cancelToken != 'undefined') {
+    if (typeof cancelToken !== 'undefined') {
       cancelToken.cancel();
     }
-    
+
     cancelToken = devopsApi.axios.CancelToken.source();
 
     const promise = devopsApi.get('builds', {
@@ -120,10 +123,16 @@ export default {
             module,
           },
           {
+            'details->tts_key': ttsKey,
+          },
+          {
             'details->branch': branch,
           },
           {
             created_by: user,
+          },
+          {
+            parent_id: null,
           },
         ],
       }),
@@ -133,7 +142,7 @@ export default {
       per_page: perPage,
       page,
     }, {
-      cancelToken: cancelToken.token
+      cancelToken: cancelToken.token,
     });
 
     promise

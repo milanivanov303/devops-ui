@@ -6,9 +6,15 @@ const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '
 const DebiteurDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Dashboard.vue');
 const DebiteurBranches = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branches.vue');
 const DebiteurBranch = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branch.vue');
+const ImxBeDashboard = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Dashboard.vue');
+const ImxBeBranches = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branches.vue');
+const ImxBeBranch = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branch.vue');
 const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
 const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
+const ImxDashboard = () => import(/* webpackChunkName: "imx" */ '../views/imx/ImxDashboard.vue');
+const ImxTTSkeys = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkeys.vue');
+const ImxTTSkey = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkey.vue');
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard.vue');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos.vue');
 const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults.vue');
@@ -24,6 +30,7 @@ const AdministrationActions = () => import(/* webpackChunkName: "administration-
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild.vue');
+const BranchDoc = () => import(/* webpackChunkName: "doc" */ '../components/ApiDocumentation.vue');
 
 export default [
   {
@@ -99,6 +106,18 @@ export default [
           breadcrumb: params => params.branch,
         },
         component: ExtranetBranch,
+        children: [
+          {
+            path: 'documenation',
+            meta: {
+              name: 'extranet-branch-documentation',
+              requiresAuth: true,
+              transitionName: 'slide',
+              title: params => `${params.branch}- Documentation `,
+            },
+            component: BranchDoc,
+          },
+        ],
       },
     ],
   },
@@ -162,6 +181,62 @@ export default [
     ],
   },
   {
+    path: '/imx_be',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-be',
+      transitionName: 'slide',
+      title: 'iMX-BE Dashboard',
+    },
+    component: ImxBeDashboard,
+    children: [
+      {
+        path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+          name: 'imx-be',
+          transitionName: 'slide',
+          title: 'iMX-BE Dashboard',
+        },
+        component: ImxBeDashboard,
+      },
+    ],
+  },
+  {
+    path: '/imx_be/branches',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-be-branches',
+      transitionName: 'slide',
+      title: 'iMX-BE Branches',
+    },
+    component: ImxBeBranches,
+    children: [
+      {
+        path: ':branch',
+        meta: {
+          name: 'imx-be-branch',
+          requiresAuth: true,
+          transitionName: 'slide',
+          title: params => params.branch,
+        },
+        component: ImxBeBranch,
+        children: [
+          {
+            path: 'documentation',
+            meta: {
+              name: 'imx-be-branch-documentation',
+              requiresAuth: true,
+              transitionName: 'slide',
+              title: params => `${params.branch}- Documentation `,
+            },
+            component: BranchDoc,
+          },
+        ],
+      },
+    ],
+  },
+  {
     path: '/imx_fe',
     meta: {
       requiresAuth: true,
@@ -202,6 +277,51 @@ export default [
           title: params => params.branch,
         },
         component: ImxFeBranch,
+      },
+    ],
+  },
+  {
+    path: '/imx',
+    meta: {
+      requiresAuth: true,
+      name: 'imx',
+      transitionName: 'slide',
+      title: 'iMX Dashboard',
+      breadcrumb: 'Dashboard',
+    },
+    component: ImxDashboard,
+    children: [
+      {
+        path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+          name: 'imx',
+          transitionName: 'slide',
+          title: 'iMX Dashboard',
+        },
+        component: ImxDashboard,
+      },
+    ],
+  },
+  {
+    path: '/imx/tts_keys',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-tts-keys',
+      transitionName: 'slide',
+      title: 'TTS keys',
+    },
+    component: ImxTTSkeys,
+    children: [
+      {
+        path: ':key',
+        meta: {
+          name: 'imx-tts-key',
+          requiresAuth: true,
+          transitionName: 'slide',
+          title: params => params.key,
+        },
+        component: ImxTTSkey,
       },
     ],
   },

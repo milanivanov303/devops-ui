@@ -4,7 +4,7 @@
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My builds</span>
-          <Builds :user="this.$auth.getUser().username"></Builds>
+          <Builds v-if="$auth.getUser()" :user="$auth.getUser().username"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
@@ -122,12 +122,12 @@ export default {
         },
       ],
       userStatisticsDays: {
-        name: 'Last 30 days',
-        value: 30,
+        name: 'Last 24 hours',
+        value: 1,
       },
       moduleStatisticsDays: {
-        name: 'Last 30 days',
-        value: 30,
+        name: 'Last 24 hours',
+        value: 1,
       },
     };
   },

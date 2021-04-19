@@ -18,13 +18,15 @@ display_usage()
    echo "-h|--help      Print this help"
    echo "-r|--recreate  Recreate containers"
    echo
+   exit 0;
 }
 
 while getopts "hr" option; do
     case "${option}"
         in
             r) RECREATE=true;;
-            h) display_usage
+            h) display_usage;;
+            *) echo "usage: $0 [-v] [-r]" >&2
                exit 0;;
     esac
 done
@@ -77,8 +79,13 @@ printf "\n"
 
 if [[ ${EXIT_CODE} -eq 0 ]]; then
     printf "\n"
-    echo "App running on: http://${WEB_CONTAINER_IP}:${WEB_CONTAINER_HTTP_PORT}, https://${WEB_CONTAINER_IP}:${WEB_CONTAINER_HTTPS_PORT}"
+    echo "App running on: http://localhost/devops"
     printf "\n"
+
+    # Install dependencies and start npm development server
+    docker-compose -f $DOCKER_COMPOSE_FILE -f $DOCKER_COMPOSE_LOCAL_FILE exec web npm install
+    docker-compose -f $DOCKER_COMPOSE_FILE -f $DOCKER_COMPOSE_LOCAL_FILE exec web npm run serve
 fi
+
 
 exit ${EXIT_CODE}
