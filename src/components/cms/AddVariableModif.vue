@@ -181,7 +181,6 @@ export default {
           .map(instance => instance.id)
           .join(', ');
       }
-      console.log(this.chain.instances);
     },
     resetCurrentVariable() {
       this.currentVariable.status = '';
@@ -257,7 +256,6 @@ export default {
         },
         contents: this.instance.name === 'All except PROD' ? this.filteredInstances : 'All',
       };
-      console.log(this.devInstance);
       this.$emit('addVariable', this.variableModif, this.currentVariable);
       this.closeModal();
     },
