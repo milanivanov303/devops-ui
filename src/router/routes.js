@@ -1,14 +1,12 @@
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
 const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Dashboard.vue');
 const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
-const ExtranetBranch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
 const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations.vue');
 const DebiteurDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Dashboard.vue');
 const DebiteurBranches = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branches.vue');
 const DebiteurBranch = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branch.vue');
 const ImxBeDashboard = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Dashboard.vue');
 const ImxBeBranches = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branches.vue');
-const ImxBeBranch = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branch.vue');
 const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
 const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
@@ -29,7 +27,6 @@ const AdministrationActions = () => import(/* webpackChunkName: "administration-
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
 const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild.vue');
-const BranchDoc = () => import(/* webpackChunkName: "doc" */ '../components/ApiDocumentation.vue');
 
 export default [
   {
@@ -85,40 +82,26 @@ export default [
     ],
   },
   {
-    path: '/extranet/branches',
+    path: '/extranet/branches/:branch?/:action?',
     meta: {
       requiresAuth: true,
       name: 'extranet-branches',
       transitionName: 'slide',
-      title: 'Extranet Branches',
-      breadcrumb: 'Branches',
+      title: (params) => {
+        let title = 'Extranet Branches';
+
+        if (params.branch) {
+          title = `${params.branch} - ${title}`;
+        }
+
+        if (params.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
     },
     component: ExtranetBranches,
-    children: [
-      {
-        path: ':branch',
-        meta: {
-          name: 'extranet-branch',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: params => params.branch,
-          breadcrumb: params => params.branch,
-        },
-        component: ExtranetBranch,
-        children: [
-          {
-            path: 'documenation',
-            meta: {
-              name: 'extranet-branch-documentation',
-              requiresAuth: true,
-              transitionName: 'slide',
-              title: params => `${params.branch}- Documentation `,
-            },
-            component: BranchDoc,
-          },
-        ],
-      },
-    ],
   },
   {
     path: '/extranet/configurations/:id?/:build?',
@@ -207,7 +190,7 @@ export default [
       requiresAuth: true,
       name: 'imx-be-branches',
       transitionName: 'slide',
-      title: params => {
+      title: (params) => {
         let title = 'iMX-BE Branches';
 
         if (params.branch) {

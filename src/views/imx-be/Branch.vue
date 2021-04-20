@@ -27,7 +27,7 @@
 <script>
 import Build from './components/Build';
 import Builds from '../../components/Builds';
-import ApiDocumentation from "@/components/ApiDocumentation";
+import ApiDocumentation from '@/components/ApiDocumentation';
 
 export default {
   components: {
@@ -46,16 +46,16 @@ export default {
 
       this.$router.history.replace({
         path: `/imx_be/branches/${this.branch}/docs`,
-        query: this.$route.query
+        query: this.$route.query,
       });
     },
     closeDocs() {
       this.showDocs = false;
 
       this.$router.history.replace({
-        path: `/imx_be/branches/${this.branch}`
+        path: `/imx_be/branches/${this.branch}`,
       });
-    }
+    },
   },
   computed: {
     action() {

@@ -17,6 +17,7 @@
         <div class="col s12 m6 l2 right" id="perPage">
           <div class="input-field col s12 l4 right">
               <Select class="col s12"
+                      v-if="sortedBranches.length"
                       displayed="value"
                       v-model="perPage"
                       :options="perPageOptions"

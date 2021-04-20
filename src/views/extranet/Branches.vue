@@ -1,10 +1,8 @@
 <template>
   <div class="branches">
     <div class="row">
-      <div class="col s12">
-        <div class="col s12 m6 l5">
-          <TextInput label="Search" icon="search" v-model="search"/>
-        </div>
+      <div class="col s12 m6 l5">
+        <TextInput label="Search" icon="search" v-model="search"/>
       </div>
     </div>
     <div class="row">
@@ -51,17 +49,13 @@
             :key="branch.name"
             :branch="branch"
             :count="getActiveBuildsCountByBranch(branch.name)"
-            :class="{
-              'selected-branch': $route.path === `/extranet/branches/${branch.name}`
-            }"
+            :class="{'selected-branch': isBranchSelected(branch)}"
           />
         </div>
         <div class="col s12 m6 l7" >
           <div class="card">
             <div class="card-content">
-              <transition name="branch" mode="out-in">
-                <router-view :key="$route.path"/>
-              </transition>
+              <BranchBuilds />
             </div>
           </div>
         </div>
@@ -73,12 +67,13 @@
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
 import Branch from '@/views/extranet/components/Branch';
+import BranchBuilds from '@/views/extranet/Branch';
 import EventBus from '@/event-bus';
-
 
 export default {
   components: {
     Branch,
+    BranchBuilds,
     paginate: Paginate,
   },
   data() {
@@ -109,6 +104,7 @@ export default {
     branches() {
       return this.$store.state.extranet.branches;
     },
+
     filteredBranches() {
       if (!this.search) {
         return this.branches;
@@ -117,6 +113,7 @@ export default {
       const regexp = new RegExp(this.search, 'i');
       return this.branches.filter(branch => branch.name.match(regexp));
     },
+
     sortedBranches() {
       const from = (this.page * this.perPage.value) - this.perPage.value;
       const to = (this.page * this.perPage.value);
@@ -124,6 +121,7 @@ export default {
       this.setLastPage(data);
       return data.slice(from, to);
     },
+
     builds() {
       return this.$store.state.builds.active;
     },
@@ -133,15 +131,19 @@ export default {
       this.$store.dispatch('builds/getActive');
       this.$store.dispatch('extranet/getHost');
     },
+
     selectedPage(page) {
       this.page = page;
     },
+
     setLastPage(data) {
       this.lastPage = Math.ceil(data.length / this.perPage.value);
     },
+
     getActiveBuildsCountByBranch(branch) {
       return this.$store.getters['builds/getActiveByBranch'](branch).length;
     },
+
     checkBranch(selected) {
       if (typeof selected !== 'undefined' && this.branches.length !== 0) {
         const branch = this.branches.find((branch) => {
@@ -168,18 +170,26 @@ export default {
       }
       return false;
     },
+
     getBranches() {
       const loader = this.$loading.show({ container: this.$refs.branches });
-      this.$store.dispatch('extranet/getBranches').then(() => {
-        loader.hide();
-        const branch = document.querySelector('.selected-branch');
-        if (branch) {
-          branch.scrollIntoView({
-            block: 'start',
-            inline: 'nearest',
-          });
-        }
-      });
+      this.$store.dispatch('extranet/getBranches')
+        .then(() => this.scrollBranchIntoView())
+        .finally(() => loader.hide());
+    },
+
+    isBranchSelected(branch) {
+      return branch.name === decodeURIComponent(this.$route.params.branch);
+    },
+
+    scrollBranchIntoView() {
+      const branch = document.querySelector('.selected-branch');
+      if (branch) {
+        branch.scrollIntoView({
+          block: 'start',
+          inline: 'nearest',
+        });
+      }
     },
   },
 
@@ -210,9 +220,6 @@ export default {
 </script>
 
 <style lang="scss">
-  .selected-branch {
-    background-color: #ccc;
-  }
   .scroll {
     max-height: 72.5vh;
     overflow-x: auto;
