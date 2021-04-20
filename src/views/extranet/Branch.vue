@@ -4,10 +4,18 @@
       <div class="col s12" >
         <h4>
           {{ branch }}
-          <a @click="openDocs()" title="Show documentation">
-            <i class="material-icons right">library_books</i>
+          <a
+            @click="openDocs()"
+            target="_blank"
+            data-tooltip="View Documentation"
+            data-position="left"
+            class="tooltipped right"
+            ref="tooltip"
+          >
+            <i class="material-icons">library_books</i>
           </a>
         </h4>
+
       </div>
     </div>
     <Builds :branch="branch" module="extranet"/>
@@ -64,6 +72,9 @@ export default {
     branch() {
       return decodeURIComponent(this.$route.params.branch);
     },
+  },
+  mounted() {
+    this.$M.Tooltip.init(this.$refs.tooltip);
   },
   created() {
     if (this.action === 'docs') {

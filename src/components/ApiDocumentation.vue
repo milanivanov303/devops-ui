@@ -10,55 +10,63 @@
         <Preloader class="big"></Preloader>
       </div>
       <div class="row" v-if="view === 'table'">
-        <div class="col s12">
-          <div class="row right" v-if="Object.keys(docDetails).length !== 0">
-            <div class="col s12 ">
-              <a @click="showDetails = !showDetails">
-                <i v-if="!showDetails" class="material-icons right">expand_more</i>
-                <i v-else class="material-icons right">expand_less</i>
-                Show Details
-              </a>
-            </div>
-          </div>
+        <a v-if="Object.keys(docDetails).length !== 0"
+            @click="showDetails = !showDetails"
+            class="col right">
+          <span class="new badge" data-badge-caption="">
+            {{showDetails ? 'Hide' : 'Show'}} Details
+          </span>
+        </a>
 
-          <div class="row" v-if="showDetails">
-            <p class="col s12"><b>Commit: </b>{{ docDetails.commit }}</p>
-            <p class="col s12"><b>Commited by: </b>{{ docDetails.username }}</p>
-            <p class="col s12"><b>Commit message: </b>{{ docDetails.message }}</p>
-            <p class="col s12"><b>Documentation date: </b>{{ $date(docDetails.time).toHuman() }}</p>
-          </div>
-
-          <div class="row" v-if="apiDocumentation.length !== 0">
-            <Table
-                class="col s12"
-                :data="apiDocumentation"
-                sort-by="title"
-                sort-dir="asc"
-                :export-btn="false"
-                :view-btn="false"
-                :add-btn="false"
-                :edit-btn="false"
-                :delete-btn="false"
-                queryPrefix="doc"
-            >
-                <Column  label="API Title" :show="(row) => getTitle(row)"/>
-                <Column
-                  label="Screens - API documentation"
-                  :show="(row) => getScreensTitle(row)"
-                />
-                <Column label="File" :show="(row) => getApiFile(row)"/>
-                <template v-slot:actions-before="{ row }">
-                    <a @click="getRamlDoc(row)">
-                        <span class="new badge" data-badge-caption="">RAML</span>
-                    </a>
-                    <a @click="getApiConsole(row)">
-                        <span class="new badge" data-badge-caption="">Api-Console</span>
-                    </a>
-                </template>
-            </Table>
-          </div>
-          <Alert v-else msg='Documentation has not been generated!'/>
+        <div class="col s12 details-box" v-if="showDetails">
+          <p class="row">
+            <span data-badge-caption="" class="new badge left">Commit:</span>
+            {{ docDetails.commit }}
+          </p>
+          <p class="row">
+            <span data-badge-caption="" class="new badge left">Commited by:</span>
+            {{ docDetails.username }}
+          </p>
+          <p class="row">
+            <span data-badge-caption="" class="new badge left">Commit message:</span>
+            {{ docDetails.message }}
+          </p>
+          <p class="row">
+            <span data-badge-caption="" class="new badge left">Documentation date:</span>
+            {{ $date(docDetails.time).toHuman() }}
+          </p>
         </div>
+
+        <Table
+            v-if="apiDocumentation.length !== 0"
+            class="col s12"
+            :data="apiDocumentation"
+            sort-by="title"
+            sort-dir="asc"
+            :export-btn="false"
+            :view-btn="false"
+            :add-btn="false"
+            :edit-btn="false"
+            :delete-btn="false"
+            queryPrefix="doc"
+        >
+            <Column label="API Title" :show="(row) => getTitle(row)" width="50%"/>
+            <Column
+              label="Screens - API documentation"
+              :show="(row) => getScreensTitle(row)"
+            />
+            <Column label="File" :show="(row) => getApiFile(row)"/>
+            <template v-slot:actions-before="{ row }">
+                <a @click="getRamlDoc(row)">
+                    <span class="new badge raml-badge" data-badge-caption="">RAML</span>
+                </a>
+                <a @click="getApiConsole(row)">
+                    <span class="new badge" data-badge-caption="">Api-Console</span>
+                </a>
+            </template>
+        </Table>
+
+        <Alert v-else msg='Documentation has not been generated!'/>
       </div>
       <div class="row" v-if="view === 'api-console'">
           <api-console class="col s12"></api-console>
@@ -178,7 +186,10 @@ export default {
               this.getApiConsole(doc);
             }
           }
-        }).finally(() => { this.view = 'table'; });
+        })
+        .finally(() => {
+          this.view = 'table';
+        });
     },
 
     getRamlDoc(row) {
@@ -262,6 +273,11 @@ export default {
 </script>
 
 <style lang="css" scoped>
+  .CodeMirror.cm-s-mbo.CodeMirror-wrap {
+    max-height: 100%;
+    height: 100%;
+  }
+
   .modal {
     top: 0 !important;
     max-height: 100%;
@@ -269,9 +285,16 @@ export default {
     width: 100%;
   }
 
-.CodeMirror.cm-s-mbo.CodeMirror-wrap {
-  max-height: 100%;
-  height: 100%;
-}
+  .details-box {
+    border: 2px solid #29a19c;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, .2);
+    padding: 1rem !important;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .raml-badge{
+    margin-bottom: 5px;
+  }
 
 </style>
