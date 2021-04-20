@@ -63,7 +63,11 @@
           <api-console class="col s12"></api-console>
       </div>
       <div class="row" v-if="view === 'raml'">
-        <pre class="col s12">{{raml}}</pre>
+        <codemirror
+          ref="codemirror"
+          :value="raml"
+          :options="cmOptions">
+        </codemirror>
       </div>
     </template>
     <template v-slot:footer>
@@ -79,11 +83,16 @@
 <script>
 import amf from 'amf-client-js';
 import 'api-console/api-console';
+import { codemirror } from 'vue-codemirror';
+import 'codemirror/lib/codemirror.css';
 
 export default {
   props: {
     repo: String,
     branch: String,
+  },
+  components: {
+    codemirror,
   },
   data() {
     return {
@@ -93,7 +102,22 @@ export default {
       docDetails: {},
       raml: '',
       showDetails: false,
+      cmOptions: {
+        // codemirror options
+        tabSize: 4,
+        theme: 'mbo',
+        mode: 'text/x-yaml',
+        lineWrapping: true,
+        lineNumbers: true,
+        readOnly: 'nocursor',
+        viewportMargin: Infinity,
+      },
     };
+  },
+  computed: {
+    codemirror() {
+      return this.$refs.codemirror.codemirror;
+    },
   },
   methods: {
     getTitle(api) {
@@ -153,7 +177,7 @@ export default {
               this.getApiConsole(doc);
             }
           }
-        }).finally(() => { this.view='table'; });
+        }).finally(() => { this.view = 'table'; });
     },
 
     getRamlDoc(row) {
@@ -199,8 +223,6 @@ export default {
         const opts = amf.render.RenderOptions().withSourceMaps.withCompactUris;
         const model = await generator.generateString(resolvedDoc, opts);
 
-        debugger;
-
         const apic = document.querySelector('api-console');
 
         apic.amf = JSON.parse(model);
@@ -233,18 +255,22 @@ export default {
     },
   },
   created() {
-    //if (this.$route.fullPath.includes('documentation')) {
-      this.getApiDocumentation();
-    //}
+    this.getApiDocumentation();
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
   .modal {
     top: 0 !important;
     max-height: 100%;
     height: 100%;
     width: 100%;
   }
+
+.CodeMirror.cm-s-mbo.CodeMirror-wrap {
+  max-height: 100%;
+  height: 100%;
+}
+
 </style>
