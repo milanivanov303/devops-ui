@@ -11,7 +11,7 @@
       </div>
       <div class="row" v-if="view === 'table'">
         <div class="col s12">
-          <div class="row right">
+          <div class="row right" v-if="Object.keys(docDetails).length !== 0">
             <div class="col s12 ">
               <a @click="showDetails = !showDetails">
                 <i v-if="!showDetails" class="material-icons right">expand_more</i>
@@ -28,7 +28,7 @@
             <p class="col s12"><b>Documentation date: </b>{{ $date(docDetails.time).toHuman() }}</p>
           </div>
 
-          <div class="row">
+          <div class="row" v-if="apiDocumentation.length !== 0">
             <Table
                 class="col s12"
                 :data="apiDocumentation"
@@ -57,6 +57,7 @@
                 </template>
             </Table>
           </div>
+          <Alert v-else msg='Documentation has not been generated!'/>
         </div>
       </div>
       <div class="row" v-if="view === 'api-console'">
