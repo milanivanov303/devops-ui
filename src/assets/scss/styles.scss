@@ -68,7 +68,7 @@ nav {
 .sidenav {
     background-color: $sidenav-bg-color;
     box-shadow: 10px 0px 10px rgba(0, 0, 0, .2);
-    
+
     li {
         a {
             color: white;
@@ -128,13 +128,13 @@ nav {
 
         }
     }
-    
+
     .collapsible-header:hover {
         background-color: lighten(color("codix", lighten-1), 5%);
     }
     .collapsible-body {
         background-color: lighten($sidenav-bg-color, 15%);
-        
+
         li.active{
             a{
                 background-color: $light-color;
@@ -344,11 +344,11 @@ p {
       left: 0;
     }
 }
-  
+
 .modal.right-sheet.open {
     transition: transform cubic-bezier(0.22, 0.61, 0.36, 1) .35s .25s;
 }
-  
+
 .modal.right-sheet.open:not([style*="display: none"]):not([style*="opacity: 0;"]) {
     transform: translate(0, 0%) !important;
 }
@@ -388,7 +388,8 @@ p {
         color: $link-color !important;
     }
 }
-a.collection-item.router-link-exact-active.router-link-active.selected-branch {
+a.router-link-active,
+a.selected-branch {
     .card{
             background-color: lighten($color: $sidenav-bg-color, $amount: 10%);
             color: white;
@@ -431,7 +432,7 @@ a{
 }
 
 .autocomplete-content.dropdown-content {
-    top: 46px !important; 
+    top: 46px !important;
 }
 
 #buildProgress {
