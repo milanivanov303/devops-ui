@@ -68,16 +68,8 @@
 
         <Alert v-else msg='Documentation has not been generated!'/>
       </div>
-      <div class="row" v-if="view === 'api-console'">
-          <api-console class="col s12"></api-console>
-      </div>
-      <div class="row" v-if="view === 'raml'">
-        <codemirror
-          ref="codemirror"
-          :value="raml"
-          :options="cmOptions">
-        </codemirror>
-      </div>
+      <api-console v-if="view === 'api-console'"></api-console>
+      <textarea v-if="view === 'raml'" ref="codemirror"></textarea>
     </template>
     <template v-slot:footer>
       <button v-if="view == 'raml' || view == 'api-console'"
@@ -92,16 +84,19 @@
 <script>
 import amf from 'amf-client-js';
 import 'api-console/api-console';
-import { codemirror } from 'vue-codemirror';
+
 import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/mbo.css';
+
+import 'codemirror/mode/yaml/yaml';
+import _CodeMirror from 'codemirror';
+
+const CodeMirror = window.CodeMirror || _CodeMirror;
 
 export default {
   props: {
     repo: String,
     branch: String,
-  },
-  components: {
-    codemirror,
   },
   data() {
     return {
@@ -109,26 +104,29 @@ export default {
       type: 'RAML 1.0',
       apiDocumentation: [],
       docDetails: {},
-      raml: '',
       showDetails: false,
-      cmOptions: {
-        // codemirror options
+      codeMirror: null,
+    };
+  },
+  methods: {
+    initCodeMirror() {
+      this.codeMirror = CodeMirror.fromTextArea(this.$refs.codemirror, {
         tabSize: 4,
         theme: 'mbo',
         mode: 'text/x-yaml',
         lineWrapping: true,
         lineNumbers: true,
         readOnly: 'nocursor',
-        viewportMargin: Infinity,
-      },
-    };
-  },
-  computed: {
-    codemirror() {
-      return this.$refs.codemirror.codemirror;
+      });
+      this.codeMirror.setSize('100%', '90%');
     },
-  },
-  methods: {
+    destroyCodeMirror() {
+      if (this.codeMirror) {
+        const element = this.codeMirror.doc.cm.getWrapperElement();
+        element.remove();
+      }
+    },
+
     getTitle(api) {
       if (!api.title) {
         return `<span class="new badge red" data-badge-caption="">${api.error}</span>`;
@@ -204,7 +202,13 @@ export default {
       )
         .then((response) => {
           this.view = 'raml';
-          this.raml = response.data;
+
+          this.codeMirrorTimeout = setTimeout(() => {
+            if (this.$refs.codemirror) {
+              this.initCodeMirror();
+            }
+            this.codeMirror.setValue(response.data);
+          }, 10);
         });
 
       this.$router.push({
@@ -260,9 +264,8 @@ export default {
       });
     },
     goBack() {
+      this.destroyCodeMirror();
       this.view = 'table';
-      this.raml = '';
-
       this.$router.push({ query: { } });
     },
   },
