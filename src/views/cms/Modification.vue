@@ -261,7 +261,7 @@ export default {
     },
     async getInstances(deliveryChain) {
       this.instances = [];
-      if (deliveryChain.dc_role && deliveryChain.dc_role === !null) {
+      if (deliveryChain.dc_role && deliveryChain.dc_role !== null) {
         switch (deliveryChain.dc_role.key) {
           case 'dc_rel':
             this.instances = this.filterChains(
