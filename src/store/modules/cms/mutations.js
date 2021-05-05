@@ -48,6 +48,9 @@ export default {
   codixTeams(state, codixTeams) {
     state.codixTeams = codixTeams;
   },
+  codixTeamsTTS(state, codixTeamsTTS) {
+    state.codixTeamsTTS = codixTeamsTTS;
+  },
   updateRspVariable(state, rspVariable) {
     state.rspVariables.map((v) => {
       if (v.id === rspVariable.id) {
@@ -94,4 +97,13 @@ export default {
   instanceStatus(state, instanceStatus) {
     state.instanceStatus = instanceStatus;
   },
+  updateTeams(state, teamValue) {
+    state.teamValues.map((v) => {
+      if (v.id === teamValue.id) {
+        Vue.set(state.rspVariables, state.rspVariables.indexOf(v), teamValue);
+      }
+      return state.teamValues;
+    });
+  },
+  
 };

@@ -17,6 +17,7 @@ const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templ
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory.vue');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification.vue');
 const Modules = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modules.vue');
+const Configurations = () => import(/* webpackChunkName: "cms" */ '../views/cms/Conf.vue');
 const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
 const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions.vue');
@@ -299,6 +300,16 @@ export default [
       breadcrumb: 'Modules',
     },
     component: Modules,
+  },
+  {
+    path: '/cms/configurations',
+    meta: {
+      alias: '/configurations',
+      name: 'configurations',
+      requiresAuth: true,
+      breadcrumb: 'Configurations',
+    },
+    component: Configurations,
   },
   {
     path: '/administration/users/:username?',

@@ -12,6 +12,7 @@ export default {
   deliveryChains: [],
   selectedDeliveryChain: '',
   codixTeams: [],
+  codixTeamsTTS: [],
   templates: [],
   revisions: [],
   templateContent: '',

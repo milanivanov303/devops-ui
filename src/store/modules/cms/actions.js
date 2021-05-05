@@ -18,6 +18,27 @@ export default {
       .catch(() => commit('error', 'Could not get config-defaults list', { root: true }));
     return promise;
   },
+
+
+  getModules({ commit }) {
+    const name = 'modules';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('cms').get('modules', {
+      with: JSON.stringify(['submodules']),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('modules', response.data.data))
+    return promise;
+  },
+
+
   getOneVariable({ commit }, variable) {
     const promise = api('cms').get(`default-variables/${variable}`);
 
@@ -26,6 +47,7 @@ export default {
       .catch(() => commit('error', 'Could not get config-defaults variable', { root: true }));
     return promise;
   },
+
   getImxModules({ commit }) {
     const name = 'imx-modules';
 
@@ -60,6 +82,32 @@ export default {
       .catch(() => commit('error', 'Could not get Codix Teams', { root: true }));
     return promise;
   },
+  codixTeamsTTS({ commit }) {
+    const name = 'teamstts';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('cms').get('codix-teams/tts-groups');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('codixTeamsTTS', response.data.data))
+    return promise;
+  },
+
+  updateTeams({ commit }, payload) {
+    const promise = api('cms').put(`codix-teams/${payload.id}`, payload);
+
+    promise
+      .then(response => commit('updateTeams', response.data.data))
+      .catch(() => commit('error', 'Could not update teams', { root: true }));
+
+    return promise;
+  },
+
   submitVariable({ commit }, payload) {
     let promise;
 
@@ -367,4 +415,5 @@ export default {
       return error;
     }
   },
+ 
 };
