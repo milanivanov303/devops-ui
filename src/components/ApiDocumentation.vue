@@ -20,19 +20,19 @@
 
         <div class="col s12 details-box" v-if="showDetails">
           <p class="row">
-            <span data-badge-caption="" class="new badge left">Commit:</span>
+            <span data-badge-caption="" class="new badge left col">Commit:</span>
             {{ docDetails.commit }}
           </p>
           <p class="row">
-            <span data-badge-caption="" class="new badge left">Commited by:</span>
+            <span data-badge-caption="" class="new badge left col">Commited by:</span>
             {{ docDetails.username }}
           </p>
           <p class="row">
-            <span data-badge-caption="" class="new badge left">Commit message:</span>
+            <span data-badge-caption="" class="new badge left col">Commit message:</span>
             {{ docDetails.message }}
           </p>
           <p class="row">
-            <span data-badge-caption="" class="new badge left">Documentation date:</span>
+            <span data-badge-caption="" class="new badge left col">Documentation date:</span>
             {{ $date(docDetails.time).toHuman() }}
           </p>
         </div>
