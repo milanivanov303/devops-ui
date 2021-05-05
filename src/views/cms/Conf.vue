@@ -19,7 +19,15 @@
               :options="codixTeamsTTS"
             />
     </div>
-
+    <div class="col s12 l12 ">
+        <button
+        class="btn waves-effect waves-light right"
+        type="button"
+        name="action">
+        <!-- @click=""> -->
+        Update Codix Teams
+      </button>
+    </div>
   </div>
 </template>
 <script>

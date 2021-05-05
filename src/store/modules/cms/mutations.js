@@ -100,10 +100,9 @@ export default {
   updateTeams(state, teamValue) {
     state.teamValues.map((v) => {
       if (v.id === teamValue.id) {
-        Vue.set(state.rspVariables, state.rspVariables.indexOf(v), teamValue);
+        Vue.set(state.teamValues, state.teamValues.indexOf(v), teamValue);
       }
       return state.teamValues;
     });
   },
-  
 };
