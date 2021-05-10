@@ -61,10 +61,10 @@
                     <span class="new badge raml-badge" data-badge-caption="">RAML</span>
                 </a>
                 <a @click="convertToOpenAPI3(row)">
-                    <span class="new badge" data-badge-caption="">Convert to OpenApi 3.0</span>
+                    <span class="new badge" data-badge-caption="">OpenAPI 3.0</span>
                 </a>
                 <a @click="getApiConsole(row)">
-                    <span class="new badge" data-badge-caption="">Api-Console</span>
+                    <span class="new badge" data-badge-caption="">API Console</span>
                 </a>
             </template>
         </Table>
@@ -329,7 +329,7 @@ export default {
     margin-bottom: 20px;
   }
 
-  .raml-badge{
+  .badge{
     margin-bottom: 5px;
   }
 
