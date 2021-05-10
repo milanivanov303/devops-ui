@@ -60,6 +60,9 @@
                 <a @click="getRamlDoc(row)">
                     <span class="new badge raml-badge" data-badge-caption="">RAML</span>
                 </a>
+                <a @click="convertToOpenAPI3(row)">
+                    <span class="new badge" data-badge-caption="">Convert to OpenApi 3.0</span>
+                </a>
                 <a @click="getApiConsole(row)">
                     <span class="new badge" data-badge-caption="">Api-Console</span>
                 </a>
@@ -69,10 +72,11 @@
         <Alert v-else msg='Documentation has not been generated!'/>
       </div>
       <api-console v-if="view === 'api-console'"></api-console>
-      <textarea v-if="view === 'raml'" ref="codemirror"></textarea>
+      <textarea v-if="view === 'openApi3.0'" ref="openApi3"></textarea>
+      <textarea v-if="view === 'raml'" ref="raml"></textarea>
     </template>
     <template v-slot:footer>
-      <button v-if="view == 'raml' || view == 'api-console'"
+      <button v-if="view !== 'table'"
               class="waves-effect btn"
               @click="goBack()">
               Back
@@ -109,8 +113,8 @@ export default {
     };
   },
   methods: {
-    initCodeMirror() {
-      this.codeMirror = CodeMirror.fromTextArea(this.$refs.codemirror, {
+    initCodeMirror(ref) {
+      this.codeMirror = CodeMirror.fromTextArea(ref, {
         tabSize: 4,
         theme: 'mbo',
         mode: 'text/x-yaml',
@@ -190,26 +194,40 @@ export default {
         });
     },
 
-    getRamlDoc(row) {
-      this.view = 'loading';
-      this.$store.dispatch(
-        'documentation/getRamlFile',
-        {
-          repo: this.repo,
-          branch: this.$route.params.branch,
-          file: row.file,
-        },
-      )
-        .then((response) => {
-          this.view = 'raml';
+    async getResolvedDoc(row) {
+      amf.plugins.document.WebApi.register();
+      amf.plugins.document.Vocabularies.register();
+      amf.plugins.features.AMFValidation.register();
 
-          this.codeMirrorTimeout = setTimeout(() => {
-            if (this.$refs.codemirror) {
-              this.initCodeMirror();
-            }
-            this.codeMirror.setValue(response.data);
-          }, 10);
-        });
+      await amf.Core.init();
+      const parser = amf.Core.parser(this.type, 'application/raml');
+
+      const ramlDoc = await parser.parseFileAsync(`https://ea-dev.codixfr.private/devops-api/v1/specs?repo=${this.repo}&branch=${this.$route.params.branch}&file=${row.file}`);
+      const resolver = amf.Core.resolver(this.type);
+      const resolvedDoc = resolver.resolve(ramlDoc, 'editing');
+
+      return resolvedDoc;
+    },
+
+    async getRamlDoc(row) {
+      this.view = 'loading';
+
+      try {
+        const resolvedDoc = await this.getResolvedDoc(row);
+        const generator = amf.Core.generator('RAML 1.0', 'application/yaml');
+        const model = await generator.generateString(resolvedDoc);
+
+        this.codeMirrorTimeout = setTimeout(() => {
+          if (this.$refs.raml) {
+            this.initCodeMirror(this.$refs.raml);
+          }
+          this.codeMirror.setValue(model);
+        }, 10);
+
+        this.view = 'raml';
+      } catch (e) {
+        console.error(e);
+      }
 
       this.$router.push({
         query: {
@@ -218,29 +236,44 @@ export default {
         },
       });
     },
+    async convertToOpenAPI3(row) {
+      this.view = 'loading';
 
+      try {
+        const resolvedDoc = await this.getResolvedDoc(row);
+        const generator = amf.Core.generator('OAS 3.0', 'application/yaml');
+        const model = await generator.generateString(resolvedDoc);
+
+        this.codeMirrorTimeout = setTimeout(() => {
+          if (this.$refs.openApi3) {
+            this.initCodeMirror(this.$refs.openApi3);
+          }
+          this.codeMirror.setValue(model);
+        }, 10);
+
+        this.view = 'openApi3.0';
+      } catch (e) {
+        console.error(e);
+      }
+      this.$router.push({
+        query: {
+          file: row.file,
+          doc_type: 'openApi3.0',
+        },
+      });
+    },
     async getApiConsole(row) {
       this.view = 'loading';
 
       try {
-        amf.plugins.document.WebApi.register();
-        amf.plugins.document.Vocabularies.register();
-        amf.plugins.features.AMFValidation.register();
-
-        await amf.Core.init();
-        const parser = amf.Core.parser(this.type, 'application/raml');
-
-        const ramlDoc = await parser.parseFileAsync(`https://ea-dev.codixfr.private/devops-api/v1/specs?repo=${this.repo}&branch=${this.$route.params.branch}&file=${row.file}`);
-        const resolver = amf.Core.resolver(this.type);
-        const resolvedDoc = resolver.resolve(ramlDoc, 'editing');
+        const resolvedDoc = await this.getResolvedDoc(row);
         const generator = amf.Core.generator('AMF Graph', 'application/json');
-        this.view = 'api-console';
-
         const opts = amf.render.RenderOptions().withSourceMaps.withCompactUris;
         const model = await generator.generateString(resolvedDoc, opts);
 
-        const apic = document.querySelector('api-console');
+        this.view = 'api-console';
 
+        const apic = document.querySelector('api-console');
         apic.amf = JSON.parse(model);
         apic.selectedShape = 'summary';
         apic.selectedShapeType = 'summary';
