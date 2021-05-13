@@ -95,6 +95,7 @@
 <script>
 import amf from 'amf-client-js';
 
+import 'api-console/api-console';
 import '@api-components/api-navigation';
 import '@api-components/api-documentation';
 
@@ -299,7 +300,7 @@ export default {
           nav.amf = JSON.parse(model);
 
           nav.addEventListener('api-navigation-selection-changed', (e) => {
-            const {selected, type} = e.detail;
+            const { selected, type } = e.detail;
             doc.selected = selected;
             doc.selectedType = type;
           });
