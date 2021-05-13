@@ -360,14 +360,11 @@ import client from '@/plugins/ws';
 
 import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
-import { Table, Column } from '@/components/table';
 
 export default {
   components: {
     Autocomplete,
     TextArea,
-    Table,
-    Column,
   },
   data() {
     return {

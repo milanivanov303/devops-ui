@@ -2,8 +2,6 @@
   <Modal @close="$emit('close')">
     <template v-slot:header>
       API Documentation for <b>{{ $route.params.branch }}</b>
-      <div v-if="view === 'api-console'"><b>Console</b></div>
-      <div v-if="view === 'raml'"><b>RAML file</b></div>
     </template>
     <template v-slot:content>
       <div class="center" v-if="view === 'loading'">
@@ -71,9 +69,18 @@
 
         <Alert v-else msg='Documentation has not been generated!'/>
       </div>
-      <api-console v-if="view === 'api-console'"></api-console>
+      <div class="row" v-if="view === 'api-console'">
+        <div class="col s4 l3">
+          <api-navigation endpointsopened rearrangeendpoints></api-navigation>
+        </div>
+        <div class="col s8 l9">
+          <api-documentation notryit></api-documentation>
+        </div>
+      </div>
+
       <textarea v-if="view === 'openApi3.0'" ref="openApi3"></textarea>
       <textarea v-if="view === 'raml'" ref="raml"></textarea>
+
     </template>
     <template v-slot:footer>
       <button v-if="view !== 'table'"
@@ -87,7 +94,9 @@
 
 <script>
 import amf from 'amf-client-js';
-import 'api-console/api-console';
+
+import '@api-components/api-navigation';
+import '@api-components/api-documentation';
 
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/mbo.css';
@@ -124,6 +133,7 @@ export default {
       });
       this.codeMirror.setSize('100%', '90%');
     },
+
     destroyCodeMirror() {
       if (this.codeMirror) {
         const element = this.codeMirror.doc.cm.getWrapperElement();
@@ -184,6 +194,10 @@ export default {
               this.getRamlDoc(doc);
             }
 
+            if (doc && this.$route.query.doc_type === 'openApi3.0') {
+              this.convertToOpenAPI3(doc);
+            }
+
             if (doc && this.$route.query.doc_type === 'api-console') {
               this.getApiConsole(doc);
             }
@@ -236,6 +250,7 @@ export default {
         },
       });
     },
+
     async convertToOpenAPI3(row) {
       this.view = 'loading';
 
@@ -244,14 +259,14 @@ export default {
         const generator = amf.Core.generator('OAS 3.0', 'application/yaml');
         const model = await generator.generateString(resolvedDoc);
 
+        this.view = 'openApi3.0';
+
         this.codeMirrorTimeout = setTimeout(() => {
           if (this.$refs.openApi3) {
             this.initCodeMirror(this.$refs.openApi3);
           }
           this.codeMirror.setValue(model);
         }, 10);
-
-        this.view = 'openApi3.0';
       } catch (e) {
         console.error(e);
       }
@@ -262,6 +277,7 @@ export default {
         },
       });
     },
+
     async getApiConsole(row) {
       this.view = 'loading';
 
@@ -273,10 +289,26 @@ export default {
 
         this.view = 'api-console';
 
-        const apic = document.querySelector('api-console');
-        apic.amf = JSON.parse(model);
-        apic.selectedShape = 'summary';
-        apic.selectedShapeType = 'summary';
+        setTimeout(() => {
+          const doc = document.querySelector('api-documentation');
+          doc.amf = JSON.parse(model);
+          doc.selected = 'summary';
+          doc.selectedType = 'summary';
+
+          const nav = document.querySelector('api-navigation');
+          nav.amf = JSON.parse(model);
+
+          nav.addEventListener('api-navigation-selection-changed', (e) => {
+            const {selected, type} = e.detail;
+            doc.selected = selected;
+            doc.selectedType = type;
+          });
+        }, 10);
+
+        // const apic = document.querySelector('api-console');
+        // apic.amf = JSON.parse(model);
+        // apic.selectedShape = 'summary';
+        // apic.selectedShapeType = 'summary';
       } catch (e) {
         console.error(e);
       }

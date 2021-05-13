@@ -234,13 +234,10 @@ import {
   required, email, numeric,
 } from 'vuelidate/lib/validators';
 import 'vue-datetime/dist/vue-datetime.css';
-import { Table, Column } from '@/components/table';
 
 export default {
   components: {
     datetime: Datetime,
-    Table,
-    Column,
   },
 
   data() {
