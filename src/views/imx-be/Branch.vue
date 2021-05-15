@@ -21,24 +21,24 @@
     <br>
     <Build @created="() => this.$refs.builds.getBuilds()"/>
 
-    <ApiDocumentation
+    <Documentation
       v-if="showDocs"
       repo="imx_be"
       :branch="branch"
       @close="closeDocs()"
-    ></ApiDocumentation>
+    ></Documentation>
 
   </div>
 </template>
 
 <script>
 import Build from './components/Build';
-import Builds from '../../components/Builds';
-import ApiDocumentation from '@/components/ApiDocumentation';
+import Builds from '@/components/Builds';
+import Documentation from '@/components/documentation';
 
 export default {
   components: {
-    ApiDocumentation,
+    Documentation,
     Build,
     Builds,
   },
@@ -51,7 +51,7 @@ export default {
     openDocs() {
       this.showDocs = true;
 
-      this.$router.history.replace({
+      this.$router.push({
         path: `/imx_be/branches/${this.branch}/docs`,
         query: this.$route.query,
       });
@@ -59,15 +59,13 @@ export default {
     closeDocs() {
       this.showDocs = false;
 
-      this.$router.history.replace({
+      this.$router.push({
         path: `/imx_be/branches/${this.branch}`,
+        query: this.$route.query,
       });
     },
   },
   computed: {
-    action() {
-      return this.$route.params.action;
-    },
     branch() {
       return decodeURIComponent(this.$route.params.branch);
     },
@@ -76,7 +74,7 @@ export default {
     this.$M.Tooltip.init(this.$refs.tooltip);
   },
   created() {
-    if (this.action === 'docs') {
+    if (this.$route.params.action === 'docs') {
       this.openDocs();
     }
   },
