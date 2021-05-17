@@ -9,13 +9,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(command, key) in getCommands"
+        <tr v-for="(command, key) in modifications"
             v-bind:key="key">
           <td class="left-align">{{command.name}}</td>
           <td>
             <button class="btn-floating waves-effect waves-light left btn-small red"
                     type="button"
-                    @click="remove(key)"
+                    @click="$emit('remove', key)"
                     data-target="action"><i class="material-icons">remove</i>
             </button>
           </td>
@@ -32,21 +32,10 @@ export default {
       required: true,
     },
   },
-  methods: {
-    remove(key) {
-      this.modifications.splice(key, 1);
-    },
-  },
-  computed: {
-    getCommands() {
-      const modificationsClone = this.modifications.slice();
-      return modificationsClone;
-    },
-  },
 };
 </script>
 
-<style lang='scss' scopped>
+<style lang='scss' scoped>
   .no-padding {
     padding-left: 0rem !important;
   }

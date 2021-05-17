@@ -22,24 +22,24 @@
     <br>
     <Build/>
 
-    <ApiDocumentation
+    <Documentation
       v-if="showDocs"
       repo="extranet"
       :branch="branch"
       @close="closeDocs()"
-    ></ApiDocumentation>
+    ></Documentation>
 
   </div>
 </template>
 
 <script>
+import Documentation from '@/components/documentation';
 import Build from './components/Build';
 import Builds from '../../components/Builds';
-import ApiDocumentation from '@/components/ApiDocumentation';
 
 export default {
   components: {
-    ApiDocumentation,
+    Documentation,
     Build,
     Builds,
   },

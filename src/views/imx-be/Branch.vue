@@ -32,9 +32,9 @@
 </template>
 
 <script>
-import Build from './components/Build';
 import Builds from '@/components/Builds';
 import Documentation from '@/components/documentation';
+import Build from './components/Build';
 
 export default {
   components: {
@@ -50,6 +50,10 @@ export default {
   methods: {
     openDocs() {
       this.showDocs = true;
+
+      if (this.$route.params.action === 'docs') {
+        return;
+      }
 
       this.$router.push({
         path: `/imx_be/branches/${this.branch}/docs`,

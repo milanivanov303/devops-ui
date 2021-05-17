@@ -1,7 +1,8 @@
 <template>
   <div class="row">
     <div class="col s12">
-      <textarea v-if="!error" ref="codemirror" hidden></textarea>
+      <Error v-if="error || validationError" :error="error" :validation-error="validationError"/>
+      <textarea ref="codemirror" hidden></textarea>
     </div>
   </div>
 </template>
@@ -9,8 +10,13 @@
 <script>
 import amfMixin from './amfMixin';
 import codemirrorMixin from './codemirrorMixin';
+import Error from './Error';
 
 export default {
+  components: {
+    Error,
+  },
+
   mixins: [
     amfMixin,
     codemirrorMixin,
@@ -21,7 +27,9 @@ export default {
     const raml = await this.getRaml();
     loader.hide();
 
-    this.initCodeMirror(raml);
+    if (raml) {
+      this.initCodeMirror(raml);
+    }
   },
 };
 </script>

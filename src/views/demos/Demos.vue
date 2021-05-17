@@ -346,25 +346,23 @@ export default {
     openAddEditDemoModal(demo, action) {
       this.$v.$reset();
 
-      this.demo = Object.assign(
-        {},
-        {
-          country: 'Bulgaria',
-          business: 'Factoring',
-          status: 'approved',
-        },
-        demo,
-      );
+      this.demo = {
+
+        country: 'Bulgaria',
+        business: 'Factoring',
+        status: 'approved',
+        ...demo,
+      };
 
       if (this.demo.business) {
         this.demo.business = this.businesses.find(
-          business => business.name === this.demo.business,
+          (business) => business.name === this.demo.business,
         );
       }
 
       if (this.demo.status) {
         this.demo.status = this.statuses.find(
-          status => status.value === this.demo.status,
+          (status) => status.value === this.demo.status,
         );
       }
 
@@ -461,7 +459,7 @@ export default {
         return;
       }
 
-      const payload = Object.assign({}, this.demo);
+      const payload = { ...this.demo };
       payload.active_from = this.$date(this.demo.active_from).toSeconds();
       payload.active_to = this.$date(this.demo.active_to).toSeconds();
       payload.business = payload.business.name;

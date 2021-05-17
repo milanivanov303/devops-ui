@@ -17,7 +17,7 @@ export default {
   },
   removeBuild(state, id) {
     state.services.splice(
-      state.services.findIndex(service => service.ID === id),
+      state.services.findIndex((service) => service.ID === id),
       1,
     );
   },
@@ -38,7 +38,7 @@ export default {
     });
   },
   deleteConfiguration(state, id) {
-    const configurations = state.configurations.filter(d => d.id !== id);
+    const configurations = state.configurations.filter((d) => d.id !== id);
     Vue.set(state, 'configurations', configurations);
   },
 };

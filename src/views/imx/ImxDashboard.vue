@@ -93,9 +93,9 @@
 
 <script>
 import BarChart from '@/components/BarChart';
-import Build from './components/Build';
 import Builds from '@/components/Builds';
 import EventBus from '@/event-bus';
+import Build from './components/Build';
 
 export default {
   components: {

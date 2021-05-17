@@ -316,7 +316,7 @@ export default {
     getPublishedPort(build, port) {
       try {
         return build.details.service.Endpoint.Ports
-          .find(value => value.TargetPort === port).PublishedPort;
+          .find((value) => value.TargetPort === port).PublishedPort;
       } catch (e) {
         return null;
       }
@@ -426,7 +426,7 @@ export default {
         .then(() => {
           this.removed = true;
           this.$store.commit('builds/remove', build.id);
-          this.builds = this.builds.filter(_build => _build.id !== build.id);
+          this.builds = this.builds.filter((_build) => _build.id !== build.id);
         })
         .catch((error) => {
           if (error.response.status === 403) {

@@ -98,7 +98,6 @@ import BarChart from '@/components/BarChart';
 import Builds from '@/components/Builds';
 import EventBus from '@/event-bus';
 
-
 export default {
   components: {
     BarChart,

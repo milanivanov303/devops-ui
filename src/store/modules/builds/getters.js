@@ -13,7 +13,7 @@ function sortBuilds(builds) {
 }
 
 export default {
-  getActiveByUser: state => (username, module) => {
+  getActiveByUser: (state) => (username, module) => {
     if (!state.active) {
       return [];
     }
@@ -25,11 +25,11 @@ export default {
     });
   },
 
-  getActiveGroupedByBranch: state => (module) => {
+  getActiveGroupedByBranch: (state) => (module) => {
     const branches = {};
     state
       .active
-      .filter(build => build.module === module)
+      .filter((build) => build.module === module)
       .forEach((build) => {
         if (!branches[build.details.branch]) {
           branches[build.details.branch] = {};
@@ -38,7 +38,6 @@ export default {
         + 1 || 1;
       });
 
-
     const builds = [];
     Object.keys(branches).forEach((branch) => {
       builds.push({ branch, builds: branches[branch] });
@@ -46,9 +45,9 @@ export default {
 
     return builds.sort((a, b) => b.builds - a.builds);
   },
-  getTTSkeysFromActiveBuilds: state => (module) => {
+  getTTSkeysFromActiveBuilds: (state) => (module) => {
     const ttsKeys = [];
-    state.active.filter(build => build.module === module)
+    state.active.filter((build) => build.module === module)
       .forEach((build) => {
         if (!ttsKeys.includes(build.details.tts_key)) {
           ttsKeys.push(build.details.tts_key);
@@ -56,11 +55,11 @@ export default {
       });
     return ttsKeys;
   },
-  getActiveGroupedByTTSkey: state => (module) => {
+  getActiveGroupedByTTSkey: (state) => (module) => {
     const ttsKeys = {};
     state
       .active
-      .filter(build => build.module === module)
+      .filter((build) => build.module === module)
       .forEach((build) => {
         if (!ttsKeys[build.details.tts_key]) {
           ttsKeys[build.details.tts_key] = {};
@@ -87,7 +86,6 @@ export default {
         branches[build.module][build.status] = branches[build.module][build.status] + 1 || 1;
       });
 
-
     const builds = [];
     Object.keys(branches).forEach((module) => {
       builds.push({ module, builds: branches[module] });
@@ -96,20 +94,20 @@ export default {
     return builds.sort((a, b) => b.builds - a.builds);
   },
 
-  getActiveByBranch: state => (branch) => {
+  getActiveByBranch: (state) => (branch) => {
     if (!state.active) {
       return [];
     }
-    return state.active.filter(build => build.details.branch === branch);
+    return state.active.filter((build) => build.details.branch === branch);
   },
-  getActiveByTTSkey: state => (key) => {
+  getActiveByTTSkey: (state) => (key) => {
     if (!state.active) {
       return [];
     }
-    return state.active.filter(build => build.details.tts_key === key);
+    return state.active.filter((build) => build.details.tts_key === key);
   },
 
-  getByModule: state => (stateName) => {
+  getByModule: (state) => (stateName) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -124,7 +122,7 @@ export default {
 
     return sortBuilds(builds);
   },
-  getByTTSkey: state => (stateName, module) => {
+  getByTTSkey: (state) => (stateName, module) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -141,7 +139,7 @@ export default {
 
     return sortBuilds(builds);
   },
-  getByUser: state => (stateName, module) => {
+  getByUser: (state) => (stateName, module) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -158,7 +156,7 @@ export default {
 
     return sortBuilds(builds);
   },
-  getByBranch: state => (stateName, module) => {
+  getByBranch: (state) => (stateName, module) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -176,7 +174,7 @@ export default {
     return sortBuilds(builds);
   },
 
-  getForBranch: state => (stateName, branch) => {
+  getForBranch: (state) => (stateName, branch) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -188,7 +186,7 @@ export default {
       return false;
     });
   },
-  getForUser: state => (stateName, user) => {
+  getForUser: (state) => (stateName, user) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -200,6 +198,6 @@ export default {
       return false;
     });
   },
-  paginationData: state => state.paginationData,
+  paginationData: (state) => state.paginationData,
 
 };

@@ -74,8 +74,8 @@
 
 <script>
 import Paginate from 'vuejs-paginate/src/components/Paginate';
-import TTSkey from './components/TTSkey';
 import EventBus from '@/event-bus';
+import TTSkey from './components/TTSkey';
 
 export default {
   components: {
@@ -116,7 +116,7 @@ export default {
       }
 
       const regexp = new RegExp(this.search, 'i');
-      return this.ttsKeys.filter(key => key.match(regexp));
+      return this.ttsKeys.filter((key) => key.match(regexp));
     },
     sorted() {
       const from = (this.page * this.perPage.value) - this.perPage.value;

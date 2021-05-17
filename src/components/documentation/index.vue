@@ -14,15 +14,15 @@
       <Details v-if="view === 'list' && !error" :repo="repo" :branch="branch"/>
       <List v-if="view === 'list' && !error" :specs="specs" @show="show"/>
 
-      <transition name="raml" mode="out-in">
+      <transition name="slide" mode="out-in">
         <Raml v-if="view === 'raml'" :repo="repo" :branch="branch" :file="file"/>
       </transition>
 
-      <transition name="openapi" mode="out-in">
+      <transition name="slide" mode="out-in">
         <Openapi v-if="view === 'openapi'" :repo="repo" :branch="branch" :file="file"/>
       </transition>
 
-      <transition name="api-console" mode="out-in">
+      <transition name="slide" mode="out-in">
         <ApiConsole v-if="view === 'api-console'" :repo="repo" :branch="branch" :file="file"/>
       </transition>
     </template>
@@ -93,6 +93,10 @@ export default {
     show(file, view) {
       this.file = file;
       this.view = view;
+
+      if (this.$route.query.file === file && this.$route.query.view === view) {
+        return;
+      }
 
       const query = { ...this.$route.query };
       query.file = file;

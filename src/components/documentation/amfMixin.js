@@ -6,6 +6,7 @@ export default {
     return {
       type: 'RAML 1.0',
       error: null,
+      validationError: null,
     };
   },
 
@@ -28,7 +29,14 @@ export default {
         `${window.location.origin}/${config.devops.url}/specs?repo=${this.repo}&branch=${this.branch}&file=${this.file}`,
       );
 
-      return amf.Core.resolver(this.type).resolve(ramlDoc, 'editing');
+      const doc = amf.Core.resolver(this.type).resolve(ramlDoc, 'editing');
+
+      const result = await amf.AMF.validate(doc, amf.ProfileNames.RAML);
+      if (result.results.length) {
+        this.validationError = result.toString();
+      }
+
+      return doc;
     },
 
     async getRaml() {
@@ -38,7 +46,7 @@ export default {
 
         return await generator.generateString(resolvedDoc);
       } catch (e) {
-        this.error = 'Could not generate raml file';
+        this.error = e.toString();
         return null;
       }
     },
@@ -51,6 +59,7 @@ export default {
         return await generator.generateString(resolvedDoc);
       } catch (e) {
         this.error = 'Could not generate openapi file';
+        this.error = e.toString();
         return null;
       }
     },
@@ -65,6 +74,7 @@ export default {
         return JSON.parse(model);
       } catch (e) {
         this.error = 'Could not generate amf graph';
+        this.error = e.toString();
         return null;
       }
     },

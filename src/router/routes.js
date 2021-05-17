@@ -2,9 +2,9 @@ const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Das
 const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Dashboard.vue');
 const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
 const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations.vue');
-const DebiteurDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Dashboard.vue');
-const DebiteurBranches = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branches.vue');
-const DebiteurBranch = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branch.vue');
+const DebiteurDashboard = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Dashboard.vue');
+const DebiteurBranches = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Branches.vue');
+const DebiteurBranch = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Branch.vue');
 const ImxBeDashboard = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Dashboard.vue');
 const ImxBeBranches = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branches.vue');
 const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
@@ -155,8 +155,8 @@ export default [
           name: 'debiteur-branch',
           requiresAuth: true,
           transitionName: 'slide',
-          title: params => params.branch,
-          breadcrumb: params => params.branch,
+          title: (params) => params.branch,
+          breadcrumb: (params) => params.branch,
         },
         component: DebiteurBranch,
       },
@@ -244,7 +244,7 @@ export default [
           name: 'imx-fe-branch',
           requiresAuth: true,
           transitionName: 'slide',
-          title: params => params.branch,
+          title: (params) => params.branch,
         },
         component: ImxFeBranch,
       },
@@ -289,7 +289,7 @@ export default [
           name: 'imx-tts-key',
           requiresAuth: true,
           transitionName: 'slide',
-          title: params => params.key,
+          title: (params) => params.key,
         },
         component: ImxTTSkey,
       },
@@ -434,7 +434,7 @@ export default [
       layout: 'basic',
       requiresAuth: false,
     },
-    redirect: to => `/builds${to.path}`,
+    redirect: (to) => `/builds${to.path}`,
   },
   {
     path: '*',

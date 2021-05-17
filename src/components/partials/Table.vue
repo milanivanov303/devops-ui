@@ -200,8 +200,8 @@ export default {
       let data = this.$store.getters[this.request.data];
 
       if (filterKey && data) {
-        data = data.filter(row => Object.keys(row)
-          .some(key => String(row[key])
+        data = data.filter((row) => Object.keys(row)
+          .some((key) => String(row[key])
             .toLowerCase()
             .indexOf(filterKey) > -1));
       }

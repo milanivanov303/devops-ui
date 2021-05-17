@@ -73,7 +73,6 @@ import Paginate from 'vuejs-paginate/src/components/Paginate';
 import Branch from '@/views/imx-fe/components/Branch';
 import EventBus from '@/event-bus';
 
-
 export default {
   components: {
     Branch,
@@ -114,7 +113,7 @@ export default {
       }
 
       const regexp = new RegExp(this.search, 'i');
-      return this.branches.filter(branch => branch.name.match(regexp));
+      return this.branches.filter((branch) => branch.name.match(regexp));
     },
     sorted() {
       const from = (this.page * this.perPage.value) - this.perPage.value;

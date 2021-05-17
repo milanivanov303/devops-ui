@@ -8,7 +8,7 @@
             class="col s12 readonly"
             label="TTS Key"
             icon="apps"
-            v-model="build.details.tts_key"
+            :value="build.details.tts_key"
           />
         </div>
         <div class="row">
@@ -16,7 +16,7 @@
             class="col s12 readonly"
             label="BE Branch"
             icon="laptop_chromebook"
-            v-model="build.details.be.branch"
+            :value="build.details.be.branch"
           />
         </div>
         <div class="row">
@@ -24,7 +24,7 @@
             class="col s12 readonly"
             label="Instance"
             icon="dynamic_feed"
-            v-model="build.details.be.instance.name"
+            :value="build.details.be.instance.name"
           />
         </div>
         <div class="row">
@@ -32,7 +32,7 @@
             class="col s12 readonly"
             label="FE Branch"
             icon="laptop_chromebook"
-            v-model="build.details.fe.branch"
+            :value="build.details.fe.branch"
           />
         </div>
         <div class="row">
@@ -40,7 +40,7 @@
             class="col s12 readonly"
             label="Client"
             icon="people"
-            v-model="build.details.fe.client"
+            :value="build.details.fe.client"
           />
         </div>
         <div class="row">
@@ -48,13 +48,13 @@
             class="col s12 m6 readonly"
             label="Created on"
             icon="event"
-            v-model="build.created_on"
+            :value="build.created_on"
           />
           <TextInput
             class="col s12 m6 readonly"
             label="Created by"
             icon="person"
-            v-model="build.created_by"
+            :value="build.created_by"
           />
         </div>
         <div class="row" v-if="build.removed_on">
@@ -62,13 +62,13 @@
             class="col s12 m6 readonly"
             label="Removed on"
             icon="event"
-            v-model="build.removed_on"
+            :value="build.removed_on"
           />
           <TextInput
             class="col s12 m6 readonly"
             label="Removed by"
             icon="person"
-            v-model="build.removed_by"
+            :value="build.removed_by"
           />
         </div>
       </div>

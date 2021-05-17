@@ -7,7 +7,7 @@
         Create variable
       </div>
       <div v-else>
-        Update {{selectedVariable.name}}
+        Update {{variable.name}}
       </div>
     </template>
     <template v-slot:content>
@@ -20,15 +20,15 @@
               label="Codix Team"
               icon="people"
               displayed="name"
-              v-model="selectedVariable.codix_team"
+              v-model="variable.codix_team"
               :options="codixTeams"
-              :invalid="$v.selectedVariable.codix_team.$error"
+              :invalid="$v.variable.codix_team.$error"
               :class="{readonly: action === 'edit'}"
             />
             <div
               class="col s12 offset-s2 validator red-text"
-              v-if="$v.selectedVariable.codix_team.$error">
-              <p v-if="!$v.selectedVariable.codix_team.required">Team must not be empty.</p>
+              v-if="$v.variable.codix_team.$error">
+              <p v-if="!$v.variable.codix_team.required">Team must not be empty.</p>
             </div>
           </div>
           <div class="col s12 m4">
@@ -78,23 +78,23 @@
           <div class="input-field col s5"
               :class="{
                 m6: action === 'edit',
-                invalid: $v.selectedVariable.name.$error
+                invalid: $v.variable.name.$error
               }">
             <i class="material-icons prefix">label_outline</i>
             <input
               type="text"
               id="name"
-              @blur="$v.selectedVariable.name.$touch()"
-              v-model="selectedVariable.name"
+              @blur="$v.variable.name.$touch()"
+              v-model="variable.name"
               :class="{readonly: action === 'edit'}">
-            <label :class="{active: selectedVariable.name}" for="name">Name</label>
+            <label :class="{active: variable.name}" for="name">Name</label>
             <div
               class="col s12 offset-s2 validator red-text"
-              v-if="$v.selectedVariable.name.$error">
-              <p v-if="!$v.selectedVariable.name.required">
+              v-if="$v.variable.name.$error">
+              <p v-if="!$v.variable.name.required">
                 Name field must not be empty.
               </p>
-              <p v-if="!$v.selectedVariable.name.isUnique">
+              <p v-if="!$v.variable.name.isUnique">
                 The variable name already exists.
               </p>
             </div>
@@ -102,22 +102,22 @@
           <div class="input-field col s4"
               :class="{
                 m6: action === 'edit',
-                invalid: $v.selectedVariable.value.$error
+                invalid: $v.variable.value.$error
               }">
             <input
               type="text"
               id="value"
-              @blur="$v.selectedVariable.value.$touch()"
-              v-model="selectedVariable.value"
+              @blur="$v.variable.value.$touch()"
+              v-model="variable.value"
               :class="{
                 s6: action === 'edit',
                 readonly: action === 'edit'
               }">
-            <label :class="{active: selectedVariable.value}" for="value">Default Value</label>
+            <label :class="{active: variable.value}" for="value">Default Value</label>
             <div
               class="col s12 validator red-text"
-              v-if="$v.selectedVariable.value.$error">
-              <p v-if="!$v.selectedVariable.value.required">
+              v-if="$v.variable.value.$error">
+              <p v-if="!$v.variable.value.required">
                 Value field must not be empty.
               </p>
             </div>
@@ -125,20 +125,20 @@
         </div>
         <div class="row">
           <div class="input-field col s12"
-              :class="{invalid: $v.selectedVariable.description.$error}">
+              :class="{invalid: $v.variable.description.$error}">
             <i class="material-icons prefix">menu</i>
             <input
               type="text"
               id="description"
-              @blur="$v.selectedVariable.description.$touch()"
-              v-model="selectedVariable.description">
-            <label :class="{active: selectedVariable.description}"
+              @blur="$v.variable.description.$touch()"
+              v-model="variable.description">
+            <label :class="{active: variable.description}"
                     for="description">Description</label>
           </div>
           <div
             class="col s12 offset-s1 red-text validator"
-            v-if="$v.selectedVariable.description.$error">
-            <p v-if="!$v.selectedVariable.description.required">
+            v-if="$v.variable.description.$error">
+            <p v-if="!$v.variable.description.required">
               Description field must not be empty.
             </p>
           </div>
@@ -241,7 +241,6 @@ export default {
       error: this.msg || '',
       name: '',
       loading: false,
-      variable: {},
       codixTeam: {},
       module: {},
       commitMsg: {
@@ -253,11 +252,12 @@ export default {
         imxModule: '',
         submodule: '',
       },
+      variable: { ...this.selectedVariable },
     };
   },
   validations() {
     const validations = {
-      selectedVariable: {
+      variable: {
         name: {
           required,
         },
@@ -271,18 +271,18 @@ export default {
     };
 
     if (this.action === 'create') {
-      validations.selectedVariable = {
+      validations.variable = {
         name: {
           isUnique() {
-            if (this.selectedVariable.name === '') {
+            if (this.variable.name === '') {
               return true;
             }
             if (this.abbrevName) {
               return this.$store.getters['cms/variableNameIsUnique'](this.abbrevName
-                .concat(this.selectedVariable.name));
+                .concat(this.variable.name));
             }
 
-            return this.$store.getters['cms/variableNameIsUnique'](this.selectedVariable.name);
+            return this.$store.getters['cms/variableNameIsUnique'](this.variable.name);
           },
           required,
         },
@@ -339,8 +339,8 @@ export default {
     },
     abbrevName() {
       let abbrevName = '';
-      if (this.selectedVariable.codix_team) {
-        abbrevName = `${this.selectedVariable.codix_team.abbreviation}_`;
+      if (this.variable.codix_team) {
+        abbrevName = `${this.variable.codix_team.abbreviation}_`;
         if (this.abbrev.imxModule) {
           abbrevName += `${this.abbrev.imxModule.abbreviation}_`;
           if (this.abbrev.submodule) {
@@ -363,27 +363,22 @@ export default {
       this.$v.$reset();
       this.$emit('close');
     },
-    selectedModule(value) {
-      this.module = value;
-      this.submodules.options = value.submodules;
-      this.submodule = '';
-    },
     async saveVariable() {
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
       }
 
-      this.selectedVariable.codix_team_id = this.codixTeam.id;
+      this.variable.codix_team_id = this.codixTeam.id;
 
       const payload = {
-        variable: this.selectedVariable,
+        variable: this.variable,
       };
 
       if (this.action === 'create') {
         payload.commitMsg = this.commitMsg;
         if (this.abbrevName) {
-          payload.variable.name = this.abbrevName.concat(this.selectedVariable.name).toUpperCase();
+          payload.variable.name = this.abbrevName.concat(this.variable.name).toUpperCase();
         }
       }
       this.loading = true;

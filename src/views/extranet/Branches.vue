@@ -26,20 +26,20 @@
           <p v-if="sortedBranches.length" class="col s12 l8 right right-align">Items per page:</p>
         </div>
         <div class="col s12 m6 l6">
-          <paginate
-          v-if="sortedBranches.length"
-          v-model="page"
-          :page-count="lastPage"
-          :click-handler="selectedPage"
-          :prev-class="'material-icons'"
-          :prev-text="'chevron_left'"
-          :next-class="'material-icons'"
-          :next-text="'chevron_right'"
-          :container-class="'pagination'"
-          :page-class="'waves-effect'"
-          :disabled-class="'disabled'"
-          :active-class="'active'">
-          </paginate>
+          <Paginate
+            v-if="sortedBranches.length"
+            v-model="page"
+            :page-count="lastPage"
+            :click-handler="selectedPage"
+            :prev-class="'material-icons'"
+            :prev-text="'chevron_left'"
+            :next-class="'material-icons'"
+            :next-text="'chevron_right'"
+            :container-class="'pagination'"
+            :page-class="'waves-effect'"
+            :disabled-class="'disabled'"
+            :active-class="'active'"
+          ></Paginate>
         </div>
       </div>
       <div v-else>
@@ -74,7 +74,7 @@ export default {
   components: {
     Branch,
     BranchBuilds,
-    paginate: Paginate,
+    Paginate,
   },
   data() {
     return {
@@ -111,7 +111,7 @@ export default {
       }
 
       const regexp = new RegExp(this.search, 'i');
-      return this.branches.filter(branch => branch.name.match(regexp));
+      return this.branches.filter((branch) => branch.name.match(regexp));
     },
 
     sortedBranches() {

@@ -1,5 +1,8 @@
 <template>
   <div class="row">
+    <div class="col s12">
+      <Error v-if="error || validationError" :error="error" :validation-error="validationError"/>
+    </div>
     <div class="col s4 l3">
       <api-navigation endpointsopened rearrangeendpoints></api-navigation>
     </div>
@@ -15,8 +18,13 @@ import amfMixin from './amfMixin';
 import 'api-console/api-console';
 import '@api-components/api-navigation';
 import '@api-components/api-documentation';
+import Error from './Error';
 
 export default {
+  components: {
+    Error,
+  },
+
   mixins: [
     amfMixin,
   ],
@@ -46,7 +54,9 @@ export default {
     const amfGraph = await this.getAmfGraph();
     loader.hide();
 
-    this.initApiConsole(amfGraph);
+    if (amfGraph) {
+      this.initApiConsole(amfGraph);
+    }
   },
 };
 </script>
