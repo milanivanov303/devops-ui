@@ -55,7 +55,7 @@ export default {
         branch: this.branch,
         repo: this.repo,
       })
-        .then(response => {
+        .then((response) => {
           this.details = response.data;
           setTimeout(() => this.dropdown.recalculateDimensions(), 10);
         })
@@ -69,14 +69,13 @@ export default {
   },
 
   mounted() {
-      this.dropdown = M.Dropdown.init(
-        this.$el.querySelector('.dropdown-trigger'),
-        {
-          constrainWidth: false,
-          onOpenStart: () => this.getDetails(),
-        }
-      );
-  }
-}
+    this.dropdown = this.$M.Dropdown.init(
+      this.$el.querySelector('.dropdown-trigger'),
+      {
+        constrainWidth: false,
+        onOpenStart: () => this.getDetails(),
+      },
+    );
+  },
+};
 </script>
-

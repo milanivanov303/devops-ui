@@ -1,4 +1,5 @@
 import amf from 'amf-client-js';
+import config from '@/config';
 
 export default {
   data() {
@@ -24,7 +25,7 @@ export default {
       const parser = amf.Core.parser(this.type, 'application/raml');
 
       const ramlDoc = await parser.parseFileAsync(
-        `${window.location.origin}/devops-api/v1/specs?repo=${this.repo}&branch=${this.branch}&file=${this.file}`
+        `${window.location.origin}/${config.devops.url}/specs?repo=${this.repo}&branch=${this.branch}&file=${this.file}`,
       );
 
       return amf.Core.resolver(this.type).resolve(ramlDoc, 'editing');
@@ -37,8 +38,8 @@ export default {
 
         return await generator.generateString(resolvedDoc);
       } catch (e) {
-        this.error = "Could not get raml file";
-        console.error(e);
+        this.error = 'Could not generate raml file';
+        return null;
       }
     },
 
@@ -49,7 +50,8 @@ export default {
 
         return await generator.generateString(resolvedDoc);
       } catch (e) {
-        console.error(e);
+        this.error = 'Could not generate openapi file';
+        return null;
       }
     },
 
@@ -62,9 +64,9 @@ export default {
 
         return JSON.parse(model);
       } catch (e) {
-        console.error(e);
+        this.error = 'Could not generate amf graph';
+        return null;
       }
     },
   },
-}
-
+};

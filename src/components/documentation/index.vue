@@ -40,11 +40,11 @@
 
 <script>
 
-import Details from "./Details";
-import List from "./List";
-import Raml from "./Raml";
-import Openapi from "./Openapi";
-import ApiConsole from "./ApiConsole";
+import Details from './Details';
+import List from './List';
+import Raml from './Raml';
+import Openapi from './Openapi';
+import ApiConsole from './ApiConsole';
 
 export default {
   components: {
@@ -61,15 +61,8 @@ export default {
   },
 
   data() {
-    let view = 'list';
-    if (this.$route.query.view) {
-      view = this.$route.query.view;
-    }
-
-    let file = null;
-    if (this.$route.query.file) {
-      file = this.$route.query.file;
-    }
+    const view = this.$route.query.view || 'list';
+    const file = this.$route.query.file || null;
 
     return {
       view,
@@ -86,14 +79,14 @@ export default {
         branch: this.branch,
         repo: this.repo,
       })
-        .then(response => {
+        .then((response) => {
           this.specs = response.data;
         })
         .catch(() => {
           this.error = 'Documentation has not been generated!';
         })
         .finally(
-          () => loader.hide()
+          () => loader.hide(),
         );
     },
 
@@ -101,31 +94,36 @@ export default {
       this.file = file;
       this.view = view;
 
-      let query = this.$route.query;
+      const query = { ...this.$route.query };
       query.file = file;
       query.view = view;
 
       this.$router.push({
-        query: {
-          file: file,
-          view: view,
-        },
+        query,
       });
     },
 
     close() {
-      this.$emit('close')
+      this.$emit('close');
+
+      const query = { ...this.$route.query };
+      delete query.file;
+      delete query.view;
+
+      Object.keys(query).forEach((key) => {
+        if (key.startsWith('docs_')) delete query[key];
+      });
 
       this.$router.push({
         path: `/${this.repo}/branches/${this.branch}`,
-        query: { },
+        query,
       });
     },
 
     goBack() {
       this.view = 'list';
 
-      let query = this.$route.query;
+      const query = { ...this.$route.query };
       delete query.file;
       delete query.view;
 

@@ -10,8 +10,7 @@
 </template>
 
 <script>
-
-import amfMixin from "./amfMixin";
+import amfMixin from './amfMixin';
 
 import 'api-console/api-console';
 import '@api-components/api-navigation';
@@ -31,13 +30,15 @@ export default {
 
       const nav = document.querySelector('api-navigation');
       nav.amf = model;
+      nav.selected = 'summary';
+      nav.selectedType = 'summary';
 
       nav.addEventListener('api-navigation-selection-changed', (e) => {
         const { selected, type } = e.detail;
         doc.selected = selected;
         doc.selectedType = type;
       });
-    }
+    },
   },
 
   async mounted() {
@@ -47,5 +48,5 @@ export default {
 
     this.initApiConsole(amfGraph);
   },
-}
+};
 </script>

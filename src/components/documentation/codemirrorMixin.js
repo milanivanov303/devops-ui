@@ -23,11 +23,10 @@ export default {
           lineWrapping: true,
           lineNumbers: true,
           readOnly: 'nocursor',
-        }
+        },
       );
       this.codeMirror.setSize('100%', '90%');
       this.codeMirror.setValue(raml);
     },
   },
-}
-
+};

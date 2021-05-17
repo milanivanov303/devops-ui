@@ -1,15 +1,15 @@
 <template>
   <div class="row">
     <div class="col s12">
-      <textarea v-if="!error" ref="codemirror"></textarea>
+      <textarea v-if="!error" ref="codemirror" hidden></textarea>
     </div>
   </div>
 </template>
 
 <script>
 
-import amfMixin from "./amfMixin";
-import codemirrorMixin from "./codemirrorMixin";
+import amfMixin from './amfMixin';
+import codemirrorMixin from './codemirrorMixin';
 
 export default {
   mixins: [
@@ -24,5 +24,5 @@ export default {
 
     this.initCodeMirror(openapi);
   },
-}
+};
 </script>
