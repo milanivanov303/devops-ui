@@ -33,3 +33,12 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  .collapsible {
+    .collapsible-header {
+      padding: 5px;
+      line-height: 1.6rem;
+    }
+  }
+</style>
