@@ -1,13 +1,13 @@
 // https://vuex.vuejs.org/en/getters.html
 
 export default {
-  getError: state => state.error,
-  requstedDemos: state => state.demos.filter(demos => demos.status === 'requested'),
-  demo: state => demo => state.demos.filter(demos => demos.id === demo),
-  demos: state => state.demos,
-  statDemos: state => state.statDemos,
+  getError: (state) => state.error,
+  requstedDemos: (state) => state.demos.filter((demos) => demos.status === 'requested'),
+  demo: (state) => (demo) => state.demos.filter((demos) => demos.id === demo),
+  demos: (state) => state.demos,
+  statDemos: (state) => state.statDemos,
 
-  getAllByStatus: state => (stateName) => {
+  getAllByStatus: (state) => (stateName) => {
     if (!state.statDemos[stateName]) {
       return [];
     }
@@ -23,7 +23,7 @@ export default {
     );
   },
 
-  getByStatus: state => (stateName, status, dates) => {
+  getByStatus: (state) => (stateName, status, dates) => {
     if (!state.statDemos[stateName]) {
       return [];
     }

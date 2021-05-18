@@ -50,7 +50,7 @@
         </div>
     </div>
     <div class="white-text">
-        Logging you in via single sign on...
+      Logging in, please wait...
     </div>
   </div>
 </template>

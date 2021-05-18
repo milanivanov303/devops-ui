@@ -73,6 +73,7 @@
             displayed="name"
             v-model="instance"
             :options="instances"
+            @change="filterInstancesId"
           />
           <div class="validator red-text" v-if="$v.instance.$error">
             <span v-if="!$v.instance.required">Field is required!</span>
@@ -94,7 +95,7 @@
         <table class="responsive-table striped col s12">
           <thead>
             <tr>
-              <th>Varible was found in these templates:</th>
+              <th>Variable was found in these templates:</th>
             </tr>
           </thead>
           <tbody>
@@ -138,6 +139,7 @@ export default {
     return {
       showAddEditVariableModal: false,
       instance: {},
+      filteredInstances: '',
       templates: [],
       currentVariable: {
         name: '',
@@ -165,13 +167,29 @@ export default {
   computed: {
     devInstance() {
       const [devInstance] = this.chain.instances
-        .filter(instance => instance.owner.key === 'codix')
-        .filter(instance => instance.instance_type_id === 'DEV')
-        .filter(instance => instance.instance_to_delivery_chain.instance_previous_id === null);
+        .filter((instance) => instance.owner.key === 'codix')
+        .filter((instance) => instance.instance_type_id === 'DEV')
+        .filter((instance) => instance.instance_to_delivery_chain.instance_previous_id === null);
       return devInstance || 'refbg2';
     },
   },
   methods: {
+    filterInstancesId(value) {
+      switch (value.name) {
+        case 'All except PROD':
+          this.filteredInstances = this.chain.instances
+            .filter((instance) => instance.instance_type_id !== 'PROD')
+            .map((instance) => instance.id)
+            .join(', ');
+          break;
+        case 'All':
+          this.filteredInstances = 'All';
+          break;
+        default:
+          this.filteredInstances = value.id.toString();
+          break;
+      }
+    },
     resetCurrentVariable() {
       this.currentVariable.status = '';
       this.currentVariable.defaultValue = '';
@@ -244,7 +262,7 @@ export default {
         subtype: {
           key: 'cms_cmd',
         },
-        contents: this.instance.name === 'All' ? 'All' : this.instance.id.toString(),
+        contents: this.filteredInstances,
       };
       this.$emit('addVariable', this.variableModif, this.currentVariable);
       this.closeModal();

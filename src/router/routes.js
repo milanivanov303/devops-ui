@@ -1,14 +1,18 @@
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
 const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Dashboard.vue');
 const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
-const ExtranetBranch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
 const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations.vue');
-const DebiteurDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Dashboard.vue');
-const DebiteurBranches = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branches.vue');
-const DebiteurBranch = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branch.vue');
+const DebiteurDashboard = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Dashboard.vue');
+const DebiteurBranches = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Branches.vue');
+const DebiteurBranch = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Branch.vue');
+const ImxBeDashboard = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Dashboard.vue');
+const ImxBeBranches = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branches.vue');
 const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
 const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
 const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
+const ImxDashboard = () => import(/* webpackChunkName: "imx" */ '../views/imx/ImxDashboard.vue');
+const ImxTTSkeys = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkeys.vue');
+const ImxTTSkey = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkey.vue');
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard.vue');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos.vue');
 const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults.vue');
@@ -78,28 +82,26 @@ export default [
     ],
   },
   {
-    path: '/extranet/branches',
+    path: '/extranet/branches/:branch?/:action?',
     meta: {
       requiresAuth: true,
       name: 'extranet-branches',
       transitionName: 'slide',
-      title: 'Extranet Branches',
-      breadcrumb: 'Branches',
+      title: (params) => {
+        let title = 'Extranet Branches';
+
+        if (params.branch) {
+          title = `${params.branch} - ${title}`;
+        }
+
+        if (params.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
     },
     component: ExtranetBranches,
-    children: [
-      {
-        path: ':branch',
-        meta: {
-          name: 'extranet-branch',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: params => params.branch,
-          breadcrumb: params => params.branch,
-        },
-        component: ExtranetBranch,
-      },
-    ],
   },
   {
     path: '/extranet/configurations/:id?/:build?',
@@ -153,12 +155,56 @@ export default [
           name: 'debiteur-branch',
           requiresAuth: true,
           transitionName: 'slide',
-          title: params => params.branch,
-          breadcrumb: params => params.branch,
+          title: (params) => params.branch,
+          breadcrumb: (params) => params.branch,
         },
         component: DebiteurBranch,
       },
     ],
+  },
+  {
+    path: '/imx_be',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-be',
+      transitionName: 'slide',
+      title: 'iMX-BE Dashboard',
+    },
+    component: ImxBeDashboard,
+    children: [
+      {
+        path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+          name: 'imx-be',
+          transitionName: 'slide',
+          title: 'iMX-BE Dashboard',
+        },
+        component: ImxBeDashboard,
+      },
+    ],
+  },
+  {
+    path: '/imx_be/branches/:branch?/:action?',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-be-branches',
+      transitionName: 'slide',
+      title: (params) => {
+        let title = 'iMX-BE Branches';
+
+        if (params.branch) {
+          title = `${params.branch} - ${title}`;
+        }
+
+        if (params.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: ImxBeBranches,
   },
   {
     path: '/imx_fe',
@@ -198,9 +244,54 @@ export default [
           name: 'imx-fe-branch',
           requiresAuth: true,
           transitionName: 'slide',
-          title: params => params.branch,
+          title: (params) => params.branch,
         },
         component: ImxFeBranch,
+      },
+    ],
+  },
+  {
+    path: '/imx',
+    meta: {
+      requiresAuth: true,
+      name: 'imx',
+      transitionName: 'slide',
+      title: 'iMX Dashboard',
+      breadcrumb: 'Dashboard',
+    },
+    component: ImxDashboard,
+    children: [
+      {
+        path: 'dashboard',
+        meta: {
+          requiresAuth: true,
+          name: 'imx',
+          transitionName: 'slide',
+          title: 'iMX Dashboard',
+        },
+        component: ImxDashboard,
+      },
+    ],
+  },
+  {
+    path: '/imx/tts_keys',
+    meta: {
+      requiresAuth: true,
+      name: 'imx-tts-keys',
+      transitionName: 'slide',
+      title: 'TTS keys',
+    },
+    component: ImxTTSkeys,
+    children: [
+      {
+        path: ':key',
+        meta: {
+          name: 'imx-tts-key',
+          requiresAuth: true,
+          transitionName: 'slide',
+          title: (params) => params.key,
+        },
+        component: ImxTTSkey,
       },
     ],
   },
@@ -343,7 +434,7 @@ export default [
       layout: 'basic',
       requiresAuth: false,
     },
-    redirect: to => `/builds${to.path}`,
+    redirect: (to) => `/builds${to.path}`,
   },
   {
     path: '*',

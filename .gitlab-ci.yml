@@ -1,4 +1,4 @@
-image: gitlab.codixfr.private:5005/enterpriseapps/images/docker:1.0
+image: gitlab.codixfr.private:5005/enterpriseapps/images/docker:1.1
 
 before_script:
   - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
@@ -11,14 +11,31 @@ before_script:
   - docker push $IMAGE-$CI_ENVIRONMENT_NAME
 
 .deploy-script: &deploy-script
-  - apk add docker-compose
   - export WEB_CONTAINER_IMAGE=$IMAGE-$CI_ENVIRONMENT_NAME
   - docker-compose --host $DEPLOY_HOST pull
   - docker-compose --host $DEPLOY_HOST up --no-build --detach
+  #- export SERVER=$(echo $DEPLOY_HOST | sed "s/http:\/\///g" | sed "s/:[0-9]*//g")
+  - export SERVER=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/:.*//g")
+  - export PORT=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/.*://g")
+  - |
+    curl \
+      --request POST $WEB_PROXY_URL \
+      --header "Content-Type: application/json" \
+      --header "Authorization: Bearer $WEB_PROXY_TOKEN" \
+      --insecure \
+      --data-raw '{"path": "devops", "servers": ["'$SERVER:$PORT'"]}'
 
 stages:
   - build
   - deploy
+
+test:
+  stage: build
+  environment: dev
+  script:
+    - *build-script
+  only:
+    - merge_requests
 
 build for dev:
   stage: build
@@ -32,6 +49,8 @@ deploy on dev:
   stage: deploy
   environment: dev
   script:
+    - export WEB_PROXY_URL=$WEB_PROXY_URL_DEV
+    - export WEB_PROXY_TOKEN=$WEB_PROXY_TOKEN_DEV
     - *deploy-script
   dependencies:
     - build for dev
@@ -52,6 +71,8 @@ deploy on prod:
   environment: prod
   script:
     - export IMAGE=$IMAGE_TAG
+    - export WEB_PROXY_URL=$WEB_PROXY_URL_PROD
+    - export WEB_PROXY_TOKEN=$WEB_PROXY_TOKEN_PROD
     - *deploy-script
   only:
     - tags

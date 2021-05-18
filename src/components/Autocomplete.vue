@@ -67,7 +67,7 @@ export default {
       return data;
     },
     input(value) {
-      const item = this.items.find(item => item[this.getValueKey()] === value);
+      const item = this.items.find((item) => item[this.getValueKey()] === value);
       this.$emit('input', item || value);
     },
     init() {

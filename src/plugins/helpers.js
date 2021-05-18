@@ -29,4 +29,4 @@ class DateHelper {
   }
 }
 
-export const date = date => new DateHelper(date);
+export const date = (date) => new DateHelper(date);

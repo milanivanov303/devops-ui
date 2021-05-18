@@ -5,8 +5,8 @@ export default {
   createDemo({ commit }, payload) {
     const promise = api('devops').post('demos', payload);
     promise
-      .then(response => commit('createDemo', response.data.data))
-      .catch(error => commit('error', error));
+      .then((response) => commit('createDemo', response.data.data))
+      .catch((error) => commit('error', error));
 
     return promise;
   },
@@ -14,8 +14,8 @@ export default {
   updateDemo({ commit }, payload) {
     const promise = api('devops').put(`demos/${payload.id}`, payload);
     promise
-      .then(response => commit('updateDemo', response.data.data))
-      .catch(error => commit('error', error));
+      .then((response) => commit('updateDemo', response.data.data))
+      .catch((error) => commit('error', error));
     return promise;
   },
 
@@ -24,8 +24,8 @@ export default {
       orders: JSON.stringify({ id: 'desc' }),
     });
     promise
-      .then(response => commit('fillDemos', response.data.data))
-      .catch(error => commit('error', error));
+      .then((response) => commit('fillDemos', response.data.data))
+      .catch((error) => commit('error', error));
     return promise;
   },
 
@@ -44,7 +44,7 @@ export default {
     });
 
     promise
-      .then(response => commit('demos', { name: stateName, data: response.data.data }))
+      .then((response) => commit('demos', { name: stateName, data: response.data.data }))
       .catch(() => commit('error', 'Could not get demos list'));
 
     return promise;
@@ -72,7 +72,7 @@ export default {
 
         fileLink.click();
       })
-      .catch(error => commit('error', error));
+      .catch((error) => commit('error', error));
     return promise;
   },
 };

@@ -13,7 +13,7 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('clients', response.data))
+      .then((response) => commit('clients', response.data))
       .catch(() => commit('error', 'Could not get clients list', { root: true }));
     return promise;
   },
@@ -30,7 +30,7 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('branches', response.data))
+      .then((response) => commit('branches', response.data))
       .catch(() => commit('error', 'Could not get branches list', { root: true }));
     return promise;
   },
@@ -48,7 +48,7 @@ export default {
 
   startBuild({ commit }, payload) {
     const promise = api('devops').post('debiteur/build', payload);
-    promise.catch(error => commit('error', error, { root: true }));
+    promise.catch((error) => commit('error', error, { root: true }));
     return promise;
   },
 
@@ -56,7 +56,7 @@ export default {
     const promise = api('devops').delete(`debiteur/build/${id}`);
     promise
       .then(() => commit('removeBuild', id))
-      .catch(error => commit('error', error, { root: true }));
+      .catch((error) => commit('error', error, { root: true }));
     return promise;
   },
 };
