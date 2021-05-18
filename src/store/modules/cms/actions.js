@@ -105,7 +105,6 @@ export default {
         const result = await api('cms').get('response-variables', payload);
         commit('rspVariables', result.data.data);
       } catch (error) {
-        console.log(error);
         commit('error', error);
       }
     }
@@ -184,7 +183,6 @@ export default {
 
         await api('mmpi').get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
       } catch (error) {
-        console.log(error);
         commit('error', error);
       }
     }
@@ -201,7 +199,6 @@ export default {
       }, []);
       commit('templates', result.sort((a, b) => a.source_name.localeCompare(b.source_name)));
     } catch (error) {
-      console.log(error);
       commit('error', error);
     }
   },
@@ -217,7 +214,6 @@ export default {
       const result = await api('cms').get('templates/template-content', payload);
       commit('templateContent', result.data);
     } catch (error) {
-      console.log(error);
       commit('error', error);
     }
   },
@@ -227,7 +223,6 @@ export default {
       try {
         commit('inventoryInstances', instances.filter((i) => payload.some((id) => id === i.id)));
       } catch (error) {
-        console.log(error);
         commit('error', error);
       }
     }
@@ -306,7 +301,6 @@ export default {
       const result = await api('cms').put(`response-variables/${payload.id}`, payload);
       commit('updateRspVariable', result.data.data);
     } catch (error) {
-      console.log(error);
       commit('error', error);
     }
   },
@@ -323,7 +317,6 @@ export default {
         });
       return response;
     } catch (error) {
-      console.log(error);
       return error;
     }
   },
@@ -333,7 +326,6 @@ export default {
       const resp = await api('cms').get(`response-variables?instance_id=${payload.id}`);
       commit('firstInstanceVariables', resp.data.data);
     } catch (error) {
-      console.log(error);
       commit('error', error);
     }
   },
@@ -342,7 +334,6 @@ export default {
       const resp = await api('cms').get(`response-variables?instance_id=${payload.id}`);
       commit('secondInstanceVariables', resp.data.data);
     } catch (error) {
-      console.log(error);
       commit('error', error);
     }
   },
@@ -362,7 +353,6 @@ export default {
       const response = await api('mmpi').post('modifications/cms', payload);
       return response.data.data;
     } catch (error) {
-      console.log(error);
       commit('error', error);
       return error;
     }
