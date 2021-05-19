@@ -25,6 +25,13 @@ export default {
     });
   },
 
+  getActiveByModule: (state) => (module) => {
+    if (!state.active) {
+      return [];
+    }
+    return state.active.filter((build) => build.module === module);
+  },
+
   getActiveGroupedByBranch: (state) => (module) => {
     const branches = {};
     state
