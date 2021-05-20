@@ -11,7 +11,7 @@
       </div>
     </template>
     <template v-slot:content>
-      <Alert v-if="error !== ''" :msg="error"/>
+      <Alert v-if="error" :msg="error"/>
       <br>
       <form class=" col s12 l11" ref="config-add">
         <div class="row" v-if="action === 'create'">
@@ -363,7 +363,7 @@ export default {
       this.$v.$reset();
       this.$emit('close');
     },
-    async saveVariable() {
+    saveVariable() {
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
@@ -382,28 +382,28 @@ export default {
         }
       }
       this.loading = true;
-      await this.$store.dispatch('cms/submitVariable', payload)
+      this.$store.dispatch('cms/submitVariable', payload)
         .then((response) => {
+          let html = 'The variable has been updated!';
           if (this.action === 'create') {
-            this.$M.toast({ html: 'The variable is created!', classes: 'toast-seccess' });
-            return;
+            html = 'The variable is created!';
           }
-          this.$M.toast({ html: 'The variable has been updated!', classes: 'toast-seccess' });
-          this.$emit('addedVariable', response.data);
+          this.$M.toast({ html, classes: 'toast-seccess' });
+          return this.$emit('addedVariable', response.data);
         })
         .catch((error) => {
-          if (error.message === 'Request failed with status code 403') {
+          if (error.response.status === 403) {
             this.error = 'Sorry, but you have no rights to create new variable!';
-            return this.error;
           }
-          if (error.message === 'Request failed with status code 422') {
+          if (error.response.status === 422) {
             this.error = 'Sorry, but variable name are already registered!';
-            return this.error;
           }
-          return error;
+          return this.$emit('error', error.message);
+        })
+        .finally(() => {
+          this.loading = false;
+          this.closeModal();
         });
-      this.loading = false;
-      this.closeModal();
     },
   },
   created() {
