@@ -1,5 +1,5 @@
 <template>
-  <div class="branches">
+  <div class="branches" ref="branches">
     <div class="row">
       <div class="col s12">
         <div class="col s12 m6 l5">
@@ -45,7 +45,7 @@
         </div>
       </div>
       <div v-else>
-        <div class="col s12 m6 l5 scroll" ref="branches">
+        <div class="col s12 m6 l5 scroll">
           <Branch
             v-for="branch in filteredBranches"
             :key="branch.name"
@@ -195,7 +195,10 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+  .branches {
+    position: relative;
+  }
   .selected-branch {
     background-color: #ccc;
   }

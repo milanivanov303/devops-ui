@@ -4,27 +4,23 @@
       Documentation for <b>{{ repo }}</b> branch <b>{{ branch }}</b>
     </template>
     <template v-slot:content>
-      <div v-if="error" class="row error">
-        <div class="s12 center">
-          <i class="material-icons">error</i>
-          <h5>{{ error }}</h5>
+      <div class="list" ref="list">
+        <div v-if="error" class="row error">
+          <div class="s12 center">
+            <i class="material-icons">error</i>
+            <h5>{{ error }}</h5>
+          </div>
         </div>
-      </div>
 
-      <Details v-if="view === 'list' && !error" :repo="repo" :branch="branch"/>
-      <List v-if="view === 'list' && !error" :specs="specs" @show="show"/>
+        <Details v-if="view === 'list' && !error" :repo="repo" :branch="branch"/>
+        <List v-if="view === 'list' && !error" :specs="specs" @show="show"/>
 
-      <transition name="slide" mode="out-in">
         <Raml v-if="view === 'raml'" :repo="repo" :branch="branch" :file="file"/>
-      </transition>
 
-      <transition name="slide" mode="out-in">
         <Openapi v-if="view === 'openapi'" :repo="repo" :branch="branch" :file="file"/>
-      </transition>
 
-      <transition name="slide" mode="out-in">
         <ApiConsole v-if="view === 'api-console'" :repo="repo" :branch="branch" :file="file"/>
-      </transition>
+      </div>
     </template>
     <template v-slot:footer>
       <button
@@ -73,7 +69,7 @@ export default {
   },
   methods: {
     getSpecs() {
-      const loader = this.$loading.show({ container: this.$el });
+      const loader = this.$loading.show({ container: this.$refs.list });
 
       this.$store.dispatch('documentation/getSpecs', {
         branch: this.branch,
@@ -136,12 +132,17 @@ export default {
   },
 
   mounted() {
-    this.getSpecs();
+    setTimeout(this.getSpecs, 50);
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.list {
+  position: relative;
+  min-height: 400px;
+}
+
 .error {
   margin-top: 200px;
 
