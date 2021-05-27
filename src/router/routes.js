@@ -1,9 +1,5 @@
-const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
-const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Dashboard');
+const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
 const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations');
-const DebiteurDashboard = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Dashboard');
-const ImxBeDashboard = () => import(/* webpackChunkName: "imx-be" */ '../views/imx_be/Dashboard');
-const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx_fe/Dashboard');
 const ImxDashboard = () => import(/* webpackChunkName: "imx" */ '../views/imx/ImxDashboard');
 const ImxTTSkeys = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkeys');
 const ImxTTSkey = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkey');
@@ -18,6 +14,7 @@ const AdministrationUsers = () => import(/* webpackChunkName: "administration-us
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles');
 const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions');
 
+const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
@@ -51,31 +48,25 @@ export default [
       title: 'Dashboard',
       breadcrumb: 'Dashboard',
     },
-    component: Dashboard,
+    component: MainDashboard,
   },
   {
     path: '/extranet',
+    redirect: '/extranet/dashboard',
+  },
+  {
+    path: '/extranet/dashboard',
     meta: {
       requiresAuth: true,
       name: 'extranet',
       transitionName: 'slide',
       title: 'Extranet Dashboard',
-      breadcrumb: 'Extranet',
+      breadcrumb: 'Dashboard',
     },
-    component: ExtranetDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'extranet',
-          transitionName: 'slide',
-          title: 'Extranet Dashboard',
-          breadcrumb: 'Dashboard',
-        },
-        component: ExtranetDashboard,
-      },
-    ],
+    component: Dashboard,
+    props: {
+      module: 'extranet',
+    },
   },
   {
     path: '/extranet/branches/:branch?',
@@ -115,27 +106,21 @@ export default [
   },
   {
     path: '/debiteur',
+    redirect: '/debiteur/dashboard',
+  },
+  {
+    path: '/debiteur/dashboard',
     meta: {
       requiresAuth: true,
       name: 'debiteur',
       transitionName: 'slide',
       title: 'Debiteur Dashboard',
-      breadcrumb: 'Debiteur',
+      breadcrumb: 'Dashboard',
     },
-    component: DebiteurDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'debiteur',
-          transitionName: 'slide',
-          title: 'Debiteur Dashboard',
-          breadcrumb: 'Dashboard',
-        },
-        component: DebiteurDashboard,
-      },
-    ],
+    component: Dashboard,
+    props: {
+      module: 'debiteur',
+    },
   },
   {
     path: '/debiteur/branches/:branch?',
@@ -153,25 +138,20 @@ export default [
   },
   {
     path: '/imx_be',
+    redirect: '/imx_be/dashboard',
+  },
+  {
+    path: '/imx_be/dashboard',
     meta: {
       requiresAuth: true,
       name: 'imx-be',
       transitionName: 'slide',
-      title: 'iMX-BE Dashboard',
+      title: 'iMX BE Dashboard',
     },
-    component: ImxBeDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'imx-be',
-          transitionName: 'slide',
-          title: 'iMX-BE Dashboard',
-        },
-        component: ImxBeDashboard,
-      },
-    ],
+    component: Dashboard,
+    props: {
+      module: 'imx_be',
+    },
   },
   {
     path: '/imx_be/branches',
@@ -180,7 +160,7 @@ export default [
       name: 'imx-be-branches',
       transitionName: 'slide',
       title: (route) => {
-        let title = 'iMX-BE Branches';
+        let title = 'iMX BE Branches';
 
         if (route.query.branch) {
           title = `${route.query.branch} - ${title}`;
@@ -200,25 +180,20 @@ export default [
   },
   {
     path: '/imx_fe',
+    redirect: '/imx_fe/dashboard',
+  },
+  {
+    path: '/imx_fe/dashboard',
     meta: {
       requiresAuth: true,
       name: 'imx-fe',
       transitionName: 'slide',
-      title: 'iMX-FE Dashboard',
+      title: 'iMX FE Dashboard',
     },
-    component: ImxFeDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'imx-fe',
-          transitionName: 'slide',
-          title: 'iMX-FE Dashboard',
-        },
-        component: ImxFeDashboard,
-      },
-    ],
+    component: Dashboard,
+    props: {
+      module: 'imx_fe',
+    },
   },
   {
     path: '/imx_fe/branches',

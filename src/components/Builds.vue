@@ -117,14 +117,12 @@
       </table>
     </div>
 
-    <div v-if="builds.length" class="row">
-      <div class="col s12 m6 l9">
-        <Paginate v-if="lastPage > 1" v-model="page" :page-count="lastPage"/>
-      </div>
-      <div class="col s12 m6 l3 per-page">
-        <Select v-model="perPage" :options="perPageOptions" :defaultOption="false" class="right"/>
-        <p class="right right-align">Items per page:</p>
-      </div>
+    <div v-if="builds.length" class="col s12 m6 l9">
+      <Paginate v-if="lastPage > 1" v-model="page" :page-count="lastPage"/>
+    </div>
+    <div v-if="builds.length" class="col s12 m6 l3 per-page">
+      <Select v-model="perPage" :options="perPageOptions" :defaultOption="false" class="right"/>
+      <p class="right right-align">Items per page:</p>
     </div>
 
     <component
@@ -430,7 +428,9 @@ export default {
       this.getBuilds();
     }
 
-    this.$store.dispatch(`${this.module}/getHost`);
+    if (this.module) {
+      this.$store.dispatch(`${this.module}/getHost`);
+    }
   },
 
   created() {
