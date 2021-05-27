@@ -21,6 +21,14 @@
         </div>
         <div class="row">
           <TextInput
+            class="col s12 readonly"
+            label="Endpoint"
+            icon="link"
+            :value="build.details.endpoint"
+          />
+        </div>
+        <div class="row">
+          <TextInput
             class="col s12 m6 readonly"
             label="Created on"
             icon="event"
@@ -45,6 +53,14 @@
             label="Removed by"
             icon="person"
             :value="build.removed_by"
+          />
+        </div>
+        <div class="row" v-if="build.status === 'running'">
+          <TextInput
+            class="col s12 readonly"
+            label="Deploy URL"
+            icon="link"
+            :value="build.details.url"
           />
         </div>
       </div>

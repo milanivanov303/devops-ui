@@ -144,7 +144,7 @@
 <script>
 import { required } from 'vuelidate/lib/validators';
 import config from '@/config';
-import Inserts from '@/components/partials/Inserts';
+import Inserts from '@/components/cms/Inserts';
 import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
 import AddVariableModif from '@/components/cms/AddVariableModif';
 import AddTemplateModif from '@/components/cms/AddTemplateModif';

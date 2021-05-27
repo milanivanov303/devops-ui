@@ -63,6 +63,14 @@
             :value="build.removed_by"
           />
         </div>
+        <div class="row" v-if="build.status === 'running'">
+          <TextInput
+            class="col s12 readonly"
+            label="Deploy URL"
+            icon="link"
+            :value="build.details.url"
+          />
+        </div>
       </div>
     </template>
     <template v-slot:footer></template>

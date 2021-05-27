@@ -7,9 +7,10 @@ module.exports = {
       .chunkFilename('js/[name].[hash:8].js');
   },
   devServer: {
+    public: '0.0.0.0',
     sockPath: '/devops/sockjs-node',
-    disableHostCheck: true,
     port: 80,
+    disableHostCheck: true,
     proxy: {
       '^/devops/ssh': {
         target: 'http://webssh2',

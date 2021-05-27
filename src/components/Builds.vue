@@ -408,7 +408,10 @@ export default {
       this.updating = build.id;
       this.init();
       this.$store.dispatch('builds/start', build.id)
-        .then(() => { build.status = 'running'; })
+        .then((response) => {
+          build.status = response.data.data.status;
+          build.details = response.data.data.details;
+        })
         .finally(() => { this.updating = false; });
     },
 
@@ -416,7 +419,10 @@ export default {
       this.updating = build.id;
       this.init();
       this.$store.dispatch('builds/stop', build.id)
-        .then(() => { build.status = 'stopped'; })
+        .then((response) => {
+          build.status = response.data.data.status;
+          build.details = response.data.data.details;
+        })
         .finally(() => { this.updating = false; });
     },
 
