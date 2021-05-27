@@ -94,7 +94,7 @@ export default {
   },
 
   getBuildsByStatus({ commit }, {
-    branch, ttsKey, module, status, user, perPage, page, search,
+    branch, ttsKey, module, status, createdBy, perPage, page, search,
   }) {
     const devopsApi = api('devops');
 
@@ -124,7 +124,7 @@ export default {
         'details->branch': branch,
       },
       {
-        created_by: user,
+        created_by: createdBy,
       },
     ];
 

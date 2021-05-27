@@ -26,7 +26,7 @@
             <th>#</th>
             <th>Name</th>
             <th v-if="!module">Module</th>
-            <th>Created By</th>
+            <th v-if="!createdBy">Created By</th>
             <th>Created On</th>
             <th>Status</th>
             <th>Quick Actions</th>
@@ -37,7 +37,7 @@
             <td>{{ (page - 1) * perPage + index + 1 }}</td>
             <td>{{ build.name }}</td>
             <td v-if="!module">{{ build.module }}</td>
-            <td>{{ build.created_by }}</td>
+            <td v-if="!createdBy">{{ build.created_by }}</td>
             <td>{{ $date(build.created_on).toHuman() }}</td>
             <td v-html="getStatusText(build)"></td>
             <td class="quick-actions">
@@ -189,7 +189,7 @@ export default {
     module: String,
     branch: String,
     ttsKey: String,
-    user: String,
+    createdBy: String,
     fetchOnCreate: {
       type: Boolean,
       default: true,
@@ -238,7 +238,7 @@ export default {
         ttsKey: this.ttsKey,
         module: this.module,
         status: this.getStatus(),
-        user: this.user,
+        createdBy: this.createdBy,
         perPage: this.perPage,
         page: this.page,
         search: this.search.trim(),
@@ -429,6 +429,8 @@ export default {
     if (this.fetchOnCreate) {
       this.getBuilds();
     }
+
+    this.$store.dispatch(`${this.module}/getHost`);
   },
 
   created() {

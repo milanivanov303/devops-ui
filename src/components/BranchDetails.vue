@@ -17,7 +17,7 @@
       <Builds :branch="branch.name" :module="module"/>
 
       <template v-if="!branch.removed">
-        <component :is="buildComponent"></component>
+        <component :is="buildComponent" :branch="branch.name"></component>
       </template>
     </div>
   </div>

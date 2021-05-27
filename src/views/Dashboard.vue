@@ -4,7 +4,7 @@
       <div class="card" ref="my_builds">
         <div class="card-content">
           <span class="card-title">My builds</span>
-          <Builds v-if="$auth.getUser()" :user="$auth.getUser().username"></Builds>
+          <Builds v-if="$auth.getUser()" :created-by="$auth.getUser().username"></Builds>
         </div>
       </div>
       <div class="card" ref="builds_by_module">
