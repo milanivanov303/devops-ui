@@ -1,32 +1,28 @@
-const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
-const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Dashboard.vue');
-const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
-const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations.vue');
-const DebiteurDashboard = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Dashboard.vue');
-const DebiteurBranches = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Branches.vue');
-const DebiteurBranch = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Branch.vue');
-const ImxBeDashboard = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Dashboard.vue');
-const ImxBeBranches = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branches.vue');
-const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
-const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
-const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
-const ImxDashboard = () => import(/* webpackChunkName: "imx" */ '../views/imx/ImxDashboard.vue');
-const ImxTTSkeys = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkeys.vue');
-const ImxTTSkey = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkey.vue');
-const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard.vue');
-const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos.vue');
-const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults.vue');
-const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/ResponseFile.vue');
-const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates.vue');
-const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory.vue');
-const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification.vue');
-const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
-const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
-const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions.vue');
+const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
+const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Dashboard');
+const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations');
+const DebiteurDashboard = () => import(/* webpackChunkName: "debiteur" */ '../views/debiteur/Dashboard');
+const ImxBeDashboard = () => import(/* webpackChunkName: "imx-be" */ '../views/imx_be/Dashboard');
+const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx_fe/Dashboard');
+const ImxDashboard = () => import(/* webpackChunkName: "imx" */ '../views/imx/ImxDashboard');
+const ImxTTSkeys = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkeys');
+const ImxTTSkey = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkey');
+const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
+const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
+const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults');
+const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/ResponseFile');
+const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates');
+const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
+const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
+const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users');
+const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles');
+const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions');
 
-const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
-const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
-const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild.vue');
+const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
+
+const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
+const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser');
+const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
 export default [
   {
@@ -82,26 +78,29 @@ export default [
     ],
   },
   {
-    path: '/extranet/branches/:branch?/:action?',
+    path: '/extranet/branches/:branch?',
     meta: {
       requiresAuth: true,
       name: 'extranet-branches',
       transitionName: 'slide',
-      title: (params) => {
+      title: (route) => {
         let title = 'Extranet Branches';
 
-        if (params.branch) {
-          title = `${params.branch} - ${title}`;
+        if (route.query.branch) {
+          title = `${route.query.branch} - ${title}`;
         }
 
-        if (params.action === 'docs') {
+        if (route.query.action === 'docs') {
           title = `Documentation - ${title}`;
         }
 
         return title;
       },
     },
-    component: ExtranetBranches,
+    component: Branches,
+    props: {
+      module: 'extranet',
+    },
   },
   {
     path: '/extranet/configurations/:id?/:build?',
@@ -139,7 +138,7 @@ export default [
     ],
   },
   {
-    path: '/debiteur/branches',
+    path: '/debiteur/branches/:branch?',
     meta: {
       requiresAuth: true,
       name: 'debiteur-branches',
@@ -147,20 +146,10 @@ export default [
       title: 'Debiteur Branches',
       breadcrumb: 'Branches',
     },
-    component: DebiteurBranches,
-    children: [
-      {
-        path: ':branch',
-        meta: {
-          name: 'debiteur-branch',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: (params) => params.branch,
-          breadcrumb: (params) => params.branch,
-        },
-        component: DebiteurBranch,
-      },
-    ],
+    component: Branches,
+    props: {
+      module: 'debiteur',
+    },
   },
   {
     path: '/imx_be',
@@ -185,26 +174,29 @@ export default [
     ],
   },
   {
-    path: '/imx_be/branches/:branch?/:action?',
+    path: '/imx_be/branches',
     meta: {
       requiresAuth: true,
       name: 'imx-be-branches',
       transitionName: 'slide',
-      title: (params) => {
+      title: (route) => {
         let title = 'iMX-BE Branches';
 
-        if (params.branch) {
-          title = `${params.branch} - ${title}`;
+        if (route.query.branch) {
+          title = `${route.query.branch} - ${title}`;
         }
 
-        if (params.action === 'docs') {
+        if (route.query.action === 'docs') {
           title = `Documentation - ${title}`;
         }
 
         return title;
       },
     },
-    component: ImxBeBranches,
+    component: Branches,
+    props: {
+      module: 'imx_be',
+    },
   },
   {
     path: '/imx_fe',
@@ -236,19 +228,10 @@ export default [
       transitionName: 'slide',
       title: 'iMX-FE Branches',
     },
-    component: ImxFeBranches,
-    children: [
-      {
-        path: ':branch',
-        meta: {
-          name: 'imx-fe-branch',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: (params) => params.branch,
-        },
-        component: ImxFeBranch,
-      },
-    ],
+    component: Branches,
+    props: {
+      module: 'imx_fe',
+    },
   },
   {
     path: '/imx',
@@ -289,7 +272,7 @@ export default [
           name: 'imx-tts-key',
           requiresAuth: true,
           transitionName: 'slide',
-          title: (params) => params.key,
+          title: (route) => route.params.key,
         },
         component: ImxTTSkey,
       },

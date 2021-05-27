@@ -24,7 +24,7 @@
                 <td>{{ index + 1 }}</td>
                 <td>
                   <router-link
-                    v-bind:to="'/extranet/branches/' + encodeURIComponent(build.branch)">
+                    v-bind:to="'/extranet/branches?branch=' + encodeURIComponent(build.branch)">
                     {{ build.branch }}
                   </router-link>
                 </td>

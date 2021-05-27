@@ -23,7 +23,7 @@
               <tr v-for="(build, index) in activeBuildsGroupedByBranch" :key="index">
                 <td>{{ index + 1 }}</td>
                 <td>
-                  <router-link :to="'/imx_be/branches/' + encodeURIComponent(build.branch)">
+                  <router-link :to="'/imx_be/branches?branch=' + encodeURIComponent(build.branch)">
                     {{ build.branch }}
                   </router-link>
                 </td>

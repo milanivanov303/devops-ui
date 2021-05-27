@@ -1,11 +1,10 @@
 <template>
-  <router-link v-bind:to="getRoute(branch)" class="collection-item">
+  <router-link :to="getTo()">
     <div class="card">
       <div class="card-content">
         <div class="card-title truncate">
             <span class="badge" v-if="count">{{ count }}</span>
             {{ branch.name }}
-
         </div>
         <p>Hash: {{ branch.hash }}</p>
         <p>Version: {{ branch.version }}</p>
@@ -17,15 +16,17 @@
 <script>
 export default {
   props: {
+    module: String,
     branch: {},
     count: {},
   },
+
   methods: {
-    getRoute(branch) {
-      return {
-        path: `/debiteur/branches/${branch.name}`,
-        query: this.$route.query,
-      };
+    getTo() {
+      const query = { ...this.$route.query };
+      query.branch = this.branch.name;
+
+      return { query };
     },
   },
 };

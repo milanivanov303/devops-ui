@@ -104,37 +104,42 @@ export default {
 
     cancelToken = devopsApi.axios.CancelToken.source();
 
+    const filters = [
+      {
+        status: {
+          operator: 'in',
+          value: status,
+        },
+      },
+      {
+        parent_id: null,
+      },
+      {
+        module,
+      },
+      {
+        'details->tts_key': ttsKey,
+      },
+      {
+        'details->branch': branch,
+      },
+      {
+        created_by: user,
+      },
+    ];
+
+    if (search) {
+      filters.push({
+        name: {
+          operator: 'like',
+          value: ''.concat('%', search, '%'),
+        },
+      });
+    }
+
     const promise = devopsApi.get('builds', {
       filters: JSON.stringify({
-        allOf: [
-          {
-            status: {
-              operator: 'in',
-              value: status,
-            },
-          },
-          {
-            name: {
-              operator: 'like',
-              value: ''.concat('%', search, '%'),
-            },
-          },
-          {
-            module,
-          },
-          {
-            'details->tts_key': ttsKey,
-          },
-          {
-            'details->branch': branch,
-          },
-          {
-            created_by: user,
-          },
-          {
-            parent_id: null,
-          },
-        ],
+        allOf: filters,
       }),
       orders: JSON.stringify({
         created_on: 'desc',

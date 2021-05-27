@@ -140,6 +140,7 @@ export default {
       return this.$store.state.extranet.feBranches;
     },
   },
+
   validations: {
     form: {
       client: {
@@ -156,6 +157,7 @@ export default {
       },
     },
   },
+
   methods: {
     getClients() {
       this.$store.dispatch('extranet/getClients');
@@ -170,6 +172,10 @@ export default {
       this.form = initialState().form;
       this.build = initialState().build;
       this.showModal = true;
+
+      this.getClients();
+      this.getInstances();
+      this.getFeBranches();
     },
     close() {
       this.showModal = false;
@@ -209,10 +215,9 @@ export default {
         .finally(() => { this.build.started = true; });
     },
   },
+
   mounted() {
-    this.getClients();
-    this.getInstances();
-    this.getFeBranches();
+
   },
 };
 </script>

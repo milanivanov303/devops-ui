@@ -1,46 +1,58 @@
 <template>
-  <Modal @close="close()" class="fullscreen">
-    <template v-slot:header>
-      Documentation for <b>{{ repo }}</b> branch <b>{{ branch }}</b>
-    </template>
-    <template v-slot:content>
-      <div class="list" ref="list">
-        <div v-if="error" class="row error">
-          <div class="s12 center">
-            <i class="material-icons">error</i>
-            <h5>{{ error }}</h5>
+  <div>
+    <a
+      @click="open()"
+      data-tooltip="Documentation"
+      data-position="left"
+      class="tooltipped right"
+      ref="tooltip"
+    >
+      <i class="material-icons">library_books</i>
+    </a>
+
+    <Modal v-if="showModal" @close="close()" class="fullscreen">
+      <template v-slot:header>
+        Documentation for <b>{{ repo }}</b> branch <b>{{ branch }}</b>
+      </template>
+      <template v-slot:content>
+        <div class="list" ref="list">
+          <div v-if="error" class="row error">
+            <div class="s12 center">
+              <i class="material-icons">error</i>
+              <h5>{{ error }}</h5>
+            </div>
           </div>
+
+          <Details v-if="view === 'list' && !error" :repo="repo" :branch="branch"/>
+          <List v-if="view === 'list' && !error" :specs="specs" @show="show"/>
+
+          <Raml v-if="view === 'raml'" :repo="repo" :branch="branch" :file="file"/>
+
+          <Openapi v-if="view === 'openapi'" :repo="repo" :branch="branch" :file="file"/>
+
+          <ApiConsole v-if="view === 'api-console'" :repo="repo" :branch="branch" :file="file"/>
         </div>
-
-        <Details v-if="view === 'list' && !error" :repo="repo" :branch="branch"/>
-        <List v-if="view === 'list' && !error" :specs="specs" @show="show"/>
-
-        <Raml v-if="view === 'raml'" :repo="repo" :branch="branch" :file="file"/>
-
-        <Openapi v-if="view === 'openapi'" :repo="repo" :branch="branch" :file="file"/>
-
-        <ApiConsole v-if="view === 'api-console'" :repo="repo" :branch="branch" :file="file"/>
-      </div>
-    </template>
-    <template v-slot:footer>
-      <button
-        v-if="view !== 'list'"
-        class="waves-effect btn"
-        @click="goBack()"
-      >
-        Back to API list
-      </button>
-    </template>
-  </Modal>
+      </template>
+      <template v-slot:footer>
+        <button
+          v-if="view !== 'list'"
+          class="waves-effect btn"
+          @click="back()"
+        >
+          Back to API list
+        </button>
+      </template>
+    </Modal>
+  </div>
 </template>
 
 <script>
 
-import Details from './Details';
-import List from './List';
-import Raml from './Raml';
-import Openapi from './Openapi';
-import ApiConsole from './ApiConsole';
+const Details = () => import('./Details');
+const List = () => import('./List');
+const Raml = () => import('./Raml');
+const Openapi = () => import('./Openapi');
+const ApiConsole = () => import('./ApiConsole');
 
 export default {
   components: {
@@ -61,6 +73,7 @@ export default {
     const file = this.$route.query.file || null;
 
     return {
+      showModal: false,
       view,
       file,
       specs: [],
@@ -86,6 +99,34 @@ export default {
         );
     },
 
+    open() {
+      this.showModal = true;
+
+      const query = { ...this.$route.query };
+      query.action = 'docs';
+
+      this.$router.push({ query });
+
+      this.getSpecs();
+    },
+
+    close() {
+      this.showModal = false;
+
+      this.$emit('close');
+
+      const query = { ...this.$route.query };
+      delete query.action;
+      delete query.file;
+      delete query.view;
+
+      Object.keys(query).forEach((key) => {
+        if (key.startsWith('docs_')) delete query[key];
+      });
+
+      this.$router.push({ query });
+    },
+
     show(file, view) {
       this.file = file;
       this.view = view;
@@ -103,24 +144,7 @@ export default {
       });
     },
 
-    close() {
-      this.$emit('close');
-
-      const query = { ...this.$route.query };
-      delete query.file;
-      delete query.view;
-
-      Object.keys(query).forEach((key) => {
-        if (key.startsWith('docs_')) delete query[key];
-      });
-
-      this.$router.push({
-        path: `/${this.repo}/branches/${this.branch}`,
-        query,
-      });
-    },
-
-    goBack() {
+    back() {
       this.view = 'list';
 
       const query = { ...this.$route.query };
@@ -132,7 +156,13 @@ export default {
   },
 
   mounted() {
-    setTimeout(this.getSpecs, 50);
+    this.$M.Tooltip.init(this.$refs.tooltip);
+  },
+
+  created() {
+    if (this.$route.query.action === 'docs') {
+      this.open();
+    }
   },
 };
 </script>

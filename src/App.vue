@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <component :is="layout">
-      <router-view />
+      <router-view :key="$route.path"/>
     </component>
   </div>
 </template>
@@ -28,7 +28,7 @@ export default {
   methods: {
     getTitle(route) {
       if (typeof route.meta.title === 'function') {
-        return route.meta.title(this.$route.params);
+        return route.meta.title(this.$route);
       }
       return route.meta.title;
     },

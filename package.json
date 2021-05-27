@@ -31,6 +31,7 @@
     "vue-datetime": "^1.0.0-beta.14",
     "vue-ea-core": "^3.1.13",
     "vue-loading-overlay": "^3.4.2",
+    "vue-loading-skeleton": "^1.1.9",
     "vue-particles": "^1.0.9",
     "vue-property-decorator": "^8.5.1",
     "vue-router": "^3.5.1",
