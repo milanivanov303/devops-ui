@@ -6,8 +6,9 @@
             <span class="badge" v-if="count">{{ count }}</span>
             {{ branch.name }}
         </div>
-        <p>Hash: {{ branch.hash }}</p>
-        <p>Version: {{ branch.version }}</p>
+        <p>Commit: {{ branch.commit }}</p>
+        <p>Committed by: {{ branch.user }}</p>
+        <p>Committed by: {{ $date(branch.date).toHuman() }}</p>
       </div>
     </div>
   </router-link>

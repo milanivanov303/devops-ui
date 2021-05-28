@@ -2,7 +2,7 @@
   <ul class="collapsible">
     <li v-if="error" class="active">
       <div class="collapsible-header red white-text">
-        <i class="material-icons">error</i> Could not generate raml file
+        <i class="material-icons">error</i> Could not generate raml file. Click for details
       </div>
       <div class="collapsible-body">
         <pre>{{ error }}</pre>
@@ -10,7 +10,7 @@
     </li>
     <li v-if="validationError">
       <div class="collapsible-header yellow">
-        <i class="material-icons">info</i> There are validation errors
+        <i class="material-icons">info</i> There are validation errors. Click for details
       </div>
       <div class="collapsible-body">
         <pre>{{ validationError }}</pre>

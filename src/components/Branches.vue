@@ -98,6 +98,17 @@ export default {
         branches = branches.filter((branch) => branch.name.match(regexp));
       }
 
+      branches = branches.sort((a, b) => {
+        if (a.date > b.date) {
+          return -1;
+        }
+        if (a.date < b.last_nom) {
+          return 1;
+        }
+
+        return 0;
+      });
+
       return branches;
     },
 

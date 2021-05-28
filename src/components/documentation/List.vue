@@ -12,12 +12,13 @@
         :delete-btn="false"
         queryPrefix="docs_"
       >
-        <Column label="API Title" :show="spec => getTitle(spec)" width="40%"/>
+        <Column label="API Title" name="title" :show="spec => getTitle(spec)" width="40%"/>
         <Column
           label="Screens - API documentation"
+          name="documentation"
           :show="spec => getScreensTitle(spec)"
         />
-        <Column label="File" :show="spec => getApiFile(spec)"/>
+        <Column label="File" show="file"/>
         <template v-slot:actions-before="{ row }">
           <a class="btn btn-tiny" @click="$emit('show', row.file, 'raml')">
             RAML
@@ -37,7 +38,13 @@
 
 <script>
 
+import Table from '@/components/documentation/Table';
+
 export default {
+  components: {
+    Table,
+  },
+
   props: {
     specs: Array,
   },
@@ -51,21 +58,15 @@ export default {
     },
 
     getScreensTitle(api) {
-      if (api.documentation) {
-        let screens = '';
-        api.documentation.forEach((i) => {
-          screens = `${screens.concat(i.title)}<br>`;
-        });
-        return screens;
+      if (!api.documentation) {
+        return '';
       }
-      return '<span class="new badge red" data-badge-caption="">ERROR</span>';
-    },
 
-    getApiFile(api) {
-      if (api.documentation) {
-        return api.file;
-      }
-      return `<span class="red-text">${api.file}</span>`;
+      let screens = '';
+      api.documentation.forEach((i) => {
+        screens += `${i.title}<br>`;
+      });
+      return screens;
     },
   },
 };

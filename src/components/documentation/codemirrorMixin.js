@@ -28,5 +28,9 @@ export default {
       this.codeMirror.setSize('100%', '90%');
       this.codeMirror.setValue(raml);
     },
+
+    getValue() {
+      return this.codeMirror.getValue();
+    },
   },
 };

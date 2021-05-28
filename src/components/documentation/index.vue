@@ -26,9 +26,21 @@
           <Details v-if="view === 'list' && !error" :repo="repo" :branch="branch"/>
           <List v-if="view === 'list' && !error" :specs="specs" @show="show"/>
 
-          <Raml v-if="view === 'raml'" :repo="repo" :branch="branch" :file="file"/>
+          <Raml
+            v-if="view === 'raml'"
+            ref="codemirror"
+            :repo="repo"
+            :branch="branch"
+            :file="file"
+          />
 
-          <Openapi v-if="view === 'openapi'" :repo="repo" :branch="branch" :file="file"/>
+          <Openapi
+            v-if="view === 'openapi'"
+            ref="codemirror"
+            :repo="repo"
+            :branch="branch"
+            :file="file"
+          />
 
           <ApiConsole v-if="view === 'api-console'" :repo="repo" :branch="branch" :file="file"/>
         </div>
@@ -36,7 +48,14 @@
       <template v-slot:footer>
         <button
           v-if="view !== 'list'"
-          class="waves-effect btn"
+          class="btn btn-small left waves-effect"
+          @click="copy()"
+        >
+          Copy content
+        </button>
+        <button
+          v-if="view !== 'list'"
+          class="btn btn-small waves-effect"
           @click="back()"
         >
           Back to API list
@@ -69,17 +88,15 @@ export default {
   },
 
   data() {
-    const view = this.$route.query.view || 'list';
-    const file = this.$route.query.file || null;
-
     return {
       showModal: false,
-      view,
-      file,
+      view: null,
+      file: null,
       specs: [],
       error: null,
     };
   },
+
   methods: {
     getSpecs() {
       const loader = this.$loading.show({ container: this.$refs.list });
@@ -100,14 +117,21 @@ export default {
     },
 
     open() {
-      this.showModal = true;
+      const action = 'docs';
 
-      const query = { ...this.$route.query };
-      query.action = 'docs';
-
-      this.$router.push({ query });
+      this.view = this.$route.query.view || 'list';
+      this.file = this.$route.query.file || null;
 
       this.getSpecs();
+
+      if (action !== this.$route.query.action) {
+        const query = { ...this.$route.query };
+        query.action = action;
+
+        this.$router.push({ query });
+      }
+
+      this.showModal = true;
     },
 
     close() {
@@ -135,13 +159,13 @@ export default {
         return;
       }
 
-      const query = { ...this.$route.query };
-      query.file = file;
-      query.view = view;
+      if (view !== this.$route.query.view || file !== this.$route.query.file) {
+        const query = { ...this.$route.query };
+        query.file = file;
+        query.view = view;
 
-      this.$router.push({
-        query,
-      });
+        this.$router.push({ query });
+      }
     },
 
     back() {
@@ -152,6 +176,18 @@ export default {
       delete query.view;
 
       this.$router.push({ query });
+    },
+
+    copy() {
+      navigator.clipboard.writeText(
+        this.$refs.codemirror.getValue(),
+      )
+        .then(() => {
+          this.$M.toast({ html: 'Content was copied', classes: 'light-green' });
+        })
+        .catch(() => {
+          this.$M.toast({ html: 'Could not copy content', classes: 'red' });
+        });
     },
   },
 
