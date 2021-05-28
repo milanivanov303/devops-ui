@@ -13,7 +13,7 @@
     "@api-components/api-documentation": "^6.0.1",
     "@api-components/api-navigation": "^4.2.8",
     "@enterpriseapps/ea-js-sdk": "^1.0.5",
-    "amf-client-js": "^4.7.1",
+    "amf-client-js": "4.7.1",
     "api-console": "^6.4.10",
     "axios": "^0.19.2",
     "chart.js": "^2.9.4",

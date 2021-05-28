@@ -116,7 +116,7 @@ export default {
   },
 
   props: {
-    branch: Object,
+    branch: String,
   },
 
   data() {

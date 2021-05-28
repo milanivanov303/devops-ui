@@ -2,16 +2,20 @@
   <div class="card">
     <div class="card-content">
       <span class="card-title">Builds by {{ aggregateBy }}</span>
-      <div class="col s12 l6 right">
-        <Select
-          v-model="days"
-          :options="options"
-          icon="today"
-          displayed="name"
-          :defaultOption="false"
-        />
+      <div class="row">
+        <div class="col s12 l6 right">
+          <Select
+            v-model="days"
+            :options="options"
+            icon="today"
+            displayed="name"
+            :defaultOption="false"
+          />
+        </div>
+        <div class="col s12">
+          <BarChart :data="chartData" :height="200"/>
+        </div>
       </div>
-      <BarChart :data="chartData" :height="200"/>
     </div>
   </div>
 </template>
@@ -112,3 +116,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.card{
+  min-height: 400px;
+}
+</style>
