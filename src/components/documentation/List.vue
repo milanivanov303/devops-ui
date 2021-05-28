@@ -38,13 +38,7 @@
 
 <script>
 
-import Table from '@/components/documentation/Table';
-
 export default {
-  components: {
-    Table,
-  },
-
   props: {
     specs: Array,
   },
