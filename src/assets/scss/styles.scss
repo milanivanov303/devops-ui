@@ -54,7 +54,7 @@
     padding-top: 20px;
     text-align: center;
     img{
-        width: 50%;
+        width: 100%;
     }
 }
 
@@ -395,7 +395,7 @@ p {
         color: $link-color !important;
     }
 }
-a.router-link-active,
+a.router-link-exact-active,
 a.selected-branch {
     .card{
             background-color: lighten($color: $sidenav-bg-color, $amount: 10%);

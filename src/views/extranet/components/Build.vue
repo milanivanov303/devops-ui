@@ -8,10 +8,10 @@
         <i class="material-icons left">add</i> New build
       </button>
 
-      <Modal v-if="showModal" @close="close()" @opened="initForm()" class="right-sheet">
+      <Modal v-if="showModal" @close="close()" class="right-sheet">
         <template v-slot:header>{{ branch }} // Create new build </template>
         <template v-slot:content>
-          <div v-if="build.started === false" class="col s12 l11" key="form" >
+          <div v-if="!build.started" class="col s12 l11" key="form" >
               <div class="row">
                 <div class="col s12" >
                   <Autocomplete
@@ -32,16 +32,14 @@
                 </div>
               </div>
               <div class="row">
-                <div class="input-field col s12">
-                  <i class="material-icons prefix" >history</i>
-                  <select id="java-version" ref="java-version" v-model="form.javaVersion">
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                  </select>
-                  <label for="java-version">Java Version</label>
+                <div class="col s12">
+                  <Select
+                    v-model="form.javaVersion"
+                    :options="[4,5,6,7,8]"
+                    :defaultOption="false"
+                    label="Java Version"
+                    icon="history"
+                  />
                 </div>
               </div>
               <div class="row">
@@ -83,11 +81,7 @@
           ></BuildProgress>
         </template>
         <template v-slot:footer>
-          <button
-            id="start-btn"
-            v-if="!build.started"
-            class="waves-effect btn"
-            @click="start()">
+          <button v-if="!build.started" class="waves-effect btn" @click="start()">
             <i class="material-icons left">play_arrow</i> Start
           </button>
         </template>
@@ -122,14 +116,19 @@ function initialState() {
 }
 
 export default {
-  components: { BuildProgress },
+  components: {
+    BuildProgress,
+  },
+
+  props: {
+    branch: String,
+  },
+
   data() {
     return initialState();
   },
+
   computed: {
-    branch() {
-      return this.$route.params.branch;
-    },
     clients() {
       return this.$store.state.extranet.clients;
     },
@@ -140,6 +139,7 @@ export default {
       return this.$store.state.extranet.feBranches;
     },
   },
+
   validations: {
     form: {
       client: {
@@ -156,28 +156,28 @@ export default {
       },
     },
   },
+
   methods: {
-    getClients() {
+    getData() {
       this.$store.dispatch('extranet/getClients');
-    },
-    getInstances() {
       this.$store.dispatch('mmpi/getInstances');
-    },
-    getFeBranches() {
       this.$store.dispatch('extranet/getFeBranches');
     },
+
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
+
+      this.getData();
+
       this.showModal = true;
     },
+
     close() {
       this.showModal = false;
       this.$v.$reset();
     },
-    initForm() {
-      this.$M.FormSelect.init(this.$refs['java-version']);
-    },
+
     start() {
       this.$v.$touch();
       if (this.$v.$invalid) {
@@ -209,18 +209,5 @@ export default {
         .finally(() => { this.build.started = true; });
     },
   },
-  mounted() {
-    this.getClients();
-    this.getInstances();
-    this.getFeBranches();
-  },
 };
 </script>
-
-<style lang="scss" >
-  .log {
-    height: 60vh;
-    overflow: auto;
-    white-space: pre;
-  }
-</style>

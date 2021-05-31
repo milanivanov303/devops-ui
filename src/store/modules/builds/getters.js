@@ -52,6 +52,7 @@ export default {
 
     return builds.sort((a, b) => b.builds - a.builds);
   },
+
   getTTSkeysFromActiveBuilds: (state) => (module) => {
     const ttsKeys = [];
     state.active.filter((build) => build.module === module)
@@ -62,6 +63,7 @@ export default {
       });
     return ttsKeys;
   },
+
   getActiveGroupedByTTSkey: (state) => (module) => {
     const ttsKeys = {};
     state
@@ -82,6 +84,7 @@ export default {
 
     return builds.sort((a, b) => b.builds - a.builds);
   },
+
   getActiveGroupedByModule: (state) => {
     const branches = {};
     state
@@ -101,11 +104,22 @@ export default {
     return builds.sort((a, b) => b.builds - a.builds);
   },
 
-  getActiveByBranch: (state) => (branch) => {
+  getActiveByBranch: (state) => (module, branch) => {
     if (!state.active) {
       return [];
     }
-    return state.active.filter((build) => build.details.branch === branch);
+
+    return state.active.filter((build) => {
+      if (build.module !== module) {
+        return false;
+      }
+
+      if (build.details.branch !== branch) {
+        return false;
+      }
+
+      return true;
+    });
   },
   getActiveByTTSkey: (state) => (key) => {
     if (!state.active) {
@@ -129,6 +143,7 @@ export default {
 
     return sortBuilds(builds);
   },
+
   getByTTSkey: (state) => (stateName, module) => {
     if (!state.statistics[stateName]) {
       return [];
@@ -146,6 +161,7 @@ export default {
 
     return sortBuilds(builds);
   },
+
   getByUser: (state) => (stateName, module) => {
     if (!state.statistics[stateName]) {
       return [];
@@ -163,6 +179,7 @@ export default {
 
     return sortBuilds(builds);
   },
+
   getByBranch: (state) => (stateName, module) => {
     if (!state.statistics[stateName]) {
       return [];
@@ -193,6 +210,7 @@ export default {
       return false;
     });
   },
+
   getForUser: (state) => (stateName, user) => {
     if (!state.statistics[stateName]) {
       return [];
@@ -205,6 +223,6 @@ export default {
       return false;
     });
   },
-  paginationData: (state) => state.paginationData,
 
+  paginationData: (state) => state.paginationData,
 };

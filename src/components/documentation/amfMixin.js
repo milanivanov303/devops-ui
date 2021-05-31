@@ -43,8 +43,11 @@ export default {
       try {
         const resolvedDoc = await this.getResolvedDoc();
         const generator = amf.Core.generator('RAML 1.0', 'application/yaml');
+        const raml = await generator.generateString(resolvedDoc);
 
-        return await generator.generateString(resolvedDoc);
+        this.$emit('loaded');
+
+        return raml;
       } catch (e) {
         this.error = e.toString();
         return null;
@@ -55,8 +58,11 @@ export default {
       try {
         const resolvedDoc = await this.getResolvedDoc();
         const generator = amf.Core.generator('OAS 3.0', 'application/yaml');
+        const openapi = await generator.generateString(resolvedDoc);
 
-        return await generator.generateString(resolvedDoc);
+        this.$emit('loaded');
+
+        return openapi;
       } catch (e) {
         this.error = 'Could not generate openapi file';
         this.error = e.toString();
@@ -70,6 +76,8 @@ export default {
         const generator = amf.Core.generator('AMF Graph', 'application/json');
         const opts = amf.render.RenderOptions().withSourceMaps.withCompactUris;
         const model = await generator.generateString(resolvedDoc, opts);
+
+        this.$emit('loaded');
 
         return JSON.parse(model);
       } catch (e) {

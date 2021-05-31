@@ -5,7 +5,7 @@
         <div class="card" ref="my_builds">
           <div class="card-content">
             <span class="card-title">My IMX builds</span>
-            <Builds :user="this.$auth.getUser().username" module="imx"></Builds>
+            <Builds :created-by="this.$auth.getUser().username" module="imx"></Builds>
             <br>
             <Build @created="() => this.$refs.builds.getBuilds()"/>
           </div>

@@ -12,12 +12,10 @@
         :delete-btn="false"
         queryPrefix="docs_"
       >
-        <Column label="API Title" :show="spec => getTitle(spec)" width="40%"/>
-        <Column
-          label="Screens - API documentation"
-          :show="spec => getScreensTitle(spec)"
-        />
-        <Column label="File" :show="spec => getApiFile(spec)"/>
+        <Column label="API Title" name="title" :show="spec => getTitle(spec)" width="20%"/>
+        <Column label="Screens" name="screens" :show="spec => getScreens(spec)" width="20%"/>
+        <Column label="File" show="file" width="40%"/>
+        <Column label="Paths" :show="spec => getPaths(spec)" class="hidden"/>
         <template v-slot:actions-before="{ row }">
           <a class="btn btn-tiny" @click="$emit('show', row.file, 'raml')">
             RAML
@@ -43,29 +41,36 @@ export default {
   },
 
   methods: {
-    getTitle(api) {
-      if (!api.title) {
-        return `<span class="red-text">${api.error}</span>`;
+    getTitle(spec) {
+      if (!spec.title) {
+        return `<span class="red-text">${spec.error}</span>`;
       }
-      return api.title;
+      return spec.title;
     },
 
-    getScreensTitle(api) {
-      if (api.documentation) {
-        let screens = '';
-        api.documentation.forEach((i) => {
-          screens = `${screens.concat(i.title)}<br>`;
-        });
-        return screens;
+    getScreens(spec) {
+      if (!spec.documentation) {
+        return '';
       }
-      return '<span class="new badge red" data-badge-caption="">ERROR</span>';
+
+      let screens = '';
+      spec.documentation.forEach((i) => {
+        screens += `${i.title}<br>`;
+      });
+      return screens;
     },
 
-    getApiFile(api) {
-      if (api.documentation) {
-        return api.file;
+    getPaths(spec) {
+      if (!spec.paths) {
+        return '';
       }
-      return `<span class="red-text">${api.file}</span>`;
+
+      let paths = '';
+      spec.paths.forEach((path) => {
+        paths += `${path}<br>`;
+      });
+
+      return paths;
     },
   },
 };
