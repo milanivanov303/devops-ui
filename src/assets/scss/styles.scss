@@ -395,7 +395,7 @@ p {
         color: $link-color !important;
     }
 }
-a.router-link-active,
+a.router-link-exact-active,
 a.selected-branch {
     .card{
             background-color: lighten($color: $sidenav-bg-color, $amount: 10%);

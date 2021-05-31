@@ -90,7 +90,6 @@
 import { required } from 'vuelidate/lib/validators';
 import BuildProgress from '@/components/BuildProgress';
 import EventBus from '@/event-bus';
-import Autocomplete from '../../../components/Autocomplete';
 
 function initialState() {
   return {
@@ -113,8 +112,11 @@ function initialState() {
 
 export default {
   components: {
-    Autocomplete,
     BuildProgress,
+  },
+
+  props: {
+    branch: String,
   },
 
   data() {
@@ -122,9 +124,6 @@ export default {
   },
 
   computed: {
-    branch() {
-      return this.$route.params.branch;
-    },
     builds() {
       return this.$store.getters['builds/getActiveByModule']('imx_be');
     },
@@ -162,6 +161,9 @@ export default {
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
+
+      this.getBuilds();
+
       this.showModal = true;
     },
 
@@ -199,17 +201,5 @@ export default {
         .finally(() => { this.build.started = true; });
     },
   },
-
-  mounted() {
-    this.getBuilds();
-  },
 };
 </script>
-
-<style lang="scss" >
-  .log {
-    height: 60vh;
-    overflow: auto;
-    white-space: pre;
-  }
-</style>
