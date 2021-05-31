@@ -12,13 +12,14 @@
         :delete-btn="false"
         queryPrefix="docs_"
       >
-        <Column label="API Title" name="title" :show="spec => getTitle(spec)" width="40%"/>
+        <Column label="API Title" name="title" :show="spec => getTitle(spec)" width="20%"/>
         <Column
           label="Screens - API documentation"
           name="documentation"
           :show="spec => getScreensTitle(spec)"
+          width="20%"
         />
-        <Column label="File" show="file"/>
+        <Column label="File" show="file" width="40%"/>
         <template v-slot:actions-before="{ row }">
           <a class="btn btn-tiny" @click="$emit('show', row.file, 'raml')">
             RAML

@@ -32,6 +32,7 @@
             :repo="repo"
             :branch="branch"
             :file="file"
+            @loaded="showCopyBtn = true"
           />
 
           <Openapi
@@ -40,17 +41,14 @@
             :repo="repo"
             :branch="branch"
             :file="file"
+            @loaded="showCopyBtn = true"
           />
 
           <ApiConsole v-if="view === 'api-console'" :repo="repo" :branch="branch" :file="file"/>
         </div>
       </template>
       <template v-slot:footer>
-        <button
-          v-if="view !== 'list'"
-          class="btn btn-small left waves-effect"
-          @click="copy()"
-        >
+        <button v-if="showCopyBtn" class="btn btn-small left waves-effect" @click="copy()">
           Copy content
         </button>
         <button
@@ -94,7 +92,14 @@ export default {
       file: null,
       specs: [],
       error: null,
+      showCopyBtn: false,
     };
+  },
+
+  computed: {
+    codemirror() {
+      return this.$refs.codemirror;
+    },
   },
 
   methods: {
@@ -188,6 +193,12 @@ export default {
         .catch(() => {
           this.$M.toast({ html: 'Could not copy content', classes: 'red' });
         });
+    },
+  },
+
+  watch: {
+    view() {
+      this.showCopyBtn = false;
     },
   },
 
