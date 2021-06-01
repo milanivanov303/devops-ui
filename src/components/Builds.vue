@@ -154,7 +154,7 @@
         <button
           v-if="!removing && !removed"
           class="waves-effect btn red"
-          @click="remove(build)"
+          @click="remove()"
         >
           <i class="material-icons left">delete</i> Remove
         </button>
@@ -164,7 +164,7 @@
     <Modal v-if="showProgressModal" @close="showProgressModal = false" class="right-sheet">
       <template v-slot:header>{{ build.name }}</template>
       <template v-slot:content>
-        <BuildProgress :broadcast="this.build.details.broadcast"></BuildProgress>
+        <BuildProgress :broadcast="build.details.broadcast"></BuildProgress>
       </template>
     </Modal>
 
@@ -373,16 +373,13 @@ export default {
         .finally(() => { this.updating = false; });
     },
 
-    remove(build) {
+    remove() {
       this.removing = true;
 
-      this.$store.dispatch(`${build.module}/removeBuild`, build.id)
-        .then((response) => {
+      this.$store.dispatch(`${this.build.module}/removeBuild`, this.build.id)
+        .then(() => {
           this.removed = true;
-          build.status = response.data.data.status;
-          build.removed_on = response.data.data.removed_on;
-          build.removed_by = response.data.data.removed_by;
-          build.details = response.data.data.details;
+          this.builds = this.builds.filter((build) => build.id !== this.build.id);
         })
         .catch((error) => {
           if (error.response.status === 403) {
