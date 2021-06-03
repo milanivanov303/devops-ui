@@ -10,6 +10,7 @@ const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/Re
 const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates');
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
+const EsxiDashboard = () => import(/* webpackChunkName: "cms" */ '../views/esxi/Dashboard');
 const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users');
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles');
 const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions');
@@ -18,7 +19,6 @@ const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
-const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
 export default [
@@ -372,11 +372,15 @@ export default [
     component: AdministrationActions,
   },
   {
-    path: '/logged-in-sso-user',
+    path: '/esxi',
     meta: {
-      requiresAuth: false,
+      requiresAuth: true,
+      alias: '/esxi',
+      name: 'esxi',
+      title: 'ESXI Servers',
+      breadcrumb: 'ESXI Servers',
     },
-    component: LoggedInSSOUser,
+    component: EsxiDashboard,
   },
   {
     path: '/builds/:name(.*_\\d+)/:uri(.*)?',

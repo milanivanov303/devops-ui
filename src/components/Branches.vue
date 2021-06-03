@@ -93,6 +93,8 @@ export default {
     branches() {
       let { branches } = this.$store.state[this.module];
 
+     // branches = branches.slice(1, 10);
+
       if (this.search) {
         const regexp = new RegExp(this.search, 'i');
         branches = branches.filter((branch) => branch.name.match(regexp));
@@ -102,7 +104,7 @@ export default {
         if (a.date > b.date) {
           return -1;
         }
-        if (a.date < b.last_nom) {
+        if (a.date < b.date) {
           return 1;
         }
 

@@ -150,6 +150,11 @@
             </ul>
           </div>
         </li>
+        <li :class="{ active: isActive('esxi') }">
+          <router-link to="/esxi">
+            <i class="material-icons">storage</i> ESXI Servers
+          </router-link>
+        </li>
         <li
           v-if="$auth.can('can-manage-authorizations')"
           :class="{ active: isActive('administration') }"
