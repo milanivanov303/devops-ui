@@ -34,11 +34,20 @@ export default [
     beforeEnter: (to, from, next) => {
       if (auth.getUser()) {
         next('/dashbaord');
-      } else {
-        next();
+        return;
       }
+
+      next();
     },
   },
+  {
+    path: '/logged-in-sso-user',
+    meta: {
+      requiresAuth: false,
+    },
+    component: LoggedInSSOUser,
+  },
+
   {
     path: '/dashboard',
     meta: {
@@ -50,6 +59,7 @@ export default [
     },
     component: MainDashboard,
   },
+
   {
     path: '/extranet',
     redirect: '/extranet/dashboard',
@@ -104,6 +114,7 @@ export default [
     },
     component: ExtranetConfigurations,
   },
+
   {
     path: '/debiteur',
     redirect: '/debiteur/dashboard',
@@ -136,6 +147,7 @@ export default [
       module: 'debiteur',
     },
   },
+
   {
     path: '/imx_be',
     redirect: '/imx_be/dashboard',
@@ -253,6 +265,7 @@ export default [
       },
     ],
   },
+
   {
     path: '/demos',
     meta: {
@@ -288,6 +301,7 @@ export default [
     },
     component: DemosList,
   },
+
   {
     path: '/cms/config-defaults',
     meta: {
@@ -338,6 +352,7 @@ export default [
     },
     component: Modification,
   },
+
   {
     path: '/administration/users/:username?',
     meta: {
@@ -371,13 +386,7 @@ export default [
     },
     component: AdministrationActions,
   },
-  {
-    path: '/logged-in-sso-user',
-    meta: {
-      requiresAuth: false,
-    },
-    component: LoggedInSSOUser,
-  },
+
   {
     path: '/builds/:name(.*_\\d+)/:uri(.*)?',
     meta: {
@@ -394,6 +403,7 @@ export default [
     },
     redirect: (to) => `/builds${to.path}`,
   },
+
   {
     path: '*',
     meta: {
