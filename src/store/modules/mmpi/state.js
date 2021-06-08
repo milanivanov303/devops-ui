@@ -8,4 +8,6 @@ export default {
   devInstances: [],
   deliveryChains: [],
   error: '',
+  hashes: [],
+  binaryTypes: [],
 };

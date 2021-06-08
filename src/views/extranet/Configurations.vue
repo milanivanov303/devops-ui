@@ -49,12 +49,12 @@
       <template v-slot:header>
         <span v-if="action === 'create'">Create </span>
         <span v-else-if="action === 'update'">Update </span>
-        <span v-else>Build </span>
+        <span v-else-if="action === 'build'">Build </span>
         configuration
       </template>
       <template v-slot:content>
         <template v-if="build.started === false">
-          <div class="row">
+          <div class="row" v-if="!(action === 'build')">
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -92,7 +92,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="!(action === 'build')">
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -119,7 +119,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="!(action === 'build')">
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -148,7 +148,7 @@
               v-model="configuration.val_instance"
             />
           </div>
-          <div class="row">
+          <div class="row" v-if="!(action === 'build')">
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -194,7 +194,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="!(action === 'build')">
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -211,7 +211,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="!(action === 'build')" >
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -247,7 +247,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row" v-if="!(action === 'build')">
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
@@ -285,6 +285,9 @@
               icon="description"
               v-model="configuration.additional_info"
             />
+          </div>
+          <div class="row" v-if="action === 'build'">
+              <BuildConfiguration></BuildConfiguration>
           </div>
         </template>
         <template v-else>
@@ -361,6 +364,7 @@ import client from '@/plugins/ws';
 import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
 import { Table, Column } from '@/components/table';
+import BuildConfiguration from '@/components/extranet/BuildConfiguration';
 
 export default {
   components: {
@@ -368,6 +372,7 @@ export default {
     TextArea,
     Table,
     Column,
+    BuildConfiguration,
   },
   data() {
     return {
@@ -513,6 +518,7 @@ export default {
       promises.push(this.$store.dispatch('debiteur/getBranches'));
       promises.push(this.$store.dispatch('extranet/getClients'));
       promises.push(this.$store.dispatch('debiteur/getClients'));
+      // promises.push(this.$store.dispatch('mmpi/getHashes'));
 
       Promise.all(promises).finally(() => {
         loader.hide();

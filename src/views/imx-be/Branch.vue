@@ -4,7 +4,7 @@
       <div class="col s12">
         <h4>
           {{ branch }}
-          <a
+           <a
             @click="openDocs()"
             target="_blank"
             data-tooltip="View Documentation"

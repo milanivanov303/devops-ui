@@ -300,4 +300,103 @@ export default {
 
     return promise;
   },
+
+  getHashes({ commit }) {
+    const name = 'hashes';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('hashes', {
+      limit: 5000,
+      fields: JSON.stringify({
+        hash_rev: [],
+        made_on: [],
+        description: [],
+        repo_type: {
+          key: [],
+        },
+      }),
+      filters: JSON.stringify({
+        allOf: [
+          {
+            made_on: {
+              operator: '>',
+              value: '2020_01_01',
+            },
+            allOf: [
+              {
+                repo_type: {
+                  allOf: [
+                    {
+                      key: {
+                        value: [
+                          'imx_be',
+                          'imx_fe',
+                        ],
+                        operator: 'in',
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+      }),
+      with: JSON.stringify({
+        repo_type: [],
+      }),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('hashes', response.data.data))
+      .catch(() => commit('error', 'Could not get hashes', { root: true }));
+
+    return promise;
+  },
+
+  getBinaryTypes({ commit }) {
+    const name = 'binaryTypes';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('enum-values', {
+      fields: JSON.stringify({
+        type: [],
+        value: [],
+      }),
+      filters: JSON.stringify({
+        allOf: [
+          {
+            type: {
+              allOf: [
+                'binary_types',
+              ],
+            },
+            value: {
+              allOf: [],
+            },
+          },
+        ],
+      }),
+      with: JSON.stringify({
+        type: [],
+        value: [],
+      }),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then(response => commit('binaryTypes', response.data.data))
+      .catch(() => commit('error', 'Could not get binary types', { root: true }));
+
+    return promise;
+  },
 };
