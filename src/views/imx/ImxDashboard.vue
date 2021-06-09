@@ -2,6 +2,7 @@
   <div class="imx-dashboard">
     <div v-if="$route.meta.name === 'imx'">
       <div class="col s12 l8">
+
         <div class="card" ref="my_builds">
           <div class="card-content">
             <span class="card-title">My IMX builds</span>
@@ -10,6 +11,7 @@
             <Build @created="() => this.$refs.builds.getBuilds()"/>
           </div>
         </div>
+
         <div class="card" ref="builds_by_TTSkey">
           <div class="card-content">
             <span class="card-title">Active iMX builds by TTS key</span>
@@ -52,6 +54,7 @@
           </div>
         </div>
       </div>
+
       <div class="col s12 l4">
         <div class="card" ref="stats_by_user">
           <div class="card-content">
@@ -69,25 +72,23 @@
             <BarChart :data="usersChartData" :height="200"></BarChart>
           </div>
         </div>
+
         <div class="card" ref="stats_by_TTSkey">
           <div class="card-content">
             <span class="card-title">iMX builds by TTS key</span>
             <div class="col s12 l6 right">
-              <div class="input-field">
-                <Select class="col s12"
-                        icon="today"
-                        displayed="name"
-                        v-model="TTSkeyStatisticsDays"
-                        :options="dateOptions"
-                />
-              </div>
+              <Select
+                icon="today"
+                displayed="name"
+                v-model="TTSkeyStatisticsDays"
+                :options="dateOptions"
+              />
             </div>
             <BarChart :data="TTSkeyChartData" :height="200"></BarChart>
           </div>
         </div>
       </div>
     </div>
-    <router-view v-else :key="$route.path"/>
   </div>
 </template>
 
