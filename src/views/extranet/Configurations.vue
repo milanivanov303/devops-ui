@@ -37,13 +37,19 @@
           "
         />
         <template v-slot:actions-before="{ row }">
-          <a @click="openAddEditModal('build', row)" class="green-text" title="Start Build">
+          <!--<a @click="openAddEditModal('build', row)" class="green-text" title="Start Build">
+            <i class="material-icons">send</i>
+          </a>
+          -->
+          <a @click="openBuildModal(row)" class="green-text" title="Start Build">
             <i class="material-icons">send</i>
           </a>
         </template>
       </Table>
 
     </div>
+
+    <BuildConfiguration v-if="action === 'build'" ></BuildConfiguration>
 
     <Modal v-if="showAddEditModal" @close="closeAddEditModal()" class="right-sheet">
       <template v-slot:header>
@@ -362,10 +368,12 @@ import { required } from 'vuelidate/lib/validators';
 import client from '@/plugins/ws';
 
 import TextArea from '@/components/TextArea';
+import BuildConfiguration from '@/components/extranet/BuildConfiguration';
 
 export default {
   components: {
     TextArea,
+    BuildConfiguration,
   },
   data() {
     return {
@@ -603,6 +611,11 @@ export default {
       this.$router.push({
         path: '/extranet/configurations',
       });
+    },
+
+    openBuildModal(configuration) {
+      this.action = 'build';
+      this.configuration = { ...configuration };
     },
 
     save() {

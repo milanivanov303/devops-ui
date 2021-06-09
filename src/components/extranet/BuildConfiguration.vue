@@ -1,5 +1,10 @@
 <template>
-  <form @submit.prevent="handleSubmit">
+  <Modal @close="closeAddEditModal()" class="right-sheet">
+    <template v-slot:header>
+      Build configuration
+    </template>
+    <template v-slot:content>
+      <form @submit.prevent="handleSubmit">
 <!--    <div class="row">-->
 <!--      <tts-key></tts-key>-->
 <!--    </div>-->
@@ -139,6 +144,8 @@
       <button class="btn btn-primary">Submit</button>
     </div>
   </form>
+    </template>
+  </Modal>
 </template>
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
