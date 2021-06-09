@@ -79,18 +79,24 @@ function initialState() {
 }
 
 export default {
-  components: { BuildProgress },
+  components: {
+    BuildProgress,
+  },
+
+  props: {
+    branch: String,
+  },
+
   data() {
     return initialState();
   },
+
   computed: {
-    branch() {
-      return this.$route.params.branch;
-    },
     instances() {
       return this.$store.state.mmpi.instances;
     },
   },
+
   validations: {
     form: {
       instance: {
@@ -98,15 +104,21 @@ export default {
       },
     },
   },
+
   methods: {
     getInstances() {
       this.$store.dispatch('mmpi/getInstances');
     },
+
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
+
+      this.getInstances();
+
       this.showModal = true;
     },
+
     close() {
       this.$v.$reset();
       this.showModal = false;
@@ -140,16 +152,5 @@ export default {
         .finally(() => { this.build.started = true; });
     },
   },
-  mounted() {
-    this.getInstances();
-  },
 };
 </script>
-
-<style lang="scss" >
-  .log {
-    height: 60vh;
-    overflow: auto;
-    white-space: pre;
-  }
-</style>

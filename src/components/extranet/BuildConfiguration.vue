@@ -146,14 +146,11 @@ import _ from 'lodash';
 
 import TextArea from '@/components/TextArea';
 // import TtsKey from '@/components/extranet/TtsKey';
-import Autocomplete from '@/components/Autocomplete';
-
 
 export default {
   name: 'build-configuration',
   components: {
     // TtsKey,
-    Autocomplete,
     TextArea,
   },
   data() {
@@ -210,7 +207,7 @@ export default {
   },
   validations: {
     configName: {
-      required: requiredIf(formModel => formModel.binaryType.value === 'Manual'),
+      required: requiredIf((formModel) => formModel.binaryType.value === 'Manual'),
     },
     feHash: {
       required,

@@ -8,11 +8,10 @@
         <i class="material-icons left">add</i> New build
       </button>
 
-      <Modal v-if="showModal" @close="close()" @opened="initForm()" class="right-sheet">
+      <Modal v-if="showModal" @close="close()" class="right-sheet">
         <template v-slot:header>{{ branch }} // Create new build </template>
         <template v-slot:content>
-          <template v-if="build.started === false">
-            <div  class="col s12 l11" key="form" >
+          <div v-if="!build.started"  class="col s12 l11" key="form" >
               <div class="row">
                 <div class="col s12" >
                   <Autocomplete
@@ -33,16 +32,14 @@
                 </div>
               </div>
               <div class="row">
-                <div class="input-field col s12">
-                  <i class="material-icons prefix" >history</i>
-                  <select id="java-version" ref="java-version" v-model="form.javaVersion">
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                  </select>
-                  <label for="java-version">Java Version</label>
+                <div class="col s12">
+                  <Select
+                    v-model="form.javaVersion"
+                    :options="[4,5,6,7,8]"
+                    :defaultOption="false"
+                    label="Java Version"
+                    icon="history"
+                  />
                 </div>
               </div>
               <div class="row">
@@ -65,34 +62,13 @@
                 </div>
               </div>
             </div>
-          </template>
-          <template v-else>
-            <div key="build" >
-
-              <div v-if="build.status === 'success'" class="center" >
-                <i class="material-icons large green-text">check_circle_outline</i>
-                <p>Build completed successfully</p>
-              </div>
-
-              <div v-else-if="build.status === 'failed'" class="center">
-                <i class="material-icons large red-text">error_outline</i>
-                <p>{{ build.error || build.summary }}</p>
-              </div>
-
-              <div v-else class="row">
-                <div class="col s12">
-                  <p>{{ build.summary }}</p>
-                  <Progress v-if="build.status === 'running'" :progress="build.progress"></Progress>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col s12">
-                  <div class="log">{{ build.log }}</div>
-                </div>
-              </div>
-            </div>
-          </template>
+          <BuildProgress
+            v-else
+            :broadcast="build.broadcast"
+            :status="build.status"
+            :summary="build.summary"
+            :error="build.error"
+          ></BuildProgress>
         </template>
         <template v-slot:footer>
           <button
@@ -111,6 +87,8 @@
 <script>
 
 import { required } from 'vuelidate/lib/validators';
+import BuildProgress from '@/components/BuildProgress';
+import EventBus from '@/event-bus';
 
 function initialState() {
   return {
@@ -132,14 +110,19 @@ function initialState() {
 }
 
 export default {
+  components: {
+    BuildProgress,
+  },
+
+  props: {
+    branch: String,
+  },
 
   data() {
     return initialState();
   },
+
   computed: {
-    branch() {
-      return this.$route.params.branch;
-    },
     clients() {
       return this.$store.state.debiteur.clients;
     },
@@ -147,6 +130,7 @@ export default {
       return this.$store.state.mmpi.instances;
     },
   },
+
   validations: {
     form: {
       client: {
@@ -163,76 +147,44 @@ export default {
       },
     },
   },
+
   methods: {
-    getClients() {
+    getData() {
       this.$store.dispatch('debiteur/getClients');
-    },
-    getInstances() {
       this.$store.dispatch('mmpi/getInstances');
     },
+
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
+
       this.showModal = true;
+
+      this.getData();
     },
+
     close() {
       this.showModal = false;
       this.$v.$reset();
     },
-    initForm() {
-      this.$M.FormSelect.init(this.$refs['java-version']);
-    },
+
     start() {
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
       }
 
-      this.build.started = true;
-      this.build.summary = 'Build will start shortly ...';
-
-      const payload = {
+      this.$store.dispatch('debiteur/startBuild', {
         branch: this.branch,
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-      };
-
-      this.$store.dispatch('debiteur/startBuild', payload)
+      })
         .then((response) => {
           this.build.status = 'running';
-
-          if (!this.$ws.isConnected()) {
-            return;
-          }
-
-          const subscribe = this.$ws.subscribe(
-            `/queue/${response.data.broadcast.queue}`,
-            (message) => {
-              const data = JSON.parse(message.body);
-
-              if (data.summary) {
-                this.build.summary = data.summary;
-              }
-              this.build.progress = data.progress || null;
-
-              if (data.log) {
-                this.build.log += data.log;
-                this.scrollLogContainer();
-              }
-
-              if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
-                if (data.action === 'deploy' && data.status === 'success') {
-                  this.$store.dispatch('builds/getActive');
-                }
-
-                this.build.status = data.status;
-                this.$emit('created');
-                subscribe.unsubscribe();
-              }
-            },
-            response.data.broadcast,
-          );
+          this.build.summary = 'Build will start shortly ...';
+          this.build.broadcast = response.data.broadcast;
+          EventBus.$emit('build.created');
         })
         .catch((error) => {
           this.build.status = 'failed';
@@ -242,26 +194,9 @@ export default {
           } else {
             this.build.error = error;
           }
-        });
+        })
+        .finally(() => { this.build.started = true; });
     },
-    scrollLogContainer() {
-      setTimeout(() => {
-        const container = this.$el.querySelector('.log');
-        container.scrollTop = container.scrollHeight;
-      }, 100);
-    },
-  },
-  mounted() {
-    this.getClients();
-    this.getInstances();
   },
 };
 </script>
-
-<style lang="scss" >
-  .log {
-    height: 60vh;
-    overflow: auto;
-    white-space: pre;
-  }
-</style>

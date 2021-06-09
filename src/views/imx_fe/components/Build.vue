@@ -14,14 +14,13 @@
           <div v-if="build.started === false" class="col s12 l11" key="form" >
             <div class="row">
               <div class="col s12" >
-                <Autocomplete
+                <TextInput
                   label="Client"
                   icon="people"
-                  :items="clients"
                   v-model="form.client"
                   :invalid="$v.form.client.$error"
                   @blur="$v.form.client.$touch()"
-                  />
+                />
               </div>
               <div class="validator col s11 offset-s1 ">
                 <div class="red-text" v-if="$v.form.client.$error">
@@ -33,14 +32,26 @@
             </div>
             <div class="row">
               <div class="col s12" >
+                <Autocomplete
+                  label="BE Build"
+                  icon="laptop_chromebook"
+                  :items="builds"
+                  v-model="form.build"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
                 <TextInput
                   label="Endpoint"
                   icon="link"
                   v-model="form.endpoint"
+                  :readonly="endpoint !== null"
                   :invalid="$v.form.endpoint.$error"
                   @blur="$v.form.endpoint.$touch()"
                 />
               </div>
+
               <div class="validator col s11 offset-s1 ">
                 <div class="red-text" v-if="$v.form.endpoint.$error">
                   <p v-if="!$v.form.endpoint.required">
@@ -49,6 +60,7 @@
                 </div>
               </div>
             </div>
+
           </div>
           <BuildProgress
             v-else
@@ -84,6 +96,7 @@ function initialState() {
     showModal: false,
     form: {
       client: null,
+      build: null,
       endpoint: null,
     },
     build: {
@@ -98,18 +111,31 @@ function initialState() {
 }
 
 export default {
-  components: { BuildProgress },
+  components: {
+    BuildProgress,
+  },
+
+  props: {
+    branch: String,
+  },
+
   data() {
     return initialState();
   },
+
   computed: {
-    branch() {
-      return this.$route.params.branch;
+    builds() {
+      return this.$store.getters['builds/getActiveByModule']('imx_be');
     },
-    clients() {
-      return this.$store.state.extranet.clients;
+    endpoint() {
+      if (!this.form.build) {
+        return null;
+      }
+
+      return this.form.build.details.url;
     },
   },
+
   validations: {
     form: {
       client: {
@@ -120,15 +146,27 @@ export default {
       },
     },
   },
-  methods: {
-    getClients() {
-      this.$store.dispatch('extranet/getClients');
+
+  watch: {
+    endpoint(value) {
+      this.form.endpoint = value;
     },
+  },
+
+  methods: {
+    getBuilds() {
+      this.$store.dispatch('builds/getActive');
+    },
+
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
+
+      this.getBuilds();
+
       this.showModal = true;
     },
+
     close() {
       this.$v.$reset();
       this.showModal = false;
@@ -163,16 +201,5 @@ export default {
         .finally(() => { this.build.started = true; });
     },
   },
-  mounted() {
-    this.getClients();
-  },
 };
 </script>
-
-<style lang="scss" >
-  .log {
-    height: 60vh;
-    overflow: auto;
-    white-space: pre;
-  }
-</style>

@@ -137,7 +137,10 @@ import BuildProgress from '@/components/BuildProgress';
 import EventBus from '@/event-bus';
 
 export default {
-  components: { BuildProgress },
+  components: {
+    BuildProgress,
+  },
+
   data() {
     return {
       showModal: false,
@@ -152,6 +155,7 @@ export default {
       },
     };
   },
+
   computed: {
     be_branches() {
       return this.$store.state.imx_be.branches;
@@ -163,6 +167,7 @@ export default {
       return this.$store.state.mmpi.instances;
     },
   },
+
   validations: {
     build: {
       tts_key: {
@@ -182,8 +187,9 @@ export default {
       },
     },
   },
+
   methods: {
-    loadData() {
+    getData() {
       const promises = [];
       promises.push(this.$store.dispatch('imx_be/getBranches'));
       promises.push(this.$store.dispatch('mmpi/getInstances'));
@@ -198,8 +204,10 @@ export default {
     },
 
     open() {
+      this.getData();
       this.showModal = true;
     },
+
     close() {
       this.$v.$reset();
       this.showModal = false;
@@ -234,16 +242,5 @@ export default {
         .finally(() => { this.building.started = true; });
     },
   },
-  mounted() {
-    this.loadData();
-  },
 };
 </script>
-
-<style lang="scss" >
-    .log {
-        height: 60vh;
-        overflow: auto;
-        white-space: pre;
-    }
-</style>

@@ -6,17 +6,17 @@
         <div class="row">
           <TextInput
             class="col s12 readonly"
-            label="FE Branch"
+            label="BE Branch"
             icon="laptop_chromebook"
-            v-model="build.details.branch"
+            :value="build.details.branch"
           />
         </div>
         <div class="row">
           <TextInput
             class="col s12 readonly"
-            label="Client"
-            icon="people"
-            v-model="build.details.client"
+            label="Instance"
+            icon="dynamic_feed"
+            :value="build.details.instance.name"
           />
         </div>
         <div class="row">
@@ -24,13 +24,13 @@
             class="col s12 m6 readonly"
             label="Created on"
             icon="event"
-            v-model="build.created_on"
+            :value="build.created_on"
           />
           <TextInput
             class="col s12 m6 readonly"
             label="Created by"
             icon="person"
-            v-model="build.created_by"
+            :value="build.created_by"
           />
         </div>
         <div class="row" v-if="build.removed_on">
@@ -38,13 +38,21 @@
             class="col s12 m6 readonly"
             label="Removed on"
             icon="event"
-            v-model="build.removed_on"
+            :value="build.removed_on"
           />
           <TextInput
             class="col s12 m6 readonly"
             label="Removed by"
             icon="person"
-            v-model="build.removed_by"
+            :value="build.removed_by"
+          />
+        </div>
+        <div class="row" v-if="build.status === 'running'">
+          <TextInput
+            class="col s12 readonly"
+            label="Deploy URL"
+            icon="link"
+            :value="build.details.url"
           />
         </div>
       </div>

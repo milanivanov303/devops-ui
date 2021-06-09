@@ -1,7 +1,5 @@
 FROM gitlab.codixfr.private:5005/enterpriseapps/images/nodejs:1.0 AS base
 
-RUN apk add --no-cache --virtual .gyp python make g++
-
 # ---------- Builder ----------
 FROM base AS builder
 

@@ -13,7 +13,7 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('clients', response.data))
+      .then((response) => commit('clients', response.data))
       .catch(() => commit('error', 'Could not get clients list', { root: true }));
     return promise;
   },
@@ -30,7 +30,7 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('branches', response.data))
+      .then((response) => commit('branches', response.data))
       .catch(() => commit('error', 'Could not get branches list', { root: true }));
     return promise;
   },
@@ -58,14 +58,14 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('feBranches', response.data))
+      .then((response) => commit('feBranches', response.data))
       .catch(() => commit('error', 'Could not get branches list', { root: true }));
     return promise;
   },
 
   startBuild({ commit }, payload) {
     const promise = api('devops').post('extranet/build', payload);
-    promise.catch(error => commit('error', error, { root: true }));
+    promise.catch((error) => commit('error', error, { root: true }));
     return promise;
   },
 
@@ -73,7 +73,7 @@ export default {
     const promise = api('devops').delete(`extranet/build/${id}`);
     promise
       .then(() => commit('removeBuild', id))
-      .catch(error => commit('error', error, { root: true }));
+      .catch((error) => commit('error', error, { root: true }));
     return promise;
   },
 
@@ -89,7 +89,7 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('configurations', response.data.data))
+      .then((response) => commit('configurations', response.data.data))
       .catch(() => commit('error', 'Could not get configurations list', { root: true }));
     return promise;
   },
@@ -98,7 +98,7 @@ export default {
     const promise = api('devops').post('extranet/configurations', payload);
 
     promise
-      .then(response => commit('createConfiguration', response.data.data))
+      .then((response) => commit('createConfiguration', response.data.data))
       .catch(() => commit('error', 'Could not create configuration', { root: true }));
 
     return promise;
@@ -106,7 +106,7 @@ export default {
 
   buildConfiguration({ commit }, { id, payload }) {
     const promise = api('devops').post(`extranet/configurations/${id}/build`, payload);
-    promise.catch(error => commit('error', error, { root: true }));
+    promise.catch((error) => commit('error', error, { root: true }));
     return promise;
   },
 
@@ -114,7 +114,7 @@ export default {
     const promise = api('devops').put(`extranet/configurations/${payload.id}`, payload);
 
     promise
-      .then(response => commit('updateConfiguration', response.data.data))
+      .then((response) => commit('updateConfiguration', response.data.data))
       .catch(() => commit('error', 'Could not update configuration', { root: true }));
 
     return promise;

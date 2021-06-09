@@ -1,23 +1,23 @@
 // https://vuex.vuejs.org/en/getters.html
 
 export default {
-  getContainersByBranch: state => (branch) => {
+  getContainersByBranch: (state) => (branch) => {
     if (!state.containers) {
       return [];
     }
-    return state.containers.filter(container => (
+    return state.containers.filter((container) => (
       container.Labels.branch === branch
     ));
   },
-  getContainersByUser: state => (username) => {
+  getContainersByUser: (state) => (username) => {
     if (!state.containers) {
       return [];
     }
-    return state.containers.filter(container => (
+    return state.containers.filter((container) => (
       container.Labels.username === username
     ));
   },
-  getContainersGroupedByBranch: state => () => {
+  getContainersGroupedByBranch: (state) => () => {
     const branches = {};
     state.containers.forEach((container) => {
       branches[container.Labels.branch] = (branches[container.Labels.branch] + 1) || 1;

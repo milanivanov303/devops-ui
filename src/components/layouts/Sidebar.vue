@@ -1,7 +1,7 @@
 <template>
   <ul id="nav-mobile" class="sidenav sidenav-fixed">
     <li class="logo">
-        <img src="/applications/yTjvXuxGM5i/logo" alt="DevOps Management">
+        <img src="/applications/yTjvXuxGM5i/big_logo" alt="DevOps Management">
     </li>
     <li>
       <ul class="collapsible collapsible-accordion">

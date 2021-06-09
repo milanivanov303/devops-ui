@@ -87,7 +87,7 @@
         </div>
       </div>
       <div v-if="modifications.length">
-        <inserts :modifications="modifications"/>
+        <inserts :modifications="modifications" @remove="key => modifications.splice(key, 1)"/>
         <div class="validator red-text" v-if="$v.modifications.$error">
           <p v-if="!$v.modifications.required">There are no added modifications!</p>
         </div>
@@ -144,7 +144,7 @@
 <script>
 import { required } from 'vuelidate/lib/validators';
 import config from '@/config';
-import Inserts from '@/components/partials/Inserts';
+import Inserts from '@/components/cms/Inserts';
 import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
 import AddVariableModif from '@/components/cms/AddVariableModif';
 import AddTemplateModif from '@/components/cms/AddTemplateModif';
@@ -297,9 +297,9 @@ export default {
         if (roles.includes(chain.dc_role.key)
           && chain.type.type === type) {
           chain.instances
-            .filter(instance => instance.instance_type_id !== 'DEV')
-            .filter(instance => instance.instance_type_id !== 'codix')
-            .map(instance => acc.push(instance));
+            .filter((instance) => instance.instance_type_id !== 'DEV')
+            .filter((instance) => instance.instance_type_id !== 'codix')
+            .map((instance) => acc.push(instance));
         }
         return acc;
       }, []);
@@ -384,7 +384,7 @@ export default {
       this.$M.Tooltip.init(this.$refs.tooltip);
       await this.$store.dispatch('cms/getInstanceStatus');
       this.instanceStatuses = this.$store.state.cms.instanceStatus;
-      this.form.instance_status = this.instanceStatuses.find(is => is.value === 'Installer decision').id;
+      this.form.instance_status = this.instanceStatuses.find((is) => is.value === 'Installer decision').id;
     },
     selectedDeliveryChain(value) {
       this.form.delivery_chain_id = value.id;
