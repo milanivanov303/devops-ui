@@ -92,8 +92,9 @@ export default {
 
       if (this.searchVm) {
         const regexp = new RegExp(this.searchVm, 'i');
-        virtualMachines =
-          virtualMachines.filter((virtualMachine) => virtualMachine.main_info.name.match(regexp));
+        virtualMachines = virtualMachines.filter(
+          (virtualMachine) => virtualMachine.main_info.name.match(regexp)
+        );
       }
 
       return virtualMachines;
