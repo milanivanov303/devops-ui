@@ -7,8 +7,13 @@
             {{ esxiHost.hostname }}
           </div>
 
-          <div v-if="esxiHost.details && esxiHost.details.cpu">CPU: {{ esxiHost.details.cpu.c_p_u_cores ? esxiHost.details.cpu.c_p_u_cores : ''}}</div>
-          <div v-if="esxiHost.details && esxiHost.details.memory">Memory: {{ bytesToSize(esxiHost.details ? esxiHost.details.memory.physical_memory : '') }}</div>
+          <div v-if="esxiHost.details && esxiHost.details.cpu">
+            CPU: {{ esxiHost.details.cpu.c_p_u_cores ? esxiHost.details.cpu.c_p_u_cores : ''}}
+          </div>
+          <div v-if="esxiHost.details && esxiHost.details.memory">
+            Memory:
+            {{ bytesToSize(esxiHost.details ? esxiHost.details.memory.physical_memory : '') }}
+          </div>
           <div v-if="esxiHost.details" class="progress">
             <div class="determinate" :style="{width: getServerFreeMemory(esxiHost) + '%'}"></div>
           </div>

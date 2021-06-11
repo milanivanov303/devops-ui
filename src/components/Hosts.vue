@@ -116,7 +116,8 @@ export default {
         return null;
       }
 
-      const esxiHost = esxiHosts.find(x => x.hostname === decodeURIComponent(this.$route.query.esxiHost));
+      const esxiHost =
+        esxiHosts.find(x => x.hostname === decodeURIComponent(this.$route.query.esxiHost));
 
       return esxiHost;
     },

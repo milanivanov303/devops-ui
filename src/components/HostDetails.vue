@@ -6,7 +6,11 @@
         {{ esxiHost.hostname }}
       </div>
 
-      <div v-if="esxiHost.details.memory"><b>Memory:</b> {{ bytesToSize(esxiHost.details ? esxiHost.details.memory.physical_memory : '') }}, Free {{ bytesToSize(freeMemory(esxiHost)) }}</div>
+      <div v-if="esxiHost.details.memory">
+        <b>Memory:</b>
+        {{ bytesToSize(esxiHost.details ? esxiHost.details.memory.physical_memory : '') }},
+        Free {{ bytesToSize(freeMemory(esxiHost)) }}
+      </div>
       <div v-if="esxiHost.details" class="progress">
         <div class="determinate" :style="{width: getServerFreeMemory(esxiHost) + '%'}"></div>
       </div>
@@ -34,7 +38,8 @@
             </div>
 
             <div class="row">
-              <div v-for="virtualMachine in virtualMachines" :key="virtualMachine.name" class="col s12 m6 l12">
+              <div v-for="virtualMachine in virtualMachines"
+                   :key="virtualMachine.name" class="col s12 m6 l12">
                 <VirtualMachine
                   :module="module"
                   :virtualMachine="virtualMachine"
@@ -61,8 +66,6 @@ import Tabs from '../views/esxi/components/Tabs'
 export default {
   data() {
     return {
-      slide: 0,
-      sliding: null,
       searchVm: this.$route.query.searchVm,
     }
   },
@@ -89,7 +92,8 @@ export default {
 
       if (this.searchVm) {
         const regexp = new RegExp(this.searchVm, 'i');
-        virtualMachines = virtualMachines.filter((virtualMachine) => virtualMachine.main_info.name.match(regexp));
+        virtualMachines =
+          virtualMachines.filter((virtualMachine) => virtualMachine.main_info.name.match(regexp));
       }
 
       return virtualMachines;
@@ -129,14 +133,6 @@ export default {
       }
 
       return esxiHost.details.memory.physical_memory - this.getVmsMemory(esxiHost);
-    },
-
-    onSlideStart(slide) {
-      this.sliding = true
-    },
-
-    onSlideEnd(slide) {
-      this.sliding = false
     },
   },
 

@@ -19,7 +19,9 @@
           <span><b>Hardware</b></span>
           <p>CPUs: {{ virtualMachine.hardware.num_c_p_u }}</p>
           <p>Cores per socket: {{ virtualMachine.hardware.num_cores_per_socket }}</p>
-          <p>Memory: {{ bytesToSize(virtualMachine.hardware ? virtualMachine.hardware.memory : '') }}</p>
+          <p>
+            Memory: {{ bytesToSize(virtualMachine.hardware ? virtualMachine.hardware.memory : '') }}
+          </p>
         </div>
 
         <div class="col s12 m12">

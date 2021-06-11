@@ -12,20 +12,29 @@
 
         <div v-if="esxiHost.details">
           <p v-if="esxiHost.details.platform">
-            {{ esxiHost.details.platform.product_name }} {{ esxiHost.details.platform.vendor_name  }} SN: {{ esxiHost.details.platform.serial_number }}
+            {{ esxiHost.details.platform.product_name }}
+            {{ esxiHost.details.platform.vendor_name  }}
+            SN: {{ esxiHost.details.platform.serial_number }}
           </p>
 
           <p v-if="esxiHost.details.cpu">
-            CPU details: cores - {{ esxiHost.details.cpu.c_p_u_cores }}, packages - {{ esxiHost.details.cpu.c_p_u_packages }}, HV support - {{ esxiHost.details.cpu.h_v_support }}
+            CPU details: cores - {{ esxiHost.details.cpu.c_p_u_cores }},
+            packages - {{ esxiHost.details.cpu.c_p_u_packages }},
+            HV support - {{ esxiHost.details.cpu.h_v_support }}
           </p>
 
           <p v-if="esxiHost.details.memory">
-            RAM {{ bytesToSize(esxiHost.details.memory ? esxiHost.details.memory.physical_memory : '') }}
+            RAM
+            {{bytesToSize(esxiHost.details.memory ? esxiHost.details.memory.physical_memory : '')}}
           </p>
 
           <div class="blue-grey lighten-3">
-            <p v-if="esxiHost.details">ESXi host date: {{ esxiHost.details ? $date(esxiHost.details.date).toHuman() : '' }}</p>
-            <p v-if="esxiHost.updated_on">Updated on: {{ esxiHost.updated_on ? $date(esxiHost.updated_on).toHuman() : '' }}</p>
+            <p v-if="esxiHost.details">
+              ESXi host date: {{ esxiHost.details ? $date(esxiHost.details.date).toHuman() : '' }}
+            </p>
+            <p v-if="esxiHost.updated_on">
+              Updated on: {{ esxiHost.updated_on ? $date(esxiHost.updated_on).toHuman() : '' }}
+            </p>
           </div>
         </div>
 
