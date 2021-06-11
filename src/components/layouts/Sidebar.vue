@@ -151,9 +151,21 @@
           </div>
         </li>
         <li :class="{ active: isActive('esxi') }">
-          <router-link to="/esxi">
-            <i class="material-icons">storage</i> ESXI Servers
-          </router-link>
+          <a class="collapsible-header">
+            <i class="material-icons">devices</i> ESXi Hosts
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li :class="{ active: isActive('esxi/dashboard') }">
+                <router-link to="/esxi/dashboard"> Dashboard</router-link>
+              </li>
+              <li :class="{ active: isActive('esxi/esxiHosts') }">
+                <router-link to="/esxi/esxiHosts"> Hosts</router-link>
+              </li>
+              <li><div class="divider"></div></li>
+            </ul>
+          </div>
         </li>
         <li
           v-if="$auth.can('can-manage-authorizations')"

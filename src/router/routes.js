@@ -17,6 +17,7 @@ const AdministrationActions = () => import(/* webpackChunkName: "administration-
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
+const Hosts = () => import(/* webpackChunkName: "hosts" */ '@/components/Hosts');
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
@@ -373,14 +374,45 @@ export default [
   },
   {
     path: '/esxi',
+    redirect: '/esxi/dashboard',
+  },
+  {
+    path: '/esxi/dashboard',
     meta: {
       requiresAuth: true,
-      alias: '/esxi',
       name: 'esxi',
-      title: 'ESXI Servers',
-      breadcrumb: 'ESXI Servers',
+      transitionName: 'slide',
+      title: 'ESXI Dashboard',
     },
     component: EsxiDashboard,
+    props: {
+      module: 'esxi',
+    },
+  },
+  {
+    path: '/esxi/esxiHosts/:esxiHost?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-esxiHosts',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'ESXi Hosts';
+
+        if (route.query.esxiHost) {
+          title = `${route.query.esxiHost} - ${title}`;
+        }
+
+        if (route.query.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Hosts,
+    props: {
+      module: 'esxi',
+    },
   },
   {
     path: '/builds/:name(.*_\\d+)/:uri(.*)?',
