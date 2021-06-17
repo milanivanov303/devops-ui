@@ -19,4 +19,38 @@ export default {
     return `${Math.round((hertz / 1000000 / 1000) * 100) / 100} GHz`;
   },
 
-}
+  getVmsMemory(esxiHost) {
+    if (!esxiHost.vms_details) {
+      return 0;
+    }
+
+    return esxiHost.vms_details.reduce(
+      (accumulator, currentValue) => accumulator.hardware.memory + currentValue.hardware.memory,
+    );
+  },
+
+  getServerFreeMemory(esxiHost) {
+    if (!esxiHost.details.memory) {
+      return 0;
+    }
+
+    return (this.getVmsMemory(esxiHost) * 100) / esxiHost.details.memory.physical_memory;
+  },
+
+  freeMemory(esxiHost) {
+    if (!esxiHost.details) {
+      return 0;
+    }
+
+    return esxiHost.details.memory.physical_memory - this.getVmsMemory(esxiHost);
+  },
+
+  getCpuCoreSpeed(cpuDetails) {
+    if (!cpuDetails[0]) {
+      return null;
+    }
+
+    return this.hertzToGigahertz(cpuDetails[0].core_speed);
+  },
+
+};

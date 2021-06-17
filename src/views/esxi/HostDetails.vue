@@ -4,6 +4,9 @@
 
       <div class="card-title truncate">
         {{ esxiHost.hostname }}
+        <div v-if="esxiHost.updated_on" class="right date">
+          Updated on {{ $date(esxiHost.updated_on).toHuman() }}
+        </div>
       </div>
 
       <div v-if="esxiHost.details.memory">
@@ -16,39 +19,30 @@
       </div>
 
       <div class="wrapper">
-        <tabs>
-          <tab v-if="cpus" title="CPUs">
-            <div class="row">
-              <div v-for="cpu in cpus" :key="cpu.id" class="col s12 m6 l12">
-                <Cpu
-                  :module="module"
-                  :cpu="cpu"
-                />
-              </div>
-            </div>
-          </tab>
-          <tab v-if="virtualMachines" title="Virtual machines">
-            <div class="row">
-              Total number: {{ virtualMachines.length }}
-            </div>
-            <div class="row">
-              <div class="col s12 m6 l5">
-                <TextInput label="Search VMs" icon="search" v-model="searchVm"/>
-              </div>
-            </div>
+        <div class="row">
 
-            <div class="row">
-              <div v-for="virtualMachine in virtualMachines"
-                   :key="virtualMachine.name" class="col s12 m6 l12">
-                <VirtualMachine
-                  :module="module"
-                  :virtualMachine="virtualMachine"
-                  :esxhiHost="esxiHost"
-                />
-              </div>
-            </div>
-          </tab>
-        </tabs>
+          <ul class="tabs col s12">
+            <li class="tab col s6">
+              <a href="#esxi_details">DETAILS</a>
+            </li>
+            <li class="tab col s6">
+              <a href="#vms">VIRTUAL MACHINES</a>
+            </li>
+          </ul>
+
+          <div id="esxi_details">
+            <EsxiDetails
+              :esxiHost="esxiHost"
+            />
+          </div>
+
+          <div id="vms">
+            <VirtualMachines
+              :virtualMachines="virtualMachines"
+            />
+          </div>
+
+        </div>
       </div>
 
     </div>
@@ -57,24 +51,20 @@
 
 <script>
 
-import VirtualMachine from "../views/esxi/components/VirtualMachine";
-import Cpu from "../views/esxi/components/Cpu";
 import shared from '@/js/esxi/shared';
-import Tab from '../views/esxi/components/Tab'
-import Tabs from '../views/esxi/components/Tabs'
+import VirtualMachines from './components/VirtualMachines';
+import EsxiDetails from './components/EsxiDetails';
 
 export default {
   data() {
     return {
       searchVm: this.$route.query.searchVm,
-    }
+    };
   },
 
   components: {
-    VirtualMachine,
-    Cpu,
-    Tab,
-    Tabs,
+    VirtualMachines,
+    EsxiDetails,
   },
 
   props: {
@@ -88,12 +78,12 @@ export default {
         return null;
       }
 
-      let virtualMachines  = this.esxiHost.vms_details;
+      let virtualMachines = this.esxiHost.vms_details;
 
       if (this.searchVm) {
         const regexp = new RegExp(this.searchVm, 'i');
         virtualMachines = virtualMachines.filter(
-          (virtualMachine) => virtualMachine.main_info.name.match(regexp)
+          (virtualMachine) => virtualMachine.main_info.name.match(regexp),
         );
       }
 
@@ -153,11 +143,21 @@ export default {
   created() {
     this.bytesToSize = shared.bytesToSize;
   },
+
+  mounted() {
+    const elems = document.querySelectorAll('.tabs');
+    this.$M.Tabs.init(elems);
+  },
 };
 </script>
 
 <style scoped>
   .card-title{
     font-size: 2em;
+  }
+
+  .date{
+    font-size: 0.4em;
+    color: #999;
   }
 </style>

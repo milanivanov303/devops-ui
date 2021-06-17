@@ -17,7 +17,7 @@ const AdministrationActions = () => import(/* webpackChunkName: "administration-
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
-const Hosts = () => import(/* webpackChunkName: "hosts" */ '@/components/Hosts');
+const Hosts = () => import(/* webpackChunkName: "hosts" */ '@/views/esxi/Hosts');
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');

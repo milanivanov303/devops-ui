@@ -58,9 +58,9 @@
 
 <script>
 
-const Host = () => import('@/components/Host');
+const Host = () => import('@/views/esxi/Host');
 const BranchSkeleton = () => import('@/components/BranchSkeleton');
-const HostDetails = () => import('@/components/HostDetails');
+const HostDetails = () => import('@/views/esxi/HostDetails');
 const Paginate = () => import('@/components/partials/Paginate');
 
 export default {
@@ -80,7 +80,7 @@ export default {
       loading: false,
       search: this.$route.query.search,
       page: 1,
-      perPage: 6,
+      perPage: 12,
       lastPage: 0,
       perPageOptions: [6, 9, 12, 15],
     };
@@ -117,7 +117,7 @@ export default {
       }
 
       const esxiHost = esxiHosts.find(
-        x => x.hostname === decodeURIComponent(this.$route.query.esxiHost)
+        (x) => x.hostname === decodeURIComponent(this.$route.query.esxiHost),
       );
 
       return esxiHost;
@@ -155,7 +155,7 @@ export default {
     this.getEsxiHosts();
   },
 
-}
+};
 
 </script>
 
