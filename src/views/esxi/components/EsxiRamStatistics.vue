@@ -11,7 +11,7 @@
 
       <div class="row">
         <div v-if="esxiHosts">
-          Codix RAM {{ bytesToSize(getTotalMemory()) }},
+          Total RAM {{ bytesToSize(getTotalMemory()) }},
           Free {{ bytesToSize(getTotalFreeMemory()) }}
         </div>
 

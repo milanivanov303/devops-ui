@@ -50,16 +50,6 @@ export default {
 
       return Math.round(new Date(newDate).getTime() / 1000);
     },
-
-    // const loader = this.$loading.show({ container: this.$el });
-    //
-    // this.$store.dispatch(
-    //   'builds/getBuildsForPeriod',
-    //   {
-    //     startDate: this.getStartDate(),
-    //     stateName: this.stateName,
-    //   },
-    // ).finally(() => loader.hide());
   },
 
   created() {

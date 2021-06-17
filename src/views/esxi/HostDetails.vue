@@ -99,34 +99,6 @@ export default {
     },
   },
 
-  methods: {
-    getVmsMemory(esxiHost) {
-      if (!esxiHost.vms_details) {
-        return 0;
-      }
-
-      return esxiHost.vms_details.reduce(
-        (accumulator, currentValue) => accumulator.hardware.memory + currentValue.hardware.memory,
-      );
-    },
-
-    getServerFreeMemory(esxiHost) {
-      if (!esxiHost.details.memory) {
-        return 0;
-      }
-
-      return (this.getVmsMemory(esxiHost) * 100) / esxiHost.details.memory.physical_memory;
-    },
-
-    freeMemory(esxiHost) {
-      if (!esxiHost.details) {
-        return 0;
-      }
-
-      return esxiHost.details.memory.physical_memory - this.getVmsMemory(esxiHost);
-    },
-  },
-
   watch: {
     searchVm(value) {
       const query = { ...this.$route.query };
@@ -142,6 +114,9 @@ export default {
 
   created() {
     this.bytesToSize = shared.bytesToSize;
+    this.getVmsMemory = shared.getVmsMemory;
+    this.getServerFreeMemory = shared.getServerFreeMemory;
+    this.freeMemory = shared.freeMemory;
   },
 
   mounted() {

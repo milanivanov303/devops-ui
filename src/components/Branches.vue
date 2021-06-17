@@ -93,8 +93,6 @@ export default {
     branches() {
       let { branches } = this.$store.state[this.module];
 
-     // branches = branches.slice(1, 10);
-
       if (this.search) {
         const regexp = new RegExp(this.search, 'i');
         branches = branches.filter((branch) => branch.name.match(regexp));
