@@ -42,14 +42,6 @@ export default [
     },
   },
   {
-    path: '/logged-in-sso-user',
-    meta: {
-      requiresAuth: false,
-    },
-    component: LoggedInSSOUser,
-  },
-
-  {
     path: '/dashboard',
     meta: {
       requiresAuth: true,
@@ -435,7 +427,6 @@ export default [
     },
     redirect: (to) => `/builds${to.path}`,
   },
-
   {
     path: '*',
     meta: {
