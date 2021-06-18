@@ -35,11 +35,20 @@ export default [
     beforeEnter: (to, from, next) => {
       if (auth.getUser()) {
         next('/dashbaord');
-      } else {
-        next();
+        return;
       }
+
+      next();
     },
   },
+  {
+    path: '/logged-in-sso-user',
+    meta: {
+      requiresAuth: false,
+    },
+    component: LoggedInSSOUser,
+  },
+
   {
     path: '/dashboard',
     meta: {
@@ -51,6 +60,7 @@ export default [
     },
     component: MainDashboard,
   },
+
   {
     path: '/extranet',
     redirect: '/extranet/dashboard',
@@ -105,6 +115,7 @@ export default [
     },
     component: ExtranetConfigurations,
   },
+
   {
     path: '/debiteur',
     redirect: '/debiteur/dashboard',
@@ -137,6 +148,7 @@ export default [
       module: 'debiteur',
     },
   },
+
   {
     path: '/imx_be',
     redirect: '/imx_be/dashboard',
@@ -254,6 +266,7 @@ export default [
       },
     ],
   },
+
   {
     path: '/demos',
     meta: {
@@ -289,6 +302,7 @@ export default [
     },
     component: DemosList,
   },
+
   {
     path: '/cms/config-defaults',
     meta: {
@@ -339,6 +353,7 @@ export default [
     },
     component: Modification,
   },
+
   {
     path: '/administration/users/:username?',
     meta: {
@@ -385,9 +400,6 @@ export default [
       title: 'ESXI Dashboard',
     },
     component: EsxiDashboard,
-    props: {
-      module: 'esxi',
-    },
   },
   {
     path: '/esxi/esxiHosts/:esxiHost?',
@@ -402,17 +414,10 @@ export default [
           title = `${route.query.esxiHost} - ${title}`;
         }
 
-        if (route.query.action === 'docs') {
-          title = `Documentation - ${title}`;
-        }
-
         return title;
       },
     },
     component: Hosts,
-    props: {
-      module: 'esxi',
-    },
   },
   {
     path: '/builds/:name(.*_\\d+)/:uri(.*)?',
@@ -430,6 +435,7 @@ export default [
     },
     redirect: (to) => `/builds${to.path}`,
   },
+
   {
     path: '*',
     meta: {
