@@ -410,6 +410,9 @@ export default [
       },
     },
     component: Hosts,
+    props: {
+      module: 'esxi',
+    },
   },
   {
     path: '/builds/:name(.*_\\d+)/:uri(.*)?',
