@@ -10,15 +10,16 @@ const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/Re
 const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates');
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
+const EsxiDashboard = () => import(/* webpackChunkName: "cms" */ '../views/esxi/Dashboard');
 const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users');
 const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles');
 const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions');
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
+const Hosts = () => import(/* webpackChunkName: "hosts" */ '@/views/esxi/Hosts');
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
-const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
 export default [
@@ -40,14 +41,6 @@ export default [
       next();
     },
   },
-  {
-    path: '/logged-in-sso-user',
-    meta: {
-      requiresAuth: false,
-    },
-    component: LoggedInSSOUser,
-  },
-
   {
     path: '/dashboard',
     meta: {
@@ -386,7 +379,41 @@ export default [
     },
     component: AdministrationActions,
   },
+  {
+    path: '/esxi',
+    redirect: '/esxi/dashboard',
+  },
+  {
+    path: '/esxi/dashboard',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi',
+      transitionName: 'slide',
+      title: 'ESXI Dashboard',
+    },
+    component: EsxiDashboard,
+  },
+  {
+    path: '/esxi/esxiHosts/:esxiHost?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-esxiHosts',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'ESXi Hosts';
 
+        if (route.query.esxiHost) {
+          title = `${route.query.esxiHost} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Hosts,
+    props: {
+      module: 'esxi',
+    },
+  },
   {
     path: '/builds/:name(.*_\\d+)/:uri(.*)?',
     meta: {
@@ -403,7 +430,6 @@ export default [
     },
     redirect: (to) => `/builds${to.path}`,
   },
-
   {
     path: '*',
     meta: {

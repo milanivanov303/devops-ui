@@ -102,7 +102,7 @@ export default {
         if (a.date > b.date) {
           return -1;
         }
-        if (a.date < b.last_nom) {
+        if (a.date < b.date) {
           return 1;
         }
 
