@@ -11,9 +11,14 @@ const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templ
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
 const EsxiDashboard = () => import(/* webpackChunkName: "cms" */ '../views/esxi/Dashboard');
-const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users');
-const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles');
-const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions');
+
+const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
+const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
+const DevopsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/devops/Actions');
+
+const CmsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/cms/Users');
+const CmsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/cms/Roles');
+const CmsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/cms/Actions');
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
@@ -347,38 +352,72 @@ export default [
   },
 
   {
-    path: '/administration/users/:username?',
+    path: '/administration/devops/users/:id?',
     meta: {
       requiresAuth: true,
       name: 'administration-users',
       transitionName: 'slide',
-      title: 'Users',
+      title: 'Users Administration',
       breadcrumb: 'Users',
     },
-    component: AdministrationUsers,
+    component: DevopsUsersAdministration,
   },
   {
-    path: '/administration/roles/:id?',
+    path: '/administration/devops/roles/:id?',
     meta: {
       requiresAuth: true,
       name: 'administration-roles',
       transitionName: 'slide',
-      title: 'Roles',
+      title: 'Roles Administration',
       breadcrumb: 'Roles',
     },
-    component: AdministrationRoles,
+    component: DevopsRolesAdministration,
   },
   {
-    path: '/administration/actions/:id?',
+    path: '/administration/devops/actions/:id?',
     meta: {
       requiresAuth: true,
       name: 'administration-actions',
       transitionName: 'slide',
-      title: 'Actions',
+      title: 'Actions Administration',
       breadcrumb: 'Actions',
     },
-    component: AdministrationActions,
+    component: DevopsActionsAdministration,
   },
+  {
+    path: '/administration/cms/users/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-users',
+      transitionName: 'slide',
+      title: 'Users Administration',
+      breadcrumb: 'Users',
+    },
+    component: CmsUsersAdministration,
+  },
+  {
+    path: '/administration/cms/roles/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-roles',
+      transitionName: 'slide',
+      title: 'Roles Administration',
+      breadcrumb: 'Roles',
+    },
+    component: CmsRolesAdministration,
+  },
+  {
+    path: '/administration/cms/actions/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-actions',
+      transitionName: 'slide',
+      title: 'Actions Administration',
+      breadcrumb: 'Actions',
+    },
+    component: CmsActionsAdministration,
+  },
+
   {
     path: '/esxi',
     redirect: '/esxi/dashboard',
