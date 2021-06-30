@@ -90,12 +90,36 @@
         </div>
         <div>
           <h6 class="center">CHOOSE HASH</h6>
+          <div class="row">
+            <Autocomplete
+                class="col s12"
+                label="Hash"
+                icon="aspect_ratio"
+                valueKey="commit"
+                :items="hashes"
+                v-model="hash"
+                :invalid="$v.hash.$error"
+                @blur="$v.hash.$touch()"
+            />
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.hash.$error">
+                <p v-if="!$v.hash.required"> BE hash field must not be empty.</p>
+              </div>
+            </div>
+            <div class="row" v-if="hash">
+              <div class="col s12">
+                <pre>Description: {{ hash.description }}</pre>
+                <pre>User: {{ hash.user }}</pre>
+                <pre>Made On: {{ hash.date }}</pre>
+              </div>
+            </div>
+          </div>
             <div class="row">
               <Autocomplete
                 class="col s12"
-                label="FE Hash"
+                label="Fe Hash"
                 icon="devices"
-                valueKey="hash_rev"
+                valueKey="commit"
                 :items="feHashes"
                 v-model="feHash"
                 :invalid="$v.feHash.$error"
@@ -108,31 +132,9 @@
               </div>
               <div class="row" v-if="feHash">
                 <div class="col s12">
-                  <p>Description: {{ feHash.description }}</p>
-                  <p>Made On: {{feHash.made_on}}</p>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <Autocomplete
-                class="col s12"
-                label="BE Hash"
-                icon="aspect_ratio"
-                valueKey="hash_rev"
-                :items="beHashes"
-                v-model="beHash"
-                :invalid="$v.beHash.$error"
-                @blur="$v.beHash.$touch()"
-              />
-              <div class="validator col s12">
-                <div class="red-text" v-if="$v.beHash.$error">
-                  <p v-if="!$v.beHash.required"> BE hash field must not be empty.</p>
-                </div>
-              </div>
-              <div class="row" v-if="beHash">
-                <div class="col s12">
-                  <p>Description: {{ beHash.description }}</p>
-                  <p>Made On: {{beHash.made_on}}</p>
+                  <pre>Description: {{ feHash.description }}</pre>
+                  <pre>User: {{ feHash.user }}</pre>
+                  <pre>Made On: {{ feHash.date }} </pre>
                 </div>
               </div>
             </div>
@@ -181,7 +183,7 @@ export default {
       repack_only: false,
       comments: '',
       feHash: '',
-      beHash: '',
+      hash: '',
       ttsKey: this.$route.params.issue,
       issueStatus: '',
       issue_id: '',
@@ -213,10 +215,10 @@ export default {
   },
   computed: {
     feHashes() {
-      return this.$store.getters['mmpi/hashesByType']('imx_fe');
+      return this.$store.state.extranet.feHashes;
     },
-    beHashes() {
-      return this.$store.getters['mmpi/hashesByType']('imx_be');
+    hashes() {
+      return this.$store.state.extranet.hashes;
     },
     binaryTypes() {
       return this.$store.state.mmpi.binaryTypes;
@@ -229,7 +231,7 @@ export default {
     feHash: {
       required,
     },
-    beHash: {
+    hash: {
       required,
     },
     ttsKey: {
@@ -241,10 +243,6 @@ export default {
   },
   methods: {
     async getIssue() {
-      if (this.$route.params.issue) {
-        this.ttsKey = this.$route.params.issue;
-      }
-
       await this.$store.dispatch('cms/getIssue', this.ttsKey)
         .then(() => {
           this.issue_id = this.$store.state.cms.issue.id;
@@ -255,6 +253,12 @@ export default {
         });
     },
     buildConfiguration() {
+      this.$v.$touch();
+      if (this.$v.$invalid || this.issueStatus === 'ERROR') {
+        return;
+      }
+      console.log(this.hash);
+      console.log(this.feHash);
       // this.build.started = true;
       // this.build.summary = 'Build will start shortly ...';
       //
@@ -317,7 +321,8 @@ export default {
   },
   created() {
     this.$store.dispatch('mmpi/getBinaryTypes');
-    this.$store.dispatch('mmpi/getHashes');
+    this.$store.dispatch('extranet/getHashes');
+    this.$store.dispatch('extranet/getFeHashes');
   },
 };
 </script>

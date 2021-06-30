@@ -40,5 +40,4 @@ export default {
     }
     return [];
   },
-  hashesByType: (state) => (type) => state.hashes.filter((hash) => hash.repo_type.key === type),
 };

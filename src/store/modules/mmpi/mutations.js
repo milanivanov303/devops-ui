@@ -31,9 +31,6 @@ export default {
   deliveryChainsCMS(state, deliveryChains) {
     state.deliveryChains = deliveryChains;
   },
-  hashes(state, hashes) {
-    state.hashes = hashes;
-  },
   binaryTypes(state, binaryTypes) {
     state.binaryTypes = binaryTypes;
   },

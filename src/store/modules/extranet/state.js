@@ -6,4 +6,6 @@ export default {
   feBranches: [],
   configurations: [],
   host: '',
+  hashes: [],
+  feHashes: [],
 };
