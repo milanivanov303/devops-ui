@@ -103,19 +103,7 @@ export default {
             inactive: 0,
           },
           {
-            delivery_chains: {
-              allOf: [
-                {
-                  status: {
-                    allOf: [
-                      {
-                        active: 1,
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
+            'delivery_chains.status.active': 1,
           },
         ],
       }),
@@ -180,22 +168,10 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            owner: {
-              allOf: [
-                {
-                  key: 'codix',
-                },
-              ],
-            },
+            'owner.key': 'codix',
           },
           {
-            status: {
-              allOf: [
-                {
-                  key: 'active',
-                },
-              ],
-            },
+            'status.key': 'active',
           },
         ],
       }),
@@ -235,6 +211,7 @@ export default {
 
     return promise;
   },
+
   // Delivery Chanins for CMS Inventory page
   getDeliveryChainsCMS({ commit }) {
     const name = 'deliveryChainsCMS';
@@ -246,13 +223,7 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            status: {
-              allOf: [
-                {
-                  active: 1,
-                },
-              ],
-            },
+            'status.active': 1,
           },
         ],
       }),
