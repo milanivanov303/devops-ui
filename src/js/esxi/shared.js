@@ -2,12 +2,11 @@ export default {
   bytesToSize(bytes) {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
 
-    if (!bytes) {
+    if (!bytes || bytes < 0) {
       return '0 Byte';
     }
 
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-
     return `${Math.round(bytes / 1024 ** i)}  ${sizes[i]}`;
   },
 
@@ -25,7 +24,8 @@ export default {
     }
 
     return esxiHost.vms_details.reduce(
-      (accumulator, currentValue) => accumulator.hardware.memory + currentValue.hardware.memory,
+      (accumulator, currentValue) => accumulator + currentValue.hardware.memory,
+      0,
     );
   },
 
