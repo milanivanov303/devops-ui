@@ -168,7 +168,8 @@
           </div>
         </li>
         <li
-          v-if="$auth.can('can-manage-authorizations', getApplicationCode('cms'))"
+          v-if="$auth.can('can-manage-authorizations', getApplicationCode('cms'))
+           || $auth.can('can-manage-authorizations', getApplicationCode('devops'))"
           :class="{ active: isActive('administration') }"
         >
           <a class="collapsible-header">
