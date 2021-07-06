@@ -2,9 +2,18 @@
   <div>
 
     <div class="row">
-      <div class="col s12 m6 l5">
+      <div class="col s6 m6 l5">
         <TextInput label="Search" icon="search" v-model="search"/>
       </div>
+
+      <button
+        class="btn-floating waves-effect waves-light right"
+        data-tooltip="Add"
+        v-if="$auth.can('esxi.add')"
+        @click="openAddHostModal({}, 'create')"
+      >
+        <i class="material-icons left">add</i>
+      </button>
     </div>
 
     <div v-if="!esxiHost" class="row">
@@ -53,6 +62,13 @@
       </div>
     </div>
 
+    <AddHostModal
+      v-if="showAddHostModal"
+      v-on:close="closeAddHostModal()"
+      :newHost="host"
+      :action="action"
+    />
+
   </div>
 </template>
 
@@ -62,6 +78,7 @@ const Host = () => import('@/views/esxi/Host');
 const BranchSkeleton = () => import('@/components/BranchSkeleton');
 const HostDetails = () => import('@/views/esxi/HostDetails');
 const Paginate = () => import('@/components/partials/Paginate');
+const AddHostModal = () => import('./components/AddHostModal');
 
 export default {
   components: {
@@ -69,6 +86,7 @@ export default {
     Paginate,
     BranchSkeleton,
     HostDetails,
+    AddHostModal,
   },
 
   props: {
@@ -83,6 +101,9 @@ export default {
       perPage: 12,
       lastPage: 0,
       perPageOptions: [6, 9, 12, 15],
+      showAddHostModal: false,
+      action: '',
+      host: {},
     };
   },
 
@@ -132,6 +153,16 @@ export default {
     setLastPage(lastPage) {
       this.lastPage = lastPage;
     },
+
+    closeAddHostModal() {
+      this.showAddHostModal = false;
+    },
+
+    openAddHostModal(host, action) {
+      this.showAddHostModal = true;
+      this.action = action;
+      this.host = host;
+    },
   },
 
   watch: {
@@ -149,6 +180,10 @@ export default {
     perPage() {
       this.page = 1;
     },
+  },
+
+  updated() {
+    this.$M.Tooltip.init(this.$el.querySelectorAll('[data-tooltip]'));
   },
 
   created() {

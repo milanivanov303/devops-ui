@@ -9,7 +9,7 @@
         </div>
       </div>
 
-      <div v-if="esxiHost.details.memory">
+      <div v-if="esxiHost.details && esxiHost.details.memory">
         <b>Memory:</b>
         {{ bytesToSize(esxiHost.details ? esxiHost.details.memory.physical_memory : '') }},
         Free {{ bytesToSize(freeMemory(esxiHost)) }}
@@ -30,13 +30,13 @@
             </li>
           </ul>
 
-          <div id="esxi_details">
+          <div v-if="esxiHost.details" id="esxi_details">
             <EsxiDetails
               :esxiHost="esxiHost"
             />
           </div>
 
-          <div id="vms">
+          <div v-if="esxiHost.vms_details" id="vms">
             <VirtualMachines
               :virtualMachines="virtualMachines"
             />
