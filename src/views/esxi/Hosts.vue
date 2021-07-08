@@ -6,14 +6,16 @@
         <TextInput label="Search" icon="search" v-model="search"/>
       </div>
 
-      <button
-        class="btn-floating waves-effect waves-light right"
-        data-tooltip="Add"
-        v-if="$auth.can('esxi.add')"
-        @click="openAddHostModal({}, 'create')"
-      >
-        <i class="material-icons left">add</i>
-      </button>
+      <div class="col s6 right">
+        <button
+          class="btn-floating waves-effect waves-light right"
+          data-tooltip="Add"
+          v-if="$auth.can('esxi.add')"
+          @click="openAddHostModal({}, 'create')"
+        >
+          <i class="material-icons left">add</i>
+        </button>
+      </div>
     </div>
 
     <div v-if="!esxiHost" class="row">

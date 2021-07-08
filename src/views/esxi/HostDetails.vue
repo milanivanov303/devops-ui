@@ -21,7 +21,7 @@
       <div class="wrapper">
         <div class="row">
 
-          <ul class="tabs col s12">
+          <ul class="tabs">
             <li class="tab col s6">
               <a href="#esxi_details">DETAILS</a>
             </li>
