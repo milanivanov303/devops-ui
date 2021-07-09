@@ -1,8 +1,5 @@
 const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
 const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations');
-const ImxDashboard = () => import(/* webpackChunkName: "imx" */ '../views/imx/ImxDashboard');
-const ImxTTSkeys = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkeys');
-const ImxTTSkey = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkey');
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
 const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults');
@@ -217,51 +214,6 @@ export default [
     props: {
       module: 'imx_fe',
     },
-  },
-  {
-    path: '/imx',
-    meta: {
-      requiresAuth: true,
-      name: 'imx',
-      transitionName: 'slide',
-      title: 'iMX Dashboard',
-      breadcrumb: 'Dashboard',
-    },
-    component: ImxDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'imx',
-          transitionName: 'slide',
-          title: 'iMX Dashboard',
-        },
-        component: ImxDashboard,
-      },
-    ],
-  },
-  {
-    path: '/imx/tts_keys',
-    meta: {
-      requiresAuth: true,
-      name: 'imx-tts-keys',
-      transitionName: 'slide',
-      title: 'TTS keys',
-    },
-    component: ImxTTSkeys,
-    children: [
-      {
-        path: ':key',
-        meta: {
-          name: 'imx-tts-key',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: (route) => route.params.key,
-        },
-        component: ImxTTSkey,
-      },
-    ],
   },
 
   {

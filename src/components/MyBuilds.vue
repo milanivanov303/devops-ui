@@ -3,6 +3,10 @@
     <div class="card-content">
       <span class="card-title">My builds</span>
       <Builds :created-by="this.$auth.getUser().username" :module="module"></Builds>
+
+      <template>
+        <component :is="buildComponent"></component>
+      </template>
     </div>
   </div>
 </template>
@@ -17,6 +21,13 @@ export default {
 
   props: {
     module: String,
+  },
+
+  computed: {
+    buildComponent() {
+      // eslint-disable-next-line
+      return () => import('@/views/' + this.module + '/components/Build');
+    },
   },
 };
 </script>

@@ -12,6 +12,25 @@
         <template v-slot:header>{{ branch }} // Create new build <br></template>
         <template v-slot:content>
           <div v-if="build.started === false" class="col s12 l11" key="form" >
+            <div class="row" v-if="!branch">
+              <div class="col s12" >
+                <Autocomplete
+                  label="Branch"
+                  icon="dynamic_feed"
+                  :items="branches"
+                  v-model="form.branch"
+                  :invalid="$v.form.branch.$error"
+                  @blur="$v.form.branch.$touch()"
+                />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.branch.$error">
+                  <p v-if="!$v.form.branch.required">
+                    Branch field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
             <div class="row">
               <div class="col s12">
                 <Autocomplete
@@ -65,6 +84,7 @@ function initialState() {
   return {
     showModal: false,
     form: {
+      branch: null,
       instance: null,
     },
     build: {
@@ -92,21 +112,41 @@ export default {
   },
 
   computed: {
+    branches() {
+      return this.$store.state.imx_be.branches;
+    },
     instances() {
       return this.$store.state.mmpi.instances;
     },
   },
 
-  validations: {
-    form: {
-      instance: {
-        required,
+  validations() {
+    const validations = {
+      form: {
+        instance: {
+          required,
+          name: {
+            required,
+          },
+        },
       },
-    },
+    };
+
+    if (!this.branch) {
+      validations.form.branch = {
+        required,
+        name: {
+          required,
+        },
+      };
+    }
+
+    return validations;
   },
 
   methods: {
-    getInstances() {
+    getData() {
+      this.$store.dispatch('imx_be/getBranches');
       this.$store.dispatch('mmpi/getInstances');
     },
 
@@ -114,7 +154,7 @@ export default {
       this.form = initialState().form;
       this.build = initialState().build;
 
-      this.getInstances();
+      this.getData();
 
       this.showModal = true;
     },
@@ -131,7 +171,7 @@ export default {
       }
 
       this.$store.dispatch('imx_be/startBuild', {
-        branch: this.branch,
+        branch: this.form.branch.name || this.branch,
         instance: this.form.instance,
       })
         .then((response) => {

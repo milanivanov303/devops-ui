@@ -167,7 +167,6 @@
         <BuildProgress :broadcast="build.details.broadcast"></BuildProgress>
       </template>
     </Modal>
-
   </div>
 </template>
 
