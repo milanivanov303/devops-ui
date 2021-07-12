@@ -147,7 +147,8 @@ export default {
       return this.$store.state.imx_fe.branches;
     },
     builds() {
-      return this.$store.getters['builds/getActiveByModule']('imx_be');
+      return this.$store.getters['builds/getActiveByModule']('imx_be')
+        .filter((build) => build.status !== 'building');
     },
     endpoint() {
       if (!this.form.build) {
@@ -217,6 +218,7 @@ export default {
       this.$store.dispatch('imx_fe/startBuild', {
         branch: this.form.branch.name || this.branch,
         client: this.form.client,
+        build: this.form.build,
         endpoint: this.form.endpoint,
       })
         .then((response) => {

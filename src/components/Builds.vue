@@ -145,6 +145,11 @@
         <div v-else-if="error" class="center">
           <i class="material-icons large red-text">error_outline</i>
           <p>{{ error }}</p>
+          <ul v-if="connectedBuilds">
+            <li v-for="connectedBuild in connectedBuilds" :key="connectedBuild">
+              {{ connectedBuild }}
+            </li>
+          </ul>
         </div>
         <div v-else>
           Are you sure you what to remove <b>{{ build.name }}</b> build?
@@ -218,6 +223,7 @@ export default {
       removing: false,
       removed: false,
       error: null,
+      connectedBuilds: [],
 
       page: 1,
       perPage: 10,
@@ -375,7 +381,7 @@ export default {
     remove() {
       this.removing = true;
 
-      this.$store.dispatch(`${this.build.module}/removeBuild`, this.build.id)
+      this.$store.dispatch('builds/remove', this.build.id)
         .then(() => {
           this.removed = true;
           this.builds = this.builds.filter((build) => build.id !== this.build.id);
@@ -383,9 +389,19 @@ export default {
         .catch((error) => {
           if (error.response.status === 403) {
             this.error = 'You do not have insufficient rights to remove this build';
-          } else {
-            this.error = error;
+            return;
           }
+
+          if (error.response.status === 409) {
+            this.connectedBuilds = error.response.data.builds.reduce(
+              (accumulator, build) => [...accumulator, build.name],
+              [],
+            );
+            this.error = 'There are connected builds you need to remove first:';
+            return;
+          }
+
+          this.error = error;
         })
         .finally(() => { this.removing = false; });
     },
