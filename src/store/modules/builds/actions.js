@@ -16,9 +16,6 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            parent_id: null,
-          },
-          {
             status: {
               operator: 'in',
               value: ['running', 'stopped', 'building'],
@@ -119,9 +116,6 @@ export default {
           operator: 'in',
           value: status,
         },
-      },
-      {
-        parent_id: null,
       },
       {
         module,
