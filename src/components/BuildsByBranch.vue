@@ -67,7 +67,7 @@ export default {
         this.loader = this.$loading.show({ container: this.$el });
       }
 
-      if (!value) {
+      if (!value && this.loader) {
         this.loader.hide();
       }
     },

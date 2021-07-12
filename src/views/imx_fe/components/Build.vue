@@ -12,6 +12,25 @@
         <template v-slot:header>{{ branch }} // Create new build <br></template>
         <template v-slot:content>
           <div v-if="build.started === false" class="col s12 l11" key="form" >
+            <div class="row" v-if="!branch">
+              <div class="col s12" >
+                <Autocomplete
+                  label="Branch"
+                  icon="dynamic_feed"
+                  :items="branches"
+                  v-model="form.branch"
+                  :invalid="$v.form.branch.$error"
+                  @blur="$v.form.branch.$touch()"
+                />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.branch.$error">
+                  <p v-if="!$v.form.branch.required">
+                    Branch field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
             <div class="row">
               <div class="col s12" >
                 <TextInput
@@ -60,7 +79,6 @@
                 </div>
               </div>
             </div>
-
           </div>
           <BuildProgress
             v-else
@@ -95,6 +113,7 @@ function initialState() {
   return {
     showModal: false,
     form: {
+      branch: null,
       client: null,
       build: null,
       endpoint: null,
@@ -124,8 +143,12 @@ export default {
   },
 
   computed: {
+    branches() {
+      return this.$store.state.imx_fe.branches;
+    },
     builds() {
-      return this.$store.getters['builds/getActiveByModule']('imx_be');
+      return this.$store.getters['builds/getActiveByModule']('imx_be')
+        .filter((build) => build.status !== 'building');
     },
     endpoint() {
       if (!this.form.build) {
@@ -136,15 +159,28 @@ export default {
     },
   },
 
-  validations: {
-    form: {
-      client: {
-        required,
+  validations() {
+    const validations = {
+      form: {
+        client: {
+          required,
+        },
+        endpoint: {
+          required,
+        },
       },
-      endpoint: {
+    };
+
+    if (!this.branch) {
+      validations.form.branch = {
         required,
-      },
-    },
+        name: {
+          required,
+        },
+      };
+    }
+
+    return validations;
   },
 
   watch: {
@@ -154,7 +190,8 @@ export default {
   },
 
   methods: {
-    getBuilds() {
+    getData() {
+      this.$store.dispatch('imx_fe/getBranches');
       this.$store.dispatch('builds/getActive');
     },
 
@@ -162,7 +199,7 @@ export default {
       this.form = initialState().form;
       this.build = initialState().build;
 
-      this.getBuilds();
+      this.getData();
 
       this.showModal = true;
     },
@@ -179,8 +216,9 @@ export default {
       }
 
       this.$store.dispatch('imx_fe/startBuild', {
-        branch: this.branch,
+        branch: this.form.branch.name || this.branch,
         client: this.form.client,
+        build: this.form.build,
         endpoint: this.form.endpoint,
       })
         .then((response) => {

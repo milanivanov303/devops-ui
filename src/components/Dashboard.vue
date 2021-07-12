@@ -5,7 +5,6 @@
         <BuildsByBranch :module="module" :loading="loading"/>
       </div>
       <div class="col s12 l4">
-
         <BuildsStatistics :module="module" aggregate-by="user"/>
         <BuildsStatistics :module="module" aggregate-by="branch"/>
       </div>
@@ -15,10 +14,10 @@
 <script>
 
 import EventBus from '@/event-bus';
-import BuildsStatistics from '@/components/BuildsStatistics';
 
-const BuildsByBranch = () => import('@/components/BuildsByBranch');
+const BuildsStatistics = () => import('@/components/BuildsStatistics');
 const MyBuilds = () => import('@/components/MyBuilds');
+const BuildsByBranch = () => import('@/components/BuildsByBranch');
 
 export default {
   components: {

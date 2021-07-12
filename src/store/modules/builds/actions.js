@@ -93,6 +93,15 @@ export default {
     return promise;
   },
 
+  remove({ commit }, id) {
+    const promise = api('devops').delete(`builds/${id}/remove`);
+
+    promise
+      .catch(() => commit('error', 'Could not remove build', { root: true }));
+
+    return promise;
+  },
+
   getBuildsByStatus({ commit }, {
     branch, ttsKey, module, status, createdBy, perPage, page, search,
   }) {

@@ -53,38 +53,6 @@ export default {
     return builds.sort((a, b) => b.builds - a.builds);
   },
 
-  getTTSkeysFromActiveBuilds: (state) => (module) => {
-    const ttsKeys = [];
-    state.active.filter((build) => build.module === module)
-      .forEach((build) => {
-        if (!ttsKeys.includes(build.details.tts_key)) {
-          ttsKeys.push(build.details.tts_key);
-        }
-      });
-    return ttsKeys;
-  },
-
-  getActiveGroupedByTTSkey: (state) => (module) => {
-    const ttsKeys = {};
-    state
-      .active
-      .filter((build) => build.module === module)
-      .forEach((build) => {
-        if (!ttsKeys[build.details.tts_key]) {
-          ttsKeys[build.details.tts_key] = {};
-        }
-        ttsKeys[build.details.tts_key][build.status] = ttsKeys[build.details.tts_key][build.status]
-        + 1 || 1;
-      });
-
-    const builds = [];
-    Object.keys(ttsKeys).forEach((ttsKey) => {
-      builds.push({ ttsKey, builds: ttsKeys[ttsKey] });
-    });
-
-    return builds.sort((a, b) => b.builds - a.builds);
-  },
-
   getActiveGroupedByModule: (state) => {
     const branches = {};
     state
@@ -114,18 +82,8 @@ export default {
         return false;
       }
 
-      if (build.details.branch !== branch) {
-        return false;
-      }
-
-      return true;
+      return build.details.branch === branch;
     });
-  },
-  getActiveByTTSkey: (state) => (key) => {
-    if (!state.active) {
-      return [];
-    }
-    return state.active.filter((build) => build.details.tts_key === key);
   },
 
   getByModule: (state) => (stateName) => {
@@ -136,24 +94,6 @@ export default {
     const builds = state.statistics[stateName].reduce(
       (tally, build) => {
         tally[build.module] = (tally[build.module] || 0) + 1;
-        return tally;
-      },
-      {},
-    );
-
-    return sortBuilds(builds);
-  },
-
-  getByTTSkey: (state) => (stateName, module) => {
-    if (!state.statistics[stateName]) {
-      return [];
-    }
-
-    const builds = state.statistics[stateName].reduce(
-      (tally, build) => {
-        if (!module || build.module === module) {
-          tally[build.details.tts_key] = (tally[build.details.tts_key] || 0) + 1;
-        }
         return tally;
       },
       {},
