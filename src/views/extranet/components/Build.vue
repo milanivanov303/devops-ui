@@ -222,7 +222,7 @@ export default {
       }
 
       this.$store.dispatch('extranet/startBuild', {
-        branch: this.form.branch.name || this.branch,
+        branch: this.form.branch ? this.form.branch.name : this.branch,
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
