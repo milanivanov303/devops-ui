@@ -171,7 +171,7 @@ export default {
       }
 
       this.$store.dispatch('imx_be/startBuild', {
-        branch: this.form.branch.name || this.branch,
+        branch: this.form.branch ? this.form.branch.name : this.branch,
         instance: this.form.instance,
       })
         .then((response) => {
