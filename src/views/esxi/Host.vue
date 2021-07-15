@@ -3,8 +3,20 @@
     <div class="card">
       <div class="card-content">
 
-        <div class="card-title truncate">
-          {{ esxiHost.hostname }}
+        <div class="row">
+          <div class="col s8 card-title truncate">
+            {{ esxiHost.hostname }}
+          </div>
+          <div class="col s4">
+            <a
+              class="waves-effect waves-light btn-small update-button right"
+              data-tooltip="Update info"
+              v-if="$auth.can('esxi.add')"
+              @click.prevent="updateEsxiInfo()"
+            >
+              <i class="material-icons left">refresh</i>Update
+            </a>
+          </div>
         </div>
 
         <div v-if="esxiHost.details && esxiHost.details.cpu">
@@ -44,6 +56,28 @@ export default {
 
       return { query };
     },
+
+    updateEsxiInfo() {
+      const loader = this.$loading.show({ container: this.$el });
+      const payload = { ...this.esxiHost };
+
+      this.$store.dispatch('esxi/updateEsxiHost', payload)
+        .then((response) => {
+          if (response.data.error) {
+            this.$M.toast({ html: response.data.error });
+            return;
+          }
+
+          this.$M.toast({
+            html: `Information about ESXi host ${this.esxiHost.hostname
+            } has been updated!`,
+            classes: 'toast-seccess',
+          });
+        })
+        .catch((error) => {
+          this.$M.toast({ html: error });
+        }).finally(() => loader.hide());
+    },
   },
 
   created() {
@@ -59,10 +93,13 @@ export default {
 
 <style lang="scss" scoped>
 .card-title {
-
   span {
     font-size: 12px;
   }
+}
+
+.update-button {
+  font-size: 10px;
 }
 
 </style>

@@ -17,6 +17,10 @@
           :show="(virtualMachine) => virtualMachine.main_info.name"
         />
         <Column
+          label="Powered"
+          :show="(virtualMachine) => virtualMachine.powered || 'N/A'"
+        />
+        <Column
           label="RAM"
           :show="(virtualMachine) => bytesToSize(virtualMachine.hardware.memory)"
         />
