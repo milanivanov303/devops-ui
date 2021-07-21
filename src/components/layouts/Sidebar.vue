@@ -81,23 +81,6 @@
             </ul>
           </div>
         </li>
-        <li :class="{ active: isActive('imx/dashboard') }">
-          <a class="collapsible-header">
-            <i class="material-icons">queue_play_next</i> iMX
-            <i class="material-icons right">arrow_drop_down</i>
-          </a>
-          <div class="collapsible-body">
-            <ul>
-              <li :class="{ active: isActive('imx/dashboard') }">
-                <router-link to="/imx/dashboard"> Dashboard</router-link>
-              </li>
-              <li v-bind:class="{ active: isActive('imx/tts_keys') }">
-                <router-link to="/imx/tts_keys"> TTS Keys</router-link>
-              </li>
-              <li><div class="divider"></div></li>
-            </ul>
-          </div>
-        </li>
         <li :class="{ active: isActive('demos') }">
           <a class="collapsible-header">
             <i class="material-icons">event</i> Demos
@@ -150,8 +133,26 @@
             </ul>
           </div>
         </li>
+        <li :class="{ active: isActive('esxi') }">
+          <a class="collapsible-header">
+            <i class="material-icons">devices</i> ESXi Hosts
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li :class="{ active: isActive('esxi/dashboard') }">
+                <router-link to="/esxi/dashboard"> Dashboard</router-link>
+              </li>
+              <li :class="{ active: isActive('esxi/esxiHosts') }">
+                <router-link to="/esxi/esxiHosts"> Hosts</router-link>
+              </li>
+              <li><div class="divider"></div></li>
+            </ul>
+          </div>
+        </li>
         <li
-          v-if="$auth.can('can-manage-authorizations')"
+          v-if="$auth.can('can-manage-authorizations', getApplicationCode('cms'))
+           || $auth.can('can-manage-authorizations', getApplicationCode('devops'))"
           :class="{ active: isActive('administration') }"
         >
           <a class="collapsible-header">
@@ -159,21 +160,42 @@
             <i class="material-icons right">arrow_drop_down</i>
           </a>
           <div class="collapsible-body">
-            <ul>
-              <li v-if="$auth.can('can-manage-authorizations')"
-                 :class="{ active: isActive('administration/users') }">
-                <router-link to="/administration/users"> Users</router-link>
-              </li>
-              <li v-if="$auth.can('can-manage-authorizations')"
-                 :class="{ active: isActive('administration/roles') }">
-                <router-link to="/administration/roles"> Roles</router-link>
-              </li>
-              <li v-if="$auth.can('isAdmin')"
-                 :class="{ active: isActive('administration/actions') }">
-                <router-link to="/administration/actions"> Actions</router-link>
-              </li>
-              <li><div class="divider"></div></li>
-            </ul>
+            <div v-if="$auth.can('can-manage-authorizations', getApplicationCode('devops'))">
+              <div class="subheader">Devops</div>
+              <ul>
+                <li :class="{ active: isActive('administration/devops/users') }">
+                  <router-link to="/administration/devops/users"> Users</router-link>
+                </li>
+                <li :class="{ active: isActive('administration/devops/roles') }">
+                  <router-link to="/administration/devops/roles"> Roles</router-link>
+                </li>
+                <li
+                  v-if="$auth.can('isAdmin', getApplicationCode('devops'))"
+                  :class="{ active: isActive('administration/devops/actions') }"
+                >
+                  <router-link to="/administration/devops/actions"> Actions</router-link>
+                </li>
+                <li><div class="divider"></div></li>
+              </ul>
+            </div>
+            <div v-if="$auth.can('can-manage-authorizations', getApplicationCode('cms'))">
+              <div class="subheader">CMS</div>
+              <ul>
+                <li :class="{ active: isActive('administration/cms/users') }">
+                  <router-link to="/administration/cms/users"> Users</router-link>
+                </li>
+                <li :class="{ active: isActive('administration/cms/roles') }">
+                  <router-link to="/administration/cms/roles"> Roles</router-link>
+                </li>
+                <li
+                  v-if="$auth.can('isAdmin', getApplicationCode('cms'))"
+                  :class="{ active: isActive('administration/cms/actions') }"
+                >
+                  <router-link to="/administration/cms/actions"> Actions</router-link>
+                </li>
+                <li><div class="divider"></div></li>
+              </ul>
+            </div>
           </div>
         </li>
       </ul>
@@ -182,6 +204,8 @@
 </template>
 
 <script>
+import config from '@/config';
+
 export default {
   methods: {
     isActive(path) {
@@ -193,7 +217,12 @@ export default {
 
       return regexp.test(this.$route.path);
     },
+
+    getApplicationCode(application) {
+      return config[application].code;
+    },
   },
+
   mounted() {
     this.$M.Sidenav.init(document.querySelector('.sidenav'));
     this.$M.Collapsible.init(document.querySelector('.collapsible'));
@@ -205,6 +234,13 @@ export default {
   li.active {
     .collapsible-body {
       display: block;
+    }
+  }
+
+  .sidenav {
+    .subheader {
+      color: white;
+      padding: 0 15px;
     }
   }
 </style>

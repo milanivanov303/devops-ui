@@ -12,56 +12,75 @@
         <template v-slot:header>{{ branch }} // Create new build </template>
         <template v-slot:content>
           <div v-if="!build.started"  class="col s12 l11" key="form" >
-              <div class="row">
-                <div class="col s12" >
-                  <Autocomplete
-                    label="Client"
-                    icon="people"
-                    :items="clients"
-                    v-model="form.client"
-                    :invalid="$v.form.client.$error"
-                    @blur="$v.form.client.$touch()"
-                  />
-                </div>
-                <div class="validator col s11 offset-s1">
-                  <div class="red-text" v-if="$v.form.client.$error">
-                    <p v-if="!$v.form.client.required">
-                      Client field must not be empty.
-                    </p>
-                  </div>
-                </div>
+            <div class="row" v-if="!branch">
+              <div class="col s12" >
+                <Autocomplete
+                  label="Branch"
+                  icon="dynamic_feed"
+                  :items="branches"
+                  v-model="form.branch"
+                  :invalid="$v.form.branch.$error"
+                  @blur="$v.form.branch.$touch()"
+                />
               </div>
-              <div class="row">
-                <div class="col s12">
-                  <Select
-                    v-model="form.javaVersion"
-                    :options="[4,5,6,7,8]"
-                    :defaultOption="false"
-                    label="Java Version"
-                    icon="history"
-                  />
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12">
-                  <Autocomplete
-                    label="Instance"
-                    icon="dynamic_feed"
-                    :items="instances"
-                    v-model="form.instance"
-                    :invalid="$v.form.instance.$error"
-                    @blur="$v.form.instance.$touch()"
-                  />
-                </div>
-                <div class="validator col s11 offset-s1">
-                  <div class="red-text" v-if="$v.form.instance.$error">
-                    <p v-if="!$v.form.instance.required">
-                      Instance field must not be empty.
-                    </p>
-                  </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.branch.$error">
+                  <p v-if="!$v.form.branch.required">
+                    Branch field must not be empty.
+                  </p>
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col s12" >
+                <Autocomplete
+                  label="Client"
+                  icon="people"
+                  :items="clients"
+                  v-model="form.client"
+                  :invalid="$v.form.client.$error"
+                  @blur="$v.form.client.$touch()"
+                />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.client.$error">
+                  <p v-if="!$v.form.client.required">
+                    Client field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <Select
+                  v-model="form.javaVersion"
+                  :options="[4,5,6,7,8]"
+                  :defaultOption="false"
+                  label="Java Version"
+                  icon="history"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <Autocomplete
+                  label="Instance"
+                  icon="dynamic_feed"
+                  :items="instances"
+                  v-model="form.instance"
+                  :invalid="$v.form.instance.$error"
+                  @blur="$v.form.instance.$touch()"
+                />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.instance.$error">
+                  <p v-if="!$v.form.instance.required">
+                    Instance field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
           <BuildProgress
             v-else
             :broadcast="build.broadcast"
@@ -94,6 +113,7 @@ function initialState() {
   return {
     showModal: false,
     form: {
+      branch: null,
       client: null,
       javaVersion: 8,
       instance: null,
@@ -126,31 +146,48 @@ export default {
     clients() {
       return this.$store.state.debiteur.clients;
     },
+    branches() {
+      return this.$store.state.debiteur.branches;
+    },
     instances() {
       return this.$store.state.mmpi.instances;
     },
   },
 
-  validations: {
-    form: {
-      client: {
+  validations() {
+    const validations = {
+      form: {
+        client: {
+          required,
+          name: {
+            required,
+          },
+        },
+        instance: {
+          required,
+          name: {
+            required,
+          },
+        },
+      },
+    };
+
+    if (!this.branch) {
+      validations.form.branch = {
         required,
         name: {
           required,
         },
-      },
-      instance: {
-        required,
-        name: {
-          required,
-        },
-      },
-    },
+      };
+    }
+
+    return validations;
   },
 
   methods: {
     getData() {
       this.$store.dispatch('debiteur/getClients');
+      this.$store.dispatch('debiteur/getBranches');
       this.$store.dispatch('mmpi/getInstances');
     },
 
@@ -175,7 +212,7 @@ export default {
       }
 
       this.$store.dispatch('debiteur/startBuild', {
-        branch: this.branch,
+        branch: this.form.branch ? this.form.branch.name : this.branch,
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,

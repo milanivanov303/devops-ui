@@ -1,8 +1,5 @@
 const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
 const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations');
-const ImxDashboard = () => import(/* webpackChunkName: "imx" */ '../views/imx/ImxDashboard');
-const ImxTTSkeys = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkeys');
-const ImxTTSkey = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkey');
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
 const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults');
@@ -10,15 +7,21 @@ const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/Re
 const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates');
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
-const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users');
-const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles');
-const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions');
+const EsxiDashboard = () => import(/* webpackChunkName: "cms" */ '../views/esxi/Dashboard');
+
+const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
+const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
+const DevopsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/devops/Actions');
+
+const CmsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/cms/Users');
+const CmsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/cms/Roles');
+const CmsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/cms/Actions');
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
+const Hosts = () => import(/* webpackChunkName: "hosts" */ '@/views/esxi/Hosts');
 
 const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
-const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
 export default [
@@ -40,14 +43,6 @@ export default [
       next();
     },
   },
-  {
-    path: '/logged-in-sso-user',
-    meta: {
-      requiresAuth: false,
-    },
-    component: LoggedInSSOUser,
-  },
-
   {
     path: '/dashboard',
     meta: {
@@ -220,51 +215,6 @@ export default [
       module: 'imx_fe',
     },
   },
-  {
-    path: '/imx',
-    meta: {
-      requiresAuth: true,
-      name: 'imx',
-      transitionName: 'slide',
-      title: 'iMX Dashboard',
-      breadcrumb: 'Dashboard',
-    },
-    component: ImxDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'imx',
-          transitionName: 'slide',
-          title: 'iMX Dashboard',
-        },
-        component: ImxDashboard,
-      },
-    ],
-  },
-  {
-    path: '/imx/tts_keys',
-    meta: {
-      requiresAuth: true,
-      name: 'imx-tts-keys',
-      transitionName: 'slide',
-      title: 'TTS keys',
-    },
-    component: ImxTTSkeys,
-    children: [
-      {
-        path: ':key',
-        meta: {
-          name: 'imx-tts-key',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: (route) => route.params.key,
-        },
-        component: ImxTTSkey,
-      },
-    ],
-  },
 
   {
     path: '/demos',
@@ -354,39 +304,107 @@ export default [
   },
 
   {
-    path: '/administration/users/:username?',
+    path: '/administration/devops/users/:id?',
     meta: {
       requiresAuth: true,
       name: 'administration-users',
       transitionName: 'slide',
-      title: 'Users',
+      title: 'Users Administration',
       breadcrumb: 'Users',
     },
-    component: AdministrationUsers,
+    component: DevopsUsersAdministration,
   },
   {
-    path: '/administration/roles/:id?',
+    path: '/administration/devops/roles/:id?',
     meta: {
       requiresAuth: true,
       name: 'administration-roles',
       transitionName: 'slide',
-      title: 'Roles',
+      title: 'Roles Administration',
       breadcrumb: 'Roles',
     },
-    component: AdministrationRoles,
+    component: DevopsRolesAdministration,
   },
   {
-    path: '/administration/actions/:id?',
+    path: '/administration/devops/actions/:id?',
     meta: {
       requiresAuth: true,
       name: 'administration-actions',
       transitionName: 'slide',
-      title: 'Actions',
+      title: 'Actions Administration',
       breadcrumb: 'Actions',
     },
-    component: AdministrationActions,
+    component: DevopsActionsAdministration,
+  },
+  {
+    path: '/administration/cms/users/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-users',
+      transitionName: 'slide',
+      title: 'Users Administration',
+      breadcrumb: 'Users',
+    },
+    component: CmsUsersAdministration,
+  },
+  {
+    path: '/administration/cms/roles/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-roles',
+      transitionName: 'slide',
+      title: 'Roles Administration',
+      breadcrumb: 'Roles',
+    },
+    component: CmsRolesAdministration,
+  },
+  {
+    path: '/administration/cms/actions/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-actions',
+      transitionName: 'slide',
+      title: 'Actions Administration',
+      breadcrumb: 'Actions',
+    },
+    component: CmsActionsAdministration,
   },
 
+  {
+    path: '/esxi',
+    redirect: '/esxi/dashboard',
+  },
+  {
+    path: '/esxi/dashboard',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi',
+      transitionName: 'slide',
+      title: 'ESXI Dashboard',
+    },
+    component: EsxiDashboard,
+  },
+  {
+    path: '/esxi/esxiHosts/:esxiHost?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-esxiHosts',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'ESXi Hosts';
+
+        if (route.query.esxiHost) {
+          title = `${route.query.esxiHost} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Hosts,
+    props: {
+      module: 'esxi',
+    },
+  },
   {
     path: '/builds/:name(.*_\\d+)/:uri(.*)?',
     meta: {
@@ -403,7 +421,6 @@ export default [
     },
     redirect: (to) => `/builds${to.path}`,
   },
-
   {
     path: '*',
     meta: {

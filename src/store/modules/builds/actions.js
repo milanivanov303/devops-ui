@@ -16,9 +16,6 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            parent_id: null,
-          },
-          {
             status: {
               operator: 'in',
               value: ['running', 'stopped', 'building'],
@@ -93,6 +90,15 @@ export default {
     return promise;
   },
 
+  remove({ commit }, id) {
+    const promise = api('devops').delete(`builds/${id}/remove`);
+
+    promise
+      .catch(() => commit('error', 'Could not remove build', { root: true }));
+
+    return promise;
+  },
+
   getBuildsByStatus({ commit }, {
     branch, ttsKey, module, status, createdBy, perPage, page, search,
   }) {
@@ -110,9 +116,6 @@ export default {
           operator: 'in',
           value: status,
         },
-      },
-      {
-        parent_id: null,
       },
       {
         module,
