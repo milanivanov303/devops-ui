@@ -226,7 +226,7 @@ export default {
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-        fe_branch: this.form.feBranch,
+        fe_branch: this.form.feBranch ? this.form.feBranch.name : '',
       })
         .then((response) => {
           this.build.status = 'running';

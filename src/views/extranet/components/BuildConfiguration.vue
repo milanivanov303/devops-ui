@@ -8,7 +8,7 @@
         <div class="row">
           <div class="input-field col s12">
             <i class="material-icons prefix">label_outline</i>
-            <label class="active">TTS Key</label>
+            <label class="active" for="tts_key">TTS Key</label>
               <input
                  id="tts_key"
                  type="text"
@@ -224,6 +224,7 @@ export default {
       return this.$store.state.mmpi.binaryTypes;
     },
   },
+
   validations: {
     configName: {
       required: requiredIf((formModel) => formModel.binaryType.value === 'Manual'),
@@ -252,6 +253,7 @@ export default {
           }
         });
     },
+
     buildConfiguration() {
       this.$v.$touch();
       if (this.$v.$invalid || this.issueStatus === 'ERROR') {
@@ -311,12 +313,6 @@ export default {
       //       this.build.error = error;
       //     }
       //   });
-    },
-    scrollLogContainer() {
-      setTimeout(() => {
-        const container = this.$el.querySelector('.log');
-        container.scrollTop = container.scrollHeight;
-      }, 100);
     },
   },
   created() {
