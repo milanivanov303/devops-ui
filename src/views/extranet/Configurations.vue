@@ -38,7 +38,7 @@
           "
         />
         <template v-slot:actions-before="{ row }">
-          <a @click="openBuildModal(row)" class="green-text" title="Start Build">
+          <a @click="openBuildModal('build',row)" class="green-text" title="Start Build">
             <i class="material-icons">send</i>
           </a>
         </template>
@@ -54,8 +54,10 @@
     />
 
     <BuildConfiguration
-        v-if="action === 'build'"
-        @close="action = ''"
+        v-if="showBuildModal"
+        :action="action"
+        :configuration="configuration"
+        @close="closeBuildModal()"
     />
 
     <DeleteConfig
@@ -85,6 +87,7 @@ export default {
       action: '',
       configuration: {},
       showRemoveModal: false,
+      showBuildModal: false,
     };
   },
   computed: {
@@ -137,12 +140,21 @@ export default {
       this.showAddEditModal = false;
     },
 
-    openBuildModal(configuration) {
+    openBuildModal(action, configuration = {}) {
+      this.action = action;
       this.configuration = { ...configuration };
-      this.action = 'build';
+      this.showBuildModal = true;
       this.$router.history.replace({
         path: `/extranet/configurations/${encodeURIComponent(this.configuration.id)}/build`,
       });
+    },
+
+    closeBuildModal() {
+      this.configuration = {};
+      this.$router.history.replace({
+        path: '/extranet/configurations',
+      });
+      this.showBuildModal = false;
     },
 
     openDeleteModal(configuration) {

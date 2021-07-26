@@ -1,7 +1,7 @@
 <template>
   <Modal class="right-sheet" @close="$emit('close')">
     <template v-slot:header>
-        Build configuration
+      <span v-if="action === 'build'">Build configuration</span>
     </template>
     <template v-slot:content>
       <form>
@@ -164,11 +164,12 @@ export default {
     TextArea,
   },
   props: {
-    configuration: {},
+    configuration: Object,
     action: String,
   },
   data() {
     return {
+      mmpi: {},
       binaryType: '',
       configName: '',
       repack: '',
@@ -259,17 +260,31 @@ export default {
       if (this.$v.$invalid || this.issueStatus === 'ERROR') {
         return;
       }
-      console.log(this.hash);
-      console.log(this.feHash);
-      // this.build.started = true;
-      // this.build.summary = 'Build will start shortly ...';
-      //
-      // const payload = {
-      //   instance: this.configuration.dev_instance,
-      //   deploy_instance: this.configuration.deploy_instance,
-      //   client: this.clients.find((client) => client.package === this.configuration.prefix),
-      // };
-      //
+
+      this.build.started = true;
+      this.build.summary = 'Build will start shortly ...';
+
+      const payload = {
+        branch: this.hash.commit,
+        fe_branch: this.feHash.commit,
+        instance: this.configuration.dev_instance,
+        deploy_instance: this.configuration.deploy_instance,
+        client: this.configuration.prefix,
+        mmpi: {
+          binaryType: {
+            type: this.binaryTypes,
+            value: this.binaryType.value,
+          },
+          comments: this.comments,
+          repack: {
+            name: this.repack.name,
+          },
+          repack_only: this.repack_only,
+          ttsKey: this.ttsKey,
+        },
+      };
+      console.log(payload);
+
       // this.$store.dispatch('extranet/buildConfiguration', {
       //   id: this.configuration.id,
       //   payload,
