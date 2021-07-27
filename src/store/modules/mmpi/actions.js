@@ -18,7 +18,7 @@ export default {
           },
           {
             instance_type_id: {
-              value: ['DEV', 'VAL'],
+              value: ['DEV', 'VAL', 'PATCH'],
               operator: 'in',
             },
           },
