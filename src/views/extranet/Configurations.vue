@@ -20,7 +20,6 @@
         <Column show="delivery_chain"/>
         <Column show="dev_instance"/>
         <Column show="val_instance"/>
-        <Column show="deploy_instance"/>
         <Column show="app_type" :sortable="false" filter-type="dropdown"/>
         <Column show="app_version" :sortable="false" filter-type="dropdown"/>
         <Column show="branch" :sortable="false" filter-type="search"/>
@@ -28,14 +27,6 @@
         <Column show="servlet_container"/>
         <Column show="jdk"/>
         <Column show="jre"/>
-        <Column
-          show="additional_info"
-          v-if="
-            $auth.can('extranet.manage-configurations')
-            ||
-            $auth.can('extranet.see-configurations-additional-info')
-          "
-        />
         <template v-slot:actions-before="{ row }">
           <a @click="openAddEditModal('build', row)" class="green-text" title="Start Build">
             <i class="material-icons">send</i>
@@ -107,7 +98,9 @@
                 &&
                 delete configuration.val_instance
                 &&
-                delete configuration.deploy_instance
+                delete configuration.deploy_dev_instance
+                &&
+                delete configuration.deploy_val_instance
               "
               @blur="$v.configuration.delivery_chain.$touch()"
             />
@@ -152,10 +145,20 @@
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
-              label="Deploy Instance"
+              label="Deploy DEV Instance"
               icon="dynamic_feed"
               :items="deploy_instances"
-              v-model="configuration.deploy_instance"
+              v-model="configuration.deploy_dev_instance"
+            />
+          </div>
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Deploy VAL Instance"
+              icon="dynamic_feed"
+              :items="deploy_instances"
+              v-model="configuration.deploy_val_instance"
             />
           </div>
           <div class="row" v-if="!(action === 'build')">
@@ -575,9 +578,15 @@ export default {
         );
       }
 
-      if (this.configuration.deploy_instance) {
-        this.configuration.deploy_instance = this.deploy_instances.find(
-          (instance) => instance.name === this.configuration.deploy_instance,
+      if (this.configuration.deploy_dev_instance) {
+        this.configuration.deploy_dev_instance = this.deploy_instances.find(
+          (instance) => instance.name === this.configuration.deploy_dev_instance,
+        );
+      }
+
+      if (this.configuration.deploy_val_instance) {
+        this.configuration.deploy_val_instance = this.deploy_instances.find(
+          (instance) => instance.name === this.configuration.deploy_val_instance,
         );
       }
 
@@ -619,8 +628,11 @@ export default {
       if (this.configuration.val_instance) {
         payload.val_instance = this.configuration.val_instance.name;
       }
-      if (this.configuration.deploy_instance) {
-        payload.deploy_instance = this.configuration.deploy_instance.name;
+      if (this.configuration.deploy_dev_instance) {
+        payload.deploy_dev_instance = this.configuration.deploy_dev_instance.name;
+      }
+      if (this.configuration.deploy_val_instance) {
+        payload.deploy_val_instance = this.configuration.deploy_val_instance.name;
       }
       payload.branch = this.configuration.branch.name;
       payload.prefix = this.configuration.prefix.package;
@@ -660,7 +672,7 @@ export default {
 
       const payload = {
         instance: this.configuration.dev_instance,
-        deploy_instance: this.configuration.deploy_instance,
+        deploy_dev_instance: this.configuration.deploy_dev_instance,
         client: this.clients.find((client) => client.package === this.configuration.prefix),
       };
 
