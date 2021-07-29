@@ -3,6 +3,7 @@
     <div class="data-table">
       <Table
         :data="instances"
+        query-prefix="instances_"
         :export-btn="false"
         :view-btn="true"
         :add-btn="false"

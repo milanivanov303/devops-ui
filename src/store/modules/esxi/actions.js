@@ -21,7 +21,7 @@ export default {
   },
 
   updateEsxiHost({ commit }, payload) {
-    const promise = api('devops').post('esxi/update-info', payload);
+    const promise = api('devops').post('esxi/start-update', payload);
 
     promise
       .then((response) => commit('updateHost', response.data))

@@ -69,8 +69,8 @@ export default {
           }
 
           this.$M.toast({
-            html: `Information about ESXi host ${this.esxiHost.hostname
-            } has been updated!`,
+            html: `Updating ESXi host ${this.esxiHost.hostname} details in background.
+             Please, check in a few minutes.`,
             classes: 'toast-seccess',
           });
         })
