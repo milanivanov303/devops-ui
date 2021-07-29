@@ -118,24 +118,26 @@ export default {
         let esxiHostsResults = esxiHosts.filter((esxiHost) => esxiHost.hostname.match(regexp));
 
         if (esxiHostsResults.length === 0) {
-          esxiHostsResults = esxiHosts.filter(function(esxiHost) {
+          esxiHostsResults = esxiHosts.filter((esxiHost) => {
             if (esxiHost.vms_details) {
-              return esxiHost.vms_details.some((vm) =>
-                vm.powered && vm.powered !== 'off' && vm.main_info.name.match(regexp));
+              return esxiHost.vms_details.some((vm) => vm.powered && vm.powered !== 'off' && vm.main_info.name.match(regexp));
             }
+            return false;
           });
 
           if (esxiHostsResults.length === 0) {
-            esxiHostsResults = esxiHosts.filter(function(esxiHost) {
+            esxiHostsResults = esxiHosts.filter((esxiHost) => {
               if (esxiHost.vms_details) {
-                return esxiHost.vms_details.some(function(vm) {
+                return esxiHost.vms_details.some((vm) => {
                   if (vm.powered && vm.powered !== 'off'
                     && vm.instances
                     && vm.instances instanceof Array) {
                     return vm.instances.some((instance) => instance.name.match(regexp));
                   }
+                  return false;
                 });
               }
+              return false;
             });
           }
         }
