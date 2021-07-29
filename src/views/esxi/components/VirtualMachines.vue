@@ -5,6 +5,7 @@
         :data="virtualMachines"
         sort-by="name"
         sort-dir="asc"
+        query-prefix="vm"
         :export-btn="false"
         :view-btn="true"
         :add-btn="false"
