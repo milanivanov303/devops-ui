@@ -9,6 +9,9 @@ export default {
   host(state, host) {
     state.host = host;
   },
+  images(state, images) {
+    state.images = images;
+  },
   clients(state, clients) {
     state.clients = clients;
   },

@@ -6,4 +6,5 @@ export default {
   feBranches: [],
   configurations: [],
   host: '',
+  images: [],
 };

@@ -90,6 +90,18 @@
                 />
               </div>
             </div>
+            <div class="row">
+              <div class="col s12" >
+                <Select
+                  :options="images"
+                  icon="cloud_upload"
+                  label="Deploy on"
+                  displayed="label"
+                  :default-option="false"
+                  v-model="form.image"
+                />
+              </div>
+            </div>
           </div>
           <BuildProgress
             v-else
@@ -124,6 +136,7 @@ function initialState() {
       javaVersion: 8,
       instance: null,
       fe_branch: null,
+      image: null,
     },
     build: {
       started: false,
@@ -161,6 +174,9 @@ export default {
     feBranches() {
       return this.$store.state.extranet.feBranches;
     },
+    images() {
+      return this.$store.state.extranet.images;
+    },
   },
 
   validations() {
@@ -193,11 +209,18 @@ export default {
     return validations;
   },
 
+  watch: {
+    images() {
+      [this.form.image] = this.images;
+    },
+  },
+
   methods: {
     getData() {
       this.$store.dispatch('extranet/getBranches');
       this.$store.dispatch('extranet/getFeBranches');
       this.$store.dispatch('extranet/getClients');
+      this.$store.dispatch('extranet/getImages');
       this.$store.dispatch('mmpi/getInstances');
     },
 
@@ -227,6 +250,7 @@ export default {
         java_version: this.form.javaVersion,
         instance: this.form.instance,
         fe_branch: this.form.feBranch,
+        image: this.form.image.value,
       })
         .then((response) => {
           this.build.status = 'running';
