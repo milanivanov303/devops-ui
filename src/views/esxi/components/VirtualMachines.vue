@@ -5,6 +5,7 @@
         :data="virtualMachines"
         sort-by="name"
         sort-dir="asc"
+        query-prefix="vm"
         :export-btn="false"
         :view-btn="true"
         :add-btn="false"
@@ -15,6 +16,10 @@
         <Column
           label="Virtual machine"
           :show="(virtualMachine) => virtualMachine.main_info.name"
+        />
+        <Column
+          label="Powered"
+          :show="(virtualMachine) => virtualMachine.powered || 'N/A'"
         />
         <Column
           label="RAM"

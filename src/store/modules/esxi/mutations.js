@@ -13,4 +13,12 @@ export default {
     esxiHosts.push(host);
     Vue.set(state, 'esxiHosts', esxiHosts);
   },
+  updateHost(state, host) {
+    if (!host.error) {
+      const { esxiHosts } = state;
+      const index = esxiHosts.findIndex((esxiHost) => esxiHost.hostname === host.hostname);
+      esxiHosts.splice(index, 1, host);
+      Vue.set(state, 'esxiHosts', esxiHosts);
+    }
+  },
 };

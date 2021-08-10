@@ -58,7 +58,7 @@ import EsxiDetails from './components/EsxiDetails';
 export default {
   data() {
     return {
-      searchVm: this.$route.query.searchVm,
+      vmsearch: this.$route.query.vmsearch,
     };
   },
 
@@ -80,8 +80,8 @@ export default {
 
       let virtualMachines = this.esxiHost.vms_details;
 
-      if (this.searchVm) {
-        const regexp = new RegExp(this.searchVm, 'i');
+      if (this.vmsearch) {
+        const regexp = new RegExp(this.vmsearch, 'i');
         virtualMachines = virtualMachines.filter(
           (virtualMachine) => virtualMachine.main_info.name.match(regexp),
         );
@@ -100,12 +100,12 @@ export default {
   },
 
   watch: {
-    searchVm(value) {
+    vmsearch(value) {
       const query = { ...this.$route.query };
 
-      delete query.searchVm;
+      delete query.vmsearch;
       if (value) {
-        query.searchVm = value;
+        query.vmsearch = value;
       }
 
       this.$router.push({ query });

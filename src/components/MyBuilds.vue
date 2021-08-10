@@ -4,7 +4,7 @@
       <span class="card-title">My builds</span>
       <Builds :created-by="this.$auth.getUser().username" :module="module"></Builds>
 
-      <template>
+      <template v-if="module">
         <component :is="buildComponent"></component>
       </template>
     </div>

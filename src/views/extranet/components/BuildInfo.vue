@@ -79,6 +79,14 @@
             :value="build.details.url"
           />
         </div>
+        <div class="row" v-if="build.details.image">
+          <TextInput
+            class="col s12 readonly"
+            label="Docker image"
+            icon="adjust"
+            :value="build.details.image"
+          />
+        </div>
       </div>
     </template>
     <template v-slot:footer></template>

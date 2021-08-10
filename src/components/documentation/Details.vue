@@ -15,7 +15,7 @@
             </tr>
             <tr>
               <th>Committed by</th>
-              <td>{{ details.username }}</td>
+              <td>{{ details.user }}</td>
             </tr>
             <tr>
               <th>Commit message</th>

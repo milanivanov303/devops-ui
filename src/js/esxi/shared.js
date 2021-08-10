@@ -23,10 +23,14 @@ export default {
       return 0;
     }
 
-    return esxiHost.vms_details.reduce(
-      (accumulator, currentValue) => accumulator + currentValue.hardware.memory,
-      0,
-    );
+    return esxiHost.vms_details.reduce((accumulator, currentValue) => {
+      let sum = accumulator;
+      if (currentValue.powered !== 'off') {
+        sum += currentValue.hardware.memory;
+      }
+      return sum;
+    },
+    0);
   },
 
   getServerFreeMemory(esxiHost) {

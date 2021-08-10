@@ -1,6 +1,11 @@
 <template>
   <Modal @close="$emit('close')" class="right-sheet">
-    <template v-slot:header>{{ vm.main_info.name }}</template>
+    <template v-slot:header>{{ vm.main_info.name }}
+      <span
+        :class="{ statusOn: status == 'on', statusOff: status == 'off' }"
+      > Powered {{ vm.powered }}
+      </span>
+    </template>
     <template v-slot:content>
       <ul class="collapsible popout">
         <li class="active">
@@ -9,6 +14,16 @@
             <p>File: {{ vm.file }}</p>
             <p>OS: {{ vm.main_info.guest_full_name }}</p>
             <p>version: {{ vm.main_info.version }}</p>
+          </div>
+        </li>
+        <li>
+          <div class="collapsible-header"><i class="material-icons">apps</i>Instances</div>
+          <div class="collapsible-body">
+            <Instances
+              v-if="vm.instances && vm.instances instanceof Array"
+              :instances="vm.instances"
+            />
+            <p v-if="vm.instances && vm.instances.error">{{ vm.instances.error }}</p>
           </div>
         </li>
         <li>
@@ -35,13 +50,24 @@
 
 <script>
 import shared from '@/js/esxi/shared';
+import Instances from './Instances';
 
 export default {
+
+  components: {
+    Instances,
+  },
 
   props: {
     vm: {
       type: Object,
       required: true,
+    },
+  },
+
+  computed: {
+    status() {
+      return this.vm.powered;
     },
   },
 
@@ -60,5 +86,13 @@ export default {
 <style scoped>
 .collection-section{
   font-size: 1.2em;
+}
+.statusOn{
+  font-size: 12px;
+  color: green;
+}
+.statusOff{
+  font-size: 12px;
+  color: red;
 }
 </style>

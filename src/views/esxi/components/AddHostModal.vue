@@ -81,7 +81,6 @@ export default {
           this.$emit('close');
           if (this.action === 'create') {
             this.$M.toast({ html: 'ESXi host has been created!', classes: 'toast-seccess' });
-            return;
           }
         })
         .catch((error) => {

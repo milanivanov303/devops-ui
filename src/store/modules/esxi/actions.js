@@ -20,4 +20,14 @@ export default {
     return promise;
   },
 
+  updateEsxiHost({ commit }, payload) {
+    const promise = api('devops').post('esxi/start-update', payload);
+
+    promise
+      .then((response) => commit('updateHost', response.data))
+      .catch((error) => commit('error', error));
+
+    return promise;
+  },
+
 };
