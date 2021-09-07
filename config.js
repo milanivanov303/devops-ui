@@ -37,4 +37,5 @@ module.exports = {
     vhost: process.env.VUE_APP_WS_VHOST,
   },
   instance: process.env.VUE_APP_ENV,
+  ssh_port: process.env.VUE_APP_SSH_PORT,
 };
