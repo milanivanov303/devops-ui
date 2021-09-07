@@ -16,3 +16,4 @@ volumes:
       type: "nfs"
       o: "addr=${NFS_HOST},vers=4,port=${NFS_PORT}"
       device: ":/proxy_config"
+

@@ -177,6 +177,7 @@
 
 <script>
 import EventBus from '@/event-bus';
+import config from '/config';
 
 const Paginate = () => import('@/components/partials/Paginate');
 const BuildProgress = () => import('@/components/BuildProgress');
@@ -275,10 +276,10 @@ export default {
     },
 
     getWebssh2Url(build) {
-      const { host } = this.$store.state[build.service.id];
-      const port = this.getPublishedPort(build, 22);
+      const serviceID = build.details.service.ID;
+      const port = config.ssh_port;
 
-      return this.$router.resolve(`/ssh/host/${host}?port=${port}&source=devops`).href;
+      return `/ssh/host/${serviceID}?port=${port}&source=devops`;
     },
 
     getStatusText(build) {
