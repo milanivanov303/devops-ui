@@ -275,10 +275,10 @@ export default {
     },
 
     getWebssh2Url(build) {
-      const { host } = this.$store.state[build.module];
+      const { host } = this.$store.state[build.service.id];
       const port = this.getPublishedPort(build, 22);
 
-      return this.$router.resolve(`/ssh/host/${host}?port=${port}`).href;
+      return this.$router.resolve(`/ssh/host/${host}?port=${port}&source=devops`).href;
     },
 
     getStatusText(build) {
