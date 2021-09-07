@@ -177,7 +177,7 @@
 
 <script>
 import EventBus from '@/event-bus';
-import config from '/config';
+import config from '@/config';
 
 const Paginate = () => import('@/components/partials/Paginate');
 const BuildProgress = () => import('@/components/BuildProgress');
