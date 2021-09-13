@@ -175,6 +175,9 @@
                 >
                   <router-link to="/administration/devops/actions"> Actions</router-link>
                 </li>
+                <li :class="{ active: isActive('administration/devops/logs') }">
+                  <router-link to="/administration/devops/logs"> Logs</router-link>
+                </li>
                 <li><div class="divider"></div></li>
               </ul>
             </div>

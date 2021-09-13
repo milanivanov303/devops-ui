@@ -12,6 +12,7 @@ const EsxiDashboard = () => import(/* webpackChunkName: "cms" */ '../views/esxi/
 const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
 const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
 const DevopsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/devops/Actions');
+const DevopsLogsAdministration = () => import(/* webpackChunkName: "administration-logs" */ '../views/administration/devops/Logs');
 
 const CmsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/cms/Users');
 const CmsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/cms/Roles');
@@ -335,6 +336,17 @@ export default [
       breadcrumb: 'Actions',
     },
     component: DevopsActionsAdministration,
+  },
+  {
+    path: '/administration/devops/logs',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-logs',
+      transitionName: 'slide',
+      title: 'Logs Administration',
+      breadcrumb: 'Logs',
+    },
+    component: DevopsLogsAdministration,
   },
   {
     path: '/administration/cms/users/:id?',
