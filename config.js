@@ -36,6 +36,12 @@ module.exports = {
     password: process.env.VUE_APP_WS_PASSWORD,
     vhost: process.env.VUE_APP_WS_VHOST,
   },
+  elastic: {
+    url: process.env.VUE_APP_ELASTIC_URL,
+    username: process.env.VUE_APP_ELASTIC_USERNAME,
+    pass: process.env.VUE_APP_ELASTIC_PASSWORD,
+  },
   instance: process.env.VUE_APP_ENV,
   ssh_port: process.env.VUE_APP_SSH_PORT,
+  project: process.env.VUE_APP_COMPOSE_PROJECT_NAME,
 };
