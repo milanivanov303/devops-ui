@@ -100,6 +100,15 @@
                   <i class="material-icons">wysiwyg</i>
                 </a>
                 <a
+                  @click="openServiceLogsModal(build)"
+                  target="_blank"
+                  data-tooltip="Docker service logs"
+                  class="blue-text tooltipped"
+                  v-if="build.status === 'running'"
+                >
+                  <i class="material-icons">format_align_left</i>
+                </a>
+                <a
                   v-if="canRemove(build)"
                   @click="openRemoveModal(build)"
                   data-tooltip="Remove"
@@ -130,6 +139,13 @@
       :is="infoComponent"
       :build="build"
       @close="closeInfoModal()"
+    />
+
+    <component
+      v-if="showServiceLogsModal"
+      :is="serviceLogsComponent"
+      :build="build"
+      @close="closeServiceLogsModal()"
     />
 
     <Modal v-if="showRemoveModal" @close="showRemoveModal = false" class="confirm">
@@ -204,6 +220,9 @@ export default {
       // eslint-disable-next-line
       return () => import('@/views/' + this.build.module + '/components/BuildInfo');
     },
+    serviceLogsComponent() {
+      return () => import('@/views/' + this.build.module + '/components/BuildServiceLogs');
+    },
   },
 
   data() {
@@ -219,6 +238,7 @@ export default {
       showInfoModal: false,
       showRemoveModal: false,
       showProgressModal: false,
+      showServiceLogsModal: false,
 
       updating: false,
       removing: false,
@@ -406,6 +426,19 @@ export default {
         })
         .finally(() => { this.removing = false; });
     },
+
+    openServiceLogsModal(build) {
+      this.build = { ...build };
+
+      this.showServiceLogsModal = true;
+    },
+
+    closeServiceLogsModal() {
+      this.build = {};
+
+      this.showServiceLogsModal = false;
+    },
+
   },
 
   watch: {
