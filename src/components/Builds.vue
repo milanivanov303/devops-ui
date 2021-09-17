@@ -221,6 +221,7 @@ export default {
       return () => import('@/views/' + this.build.module + '/components/BuildInfo');
     },
     serviceLogsComponent() {
+      // eslint-disable-next-line
       return () => import('@/views/' + this.build.module + '/components/BuildServiceLogs');
     },
   },
