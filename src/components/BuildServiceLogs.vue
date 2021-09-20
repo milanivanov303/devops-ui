@@ -1,5 +1,5 @@
 <template>
-  <Modal @close="$emit('close')" class="left-align">
+  <Modal @close="closeInterval" class="right-sheet">
     <template v-slot:header class="header">Build: {{ build.name }}</template>
     <template v-slot:content>
       <br>
@@ -40,7 +40,7 @@ export default {
       const serviceID = this.build.details.service.ID;
       const numberOfLogs = `&tail=${this.selectedNumberOfLogs}`;
       axios({
-        url: `/devops-docker-api/services/${serviceID}/logs?stderr=true&stdout=true&details=true${numberOfLogs}`,
+        url: `/devops-docker-api/services/${serviceID}/logs?stderr=true&stdout=true${numberOfLogs}`,
         method: 'GET',
         responseType: 'application/json',
       })
@@ -49,6 +49,10 @@ export default {
           this.logs = response.data.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '');
         })
         .catch((error) => error.message);
+    },
+    closeInterval() {
+      clearInterval(this.interval);
+      this.$emit('close');
     },
   },
   watch: {
@@ -66,7 +70,7 @@ export default {
     },
   },
   created() {
-    this.interval = setInterval(() => this.getServiceLogsByBuild(), 1000);
+    this.interval = setInterval(() => this.getServiceLogsByBuild(), 5000);
   },
 };
 </script>

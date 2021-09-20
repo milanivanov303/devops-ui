@@ -141,9 +141,8 @@
       @close="closeInfoModal()"
     />
 
-    <component
+    <BuildServiceLogs
       v-if="showServiceLogsModal"
-      :is="serviceLogsComponent"
       :build="build"
       @close="closeServiceLogsModal()"
     />
@@ -197,11 +196,13 @@ import config from '@/config';
 
 const Paginate = () => import('@/components/partials/Paginate');
 const BuildProgress = () => import('@/components/BuildProgress');
+const BuildServiceLogs = () => import('@/components/BuildServiceLogs');
 
 export default {
   components: {
     Paginate,
     BuildProgress,
+    BuildServiceLogs,
   },
 
   props: {
@@ -219,10 +220,6 @@ export default {
     infoComponent() {
       // eslint-disable-next-line
       return () => import('@/views/' + this.build.module + '/components/BuildInfo');
-    },
-    serviceLogsComponent() {
-      // eslint-disable-next-line
-      return () => import('@/views/BuildServiceLogs');
     },
   },
 
