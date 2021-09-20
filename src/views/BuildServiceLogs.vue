@@ -3,16 +3,20 @@
     <template v-slot:header class="header">Build: {{ build.name }}</template>
     <template v-slot:content>
       <br>
-      <div id="selectNumberOfLogs">
-        <span class="numberOfLogs">Select number of logs:</span>
-        <select class="form-select"  v-model="selectedNumberOfLogs" >
-          <option selected value="50">50</option>
-          <option value="100">100</option>
-          <option value="500">500</option>
-          <option value="1000">1000</option>
-        </select>
-      <br>
-      </div>
+      <div class="row">
+          <div class="col s12" >
+            <Select
+              v-model="selectedNumberOfLogs"
+              :options="[50,100,200,500,1000]"
+              icon="cloud_upload"
+              label="Select number of logs:"
+              displayed="label"
+              :default-option="false"
+              @change="$emit('change', selectedNumberOfLogs)"
+            />
+          </div>
+        </div>
+        <br>
 <pre class="showLogs">
 {{logs}}
 </pre>
@@ -27,8 +31,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      logs: this.getServiceLogsByBuild(),
-      selectedNumberOfLogs: '0',
+      selectedNumberOfLogs: '',
+      logs: null,
     };
   },
   methods: {
@@ -42,7 +46,7 @@ export default {
       })
         .then((response) => {
           // eslint-disable-next-line no-control-regex,vue/no-parsing-error,no-irregular-whitespace
-          this.logs = response.data.replace(/[�\u0000-\u0001-\u0002]/g, '');
+          this.logs = response.data.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '');
         })
         .catch((error) => error.message);
     },
@@ -50,6 +54,7 @@ export default {
   watch: {
     selectedNumberOfLogs(val) {
       if (val) {
+        this.selectedNumberOfLogs = val;
         this.getServiceLogsByBuild();
       }
     },
@@ -65,28 +70,3 @@ export default {
   },
 };
 </script>
-<style>
-select.form-select{
-  display: flex;
-  position:absolute;
-  left:40px;
-  top:130px;
-  width:150px;
-  background-color: white;
-}
-span.numberOfLogs{
-  display: flex;
-  position:absolute;
-  left:40px;
-  top:110px;
-  width:150px;
-}
-span{
-  color: black;
-}
-pre.showLogs{
-  display: flex;
-  position:absolute;
-  top:180px;
-}
-</style>
