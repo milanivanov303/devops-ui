@@ -1,25 +1,21 @@
 <template>
-  <Modal @close="closeInterval" class="right-sheet">
-    <template v-slot:header class="header">Build: {{ build.name }}</template>
+  <Modal @close="close()" class="right-sheet">
+    <template v-slot:header class="header">Logs for {{ build.name }}</template>
     <template v-slot:content>
       <br>
       <div class="row">
-          <div class="col s12" >
+          <div class="col s4 offset-s8" >
             <Select
-              v-model="selectedNumberOfLogs"
+              v-model="numberOfLines"
               :options="[50,100,200,500,1000]"
               icon="cloud_upload"
-              label="Select number of logs:"
-              displayed="label"
+              label="Number of lines"
               :default-option="false"
-              @change="$emit('change', selectedNumberOfLogs)"
             />
           </div>
         </div>
         <br>
-<pre class="showLogs">
-{{logs}}
-</pre>
+        <pre>{{logs}}</pre>
     </template>
     <template v-slot:footer></template>
   </Modal>
@@ -29,48 +25,60 @@
 import axios from 'axios';
 
 export default {
-  data() {
-    return {
-      selectedNumberOfLogs: '',
-      logs: null,
-    };
-  },
-  methods: {
-    getServiceLogsByBuild() {
-      const serviceID = this.build.details.service.ID;
-      const numberOfLogs = `&tail=${this.selectedNumberOfLogs}`;
-      axios({
-        url: `/devops-docker-api/services/${serviceID}/logs?stderr=true&stdout=true${numberOfLogs}`,
-        method: 'GET',
-        responseType: 'application/json',
-      })
-        .then((response) => {
-          // eslint-disable-next-line no-control-regex,vue/no-parsing-error,no-irregular-whitespace
-          this.logs = response.data.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF]/g, '');
-        })
-        .catch((error) => error.message);
-    },
-    closeInterval() {
-      clearInterval(this.interval);
-      this.$emit('close');
-    },
-  },
-  watch: {
-    selectedNumberOfLogs(val) {
-      if (val) {
-        this.selectedNumberOfLogs = val;
-        this.getServiceLogsByBuild();
-      }
-    },
-  },
   props: {
     build: {
       type: Object,
       required: true,
     },
   },
+
+  data() {
+    return {
+      numberOfLines: 50,
+      logs: null,
+    };
+  },
+
+  methods: {
+    getServiceLogsByBuild() {
+      const parameters = `?stderr=1&stdout=1&timestamps=0&tail=${this.numberOfLines}`;
+
+      axios
+        .create()
+        .get(`/devops-docker-api/services/${this.build.details.service.ID}/logs${parameters}`)
+        .then((response) => {
+          this.logs = response.data
+            .split('\n')
+            .map((line) => line.slice(8))
+            .join('\n');
+        })
+        .catch((error) => error.message);
+    },
+
+    close() {
+      clearInterval(this.interval);
+      this.$emit('close');
+    },
+  },
+
+  watch: {
+    selectedNumberOfLogs() {
+      this.getServiceLogsByBuild();
+    },
+  },
+
   created() {
+    this.getServiceLogsByBuild();
     this.interval = setInterval(() => this.getServiceLogsByBuild(), 5000);
   },
 };
 </script>
+
+<style scoped lang="scss">
+  pre {
+    width: 100%;
+    height: 70%;
+    overflow: auto;
+    //white-space: pre-wrap;
+  }
+</style>
