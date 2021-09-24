@@ -81,13 +81,22 @@
               </div>
             </div>
             <div class="row">
-              <div class="col s12" >
+              <div class="col s12">
                 <Autocomplete
                   label="Fe branch"
                   icon="dynamic_feed"
                   :items="feBranches"
-                  v-model="form.feBranch"
+                  v-model="form.fe_branch"
+                  :invalid="$v.form.fe_branch.$error"
+                  @blur="$v.form.fe_branch.$touch()"
                 />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.fe_branch.$error">
+                  <p v-if="!$v.form.fe_branch.required">
+                    Fe branch field must not be empty.
+                  </p>
+                </div>
               </div>
             </div>
             <div class="row">
@@ -135,7 +144,9 @@ function initialState() {
       client: null,
       javaVersion: 8,
       instance: null,
-      fe_branch: null,
+      fe_branch: {
+        name: 'X3',
+      },
       image: null,
     },
     build: {
@@ -189,6 +200,12 @@ export default {
           },
         },
         instance: {
+          required,
+          name: {
+            required,
+          },
+        },
+        fe_branch: {
           required,
           name: {
             required,
