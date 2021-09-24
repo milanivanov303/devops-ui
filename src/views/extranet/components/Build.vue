@@ -144,7 +144,9 @@ function initialState() {
       client: null,
       javaVersion: 8,
       instance: null,
-      fe_branch: null,
+      fe_branch: {
+        name: 'X3',
+      },
       image: null,
     },
     build: {
