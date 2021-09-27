@@ -11,14 +11,5 @@ module.exports = {
     sockPath: '/devops/sockjs-node',
     port: 80,
     disableHostCheck: true,
-    proxy: {
-      '^/devops/ssh': {
-        target: 'http://webssh2',
-        changeOrigin: true,
-        secure: false,
-        pathRewrite: { '^/devops/ssh': '/devops/ssh' },
-        logLevel: 'debug',
-      },
-    },
   },
 };

@@ -100,6 +100,15 @@
                   <i class="material-icons">wysiwyg</i>
                 </a>
                 <a
+                  @click="openServiceLogsModal(build)"
+                  target="_blank"
+                  data-tooltip="Docker service logs"
+                  class="blue-text tooltipped"
+                  v-if="build.status === 'running'"
+                >
+                  <i class="material-icons">format_align_left</i>
+                </a>
+                <a
                   v-if="canRemove(build)"
                   @click="openRemoveModal(build)"
                   data-tooltip="Remove"
@@ -130,6 +139,12 @@
       :is="infoComponent"
       :build="build"
       @close="closeInfoModal()"
+    />
+
+    <BuildServiceLogs
+      v-if="showServiceLogsModal"
+      :build="build"
+      @close="closeServiceLogsModal()"
     />
 
     <Modal v-if="showRemoveModal" @close="showRemoveModal = false" class="confirm">
@@ -177,14 +192,17 @@
 
 <script>
 import EventBus from '@/event-bus';
+import config from '@/config';
 
 const Paginate = () => import('@/components/partials/Paginate');
 const BuildProgress = () => import('@/components/BuildProgress');
+const BuildServiceLogs = () => import('@/components/BuildServiceLogs');
 
 export default {
   components: {
     Paginate,
     BuildProgress,
+    BuildServiceLogs,
   },
 
   props: {
@@ -218,6 +236,7 @@ export default {
       showInfoModal: false,
       showRemoveModal: false,
       showProgressModal: false,
+      showServiceLogsModal: false,
 
       updating: false,
       removing: false,
@@ -275,10 +294,10 @@ export default {
     },
 
     getWebssh2Url(build) {
-      const { host } = this.$store.state[build.module];
-      const port = this.getPublishedPort(build, 22);
+      const serviceID = build.details.service.ID;
+      const port = config.ssh_port;
 
-      return this.$router.resolve(`/ssh/host/${host}?port=${port}`).href;
+      return `/ssh/host/${serviceID}?port=${port}&source=devops`;
     },
 
     getStatusText(build) {
@@ -405,6 +424,19 @@ export default {
         })
         .finally(() => { this.removing = false; });
     },
+
+    openServiceLogsModal(build) {
+      this.build = { ...build };
+
+      this.showServiceLogsModal = true;
+    },
+
+    closeServiceLogsModal() {
+      this.build = {};
+
+      this.showServiceLogsModal = false;
+    },
+
   },
 
   watch: {
