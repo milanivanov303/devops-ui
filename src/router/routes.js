@@ -1,5 +1,6 @@
 const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
 const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations');
+const SoaModification = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/components/SOAdeployment');
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
 const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults');
@@ -69,6 +70,20 @@ export default [
       breadcrumb: 'Dashboard',
     },
     component: Dashboard,
+    props: {
+      module: 'extranet',
+    },
+  },
+  {
+    path: '/extranet/soa-modification/:issue?',
+    meta: {
+      requiresAuth: true,
+      name: 'extranet',
+      transitionName: 'slide',
+      title: 'SOA Modification',
+      breadcrumb: 'SOA Modification',
+    },
+    component: SoaModification,
     props: {
       module: 'extranet',
     },
