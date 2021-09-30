@@ -1,8 +1,6 @@
 <template>
-  <Modal @close="$emit('close')" class="right-sheet">
-    <template v-slot:header>{{ build.name }}</template>
-    <template v-slot:content>
-      <div class="col s12 l11">
+  <div>
+    <div class="col s12 l11">
         <div class="row">
           <TextInput
             class="col s12 readonly"
@@ -71,10 +69,8 @@
             :value="build.details.url"
           />
         </div>
-      </div>
-    </template>
-    <template v-slot:footer></template>
-  </Modal>
+    </div>
+  </div>
 </template>
 
 <script>

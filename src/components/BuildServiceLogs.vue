@@ -1,24 +1,19 @@
 <template>
-  <Modal @close="close()" class="right-sheet">
-    <template v-slot:header class="header">Logs for {{ build.name }}</template>
-    <template v-slot:content>
-      <br>
-      <div class="row">
-          <div class="col s4 offset-s8" >
-            <Select
-              v-model="numberOfLines"
-              :options="[50,100,200,500,1000]"
-              icon="cloud_upload"
-              label="Number of lines"
-              :default-option="false"
-            />
-          </div>
+  <div>
+    <div class="row">
+        <div class="col s4 offset-s8" >
+          <Select
+            v-model="numberOfLines"
+            :options="[50,100,200,500,1000]"
+            icon="cloud_upload"
+            label="Number of lines"
+            :default-option="false"
+          />
         </div>
-        <br>
-        <pre>{{logs}}</pre>
-    </template>
-    <template v-slot:footer></template>
-  </Modal>
+      </div>
+      <br>
+      <pre>{{logs}}</pre>
+  </div>
 </template>
 
 <script>
@@ -43,21 +38,22 @@ export default {
     getServiceLogsByBuild() {
       const parameters = `?stderr=1&stdout=1&timestamps=0&tail=${this.numberOfLines}`;
 
-      axios
-        .create()
-        .get(`/devops-docker-api/services/${this.build.details.service.ID}/logs${parameters}`)
-        .then((response) => {
-          this.logs = response.data
-            .split('\n')
-            .map((line) => line.slice(8))
-            .join('\n');
-        })
-        .catch((error) => error.message);
+      if (this.build.status === 'running') {
+        axios
+          .create()
+          .get(`/devops-docker-api/services/${this.build.details.service.ID}/logs${parameters}`)
+          .then((response) => {
+            this.logs = response.data
+              .split('\n')
+              .map((line) => line.slice(8))
+              .join('\n');
+          })
+          .catch((error) => error.message);
+      }
     },
 
     close() {
       clearInterval(this.interval);
-      this.$emit('close');
     },
   },
 
