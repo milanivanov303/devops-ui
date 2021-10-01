@@ -1,5 +1,5 @@
 <template>
-  <Modal @close="close()" class="right-sheet">
+  <Modal @close="$emit('close')" class="right-sheet">
     <template v-slot:header>{{ build.name }}</template>
     <template v-slot:content>
       <div class="row">
@@ -44,9 +44,7 @@
 
 <script>
 
-// eslint-disable-next-line
 const BuildServiceLogs = () => import('@/components/BuildServiceLogs');
-// eslint-disable-next-line
 const BuildLogs = () => import('@/components/BuildLogs');
 
 export default {
@@ -59,13 +57,6 @@ export default {
     build: {
       type: Object,
       required: true,
-    },
-  },
-
-  methods: {
-    close() {
-      this.$refs.serviceLogs.close();
-      this.$emit('close');
     },
   },
 

@@ -25,9 +25,7 @@ export default {
       api('devops')
         .post(`builds/${this.build.id}/logs`)
         .then((response) => {
-          this.logs = response.data.data
-            .split('\n')
-            .join('\n');
+          this.logs = response.data;
         })
         .catch((error) => error.message);
     },

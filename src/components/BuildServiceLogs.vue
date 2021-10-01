@@ -38,23 +38,28 @@ export default {
     getServiceLogsByBuild() {
       const parameters = `?stderr=1&stdout=1&timestamps=0&tail=${this.numberOfLines}`;
 
-      if (this.build.status === 'running') {
-        axios
-          .create()
-          .get(`/devops-docker-api/services/${this.build.details.service.ID}/logs${parameters}`)
-          .then((response) => {
-            this.logs = response.data
-              .split('\n')
-              .map((line) => line.slice(8))
-              .join('\n');
-          })
-          .catch((error) => error.message);
+      if (this.build.status !== 'running') {
+        return;
       }
+      axios
+        .create()
+        .get(`/devops-docker-api/services/${this.build.details.service.ID}/logs${parameters}`)
+        .then((response) => {
+          this.logs = response.data
+            .split('\n')
+            .map((line) => line.slice(8))
+            .join('\n');
+        })
+        .catch((error) => error.message);
     },
 
     close() {
       clearInterval(this.interval);
     },
+  },
+
+  destroyed() {
+    clearInterval(this.interval);
   },
 
   watch: {
