@@ -166,7 +166,7 @@
           </div>
         </div>
       </div>
-      <div class="row" >
+      <div class="row" v-if="soaModif.name">
         <div class="input-field col s12 m6 l6">
           <button class="btn waves-effect waves-light right"
                   type="button"
@@ -444,7 +444,7 @@ export default {
       const scriptsDestination = this.scriptsDestination
           || this.config.mmpi.modif_scripts_destination;
       const templatesDestination = this.templatesDestination
-          || config.mmpi.modif_tmp_destination;
+          || this.config.mmpi.modif_tmp_destination;
       const instance = this.deliveryChain.instances
         .find((instance) => instance.owner.key === 'codix'
               && instance.status.key === 'active'
