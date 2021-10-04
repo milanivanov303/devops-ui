@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="col s12 l12">
     <h1 class="center">SOA Module Deployment</h1>
     <custom-confirm
         ref="custom-confirm"
@@ -173,10 +173,6 @@
                   name="action"
                   @click="onSubmit">Add</button>
         </div>
-<!--        <div class="input-field col s12 m6 l6">-->
-<!--          <a href="#!"-->
-<!--             class="modal-close waves-effect waves-blue btn-flat left">Close</a>-->
-<!--        </div>-->
       </div>
     </form>
   </div>
@@ -395,8 +391,6 @@ export default {
 
         this.$refs['custom-confirm'].openModal();
         loader.hide();
-        this.soaModif = {};
-        this.cmdModif = {};
       }
     },
     async checkArtifactory() {
@@ -405,7 +399,6 @@ export default {
 
       // remove '/' char from the beginning of the address
       this.soaModif.name = this.soaModif.name.replace(/^\//g, '').trim();
-
       // return error if the given value is url
       if (/\//.test(this.soaModif.name)) {
         this.artifactoryStatus = 'ERROR';
@@ -429,7 +422,7 @@ export default {
       if (value) {
         window.location.href = `${this.config.mmpi.web}/issue/${this.$route.params.issue}`;
       } else {
-        this.confirmMsg = [];
+        this.confirmMsg = [''];
       }
     },
     selectedArtifact(value) {
@@ -451,7 +444,7 @@ export default {
       const scriptsDestination = this.scriptsDestination
           || this.config.mmpi.modif_scripts_destination;
       const templatesDestination = this.templatesDestination
-          || this.config.mmpi.modif_tmp_destination;
+          || config.mmpi.modif_tmp_destination;
       const instance = this.deliveryChain.instances
         .find((instance) => instance.owner.key === 'codix'
               && instance.status.key === 'active'
