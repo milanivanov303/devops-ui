@@ -1,4 +1,5 @@
 // https://vuex.vuejs.org/en/actions.html
+
 export default {
   getVariables({ commit }) {
     const name = 'config-defaults';
@@ -337,20 +338,18 @@ export default {
       commit('error', error);
     }
   },
-  // Add modification in CMS/Modification tab
+  // Add modification in CMS/Modification tab and Extranet/SoaDeployment tab
   async addModification({ commit }, payload) {
     try {
-      // Commented rows below, because work just on page cms/modification other two pages are not
-      // currently functional
-      // let uri = '';
-      // if (payload.type_id === 'binary') {
-      //   uri = 'binaries';
-      // } else if (payload.type_id === 'cmd') {
-      //   uri = 'commands';
-      // } else if (payload.type_id === 'cms') {
-      //   uri = 'cms';
-      // }
-      const response = await api('mmpi').post('modifications/cms', payload);
+      let uri = '';
+      if (payload.type_id === 'binary') {
+        uri = 'binaries';
+      } else if (payload.type_id === 'cmd') {
+        uri = 'commands';
+      } else if (payload.type_id === 'cms') {
+        uri = 'cms';
+      }
+      const response = await api('mmpi').post(`modifications/${uri}`, payload);
       return response.data.data;
     } catch (error) {
       commit('error', error);
