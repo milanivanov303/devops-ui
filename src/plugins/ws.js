@@ -37,7 +37,7 @@ class WebSocket {
 
     // resubscribe to active queues
     Object.values(this.queues).forEach(
-      queue => this.subscribe(queue.name, queue.callback, queue.headers),
+      (queue) => this.subscribe(queue.name, queue.callback, queue.headers),
     );
   }
 

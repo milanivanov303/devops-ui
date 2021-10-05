@@ -13,7 +13,7 @@ function sortBuilds(builds) {
 }
 
 export default {
-  getActiveByUser: state => (username, module) => {
+  getActiveByUser: (state) => (username, module) => {
     if (!state.active) {
       return [];
     }
@@ -25,11 +25,18 @@ export default {
     });
   },
 
-  getActiveGroupedByBranch: state => (module) => {
+  getActiveByModule: (state) => (module) => {
+    if (!state.active) {
+      return [];
+    }
+    return state.active.filter((build) => build.module === module);
+  },
+
+  getActiveGroupedByBranch: (state) => (module) => {
     const branches = {};
     state
       .active
-      .filter(build => build.module === module)
+      .filter((build) => build.module === module)
       .forEach((build) => {
         if (!branches[build.details.branch]) {
           branches[build.details.branch] = {};
@@ -38,7 +45,6 @@ export default {
         + 1 || 1;
       });
 
-
     const builds = [];
     Object.keys(branches).forEach((branch) => {
       builds.push({ branch, builds: branches[branch] });
@@ -46,36 +52,7 @@ export default {
 
     return builds.sort((a, b) => b.builds - a.builds);
   },
-  getTTSkeysFromActiveBuilds: state => (module) => {
-    const ttsKeys = [];
-    state.active.filter(build => build.module === module)
-      .forEach((build) => {
-        if (!ttsKeys.includes(build.details.tts_key)) {
-          ttsKeys.push(build.details.tts_key);
-        }
-      });
-    return ttsKeys;
-  },
-  getActiveGroupedByTTSkey: state => (module) => {
-    const ttsKeys = {};
-    state
-      .active
-      .filter(build => build.module === module)
-      .forEach((build) => {
-        if (!ttsKeys[build.details.tts_key]) {
-          ttsKeys[build.details.tts_key] = {};
-        }
-        ttsKeys[build.details.tts_key][build.status] = ttsKeys[build.details.tts_key][build.status]
-        + 1 || 1;
-      });
 
-    const builds = [];
-    Object.keys(ttsKeys).forEach((ttsKey) => {
-      builds.push({ ttsKey, builds: ttsKeys[ttsKey] });
-    });
-
-    return builds.sort((a, b) => b.builds - a.builds);
-  },
   getActiveGroupedByModule: (state) => {
     const branches = {};
     state
@@ -87,7 +64,6 @@ export default {
         branches[build.module][build.status] = branches[build.module][build.status] + 1 || 1;
       });
 
-
     const builds = [];
     Object.keys(branches).forEach((module) => {
       builds.push({ module, builds: branches[module] });
@@ -96,20 +72,21 @@ export default {
     return builds.sort((a, b) => b.builds - a.builds);
   },
 
-  getActiveByBranch: state => (branch) => {
+  getActiveByBranch: (state) => (module, branch) => {
     if (!state.active) {
       return [];
     }
-    return state.active.filter(build => build.details.branch === branch);
-  },
-  getActiveByTTSkey: state => (key) => {
-    if (!state.active) {
-      return [];
-    }
-    return state.active.filter(build => build.details.tts_key === key);
+
+    return state.active.filter((build) => {
+      if (build.module !== module) {
+        return false;
+      }
+
+      return build.details.branch === branch;
+    });
   },
 
-  getByModule: state => (stateName) => {
+  getByModule: (state) => (stateName) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -124,24 +101,8 @@ export default {
 
     return sortBuilds(builds);
   },
-  getByTTSkey: state => (stateName, module) => {
-    if (!state.statistics[stateName]) {
-      return [];
-    }
 
-    const builds = state.statistics[stateName].reduce(
-      (tally, build) => {
-        if (!module || build.module === module) {
-          tally[build.details.tts_key] = (tally[build.details.tts_key] || 0) + 1;
-        }
-        return tally;
-      },
-      {},
-    );
-
-    return sortBuilds(builds);
-  },
-  getByUser: state => (stateName, module) => {
+  getByUser: (state) => (stateName, module) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -158,7 +119,8 @@ export default {
 
     return sortBuilds(builds);
   },
-  getByBranch: state => (stateName, module) => {
+
+  getByBranch: (state) => (stateName, module) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -176,7 +138,7 @@ export default {
     return sortBuilds(builds);
   },
 
-  getForBranch: state => (stateName, branch) => {
+  getForBranch: (state) => (stateName, branch) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -188,7 +150,8 @@ export default {
       return false;
     });
   },
-  getForUser: state => (stateName, user) => {
+
+  getForUser: (state) => (stateName, user) => {
     if (!state.statistics[stateName]) {
       return [];
     }
@@ -200,6 +163,6 @@ export default {
       return false;
     });
   },
-  paginationData: state => state.paginationData,
 
+  paginationData: (state) => state.paginationData,
 };

@@ -12,7 +12,7 @@ export default {
   },
   removeBuild(state, id) {
     state.services.splice(
-      state.services.findIndex(service => service.ID === id),
+      state.services.findIndex((service) => service.ID === id),
       1,
     );
   },

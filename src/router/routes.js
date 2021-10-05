@@ -1,36 +1,30 @@
-const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue');
-const ExtranetDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Dashboard.vue');
-const ExtranetBranches = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branches.vue');
-const ExtranetBranch = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Branch.vue');
-const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations.vue');
-const DebiteurDashboard = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Dashboard.vue');
-const DebiteurBranches = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branches.vue');
-const DebiteurBranch = () => import(/* webpackChunkName: "extranet" */ '../views/debiteur/Branch.vue');
-const ImxBeDashboard = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Dashboard.vue');
-const ImxBeBranches = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branches.vue');
-const ImxBeBranch = () => import(/* webpackChunkName: "imx-be" */ '../views/imx-be/Branch.vue');
-const ImxFeDashboard = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Dashboard.vue');
-const ImxFeBranches = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branches.vue');
-const ImxFeBranch = () => import(/* webpackChunkName: "imx-fe" */ '../views/imx-fe/Branch.vue');
-const ImxDashboard = () => import(/* webpackChunkName: "imx" */ '../views/imx/ImxDashboard.vue');
-const ImxTTSkeys = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkeys.vue');
-const ImxTTSkey = () => import(/* webpackChunkName: "imx" */ '../views/imx/TTSkey.vue');
-const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard.vue');
-const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos.vue');
-const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults.vue');
-const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/ResponseFile.vue');
-const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates.vue');
-const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory.vue');
-const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification.vue');
 const SeTransferModif = () => import(/* webpackChunkName: "expert-system" */ '../views/expert-system/Modification.vue');
-const AdministrationUsers = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/Users.vue');
-const AdministrationRoles = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/Roles.vue');
-const AdministrationActions = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/Actions.vue');
+const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
+const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations');
+const SoaModification = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/components/SOAdeployment');
+const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
+const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
+const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults');
+const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/ResponseFile');
+const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates');
+const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
+const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
+const EsxiDashboard = () => import(/* webpackChunkName: "cms" */ '../views/esxi/Dashboard');
+const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
+const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
+const DevopsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/devops/Actions');
+const DevopsLogsAdministration = () => import(/* webpackChunkName: "administration-logs" */ '../views/administration/devops/Logs');
 
-const Login = () => import(/* webpackChunkName: "login" */ '../views/Login.vue');
-const LoggedInSSOUser = () => import(/* webpackChunkName: "login" */ '../views/LoggedInSSOUser.vue');
-const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild.vue');
-const BranchDoc = () => import(/* webpackChunkName: "doc" */ '../components/ApiDocumentation.vue');
+const CmsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/cms/Users');
+const CmsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/cms/Roles');
+const CmsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/cms/Actions');
+
+const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
+const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
+const Hosts = () => import(/* webpackChunkName: "hosts" */ '@/views/esxi/Hosts');
+
+const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
+const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
 export default [
   {
@@ -45,9 +39,10 @@ export default [
     beforeEnter: (to, from, next) => {
       if (auth.getUser()) {
         next('/dashbaord');
-      } else {
-        next();
+        return;
       }
+
+      next();
     },
   },
   {
@@ -59,67 +54,65 @@ export default [
       title: 'Dashboard',
       breadcrumb: 'Dashboard',
     },
-    component: Dashboard,
+    component: MainDashboard,
   },
+
   {
     path: '/extranet',
+    redirect: '/extranet/dashboard',
+  },
+  {
+    path: '/extranet/dashboard',
     meta: {
       requiresAuth: true,
       name: 'extranet',
       transitionName: 'slide',
       title: 'Extranet Dashboard',
-      breadcrumb: 'Extranet',
+      breadcrumb: 'Dashboard',
     },
-    component: ExtranetDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'extranet',
-          transitionName: 'slide',
-          title: 'Extranet Dashboard',
-          breadcrumb: 'Dashboard',
-        },
-        component: ExtranetDashboard,
-      },
-    ],
+    component: Dashboard,
+    props: {
+      module: 'extranet',
+    },
   },
   {
-    path: '/extranet/branches',
+    path: '/extranet/soa-modification/:issue?',
+    meta: {
+      requiresAuth: true,
+      name: 'extranet',
+      transitionName: 'slide',
+      title: 'SOA Modification',
+      breadcrumb: 'SOA Modification',
+    },
+    component: SoaModification,
+    props: {
+      module: 'extranet',
+    },
+  },
+  {
+    path: '/extranet/branches/:branch?',
     meta: {
       requiresAuth: true,
       name: 'extranet-branches',
       transitionName: 'slide',
-      title: 'Extranet Branches',
-      breadcrumb: 'Branches',
-    },
-    component: ExtranetBranches,
-    children: [
-      {
-        path: ':branch',
-        meta: {
-          name: 'extranet-branch',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: params => params.branch,
-          breadcrumb: params => params.branch,
-        },
-        component: ExtranetBranch,
-        children: [
-          {
-            path: 'documenation',
-            meta: {
-              name: 'extranet-branch-documentation',
-              requiresAuth: true,
-              transitionName: 'slide',
-              title: params => `${params.branch}- Documentation `,
-            },
-            component: BranchDoc,
-          },
-        ],
+      title: (route) => {
+        let title = 'Extranet Branches';
+
+        if (route.query.branch) {
+          title = `${route.query.branch} - ${title}`;
+        }
+
+        if (route.query.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
       },
-    ],
+    },
+    component: Branches,
+    props: {
+      module: 'extranet',
+    },
   },
   {
     path: '/extranet/configurations/:id?/:build?',
@@ -132,32 +125,27 @@ export default [
     },
     component: ExtranetConfigurations,
   },
+
   {
     path: '/debiteur',
+    redirect: '/debiteur/dashboard',
+  },
+  {
+    path: '/debiteur/dashboard',
     meta: {
       requiresAuth: true,
       name: 'debiteur',
       transitionName: 'slide',
       title: 'Debiteur Dashboard',
-      breadcrumb: 'Debiteur',
+      breadcrumb: 'Dashboard',
     },
-    component: DebiteurDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'debiteur',
-          transitionName: 'slide',
-          title: 'Debiteur Dashboard',
-          breadcrumb: 'Dashboard',
-        },
-        component: DebiteurDashboard,
-      },
-    ],
+    component: Dashboard,
+    props: {
+      module: 'debiteur',
+    },
   },
   {
-    path: '/debiteur/branches',
+    path: '/debiteur/branches/:branch?',
     meta: {
       requiresAuth: true,
       name: 'debiteur-branches',
@@ -165,42 +153,28 @@ export default [
       title: 'Debiteur Branches',
       breadcrumb: 'Branches',
     },
-    component: DebiteurBranches,
-    children: [
-      {
-        path: ':branch',
-        meta: {
-          name: 'debiteur-branch',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: params => params.branch,
-          breadcrumb: params => params.branch,
-        },
-        component: DebiteurBranch,
-      },
-    ],
+    component: Branches,
+    props: {
+      module: 'debiteur',
+    },
   },
+
   {
     path: '/imx_be',
+    redirect: '/imx_be/dashboard',
+  },
+  {
+    path: '/imx_be/dashboard',
     meta: {
       requiresAuth: true,
       name: 'imx-be',
       transitionName: 'slide',
-      title: 'iMX-BE Dashboard',
+      title: 'iMX BE Dashboard',
     },
-    component: ImxBeDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'imx-be',
-          transitionName: 'slide',
-          title: 'iMX-BE Dashboard',
-        },
-        component: ImxBeDashboard,
-      },
-    ],
+    component: Dashboard,
+    props: {
+      module: 'imx_be',
+    },
   },
   {
     path: '/imx_be/branches',
@@ -208,55 +182,41 @@ export default [
       requiresAuth: true,
       name: 'imx-be-branches',
       transitionName: 'slide',
-      title: 'iMX-BE Branches',
-    },
-    component: ImxBeBranches,
-    children: [
-      {
-        path: ':branch',
-        meta: {
-          name: 'imx-be-branch',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: params => params.branch,
-        },
-        component: ImxBeBranch,
-        children: [
-          {
-            path: 'documentation',
-            meta: {
-              name: 'imx-be-branch-documentation',
-              requiresAuth: true,
-              transitionName: 'slide',
-              title: params => `${params.branch}- Documentation `,
-            },
-            component: BranchDoc,
-          },
-        ],
+      title: (route) => {
+        let title = 'iMX BE Branches';
+
+        if (route.query.branch) {
+          title = `${route.query.branch} - ${title}`;
+        }
+
+        if (route.query.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
       },
-    ],
+    },
+    component: Branches,
+    props: {
+      module: 'imx_be',
+    },
   },
   {
     path: '/imx_fe',
+    redirect: '/imx_fe/dashboard',
+  },
+  {
+    path: '/imx_fe/dashboard',
     meta: {
       requiresAuth: true,
       name: 'imx-fe',
       transitionName: 'slide',
-      title: 'iMX-FE Dashboard',
+      title: 'iMX FE Dashboard',
     },
-    component: ImxFeDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'imx-fe',
-          transitionName: 'slide',
-          title: 'iMX-FE Dashboard',
-        },
-        component: ImxFeDashboard,
-      },
-    ],
+    component: Dashboard,
+    props: {
+      module: 'imx_fe',
+    },
   },
   {
     path: '/imx_fe/branches',
@@ -266,65 +226,12 @@ export default [
       transitionName: 'slide',
       title: 'iMX-FE Branches',
     },
-    component: ImxFeBranches,
-    children: [
-      {
-        path: ':branch',
-        meta: {
-          name: 'imx-fe-branch',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: params => params.branch,
-        },
-        component: ImxFeBranch,
-      },
-    ],
-  },
-  {
-    path: '/imx',
-    meta: {
-      requiresAuth: true,
-      name: 'imx',
-      transitionName: 'slide',
-      title: 'iMX Dashboard',
-      breadcrumb: 'Dashboard',
+    component: Branches,
+    props: {
+      module: 'imx_fe',
     },
-    component: ImxDashboard,
-    children: [
-      {
-        path: 'dashboard',
-        meta: {
-          requiresAuth: true,
-          name: 'imx',
-          transitionName: 'slide',
-          title: 'iMX Dashboard',
-        },
-        component: ImxDashboard,
-      },
-    ],
   },
-  {
-    path: '/imx/tts_keys',
-    meta: {
-      requiresAuth: true,
-      name: 'imx-tts-keys',
-      transitionName: 'slide',
-      title: 'TTS keys',
-    },
-    component: ImxTTSkeys,
-    children: [
-      {
-        path: ':key',
-        meta: {
-          name: 'imx-tts-key',
-          requiresAuth: true,
-          transitionName: 'slide',
-          title: params => params.key,
-        },
-        component: ImxTTSkey,
-      },
-    ],
-  },
+
   {
     path: '/demos',
     meta: {
@@ -360,6 +267,7 @@ export default [
     },
     component: DemosList,
   },
+
   {
     path: '/cms/config-defaults',
     meta: {
@@ -410,6 +318,7 @@ export default [
     },
     component: Modification,
   },
+
   {
     path: '/expert-system/modification/:issue?',
     meta: {
@@ -421,44 +330,117 @@ export default [
     component: SeTransferModif,
   },
   {
-    path: '/administration/users/:username?',
+    path: '/administration/devops/users/:id?',
     meta: {
       requiresAuth: true,
       name: 'administration-users',
       transitionName: 'slide',
-      title: 'Users',
+      title: 'Users Administration',
       breadcrumb: 'Users',
     },
-    component: AdministrationUsers,
+    component: DevopsUsersAdministration,
   },
   {
-    path: '/administration/roles/:id?',
+    path: '/administration/devops/roles/:id?',
     meta: {
       requiresAuth: true,
       name: 'administration-roles',
       transitionName: 'slide',
-      title: 'Roles',
+      title: 'Roles Administration',
       breadcrumb: 'Roles',
     },
-    component: AdministrationRoles,
+    component: DevopsRolesAdministration,
   },
   {
-    path: '/administration/actions/:id?',
+    path: '/administration/devops/actions/:id?',
     meta: {
       requiresAuth: true,
       name: 'administration-actions',
       transitionName: 'slide',
-      title: 'Actions',
+      title: 'Actions Administration',
       breadcrumb: 'Actions',
     },
-    component: AdministrationActions,
+    component: DevopsActionsAdministration,
   },
   {
-    path: '/logged-in-sso-user',
+    path: '/administration/devops/logs',
     meta: {
-      requiresAuth: false,
+      requiresAuth: true,
+      name: 'administration-logs',
+      transitionName: 'slide',
+      title: 'Logs Administration',
+      breadcrumb: 'Logs',
     },
-    component: LoggedInSSOUser,
+    component: DevopsLogsAdministration,
+  },
+  {
+    path: '/administration/cms/users/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-users',
+      transitionName: 'slide',
+      title: 'Users Administration',
+      breadcrumb: 'Users',
+    },
+    component: CmsUsersAdministration,
+  },
+  {
+    path: '/administration/cms/roles/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-roles',
+      transitionName: 'slide',
+      title: 'Roles Administration',
+      breadcrumb: 'Roles',
+    },
+    component: CmsRolesAdministration,
+  },
+  {
+    path: '/administration/cms/actions/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-actions',
+      transitionName: 'slide',
+      title: 'Actions Administration',
+      breadcrumb: 'Actions',
+    },
+    component: CmsActionsAdministration,
+  },
+
+  {
+    path: '/esxi',
+    redirect: '/esxi/dashboard',
+  },
+  {
+    path: '/esxi/dashboard',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi',
+      transitionName: 'slide',
+      title: 'ESXI Dashboard',
+    },
+    component: EsxiDashboard,
+  },
+  {
+    path: '/esxi/esxiHosts/:esxiHost?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-esxiHosts',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'ESXi Hosts';
+
+        if (route.query.esxiHost) {
+          title = `${route.query.esxiHost} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Hosts,
+    props: {
+      module: 'esxi',
+    },
   },
   {
     path: '/builds/:name(.*_\\d+)/:uri(.*)?',
@@ -474,7 +456,7 @@ export default [
       layout: 'basic',
       requiresAuth: false,
     },
-    redirect: to => `/builds${to.path}`,
+    redirect: (to) => `/builds${to.path}`,
   },
   {
     path: '*',

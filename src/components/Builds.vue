@@ -1,158 +1,141 @@
 <template>
   <div class="row">
-    <div class="input-field col s12 m6">
-      <i class="material-icons prefix">search</i>
-      <input id="search"
-             type="text"
-             v-model="search"
-             placeholder="Search..."
-             v-on:keyup="onStopTyping"
+    <div class="col s12 m6">
+      <TextInput
+        v-model="search"
+        icon="search"
+        placeholder="Search..."
       />
     </div>
-    <div class="input-field col s12 m3 right">
-      <i class="material-icons prefix">timelapse</i>
-      <select class="select" multiple v-model="status">
-        <option value="active">Active</option>
-        <option value="removed">Removed</option>
-        <option value="failed">Failed</option>
-      </select>
+
+    <div class="col s12 m3 offset-m3">
+      <Select
+        v-model="status"
+        :options="['active', 'removed', 'failed']"
+        :defaultOption="false"
+        :multiple="true"
+        displayed="name"
+        icon="timelapse"
+      />
     </div>
 
-    <table ref="builds" v-if="currentShowBuilds">
-      <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th v-if="!module">Module</th>
-        <th>Created By</th>
-        <th>Created On</th>
-        <th>Status</th>
-        <th>Quick Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="(build, index) in builds" :key="index">
-        <td>{{ (page - 1) * perPage.value + index + 1 }}</td>
-        <td>{{ build.name }}</td>
-        <td v-if="!module">{{ build.module }}</td>
-        <td>{{ build.created_by }}</td>
-        <td>{{ $date(build.created_on).toHuman() }}</td>
-        <td v-html="getStatusText(build)"></td>
-        <td class="quick-actions">
-          <Progress v-if="updating === build.id"/>
-          <div v-else>
-            <a
-              @click="start(build)"
-              target="_blank"
-              data-tooltip="Start"
-              class="green-text tooltipped"
-              v-if="build.status === 'stopped'"
-            >
-              <i class="material-icons">play_arrow</i>
-            </a>
-            <a
-              @click="stop(build)"
-              target="_blank"
-              data-tooltip="Stop"
-              class="red-text tooltipped"
-              v-if="build.status === 'running'"
-            >
-              <i class="material-icons">stop</i>
-            </a>
-            <a
-              :href="getUrl(build)"
-              target="_blank"
-              data-tooltip="Open"
-              class="green-text tooltipped"
-              v-if="build.status === 'running'"
-            >
-              <i class="material-icons">launch</i>
-            </a>
-            <a
-              @click="openInfoModal(build)"
-              data-tooltip="Details"
-              class="blue-text tooltipped"
-            >
-              <i class="material-icons">error_outline</i>
-            </a>
-            <a
-              @click="openProgressModal(build)"
-              target="_blank"
-              data-tooltip="Progress"
-              class="tooltipped"
-              v-if="build.status === 'building'"
-            >
-              <i class="material-icons">update</i>
-            </a>
-            <a
-              :href="getWebssh2Url(build)"
-              target="_blank"
-              data-tooltip="Open terminal"
-              class="tooltipped"
-              v-if="
-                (build.module === 'extranet' || build.module === 'debiteur')
-                &&
-                build.status === 'running'
-              "
-            >
-              <i class="material-icons">wysiwyg</i>
-            </a>
-            <a
-              v-if="canRemove(build) && (build.status === 'running' || build.status === 'stopped')"
-              @click="openRemoveModal(build)"
-              data-tooltip="Remove"
-              class="red-text tooltipped"
-            >
-              <i class="material-icons">delete</i>
-            </a>
-          </div>
-        </td>
-      </tr>
-      <tr v-if="builds.length === 0">
-        <td colspan="7">There are no builds</td>
-      </tr>
-      </tbody>
-    </table>
-
-    <div class="col s12 m6 right" id="perPage">
-      <div class="input-field col s12 l4 right">
-        <Select class="col s12"
-                v-if="builds.length"
-                displayed="value"
-                v-model="perPage"
-                :options="perPageOptions"
-        />
-      </div>
-      <p v-if="builds.length" class="col s12 l8 right right-align">Items per page:</p>
-    </div>
-    <div class="col s12 m6">
-      <paginate
-        v-if="builds.length && lastPage > 1"
-        v-model="page"
-        :page-count="lastPage"
-        :click-handler="selectedPage"
-        :prev-class="'material-icons'"
-        :prev-text="'chevron_left'"
-        :next-class="'material-icons'"
-        :next-text="'chevron_right'"
-        :container-class="'pagination'"
-        :page-class="'waves-effect'"
-        :disabled-class="'disabled'"
-        :active-class="'active'">
-      </paginate>
+    <div class="col s12">
+      <table ref="builds">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th v-if="!module">Module</th>
+            <th v-if="!createdBy">Created By</th>
+            <th>Created On</th>
+            <th>Status</th>
+            <th>Quick Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(build, index) in builds" :key="index">
+            <td>{{ (page - 1) * perPage + index + 1 }}</td>
+            <td>{{ build.name }}</td>
+            <td v-if="!module">{{ build.module }}</td>
+            <td v-if="!createdBy">{{ build.created_by }}</td>
+            <td>{{ $date(build.created_on).toHuman() }}</td>
+            <td v-html="getStatusText(build)"></td>
+            <td class="quick-actions">
+              <Progress v-if="updating === build.id"/>
+              <div v-else>
+                <a
+                  @click="start(build)"
+                  target="_blank"
+                  data-tooltip="Start"
+                  class="green-text tooltipped"
+                  v-if="build.status === 'stopped'"
+                >
+                  <i class="material-icons">play_arrow</i>
+                </a>
+                <a
+                  @click="stop(build)"
+                  target="_blank"
+                  data-tooltip="Stop"
+                  class="red-text tooltipped"
+                  v-if="build.status === 'running'"
+                >
+                  <i class="material-icons">stop</i>
+                </a>
+                <a
+                  :href="getBuildUrl(build)"
+                  target="_blank"
+                  data-tooltip="Open"
+                  class="green-text tooltipped"
+                  v-if="build.status === 'running'"
+                >
+                  <i class="material-icons">launch</i>
+                </a>
+                <a
+                  @click="openBuildDetailsModal(build)"
+                  data-tooltip="Details"
+                  class="blue-text tooltipped"
+                >
+                  <i class="material-icons">error_outline</i>
+                </a>
+                <a
+                  @click="openProgressModal(build)"
+                  target="_blank"
+                  data-tooltip="Progress"
+                  class="tooltipped"
+                  v-if="build.status === 'building'"
+                >
+                  <i class="material-icons">update</i>
+                </a>
+                <a
+                  :href="getWebssh2Url(build)"
+                  target="_blank"
+                  data-tooltip="Open terminal"
+                  class="tooltipped"
+                  v-if="
+                    (build.module === 'extranet' || build.module === 'debiteur')
+                    &&
+                    build.status === 'running'
+                  "
+                >
+                  <i class="material-icons">wysiwyg</i>
+                </a>
+                <a
+                  v-if="canRemove(build)"
+                  @click="openRemoveModal(build)"
+                  data-tooltip="Remove"
+                  class="red-text tooltipped"
+                >
+                  <i class="material-icons">delete</i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="builds.length === 0">
+            <td colspan="7">There are no builds</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <component v-bind:is="infoComponent"
-       v-if="showInfoModal"
-      :build="selectedBuild"
-      @close="closeInfoModal()"
+    <div v-if="builds.length" class="col s12 m6 l9">
+      <Paginate v-if="lastPage > 1" v-model="page" :page-count="lastPage"/>
+    </div>
+    <div v-if="builds.length" class="col s12 m6 l3 per-page">
+      <Select v-model="perPage" :options="perPageOptions" :defaultOption="false" class="right"/>
+      <p class="right right-align">Items per page:</p>
+    </div>
+
+    <BuildDetails
+      v-if="showBuildDetailsModal"
+      :build="build"
+      @close="closeBuildDetailsModal()"
     />
 
     <Modal v-if="showRemoveModal" @close="showRemoveModal = false" class="confirm">
       <template v-slot:content>
         <div v-if="removing" class="center" >
           <Preloader class="big"></Preloader>
-          <p>Removing build <b>{{ selectedBuild.name }}</b> ... </p>
+          <p>Removing build <b>{{ build.name }}</b> ... </p>
         </div>
         <div v-else-if="removed" class="center" >
           <i class="material-icons large green-text">check_circle_outline</i>
@@ -161,16 +144,21 @@
         <div v-else-if="error" class="center">
           <i class="material-icons large red-text">error_outline</i>
           <p>{{ error }}</p>
+          <ul v-if="connectedBuilds">
+            <li v-for="connectedBuild in connectedBuilds" :key="connectedBuild">
+              {{ connectedBuild }}
+            </li>
+          </ul>
         </div>
         <div v-else>
-          Are you sure you what to remove <b>{{ selectedBuild.name }}</b> build?
+          Are you sure you what to remove <b>{{ build.name }}</b> build?
         </div>
       </template>
       <template v-slot:footer>
         <button
           v-if="!removing && !removed"
           class="waves-effect btn red"
-          @click="remove(selectedBuild)"
+          @click="remove()"
         >
           <i class="material-icons left">delete</i> Remove
         </button>
@@ -178,129 +166,84 @@
     </Modal>
 
     <Modal v-if="showProgressModal" @close="showProgressModal = false" class="right-sheet">
-      <template v-slot:header>{{ selectedBuild.name }}</template>
+      <template v-slot:header>{{ build.name }}</template>
       <template v-slot:content>
-        <BuildProgress :broadcast="broadcast"></BuildProgress>
+        <BuildProgress :broadcast="build.details.broadcast"></BuildProgress>
       </template>
     </Modal>
-
   </div>
 </template>
 
 <script>
-import Paginate from 'vuejs-paginate/src/components/Paginate';
-import { camelCase } from 'lodash';
 import EventBus from '@/event-bus';
+import config from '@/config';
 
+const Paginate = () => import('@/components/partials/Paginate');
 const BuildProgress = () => import('@/components/BuildProgress');
-const extranetInfoModal = () => import('@/views/extranet/components/BuildInfo');
-const debiteurInfoModal = () => import('@/views/debiteur/components/BuildInfo');
-const imxBeInfoModal = () => import('@/views/imx-be/components/BuildInfo');
-const imxFeInfoModal = () => import('@/views/imx-fe/components/BuildInfo');
-const imxInfoModal = () => import('@/views/imx/components/BuildInfo');
+const BuildDetails = () => import('@/components/BuildDetails');
 
 export default {
+  components: {
+    Paginate,
+    BuildProgress,
+    BuildDetails,
+  },
+
   props: {
-    module: {
-      type: String,
-    },
-    branch: {
-      type: String,
-    },
-    tts_key: {
-      type: String,
-    },
-    user: {
-      type: String,
-    },
-    showBuilds: {
+    module: String,
+    branch: String,
+    ttsKey: String,
+    createdBy: String,
+    fetchOnCreate: {
       type: Boolean,
       default: true,
     },
   },
-  components: {
-    Paginate,
-    BuildProgress,
-    extranetInfoModal,
-    debiteurInfoModal,
-    imxBeInfoModal,
-    imxFeInfoModal,
-    imxInfoModal,
-  },
-  computed: {
-    searchLoaded() {
-      if (this.showBuilds) {
-        return this.search;
-      }
-      return null;
-    },
-    searchAll() {
-      if (!this.showBuilds) {
-        return this.search;
-      }
-      return null;
-    },
-  },
+
   data() {
     return {
-      infoComponent: '',
+      builds: [],
+      build: {},
+
       search: '',
       searchTimeout: null,
-      broadcast: '',
-      currentShowBuilds: this.showBuilds,
-      showModal: false,
-      builds: [],
-      paginationData: {},
+
       status: ['active'],
-      selectedBuild: {
-        log: null,
-      },
-      showInfoModal: false,
+
       showRemoveModal: false,
       showProgressModal: false,
+      showBuildDetailsModal: false,
+
       updating: false,
       removing: false,
       removed: false,
       error: null,
+      connectedBuilds: [],
+
       page: 1,
-      perPage: {
-        value: 10,
-      },
+      perPage: 10,
       lastPage: 0,
-      perPageOptions: [
-        {
-          value: 10,
-        },
-        {
-          value: 20,
-        },
-        {
-          value: 30,
-        },
-        {
-          value: 50,
-        },
-      ],
+      perPageOptions: [10, 20, 30, 50],
     };
   },
+
   methods: {
     getBuilds() {
       const loader = this.$loading.show({ container: this.$refs.builds });
 
       this.$store.dispatch('builds/getBuildsByStatus', {
         branch: this.branch,
-        ttsKey: this.tts_key,
+        ttsKey: this.ttsKey,
         module: this.module,
         status: this.getStatus(),
-        user: this.user,
-        perPage: this.perPage.value,
+        createdBy: this.createdBy,
+        perPage: this.perPage,
         page: this.page,
-        search: this.showBuilds ? this.searchLoaded.trim() : this.searchAll.trim(),
+        search: this.search.trim(),
       })
         .then((response) => {
           this.builds = response.data.data;
-          this.paginationData = response.data.meta;
-          this.setLastPage();
+          this.lastPage = response.data.meta.last_page;
         })
         .finally(() => loader.hide());
     },
@@ -316,21 +259,21 @@ export default {
     getPublishedPort(build, port) {
       try {
         return build.details.service.Endpoint.Ports
-          .find(value => value.TargetPort === port).PublishedPort;
+          .find((value) => value.TargetPort === port).PublishedPort;
       } catch (e) {
         return null;
       }
     },
 
-    getUrl(build) {
+    getBuildUrl(build) {
       return this.$router.resolve(`/builds/${build.name}/`).href;
     },
 
     getWebssh2Url(build) {
-      const { host } = this.$store.state[build.module];
-      const port = this.getPublishedPort(build, 22);
+      const serviceID = build.details.service.ID;
+      const port = config.ssh_port;
 
-      return this.$router.resolve(`/ssh/host/${host}?port=${port}`).href;
+      return `/ssh/host/${serviceID}?port=${port}&source=devops`;
     },
 
     getStatusText(build) {
@@ -344,36 +287,16 @@ export default {
       return `<span class="new badge" data-badge-caption="">${build.status}</span>`;
     },
 
-    openInfoModal(build) {
-      this.selectedBuild = { ...build };
-      this.infoComponent = camelCase(build.module).concat('InfoModal');
-      if (build.details.java_version) {
-        this.selectedBuild.details.java_version = build.details.java_version.toString();
-      }
-      this.selectedBuild.created_on = this.$date(build.created_on).toHuman();
-      if (build.removed_on) {
-        this.selectedBuild.removed_on = this.$date(build.removed_on).toHuman();
-      }
-      if (build.removed_on && !build.removed_by) {
-        this.selectedBuild.removed_by = 'auto-removed';
-      }
-      this.showInfoModal = true;
-    },
-
     openProgressModal(build) {
-      this.selectedBuild = build;
-      this.broadcast = build.details.broadcast;
+      this.build = { ...build };
       this.showProgressModal = true;
     },
 
-    closeInfoModal() {
-      this.showInfoModal = false;
-      this.selectedBuild = {
-        log: null,
-      };
-    },
-
     canRemove(build) {
+      if (build.status !== 'running' && build.status !== 'stopped') {
+        return false;
+      }
+
       if (build.module === 'extranet' || build.module === 'debiteur') {
         if (this.$auth.can('extranet.remove-builds')) {
           return true;
@@ -388,94 +311,120 @@ export default {
     },
 
     openRemoveModal(build) {
-      this.showRemoveModal = true;
-      this.selectedBuild = build;
+      this.build = build;
       this.removing = false;
       this.removed = false;
       this.error = null;
+
+      this.showRemoveModal = true;
     },
 
-    init() {
+    initTooltips() {
       this.$M.Tooltip.init(
         this.$el.querySelectorAll('.tooltipped'),
-      );
-      this.$M.FormSelect.init(
-        this.$el.querySelectorAll('select'),
       );
     },
 
     start(build) {
       this.updating = build.id;
-      this.init();
+
+      this.initTooltips();
+
       this.$store.dispatch('builds/start', build.id)
-        .then(() => { build.status = 'running'; })
+        .then((response) => {
+          build.status = response.data.data.status;
+          build.details = response.data.data.details;
+        })
         .finally(() => { this.updating = false; });
     },
 
     stop(build) {
       this.updating = build.id;
-      this.init();
+
+      this.initTooltips();
+
       this.$store.dispatch('builds/stop', build.id)
-        .then(() => { build.status = 'stopped'; })
+        .then((response) => {
+          build.status = response.data.data.status;
+          build.details = response.data.data.details;
+        })
         .finally(() => { this.updating = false; });
     },
 
-    remove(build) {
+    remove() {
       this.removing = true;
-      this.$store.dispatch(`${build.module}/removeBuild`, build.id)
+
+      this.$store.dispatch('builds/remove', this.build.id)
         .then(() => {
           this.removed = true;
-          this.$store.commit('builds/remove', build.id);
-          this.builds = this.builds.filter(_build => _build.id !== build.id);
+          this.builds = this.builds.filter((build) => build.id !== this.build.id);
         })
         .catch((error) => {
           if (error.response.status === 403) {
             this.error = 'You do not have insufficient rights to remove this build';
-          } else {
-            this.error = error;
+            return;
           }
+
+          if (error.response.status === 409) {
+            this.connectedBuilds = error.response.data.builds.reduce(
+              (accumulator, build) => [...accumulator, build.name],
+              [],
+            );
+            this.error = 'There are connected builds you need to remove first:';
+            return;
+          }
+
+          this.error = error;
         })
         .finally(() => { this.removing = false; });
     },
 
-    selectedPage(page) {
-      this.page = page;
-      this.getBuilds();
-    },
+    openBuildDetailsModal(build) {
+      this.build = { ...build };
 
-    setLastPage() {
-      this.lastPage = Math.ceil(this.paginationData.total / this.perPage.value);
-    },
+      this.build.created_on = this.$date(build.created_on).toHuman();
 
-    onStopTyping() {
-      if (this.searchTimeout) {
-        clearTimeout(this.searchTimeout);
+      if (this.build.removed_on) {
+        this.build.removed_on = this.$date(this.build.removed_on).toHuman();
       }
 
-      this.searchTimeout = setTimeout(() => {
-        if (this.currentShowBuilds) {
-          this.getBuilds();
-        }
-      }, 500);
+      if (this.build.removed_on && !this.build.removed_by) {
+        this.build.removed_by = 'auto-removed';
+      }
+
+      if (this.build.details.java_version) {
+        this.build.details.java_version = this.build.details.java_version.toString();
+      }
+
+      this.showBuildDetailsModal = true;
+    },
+
+    closeBuildDetailsModal() {
+      this.build = {};
+
+      this.showBuildDetailsModal = false;
     },
 
   },
 
   watch: {
+    search() {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+
+      this.searchTimeout = setTimeout(this.getBuilds, 500);
+    },
+
     status() {
       this.page = 1;
-      if (this.currentShowBuilds) {
-        this.getBuilds();
-      }
+      this.getBuilds();
     },
-    searchAll(value) {
-      if (value) {
-        this.currentShowBuilds = true;
-        return;
-      }
-      this.builds = [];
-      this.currentShowBuilds = false;
+
+    page() {
+      this.getBuilds();
     },
+
     perPage() {
       this.page = 1;
       this.getBuilds();
@@ -483,13 +432,16 @@ export default {
   },
 
   updated() {
-    this.init();
+    this.initTooltips();
   },
 
   mounted() {
-    this.init();
-    if (this.currentShowBuilds) {
+    if (this.fetchOnCreate) {
       this.getBuilds();
+    }
+
+    if (this.module) {
+      this.$store.dispatch(`${this.module}/getHost`);
     }
   },
 
@@ -510,12 +462,14 @@ export default {
   .quick-actions a {
     margin: 0px 2.5px;
   }
-  #perPage {
-    > div {
-      padding: 0;
+
+  .per-page {
+    .input-field {
+      width: 60px;
     }
+
     p {
-      padding: 13px 0 0 0;
+      margin: 13px 0;
     }
   }
 </style>

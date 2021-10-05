@@ -2,7 +2,8 @@ import Vue from 'vue';
 import Loading from 'vue-loading-overlay';
 import Vuelidate from 'vuelidate';
 import * as M from 'materialize-css/dist/js/materialize';
-import * as vuEaCore from 'vue-ea-core';
+import * as VueComponents from '@enterpriseapps/vue-components';
+import * as VueAdministration from '@enterpriseapps/vue-administration';
 import App from './App';
 import router from './router';
 import store from './store';
@@ -18,7 +19,9 @@ import { date } from './plugins/helpers';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import WebSocket from './plugins/ws';
 
-Vue.use(vuEaCore, { store, config, api: api('um') });
+Vue.use(VueComponents);
+Vue.use(VueAdministration, { store, api: api('um') });
+
 Vue.use(Loading);
 Vue.use(Vuelidate);
 
@@ -38,5 +41,5 @@ Vue.config.productionTip = false;
 new Vue({
   router,
   store,
-  render: h => h(App),
+  render: (h) => h(App),
 }).$mount('#app');

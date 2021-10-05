@@ -20,7 +20,6 @@
         <Column show="delivery_chain"/>
         <Column show="dev_instance"/>
         <Column show="val_instance"/>
-        <Column show="deploy_instance"/>
         <Column show="app_type" :sortable="false" filter-type="dropdown"/>
         <Column show="app_version" :sortable="false" filter-type="dropdown"/>
         <Column show="branch" :sortable="false" filter-type="search"/>
@@ -28,14 +27,6 @@
         <Column show="servlet_container"/>
         <Column show="jdk"/>
         <Column show="jre"/>
-        <Column
-          show="additional_info"
-          v-if="
-            $auth.can('extranet.manage-configurations')
-            ||
-            $auth.can('extranet.see-configurations-additional-info')
-          "
-        />
         <template v-slot:actions-before="{ row }">
           <a @click="openAddEditModal('build', row)" class="green-text" title="Start Build">
             <i class="material-icons">send</i>
@@ -107,7 +98,9 @@
                 &&
                 delete configuration.val_instance
                 &&
-                delete configuration.deploy_instance
+                delete configuration.deploy_dev_instance
+                &&
+                delete configuration.deploy_val_instance
               "
               @blur="$v.configuration.delivery_chain.$touch()"
             />
@@ -152,10 +145,20 @@
             <Autocomplete
               class="col s12"
               :class="{readonly: action === 'build'}"
-              label="Deploy Instance"
+              label="Deploy DEV Instance"
               icon="dynamic_feed"
               :items="deploy_instances"
-              v-model="configuration.deploy_instance"
+              v-model="configuration.deploy_dev_instance"
+            />
+          </div>
+          <div class="row">
+            <Autocomplete
+              class="col s12"
+              :class="{readonly: action === 'build'}"
+              label="Deploy VAL Instance"
+              icon="dynamic_feed"
+              :items="deploy_instances"
+              v-model="configuration.deploy_val_instance"
             />
           </div>
           <div class="row" v-if="!(action === 'build')">
@@ -358,16 +361,11 @@
 import { required } from 'vuelidate/lib/validators';
 import client from '@/plugins/ws';
 
-import Autocomplete from '@/components/Autocomplete';
 import TextArea from '@/components/TextArea';
-import { Table, Column } from '@/components/table';
 
 export default {
   components: {
-    Autocomplete,
     TextArea,
-    Table,
-    Column,
   },
   data() {
     return {
@@ -428,14 +426,14 @@ export default {
     val_instances() {
       if (this.configuration.delivery_chain) {
         return this.configuration.delivery_chain.instances
-          .filter(instance => instance.instance_type_id === 'VAL') || [];
+          .filter((instance) => instance.instance_type_id === 'VAL') || [];
       }
       return [];
     },
     dev_instances() {
       if (this.configuration.delivery_chain) {
         return this.configuration.delivery_chain.instances
-          .filter(instance => instance.instance_type_id === 'DEV') || [];
+          .filter((instance) => instance.instance_type_id === 'DEV') || [];
       }
       return [];
     },
@@ -523,7 +521,7 @@ export default {
           }
 
           const configuration = this.configurations.find(
-            configuration => configuration.id === parseInt(this.$route.params.id, 10),
+            (configuration) => configuration.id === parseInt(this.$route.params.id, 10),
           );
           if (configuration) {
             if (this.$route.params.build === 'build') {
@@ -542,47 +540,53 @@ export default {
     openAddEditModal(action, configuration = {}) {
       this.showAddEditModal = true;
       this.action = action;
-      this.configuration = Object.assign({}, configuration);
+      this.configuration = { ...configuration };
 
       if (this.configuration.project) {
         this.configuration.project = this.projects.find(
-          project => project.name === this.configuration.project,
+          (project) => project.name === this.configuration.project,
         );
       }
 
       if (this.configuration.project_type) {
         this.configuration.project_type = this.projectTypes.find(
-          projectType => projectType.value === this.configuration.project_type,
+          (projectType) => projectType.value === this.configuration.project_type,
         );
       }
 
       if (this.configuration.app_type) {
         this.configuration.app_type = this.appTypes.find(
-          appType => appType.value === this.configuration.app_type,
+          (appType) => appType.value === this.configuration.app_type,
         );
       }
 
       if (this.configuration.delivery_chain) {
         this.configuration.delivery_chain = this.deliveryChains.find(
-          deliveryChain => deliveryChain.title === this.configuration.delivery_chain,
+          (deliveryChain) => deliveryChain.title === this.configuration.delivery_chain,
         );
       }
 
       if (this.configuration.dev_instance) {
         this.configuration.dev_instance = this.dev_instances.find(
-          instance => instance.name === this.configuration.dev_instance,
+          (instance) => instance.name === this.configuration.dev_instance,
         );
       }
 
       if (this.configuration.val_instance) {
         this.configuration.val_instance = this.val_instances.find(
-          instance => instance.name === this.configuration.val_instance,
+          (instance) => instance.name === this.configuration.val_instance,
         );
       }
 
-      if (this.configuration.deploy_instance) {
-        this.configuration.deploy_instance = this.deploy_instances.find(
-          instance => instance.name === this.configuration.deploy_instance,
+      if (this.configuration.deploy_dev_instance) {
+        this.configuration.deploy_dev_instance = this.deploy_instances.find(
+          (instance) => instance.name === this.configuration.deploy_dev_instance,
+        );
+      }
+
+      if (this.configuration.deploy_val_instance) {
+        this.configuration.deploy_val_instance = this.deploy_instances.find(
+          (instance) => instance.name === this.configuration.deploy_val_instance,
         );
       }
 
@@ -613,7 +617,7 @@ export default {
         return;
       }
 
-      const payload = Object.assign({}, this.configuration);
+      const payload = { ...this.configuration };
 
       payload.app_type = this.configuration.app_type.value;
       payload.project_type = this.configuration.project_type.value;
@@ -624,8 +628,11 @@ export default {
       if (this.configuration.val_instance) {
         payload.val_instance = this.configuration.val_instance.name;
       }
-      if (this.configuration.deploy_instance) {
-        payload.deploy_instance = this.configuration.deploy_instance.name;
+      if (this.configuration.deploy_dev_instance) {
+        payload.deploy_dev_instance = this.configuration.deploy_dev_instance.name;
+      }
+      if (this.configuration.deploy_val_instance) {
+        payload.deploy_val_instance = this.configuration.deploy_val_instance.name;
       }
       payload.branch = this.configuration.branch.name;
       payload.prefix = this.configuration.prefix.package;
@@ -665,8 +672,8 @@ export default {
 
       const payload = {
         instance: this.configuration.dev_instance,
-        deploy_instance: this.configuration.deploy_instance,
-        client: this.clients.find(client => client.package === this.configuration.prefix),
+        deploy_dev_instance: this.configuration.deploy_dev_instance,
+        client: this.clients.find((client) => client.package === this.configuration.prefix),
       };
 
       this.$store.dispatch('extranet/buildConfiguration', {

@@ -167,19 +167,27 @@ export default {
   computed: {
     devInstance() {
       const [devInstance] = this.chain.instances
-        .filter(instance => instance.owner.key !== 'codix')
-        .filter(instance => instance.instance_type_id !== 'DEV')
-        .filter(instance => instance.instance_to_delivery_chain.instance_previous_id === null);
+        .filter((instance) => instance.owner.key === 'codix')
+        .filter((instance) => instance.instance_type_id === 'DEV')
+        .filter((instance) => instance.instance_to_delivery_chain.instance_previous_id === null);
       return devInstance || 'refbg2';
     },
   },
   methods: {
     filterInstancesId(value) {
-      if (value.name === 'All except PROD') {
-        this.filteredInstances = this.chain.instances
-          .filter(instance => instance.instance_type_id !== 'PROD')
-          .map(instance => instance.id)
-          .join(', ');
+      switch (value.name) {
+        case 'All except PROD':
+          this.filteredInstances = this.chain.instances
+            .filter((instance) => instance.instance_type_id !== 'PROD')
+            .map((instance) => instance.id)
+            .join(', ');
+          break;
+        case 'All':
+          this.filteredInstances = 'All';
+          break;
+        default:
+          this.filteredInstances = value.id.toString();
+          break;
       }
     },
     resetCurrentVariable() {
@@ -254,7 +262,7 @@ export default {
         subtype: {
           key: 'cms_cmd',
         },
-        contents: this.instance.name === 'All except PROD' ? this.filteredInstances : 'All',
+        contents: this.filteredInstances,
       };
       this.$emit('addVariable', this.variableModif, this.currentVariable);
       this.closeModal();

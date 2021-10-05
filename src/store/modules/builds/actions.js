@@ -16,9 +16,6 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            parent_id: null,
-          },
-          {
             status: {
               operator: 'in',
               value: ['running', 'stopped', 'building'],
@@ -68,7 +65,7 @@ export default {
     const promise = api('devops').post(`builds/${id}/start`);
 
     promise
-      .then(response => commit('update', response.data.data))
+      .then((response) => commit('update', response.data.data))
       .catch(() => commit('error', 'Could not start build', { root: true }));
 
     return promise;
@@ -78,7 +75,7 @@ export default {
     const promise = api('devops').post(`builds/${id}/stop`);
 
     promise
-      .then(response => commit('update', response.data.data))
+      .then((response) => commit('update', response.data.data))
       .catch(() => commit('error', 'Could not stop build', { root: true }));
 
     return promise;
@@ -93,8 +90,17 @@ export default {
     return promise;
   },
 
+  remove({ commit }, id) {
+    const promise = api('devops').delete(`builds/${id}/remove`);
+
+    promise
+      .catch(() => commit('error', 'Could not remove build', { root: true }));
+
+    return promise;
+  },
+
   getBuildsByStatus({ commit }, {
-    branch, ttsKey, module, status, user, perPage, page, search,
+    branch, ttsKey, module, status, createdBy, perPage, page, search,
   }) {
     const devopsApi = api('devops');
 
@@ -104,37 +110,39 @@ export default {
 
     cancelToken = devopsApi.axios.CancelToken.source();
 
+    const filters = [
+      {
+        status: {
+          operator: 'in',
+          value: status,
+        },
+      },
+      {
+        module,
+      },
+      {
+        'details->tts_key': ttsKey,
+      },
+      {
+        'details->branch': branch,
+      },
+      {
+        created_by: createdBy,
+      },
+    ];
+
+    if (search) {
+      filters.push({
+        name: {
+          operator: 'like',
+          value: ''.concat('%', search, '%'),
+        },
+      });
+    }
+
     const promise = devopsApi.get('builds', {
       filters: JSON.stringify({
-        allOf: [
-          {
-            status: {
-              operator: 'in',
-              value: status,
-            },
-          },
-          {
-            name: {
-              operator: 'like',
-              value: ''.concat('%', search, '%'),
-            },
-          },
-          {
-            module,
-          },
-          {
-            'details->tts_key': ttsKey,
-          },
-          {
-            'details->branch': branch,
-          },
-          {
-            created_by: user,
-          },
-          {
-            parent_id: null,
-          },
-        ],
+        allOf: filters,
       }),
       orders: JSON.stringify({
         created_on: 'desc',

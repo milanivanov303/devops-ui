@@ -7,15 +7,22 @@
     "build": "vue-cli-service build",
     "build:dev": "vue-cli-service build --mode dev",
     "build:int": "vue-cli-service build --mode int",
-    "lint": "vue-cli-service lint",
-    "test:e2e": "vue-cli-service test:e2e",
-    "test:unit": "vue-cli-service test:unit"
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@api-components/api-documentation": "^6.0.1",
+    "@api-components/api-navigation": "^4.2.8",
+    "@enterpriseapps/ea-js-sdk": "^1.0.5",
+    "@enterpriseapps/vue-administration": "^1.2.0",
+    "@enterpriseapps/vue-components": "^4.0.2",
+    "amf-client-js": "4.7.1",
+    "api-console": "^6.4.10",
     "axios": "^0.19.2",
     "chart.js": "^2.9.4",
-    "core-js": "^2.6.12",
-    "luxon": "^1.26.0",
+    "codemirror": "^5.61.0",
+    "core-js": "^3.6.5",
+    "lodash": "^4.17.21",
+    "luxon": "^1.27.0",
     "materialize-css": "^1.0.0",
     "query-string": "^6.14.1",
     "stompjs": "^2.3.3",
@@ -24,8 +31,8 @@
     "vue-chartjs": "^3.5.1",
     "vue-class-component": "^7.2.6",
     "vue-datetime": "^1.0.0-beta.14",
-    "vue-ea-core": "^2.3.1",
     "vue-loading-overlay": "^3.4.2",
+    "vue-loading-skeleton": "^1.1.9",
     "vue-particles": "^1.0.9",
     "vue-property-decorator": "^8.5.1",
     "vue-router": "^3.5.1",
@@ -35,16 +42,19 @@
     "weekstart": "^1.1.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.12.1",
-    "@vue/cli-plugin-eslint": "^3.12.1",
-    "@vue/cli-service": "^3.12.1",
-    "@vue/eslint-config-airbnb": "^4.0.0",
-    "@vue/test-utils": "1.0.0-beta.29",
+    "@vue/cli-plugin-babel": "^4.5.7",
+    "@vue/cli-plugin-eslint": "^4.5.7",
+    "@vue/cli-service": "^4.5.7",
+    "@vue/eslint-config-airbnb": "^5.1.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.0.0",
+    "eslint": "^7.11.0",
+    "eslint-plugin-vue": "^7.0.1",
     "node-sass": "^4.14.1",
-    "sass-loader": "^7.3.1",
+    "pre-commit": "^1.2.2",
+    "sass-loader": "^10.0.3",
     "vue-template-compiler": "^2.6.12"
-  }
+  },
+  "pre-commit": [
+    "lint"
+  ]
 }

@@ -8,6 +8,7 @@
         <div v-if="loading || defaultVariables.length === 0" class="center" >
           <Preloader class="big"/>
         </div>
+        <Alert v-if="error" :msg="error"/>
         <Table
           v-else
           :data="defaultVariables"
@@ -36,6 +37,7 @@
           v-if="showAddEditVariableModal"
           @close="closeModal()"
           @addedVariable="closeModal()"
+          @error="(err) => this.error = err"
           :selectedVariable="selectedVariable"
           :action="action"/>
 
