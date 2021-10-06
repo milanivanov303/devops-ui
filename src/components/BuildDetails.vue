@@ -3,39 +3,39 @@
     <template v-slot:header>{{ build.name }}</template>
     <template v-slot:content>
       <div class="row">
-        <div class="col s12">
+        <div id="tabs" class="col s12">
           <ul ref="tabs" class="tabs">
-            <li class="tab col s4"><a class="active" href="#details">Details</a></li>
-            <li class="tab col s4"><a href="#buildLogs">Build logs</a></li>
-            <li class="tab col s4" v-if="build.status==='running'">
-              <a href="#buildServiceLogs" >Docker logs
-            </a></li>
-            <li v-else class="tab col s4 disabled">
-              <a v-if="build.status!=='running'" href="#buildServiceLogs">Docker logs
-            </a></li>
+            <li
+              class="tab col s4"
+              v-on:click="currentTab = BuildInfo">
+              <a class="active">Details</a>
+            </li>
+            <li
+              class="tab col s4"
+              v-on:click="currentTab = 'BuildLogs'">
+              <a>Build logs</a>
+            </li>
+            <li
+              class="tab col s4"
+              v-on:click="currentTab = 'BuildServiceLogs'"
+              v-if="build.status==='running'">
+              <a >Docker logs</a>
+            </li>
+            <li
+              v-else class="tab col s4 disabled">
+              <a v-if="build.status!=='running'">Docker logs</a>
+            </li>
           </ul>
         </div>
-        <div id="details" class="col s12 tab-content">
+        <div id="component" class="col s12 tab-content">
           <div class="row">
             <div class="col s12">
-              <component :is="BuildInfo" :build="build"></component>
+              <keep-alive>
+                <component :is="currentTabComponent" :build="build"></component>
+              </keep-alive>
             </div>
           </div>
         </div>
-        <div id="buildLogs" class="col s12 tab-content">
-          <div class="row">
-            <div class="col s12">
-              <build-logs :build="build"></build-logs>
-            </div>
-          </div>
-        </div>
-        <div id="buildServiceLogs" class="col s12 tab-content">
-          <div class="row">
-            <div class="col s12">
-          <build-service-logs :build="build" ref="serviceLogs"></build-service-logs>
-          </div>
-        </div>
-      </div>
       </div>
     </template>
     <template v-slot:footer></template>
@@ -53,6 +53,12 @@ export default {
     BuildLogs,
   },
 
+  data() {
+    return {
+      currentTab: '',
+    };
+  },
+
   props: {
     build: {
       type: Object,
@@ -65,20 +71,25 @@ export default {
       // eslint-disable-next-line
       return () => import('@/views/' + this.build.module + '/components/BuildInfo');
     },
+    currentTabComponent() {
+      return this.currentTab;
+    },
   },
 
   mounted() {
     this.$M.Tabs.init(this.$refs.tabs);
+    this.currentTab = this.BuildInfo;
   },
 
 };
 </script>
 
 <style lang="scss" scoped>
-.tab-content {
-  margin-top: 30px;
-}
-.buildServiceLogs {
-  margin-bottom: 35px;
+#component {
+  margin-top: 50px;
+  width:100%;
+  overflow-y:scroll;
+  position:relative;
+  height: 800px;
 }
 </style>
