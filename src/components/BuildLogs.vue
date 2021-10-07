@@ -31,7 +31,7 @@ export default {
     },
   },
 
-  beforeMount() {
+  activated() {
     this.getLogsByBuild();
   },
 

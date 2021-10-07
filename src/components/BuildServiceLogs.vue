@@ -58,7 +58,12 @@ export default {
     },
   },
 
-  destroyed() {
+  activated() {
+    this.getServiceLogsByBuild();
+    this.interval = setInterval(() => this.getServiceLogsByBuild(), 5000);
+  },
+
+  deactivated() {
     clearInterval(this.interval);
   },
 
@@ -66,11 +71,6 @@ export default {
     selectedNumberOfLogs() {
       this.getServiceLogsByBuild();
     },
-  },
-
-  created() {
-    this.getServiceLogsByBuild();
-    this.interval = setInterval(() => this.getServiceLogsByBuild(), 5000);
   },
 };
 </script>

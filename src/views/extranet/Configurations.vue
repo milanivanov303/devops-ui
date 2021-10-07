@@ -27,6 +27,7 @@
         <Column show="servlet_container"/>
         <Column show="jdk"/>
         <Column show="jre"/>
+        <Column show="additional_info"/>
         <template v-slot:actions-before="{ row }">
           <a @click="openAddEditModal('build', row)" class="green-text" title="Start Build">
             <i class="material-icons">send</i>
@@ -759,9 +760,9 @@ export default {
 </script>
 
 <style lang="scss" >
-  .log {
-    height: 60vh;
-    overflow: auto;
-    white-space: pre;
-  }
+.log {
+  height: 60vh;
+  overflow: auto;
+  white-space: pre;
+}
 </style>

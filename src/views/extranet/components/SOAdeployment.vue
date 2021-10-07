@@ -450,7 +450,7 @@ export default {
               && instance.status.key === 'active'
               && instance.instance_to_delivery_chain.instance_previous_id === null);
 
-      this.cmdModif.name = `${this.config.mmpi.modif_cmd} ${resp.deployment_prefix.value} ${this.artifactoryName} ${moduleName} ${moduleHome} ${scriptsDestination} ${templatesDestination}`;
+      this.cmdModif.name = `${this.config.mmpi.modif_cmd} ${resp.deployment_prefix.value}${this.artifactoryName} ${moduleName} ${moduleHome} ${scriptsDestination} ${templatesDestination}`;
       this.cmdModif.visible = this.soaModif.visible;
       this.cmdModif.issue_id = this.soaModif.issue_id;
       this.cmdModif.delivery_chain_id = this.soaModif.delivery_chain_id;
