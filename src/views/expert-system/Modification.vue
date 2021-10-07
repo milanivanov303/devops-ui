@@ -184,14 +184,14 @@
 </template>
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
-import Autocomplete from '@/components/Autocomplete';
+// import Autocomplete from '@/components/Autocomplete';
 import config from '@/config';
 import client from '@/plugins/ws';
 
 export default {
-  components: {
-    Autocomplete,
-  },
+  // components: {
+  //   Autocomplete,
+  // },
   mounted() {
     this.getIssue();
     this.getInstanceStatus();
@@ -355,15 +355,15 @@ export default {
         operation,
       };
       await this.$store.dispatch('mmpi/ociByOperation', data)
-        .then((response) => {
-          [this.texts] = Object.values(response.data);
-          loader.hide();
-        })
-        .catch((error) => {
-          loader.hide();
-          this.error = error;
-          return error;
-        });
+          .then((response) => {
+            [this.texts] = Object.values(response.data);
+            loader.hide();
+          })
+          .catch((error) => {
+            loader.hide();
+            this.error = error;
+            return error;
+          });
     },
     checkSeText(value) {
       if (!this.texts.includes(value)) {
