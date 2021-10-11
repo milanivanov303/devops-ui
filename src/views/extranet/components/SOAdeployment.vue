@@ -179,9 +179,9 @@
 </template>
 <script>
 import { required } from 'vuelidate/lib/validators';
-import CustomConfirm from "@/components/partials/CustomConfirm";
-import Artifacts from "@/components/soa-modification/Artifacts";
-import config from "@/config";
+import CustomConfirm from '@/components/partials/CustomConfirm';
+import Artifacts from '@/components/soa-modification/Artifacts';
+import config from '@/config';
 
 export default {
   components: {
@@ -286,17 +286,17 @@ export default {
       if (this.$route.params.issue) {
         const loader = this.$loading.show({ container: this.$el });
         await this.$store.dispatch('cms/getIssue', this.$route.params.issue)
-            .then(() => {
-              this.soaModif.issue_id = this.$store.state.cms.issue.id;
-              if (this.$store.state.cms.issue) {
-                this.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
-              }
-              if (!this.$store.state.cms.issue
+          .then(() => {
+            this.soaModif.issue_id = this.$store.state.cms.issue.id;
+            if (this.$store.state.cms.issue) {
+              this.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
+            }
+            if (!this.$store.state.cms.issue
                   || (this.ttsKey !== this.$store.state.cms.issue.tts_id)) {
-                this.issueStatus = 'ERROR';
-              }
-              loader.hide();
-            });
+              this.issueStatus = 'ERROR';
+            }
+            loader.hide();
+          });
       }
     },
     async getInstances(deliveryChain) {
@@ -305,20 +305,20 @@ export default {
         switch (deliveryChain.dc_role.key) {
           case 'dc_rel':
             this.instances = this.filterChains(
-                ['dc_hf', 'dc_min', 'dc_rel'],
-                deliveryChain.type.type,
+              ['dc_hf', 'dc_min', 'dc_rel'],
+              deliveryChain.type.type,
             );
             break;
           case 'dc_hf':
             this.instances = this.filterChains(
-                ['dc_hf'],
-                deliveryChain.type.type,
+              ['dc_hf'],
+              deliveryChain.type.type,
             );
             break;
           case 'dc_min':
             this.instances = this.filterChains(
-                ['dc_hf', 'dc_min'],
-                deliveryChain.type.type,
+              ['dc_hf', 'dc_min'],
+              deliveryChain.type.type,
             );
             break;
           default:
@@ -337,9 +337,9 @@ export default {
         if (roles.includes(chain.dc_role.key)
             && chain.type.type === type) {
           chain.instances
-              .filter((instance) => instance.instance_type_id !== 'DEV')
-              .filter((instance) => instance.instance_type_id !== 'codix')
-              .map((instance) => acc.push(instance));
+            .filter((instance) => instance.instance_type_id !== 'DEV')
+            .filter((instance) => instance.instance_type_id !== 'codix')
+            .map((instance) => acc.push(instance));
         }
         return acc;
       }, []);
@@ -460,4 +460,3 @@ export default {
   },
 };
 </script>
-
