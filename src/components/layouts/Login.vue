@@ -1,19 +1,23 @@
-<template>
-  <div class="page login">
-    <header></header>
-    <main>
-      <slot />
-    </main>
-    <Footer />
-  </div>
-</template>
-
 <script>
-import Footer from '@/components/layouts/Footer';
-
 export default {
-  components: {
-    Footer,
+  methods: {
+    async login() {
+      await auth.getIdentity()
+        .then((response) => {
+          auth.setUser({
+            username: response.data.username,
+            name: response.data.name,
+            country: response.data.country,
+            permissions: response.data.permissions,
+          });
+          auth.setLastActiveTime();
+
+          this.$router.push(this.$route.query.return_uri || '/');
+        });
+    },
+  },
+  async created() {
+    await this.login();
   },
   mounted() {
     this.$M.AutoInit();
