@@ -1,5 +1,6 @@
 const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
 const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations');
+const SoaModification = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/components/SOAdeployment');
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
 const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults');
@@ -22,7 +23,6 @@ const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 const Hosts = () => import(/* webpackChunkName: "hosts" */ '@/views/esxi/Hosts');
 
-const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
 export default [
@@ -33,14 +33,12 @@ export default [
       layout: 'login',
       requiresAuth: false,
     },
-    component: Login,
     // redirect if already signed in
     beforeEnter: (to, from, next) => {
       if (auth.getUser()) {
         next('/dashbaord');
         return;
       }
-
       next();
     },
   },
@@ -70,6 +68,20 @@ export default [
       breadcrumb: 'Dashboard',
     },
     component: Dashboard,
+    props: {
+      module: 'extranet',
+    },
+  },
+  {
+    path: '/extranet/soa-modification/:issue?',
+    meta: {
+      requiresAuth: true,
+      name: 'extranet',
+      transitionName: 'slide',
+      title: 'SOA Modification',
+      breadcrumb: 'SOA Modification',
+    },
+    component: SoaModification,
     props: {
       module: 'extranet',
     },
