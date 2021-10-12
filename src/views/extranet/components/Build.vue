@@ -260,7 +260,7 @@ export default {
       if (this.$v.$invalid) {
         return;
       }
-debugger;
+
       this.$store.dispatch('extranet/startBuild', {
         branch: this.form.branch ? this.form.branch.name : this.branch,
         client: this.form.client,
