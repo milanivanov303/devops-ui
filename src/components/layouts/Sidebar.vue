@@ -136,18 +136,18 @@
             </ul>
           </div>
         </li>
-        <li :class="{ active: isActive('esxi') }">
+        <li :class="{ active: isActive('inventory') }">
           <a class="collapsible-header">
-            <i class="material-icons">devices</i> ESXi Hosts
+            <i class="material-icons">view_list</i> Inventory
             <i class="material-icons right">arrow_drop_down</i>
           </a>
           <div class="collapsible-body">
             <ul>
-              <li :class="{ active: isActive('esxi/dashboard') }">
-                <router-link to="/esxi/dashboard"> Dashboard</router-link>
+              <li :class="{ active: isActive('inventory/dashboard') }">
+                <router-link to="/inventory/dashboard"> Dashboard</router-link>
               </li>
-              <li :class="{ active: isActive('esxi/esxiHosts') }">
-                <router-link to="/esxi/esxiHosts"> Hosts</router-link>
+              <li :class="{ active: isActive('inventory/esxiHosts') }">
+                <router-link to="/inventory/esxiHosts"> ESXi Hosts</router-link>
               </li>
               <li><div class="divider"></div></li>
             </ul>
