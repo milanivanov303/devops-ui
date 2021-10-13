@@ -1,51 +1,53 @@
-<script src="../../store/mutations.js"></script>
 <template>
- <div class="row">
+  <div class="row">
     <h1 class="center">SE Transfer</h1>
-   <div class="col s6">
-     <Alert
-      v-if="error !== ''"
-      v-bind:msg="error"/>
-     <div class="row">
-       <div class="input-field col s9">
-         <i class="material-icons prefix">label_outline</i>
-           <label for="tts_key" class="active">TTS Key</label>
+    <custom-confirm ref="custom-confirm"
+                    :message="confirmMsg"
+                    @selectedVal="customConfirm"/>
+    <div class="col s6">
+      <Alert
+        v-if="error !== ''"
+        v-bind:msg="error"
+      />
+    <div class="row">
+      <div class="input-field col s9">
+        <i class="material-icons prefix">label_outline</i>
+          <label for="tts_key" class="active">TTS Key</label>
             <input
-            id="tts_key"
-            type="text"
-            v-model.trim="ttsKey"
-            @blur="$v.ttsKey.$touch()"
-            @change="$v.ttsKey.$touch()">
-           <div class="validator"
-                 v-if="$v.ttsKey.$anyError || issueStatus === 'ERROR'">
-             <div class="red-text" v-if="!$v.ttsKey.required">
-                <p>Field is required</p>
-             </div>
-             <div class="red-text" v-if="!$v.ttsKey.validKey">
-                <p>Not a valid TTS key.</p>
-             </div>
-             <div class="red-text" v-if="issueStatus === 'ERROR'">
-              <p>TTS Key does not exist in MMPI!</p>
-             </div>
+              id="tts_key"
+              type="text"
+              v-model.trim="ttsKey"
+              @blur="$v.ttsKey.$touch()"
+              @change="$v.ttsKey.$touch()"
+            />
+        <div class="validator" v-if="$v.ttsKey.$anyError || issueStatus === 'ERROR'">
+           <div class="red-text" v-if="!$v.ttsKey.required">
+              <p>Field is required</p>
            </div>
-       </div>
-       <div class="input-field col s1">
-          <a
-            class="btn-floating btn-small waves-effect waves-light tooltipped"
-            data-position="right"
-            data-tooltip="Change issue"
-            ref="tooltip"
-            @click="getIssue()">
-            <i class="material-icons">cached</i>
-          </a>
-       </div>
-     </div>
-      <div
-        class="row"
+           <div class="red-text" v-if="!$v.ttsKey.validKey">
+              <p>Not a valid TTS key.</p>
+           </div>
+           <div class="red-text" v-if="issueStatus === 'ERROR'">
+              <p>TTS Key does not exist in MMPI!</p>
+           </div>
+        </div>
+      </div>
+      <div class="input-field col s1">
+        <a
+          class="btn-floating btn-small waves-effect waves-light tooltipped"
+          data-position="right"
+          data-tooltip="Change issue"
+          ref="tooltip"
+          @click="getIssue()">
+          <i class="material-icons">cached</i>
+        </a>
+      </div>
+    </div>
+    <div class="row"
          v-if="deliveryChains.length
          && !$v.ttsKey.$anyError
          && issueStatus !== 'ERROR'">
-        <div class="col s10">
+      <div class="col s10">
         <Select
           label="Delivery chains"
           icon="linear_scale"
@@ -56,13 +58,13 @@
           @blur="$v.deliveryChain.$touch()"
           @change="selectedDeliveryChain"
         />
-          <div class="validator red-text" v-if="$v.deliveryChain.$error">
-           <span v-if="!$v.deliveryChain.required">Delivery chain field is required.</span>
-          </div>
+        <div class="validator red-text" v-if="$v.deliveryChain.$error">
+          <p v-if="!$v.deliveryChain.required">Delivery chain field is required.</p>
         </div>
       </div>
-      <div class="row" v-if="$v.deliveryChain.required">
-        <div class="col s10">
+    </div>
+    <div class="row" v-if="se.delivery_chain">
+      <div class="col s10">
         <Select
           label="Instance status"
           icon="power_settings_new"
@@ -73,26 +75,26 @@
           @blur="$v.instanceStatus.$touch()"
           @change="selectedInstanceStatus"
         />
-          <div class="validator red-text" v-if="$v.instanceStatus.$error">
-            <span v-if="!$v.instanceStatus.required">Instance status field is required.</span>
-          </div>
+        <div class="validator red-text" v-if="$v.instanceStatus.$error">
+          <p v-if="!$v.instanceStatus.required">Instance status field is required.</p>
         </div>
       </div>
-       <div class="row" v-if="se.instance">
-         <div class="input-field col s10">
-           <i class="material-icons prefix">storage</i>
-           <input
-          readonly
-          type="text"
-          :value="se.instance.name"
-          id="instance">
-           <label :class="{active: se.instance.name}" for="instance">Instance</label>
-           <span class="helper-text">Instance on which the export will be done.</span>
-         </div>
-       </div>
-      <div class="row" >
-        <div class="col s10" v-if="se.instance">
-          <Select
+    </div>
+    <div class="row" v-if="se.instance && se.instance_status">
+      <div class="input-field col s10">
+        <i class="material-icons prefix">storage</i>
+         <input
+            readonly
+            type="text"
+            :value="se.instance.name"
+            id="instance">
+         <label :class="{active: se.instance.name}" for="instance">Instance</label>
+         <span class="helper-text">Instance on which the export will be done.</span>
+      </div>
+    </div>
+    <div class="row" v-if="se.instance_status && se.instance ">
+      <div class="col s10" >
+        <Select
           label="SE Type"
           icon="memory"
           displayed="value"
@@ -101,66 +103,65 @@
           :invalid="$v.seType.$error"
           @blur="$v.seType.$touch()"
           @change="selectedType"
-          />
-          <div class="validator red-text" v-if="$v.seType.$error">
-            <span v-if="!$v.seType.required">SE Type field is required.</span>
+        />
+        <div class="validator red-text" v-if="$v.seType.$error">
+          <p v-if="!$v.seType.required">SE Type field is required.</p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s10">
+        <span
+          id="description"
+          class="materialize-textarea"
+          v-html="typeDescription">
+        </span>
+      </div>
+    </div>
+    <div class="row" v-if="texts && ociDependant.includes(seType.key)">
+      <div class="col s10">
+        <Autocomplete
+          label="Procedure/Letters"
+          icon="library_books"
+          :items="texts"
+          v-model="se.contents"
+          :invalid="$v.se.contents.$error"
+          @blur="checkSeText(se.contents)"
+        />
+         <div class="validator">
+          <div class="red-text" v-if="$v.se.contents.$invalid">
+            <p>SE texts field is required for selected operation.</p>
           </div>
         </div>
       </div>
+    </div>
+    <div class="row" v-if="$v.deliveryChain.required">
+      <div class="col s5 exportCheckbox">
+        <label>
+         <input
+          ref="exportable"
+          type="checkbox"
+          @change="checkboxEvent(se.doExport)"
+          v-model="se.doExport"
+          :disabled="!exportable.includes(seType.key)"/>
+         <span>Do export on DEV instance</span>
+        </label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s5">
+        <button class="btn waves-effect waves-light right"
+          type="button"
+          name="action"
+          :disabled="$v.$invalid || exporting.status === 'running'"
+          @click="onSubmit">{{actionName}}
+        </button>
+        </div>
+      </div>
+    </div>
+    <div class="col s6" v-if="exporting.started && se.doExport">
       <div class="row">
-        <div class="col s10">
-          <span id="description"
-              class="materialize-textarea"
-              v-html="typeDescription">
-          </span>
-        </div>
-      </div>
-      <div class="row" v-if="texts && ociDependant.includes(seType.key)">
-        <div class="col s10">
-          <Autocomplete
-           label="Procedure/Letters"
-           icon="library_books"
-           :items="texts"
-           v-model="se.contents"
-           :invalid="$v.se.contents.$error"
-           @blur="checkSeText(se.contents)"/>
-           <div class="validator">
-            <div class="red-text" v-if="$v.se.contents.$invalid">
-             <p>SE texts field is required for selected operation.</p>
-           </div>
-          </div>
-        </div>
-      </div>
-      <div class="row" v-if="$v.deliveryChain.required">
-         <div class="col s5 exportCheckbox">
-          <label>
-           <input
-            ref="exportable"
-            type="checkbox"
-            @change="checkboxEvent(se.doExport)"
-            v-model="se.doExport"
-            :disabled="!exportable.includes(seType.key)"/>
-           <span>Do export on DEV instance</span>
-          </label>
-         </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s5">
-           <button class="btn waves-effect waves-light right"
-                type="button"
-                name="action"
-                :disabled="$v.$invalid || exporting.status === 'running'"
-                @click="onSubmit">{{actionName}}
-           </button>
-          </div>
-        </div>
-      </div>
-      <div class="col s6" v-if="exporting.started && se.doExport">
-      <div class="card-header white-text">
-        <span class="card-title center">Export</span>
-      </div>
-      <div class="card-content">
-        <div class="container">
+        <div class="col s6">
           <div v-if="exporting.status === 'success'" class="center" >
             <i class="material-icons large green-text">check_circle_outline</i>
             <p>Export completed successfully</p>
@@ -179,19 +180,20 @@
           </div>
         </div>
       </div>
-   </div>
- </div>
+    </div>
+  </div>
 </template>
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
-// import Autocomplete from '@/components/Autocomplete';
+import CustomConfirm from "@/components/partials/CustomConfirm";
 import config from '@/config';
 import client from '@/plugins/ws';
 
+
 export default {
-  // components: {
-  //   Autocomplete,
-  // },
+  components: {
+    'custom-confirm': CustomConfirm,
+  },
   mounted() {
     this.getIssue();
     this.getInstanceStatus();
@@ -397,6 +399,7 @@ export default {
           }
 
           if (!client.connected) {
+            console.log(client)
             return;
           }
 
@@ -445,6 +448,13 @@ export default {
           container.scrollTop = container.scrollHeight;
         }
       }, 100);
+    },
+    customConfirm(value) {
+      if (value) {
+        window.location.href = `${this.config.mmpi.web}/issue/${this.$route.params.issue}`;
+      } else {
+        this.confirmMsg = [];
+      }
     },
   },
 };
