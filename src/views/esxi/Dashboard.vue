@@ -1,20 +1,41 @@
 <template>
-  <div>
-    <div>
-      <EsxiRamStatistics :esxiHosts="esxiHosts"/>
+  <div class="row inventory">
+    <div class="col s12 l6">
+      <div class="row">
+        <div class="col s12">
+          <RAMbyHostsStatistics :esxiHosts="esxiHosts"/>
+        </div>
+        <div class="col s12 l6">
+          <PieChartRAMStatistics :esxiHosts="esxiHosts"/>
+        </div>
+      </div>
+    </div>
+    <div class="col s12 l6">
+      <div class="row">
+        <div class="col s12 l8">
+          <CPUcoresStatistics :esxiHosts="esxiHosts"/>
+        </div>
+        <div class="col s12 l4">
+          <CPUcoresCounter :esxiHosts="esxiHosts"/>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import EsxiRamStatistics from '@/views/esxi/components/EsxiRamStatistics';
+import CPUcoresCounter from '@/views/esxi/components/statistics/CPUcoresCounter';
+import CPUcoresStatistics from '@/views/esxi/components/statistics/CPUcoresStatistics';
+import RAMbyHostsStatistics from '@/views/esxi/components/statistics/RAMbyHostsStatistics';
+import PieChartRAMStatistics from '@/views/esxi/components/statistics/PieChartRAMStatistics';
 
 export default {
-
   components: {
-    EsxiRamStatistics,
+    CPUcoresCounter,
+    CPUcoresStatistics,
+    RAMbyHostsStatistics,
+    PieChartRAMStatistics,
   },
-
   computed: {
     esxiHosts() {
       return this.$store.state.esxi.esxiHosts;
@@ -33,6 +54,5 @@ export default {
   created() {
     this.getEsxiHosts();
   },
-
 };
 </script>

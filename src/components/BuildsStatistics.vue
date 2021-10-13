@@ -24,7 +24,7 @@
 import EventBus from '@/event-bus';
 import { upperFirst } from 'lodash';
 
-const BarChart = () => import('@/components/BarChart');
+const BarChart = () => import('@/components/charts/BarChart');
 
 export default {
   components: {
