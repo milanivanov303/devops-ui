@@ -86,14 +86,14 @@
                   label="Fe branch"
                   icon="dynamic_feed"
                   :items="feBranches"
-                  v-model="form.fe_branch"
-                  :invalid="$v.form.fe_branch.$error"
-                  @blur="$v.form.fe_branch.$touch()"
+                  v-model="form.feBranch"
+                  :invalid="$v.form.feBranch.$error"
+                  @blur="$v.form.feBranch.$touch()"
                 />
               </div>
               <div class="validator col s11 offset-s1">
-                <div class="red-text" v-if="$v.form.fe_branch.$error">
-                  <p v-if="!$v.form.fe_branch.required">
+                <div class="red-text" v-if="$v.form.feBranch.$error">
+                  <p v-if="!$v.form.feBranch.required">
                     Fe branch field must not be empty.
                   </p>
                 </div>
@@ -144,7 +144,7 @@ function initialState() {
       client: null,
       javaVersion: 8,
       instance: null,
-      fe_branch: {
+      feBranch: {
         name: 'X3',
       },
       image: null,
@@ -205,7 +205,7 @@ export default {
             required,
           },
         },
-        fe_branch: {
+        feBranch: {
           required,
           name: {
             required,

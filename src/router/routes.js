@@ -23,7 +23,6 @@ const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 const Hosts = () => import(/* webpackChunkName: "hosts" */ '@/views/esxi/Hosts');
 
-const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
 export default [
@@ -34,14 +33,12 @@ export default [
       layout: 'login',
       requiresAuth: false,
     },
-    component: Login,
     // redirect if already signed in
     beforeEnter: (to, from, next) => {
       if (auth.getUser()) {
         next('/dashbaord');
         return;
       }
-
       next();
     },
   },
