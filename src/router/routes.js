@@ -322,6 +322,7 @@ export default [
       alias: '/expert-system-modification',
       name: 'expert-system modification',
       requiresAuth: true,
+      title: 'SE Transfer Modification',
       breadcrumb: 'Expert system modification',
     },
     component: SeTransferModif,

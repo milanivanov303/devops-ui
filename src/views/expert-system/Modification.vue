@@ -399,7 +399,6 @@ export default {
           }
 
           if (!client.connected) {
-            console.log(client)
             return;
           }
 
