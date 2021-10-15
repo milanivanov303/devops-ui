@@ -61,10 +61,7 @@ export default {
     },
 
     getHostFreeMemory(host) {
-      if (!host.details) {
-        return 0;
-      }
-      return host.details.memory.physical_memory - this.$store.getters['esxi/getVmsMemory'](host);
+      return this.$store.getters['esxi/getHostFreeMemory'](host);
     },
 
     getTotalUsedMemory() {

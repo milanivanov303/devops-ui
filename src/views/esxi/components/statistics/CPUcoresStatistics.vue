@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <div class="card-content">
-            <span class="card-title">CPU cores by Esxi Hosts</span>
+            <span class="card-title">CPU cores by ESXi Hosts</span>
             <div class="row">
                 <BarChart :data="chartData" :height="200"/>
             </div>

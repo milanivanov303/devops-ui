@@ -1,26 +1,30 @@
 <template>
-  <div class="card">
+  <div class="card" v-if="esxiHost">
     <div class="card-content">
-
       <div class="card-title truncate">
         {{ esxiHost.hostname }}
-        <div v-if="esxiHost.updated_on" class="right date">
+        <a class="right"
+           data-tooltip="Update info"
+           v-if="$auth.can('esxi.add')"
+           @click.prevent="updateEsxiInfo()">
+          <i class="material-icons">refresh</i>
+        </a>
+        <div v-if="esxiHost.updated_on" class="right updated-on">
           Updated on {{ $date(esxiHost.updated_on).toHuman() }}
         </div>
       </div>
 
       <div v-if="esxiHost.details && esxiHost.details.memory">
-        <b>Memory:</b>
-        {{ bytesToSize(esxiHost.details ? esxiHost.details.memory.physical_memory : '') }},
-        Free {{ bytesToSize(freeMemory(esxiHost)) }}
+        <b>Memory:</b>{{ esxiHost.details ?
+          $esxi(esxiHost.details.memory.physical_memory).bytesToSizeLabel() : '' }},
+        <b>Free:</b> {{ $esxi(getHostFreeMemory(esxiHost)).bytesToSizeLabel() }}
       </div>
       <div v-if="esxiHost.details" class="progress">
-        <div class="determinate" :style="{width: getServerFreeMemory(esxiHost) + '%'}"></div>
+        <div class="determinate" :style="{width: getFreeMemoryInPerc(esxiHost) + '%'}"></div>
       </div>
 
-      <div class="wrapper">
-        <div class="row">
-
+      <div class="row">
+        <div class="col s12">
           <ul class="tabs">
             <li class="tab col s6">
               <a href="#esxi_details">DETAILS</a>
@@ -29,39 +33,23 @@
               <a href="#vms">VIRTUAL MACHINES</a>
             </li>
           </ul>
-
           <div v-if="esxiHost.details" id="esxi_details">
-            <EsxiDetails
-              :esxiHost="esxiHost"
-            />
+            <EsxiDetails :esxiHost="esxiHost"/>
           </div>
-
           <div v-if="esxiHost.vms_details" id="vms">
-            <VirtualMachines
-              :virtualMachines="virtualMachines"
-            />
+            <VirtualMachines :VMs="VMs"/>
           </div>
-
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
 <script>
-
-import shared from '@/js/esxi/shared';
 import VirtualMachines from './components/VirtualMachines';
 import EsxiDetails from './components/EsxiDetails';
 
 export default {
-  data() {
-    return {
-      vmsearch: this.$route.query.vmsearch,
-    };
-  },
-
   components: {
     VirtualMachines,
     EsxiDetails,
@@ -72,22 +60,28 @@ export default {
     esxiHost: Object,
   },
 
+  data() {
+    return {
+      vmsearch: this.$route.query.vmsearch,
+    };
+  },
+
   computed: {
-    virtualMachines() {
+    VMs() {
       if (!this.esxiHost.vms_details) {
         return null;
       }
 
-      let virtualMachines = this.esxiHost.vms_details;
+      let VMs = this.esxiHost.vms_details;
 
       if (this.vmsearch) {
         const regexp = new RegExp(this.vmsearch, 'i');
-        virtualMachines = virtualMachines.filter(
+        VMs = VMs.filter(
           (virtualMachine) => virtualMachine.main_info.name.match(regexp),
         );
       }
 
-      return virtualMachines;
+      return VMs;
     },
 
     cpus() {
@@ -96,6 +90,37 @@ export default {
       }
 
       return this.esxiHost.details.cpu_details;
+    },
+  },
+
+  methods: {
+    updateEsxiInfo() {
+      const loader = this.$loading.show({ container: this.$el });
+
+      this.$store.dispatch('esxi/updateEsxiHost', this.esxiHost)
+        .then((response) => {
+          if (response.data.error) {
+            this.$M.toast({ html: response.data.error });
+            return;
+          }
+          this.$M.toast({
+            html: `Updating ESXi host ${this.esxiHost.hostname} details in background.
+             Please, check in a few minutes.`,
+            classes: 'toast-seccess',
+          });
+        })
+        .catch((error) => {
+          this.$M.toast({ html: error });
+        }).finally(() => loader.hide());
+    },
+    getFreeMemoryInPerc() {
+      if (!this.esxiHost.details.memory) {
+        return null;
+      }
+      return (this.$store.getters['esxi/getVmsMemory'](this.esxiHost) * 100) / this.esxiHost.details.memory.physical_memory;
+    },
+    getHostFreeMemory(host) {
+      return this.$store.getters['esxi/getHostFreeMemory'](host);
     },
   },
 
@@ -112,13 +137,6 @@ export default {
     },
   },
 
-  created() {
-    this.bytesToSize = shared.bytesToSize;
-    this.getVmsMemory = shared.getVmsMemory;
-    this.getServerFreeMemory = shared.getServerFreeMemory;
-    this.freeMemory = shared.freeMemory;
-  },
-
   mounted() {
     const elems = document.querySelectorAll('.tabs');
     this.$M.Tabs.init(elems);
@@ -131,8 +149,8 @@ export default {
     font-size: 2em;
   }
 
-  .date{
+  .updated-on{
     font-size: 0.4em;
-    color: #999;
+    margin-top: 5px;
   }
 </style>

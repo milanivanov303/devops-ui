@@ -1,29 +1,37 @@
 /* eslint-disable import/prefer-default-export */
 
 class EsxiHelper {
-  constructor(esxi) {
-    this.esxi = esxi;
+  constructor(value) {
+    this.value = value;
   }
 
   bytesToSize() {
-    if (!this.esxi || this.esxi < 0) {
-      return;
+    if (!this.value || this.value < 0) {
+      return 0;
     }
-    const i = Math.floor(Math.log(this.esxi) / Math.log(1024));
+    const i = Math.floor(Math.log(this.value) / Math.log(1024));
 
-    return Math.round(this.esxi / 1024 ** i);
+    return Math.round(this.value / 1024 ** i);
   }
 
   bytesToSizeLabel() {
-    if (!this.esxi || this.esxi < 0) {
-      return;
+    if (!this.value || this.value < 0) {
+      return 0;
     }
 
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(this.esxi) / Math.log(1024));
+    const i = Math.floor(Math.log(this.value) / Math.log(1024));
 
-    return `${Math.round(this.esxi / 1024 ** i)}  ${sizes[i]}`;
+    return `${Math.round(this.value / 1024 ** i)}  ${sizes[i]}`;
+  }
+
+  hertzToGigahertz() {
+    if (!this.value) {
+      return 0;
+    }
+
+    return Math.round((this.value / 1000000 / 1000) * 100) / 100;
   }
 }
 
-export const esxi = (esxi) => new EsxiHelper(esxi);
+export const esxi = (value) => new EsxiHelper(value);

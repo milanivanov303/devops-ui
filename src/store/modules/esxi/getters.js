@@ -3,6 +3,7 @@
 export default {
   getError: (state) => state.error,
   esxiHosts: (state) => state.esxiHosts,
+  getHostByHostname: (state) => (hostname) => state.esxiHosts.find((h) => h.hostname === hostname),
   getVmsMemory: () => (host) => {
     if (!host.vms_details) {
       return 0;
@@ -41,6 +42,12 @@ export default {
     });
 
     return memoryByHosts;
+  },
+  getHostFreeMemory: (state, getters) => (host) => {
+    if (!host.details) {
+      return 0;
+    }
+    return host.details.memory.physical_memory - getters.getVmsMemory(host);
   },
 
 };

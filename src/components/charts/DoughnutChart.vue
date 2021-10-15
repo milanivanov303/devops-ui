@@ -2,7 +2,6 @@
 import { mixins, Doughnut } from 'vue-chartjs';
 
 function dataHandler() {
-  debugger;
   this.data.datasets.forEach((dataset) => {
     if (!dataset.backgroundColor) {
       dataset.backgroundColor = [];

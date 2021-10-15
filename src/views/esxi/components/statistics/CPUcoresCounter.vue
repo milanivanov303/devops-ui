@@ -37,7 +37,7 @@ export default {
       let count = 0;
       this.esxiHosts.forEach((host) => {
         if (!host.details) {
-          return 0;
+          return;
         }
         count += parseInt(host.details.cpu.c_p_u_cores, 10);
       });

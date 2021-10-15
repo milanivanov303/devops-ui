@@ -1,5 +1,5 @@
 <template>
-  <div class="row inventory">
+  <div class="row" ref="inventory">
     <div class="col s12 l6">
       <div class="row">
         <div class="col s12">
@@ -8,17 +8,13 @@
         <div class="col s12 l6">
           <PieChartRAMStatistics :esxiHosts="esxiHosts"/>
         </div>
-      </div>
-    </div>
-    <div class="col s12 l6">
-      <div class="row">
-        <div class="col s12 l8">
-          <CPUcoresStatistics :esxiHosts="esxiHosts"/>
-        </div>
-        <div class="col s12 l4">
+        <div class="col s12 l6">
           <CPUcoresCounter :esxiHosts="esxiHosts"/>
         </div>
       </div>
+    </div>
+    <div class="col s12 l6">
+      <CPUcoresStatistics :esxiHosts="esxiHosts"/>
     </div>
   </div>
 </template>
@@ -44,7 +40,7 @@ export default {
 
   methods: {
     getEsxiHosts() {
-      const loader = this.$loading.show({ container: this.$el });
+      const loader = this.$loading.show({ container: this.$refs.inventory });
 
       this.$store.dispatch('esxi/getEsxiHosts')
         .finally(() => loader.hide());

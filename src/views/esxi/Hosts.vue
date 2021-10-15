@@ -1,76 +1,68 @@
 <template>
-  <div>
-
-    <div class="row">
-      <div class="col s6 m6 l5">
-        <TextInput label="Search" icon="search" v-model="search"/>
-      </div>
-
-      <div class="col s6 right">
-        <button
-          class="btn-floating waves-effect waves-light right"
-          data-tooltip="Add"
-          v-if="$auth.can('esxi.add')"
-          @click="openAddHostModal({}, 'create')"
-        >
-          <i class="material-icons left">add</i>
-        </button>
-      </div>
-    </div>
-
-    <div v-if="!esxiHost" class="row">
-      <div v-for="esxiHost in paginatedEsxiHosts" :key="esxiHost.name" class="col s12 m6 l6">
-        <Host
-          :module="module"
-          :esxiHost="esxiHost"
-        />
-      </div>
-      <div v-if="loading">
-        <div v-for="index in perPage" :key="index" class="col s12 m6 l4">
-          <BranchSkeleton/>
+  <div class="row esxi-hosts">
+    <div class="col s12">
+      <div class="row">
+        <div class="col s12 m6">
+          <TextInput label="Search..." icon="search" v-model="search"/>
+        </div>
+        <div class="col s12 m6 right">
+          <button
+            class="btn-floating waves-effect waves-light right"
+            data-tooltip="Add"
+            v-if="$auth.can('esxi.add')"
+            @click="showAddHostModal=true"
+          >
+            <i class="material-icons left">add</i>
+          </button>
         </div>
       </div>
-    </div>
 
-    <div v-if="!esxiHost && esxiHosts.length" class="row">
-      <div class="col s12 m6 l9">
-        <Paginate v-if="lastPage > 1" v-model="page" :page-count="lastPage"/>
-      </div>
-      <div class="col s12 m6 l3 per-page">
-        <Select v-model="perPage" :options="perPageOptions" :defaultOption="false" class="right"/>
-        <p class="right right-align">Items per page:</p>
-      </div>
-    </div>
-
-    <div v-if="esxiHost" class="row">
-      <div class="col s12 m6 l5 scroll">
-        <Host
-          v-for="esxiHost in esxiHosts"
-          :key="esxiHost.hostname"
-          :module="module"
-          :esxiHost="esxiHost"
-          :ref="esxiHost.hostname"
-        />
+      <div v-if="!esxiHost" class="row">
+        <div v-for="esxiHost in paginatedEsxiHosts" :key="esxiHost.name" class="col s12 m6 l4">
+          <Host
+            :module="module"
+            :esxiHost="esxiHost"
+          />
+        </div>
         <div v-if="loading">
-          <BranchSkeleton v-for="index in perPage" :key="index"/>
+          <div v-for="index in perPage" :key="index" class="col s12 m6 l4">
+            <BranchSkeleton/>
+          </div>
         </div>
       </div>
-      <div class="col s12 m6 l7" >
-        <HostDetails
-          :module="module"
-          :esxiHost="esxiHost"
-          :key="esxiHost.hostname"
-        />
+
+      <div v-if="!esxiHost && esxiHosts.length" class="row">
+        <div class="col s12 m6 l9">
+          <Paginate v-if="lastPage > 1" v-model="page" :page-count="lastPage"/>
+        </div>
+        <div class="col s12 m6 l3 per-page">
+          <Select v-model="perPage" :options="perPageOptions" :defaultOption="false" class="right"/>
+          <p class="right right-align">Items per page:</p>
+        </div>
       </div>
+
+      <div v-if="esxiHost" class="row">
+        <div class="col s12 m6 l5 scroll">
+          <Host
+            v-for="esxiHost in esxiHosts"
+            :key="esxiHost.hostname"
+            :module="module"
+            :esxiHost="esxiHost"
+          />
+          <div v-if="loading">
+            <BranchSkeleton v-for="index in perPage" :key="index"/>
+          </div>
+        </div>
+        <div class="col s12 m6 l7" >
+          <HostDetails :module="module" :esxiHost="esxiHost"/>
+        </div>
+      </div>
+
+      <AddHostModal
+        v-if="showAddHostModal"
+        @close="showAddHostModal = false"
+      />
     </div>
-
-    <AddHostModal
-      v-if="showAddHostModal"
-      v-on:close="closeAddHostModal()"
-      :newHost="host"
-      :action="action"
-    />
-
   </div>
 </template>
 
@@ -104,31 +96,28 @@ export default {
       lastPage: 0,
       perPageOptions: [6, 9, 12, 15],
       showAddHostModal: false,
-      action: '',
-      host: {},
     };
   },
-
   computed: {
     esxiHosts() {
-      const { esxiHosts } = this.$store.state[this.module];
+      let { esxiHosts } = this.$store.state[this.module];
 
       if (this.search) {
         const regexp = new RegExp(this.search, 'i');
-        let esxiHostsResults = esxiHosts.filter((esxiHost) => esxiHost.hostname.match(regexp));
+        esxiHosts = esxiHosts.filter((e) => e.hostname.match(regexp));
 
-        if (esxiHostsResults.length === 0) {
-          esxiHostsResults = esxiHosts.filter((esxiHost) => {
-            if (esxiHost.vms_details) {
-              return esxiHost.vms_details.some((vm) => vm.powered && vm.powered !== 'off' && vm.main_info.name.match(regexp));
+        if (esxiHosts.length === 0) {
+          esxiHosts = esxiHosts.filter((e) => {
+            if (e.vms_details) {
+              return e.vms_details.some((vm) => vm.powered && vm.powered !== 'off' && vm.main_info.name.match(regexp));
             }
             return false;
           });
 
-          if (esxiHostsResults.length === 0) {
-            esxiHostsResults = esxiHosts.filter((esxiHost) => {
-              if (esxiHost.vms_details) {
-                return esxiHost.vms_details.some((vm) => {
+          if (esxiHosts.length === 0) {
+            esxiHosts = esxiHosts.filter((e) => {
+              if (e.vms_details) {
+                return e.vms_details.some((vm) => {
                   if (vm.powered && vm.powered !== 'off'
                     && vm.instances
                     && vm.instances instanceof Array) {
@@ -142,32 +131,32 @@ export default {
           }
         }
 
-        return esxiHostsResults;
+        return esxiHosts;
       }
 
       return esxiHosts;
     },
 
     paginatedEsxiHosts() {
-      const { esxiHosts } = this;
+      const paginated = this.esxiHosts;
 
       const from = (this.page * this.perPage) - this.perPage;
       const to = (this.page * this.perPage);
 
-      this.setLastPage(Math.ceil(esxiHosts.length / this.perPage));
+      this.setLastPage(Math.ceil(paginated.length / this.perPage));
 
-      return esxiHosts.slice(from, to);
+      return paginated.slice(from, to);
     },
 
     esxiHost() {
       const { esxiHosts } = this.$store.state[this.module];
 
-      if (!this.$route.query.esxiHost || !esxiHosts.length) {
+      if (!this.$route.query.host || !esxiHosts.length) {
         return null;
       }
 
       const esxiHost = esxiHosts.find(
-        (x) => x.hostname === decodeURIComponent(this.$route.query.esxiHost),
+        (x) => x.hostname === decodeURIComponent(this.$route.query.host),
       );
 
       return esxiHost;
@@ -176,21 +165,26 @@ export default {
 
   methods: {
     getEsxiHosts() {
-      this.$store.dispatch('esxi/getEsxiHosts');
+      this.loading = true;
+
+      this.$store.dispatch('esxi/getEsxiHosts').then(() => {
+        setTimeout(this.scrollBranchIntoView, 100);
+      })
+        .finally(() => { this.loading = false; });
+    },
+
+    scrollBranchIntoView() {
+      const host = document.querySelector('.router-link-exact-active');
+      if (host) {
+        host.scrollIntoView({
+          block: 'start',
+          inline: 'nearest',
+        });
+      }
     },
 
     setLastPage(lastPage) {
       this.lastPage = lastPage;
-    },
-
-    closeAddHostModal() {
-      this.showAddHostModal = false;
-    },
-
-    openAddHostModal(host, action) {
-      this.showAddHostModal = true;
-      this.action = action;
-      this.host = host;
     },
   },
 
@@ -211,14 +205,13 @@ export default {
     },
   },
 
-  updated() {
-    this.$M.Tooltip.init(this.$el.querySelectorAll('[data-tooltip]'));
-  },
-
   created() {
     this.getEsxiHosts();
   },
 
+  updated() {
+    this.$M.Tooltip.init(this.$el.querySelectorAll('[data-tooltip]'));
+  },
 };
 
 </script>
