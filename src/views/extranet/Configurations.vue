@@ -765,11 +765,14 @@ export default {
         });
     },
     getAdditionalInfoLink(data) {
-      if (data.includes('http')) {
-        const dataToDisplay = `${data.substring(0, 15)}..`;
-        return `<a href="${data}" target="_blank"> ${dataToDisplay} </a>`;
+      if (!data) {
+        return null;
       }
-      return data;
+      if (!data.includes('http')) {
+        return data;
+      }
+      const dataToDisplay = `${data.substring(0, 15)}..`;
+      return `<a href="${data}" target="_blank"> ${dataToDisplay} </a>`;
     },
   },
   mounted() {
