@@ -27,6 +27,10 @@
         <Column show="servlet_container"/>
         <Column show="jdk"/>
         <Column show="jre"/>
+        <Column
+          label="Additional info"
+          :show="(row) => getAdditionalInfoLink(row.additional_info)"
+          />
         <template v-slot:actions-before="{ row }">
           <a @click="openAddEditModal('build', row)" class="green-text" title="Start Build">
             <i class="material-icons">send</i>
@@ -357,8 +361,7 @@
   </div>
 </template>
 
-<script>
-import { required } from 'vuelidate/lib/validators';
+<script>import { required } from 'vuelidate/lib/validators';
 import client from '@/plugins/ws';
 
 import TextArea from '@/components/TextArea';
@@ -512,29 +515,33 @@ export default {
       promises.push(this.$store.dispatch('extranet/getClients'));
       promises.push(this.$store.dispatch('debiteur/getClients'));
 
-      Promise.all(promises).finally(() => {
-        loader.hide();
+      Promise.all(promises)
+        .finally(() => {
+          loader.hide();
 
-        if (this.$route.params.id) {
-          if (this.$route.params.id === 'new') {
-            return this.openAddEditModal('create');
-          }
-
-          const configuration = this.configurations.find(
-            (configuration) => configuration.id === parseInt(this.$route.params.id, 10),
-          );
-          if (configuration) {
-            if (this.$route.params.build === 'build') {
-              return this.openAddEditModal('build', configuration);
+          if (this.$route.params.id) {
+            if (this.$route.params.id === 'new') {
+              return this.openAddEditModal('create');
             }
-            return this.openAddEditModal('update', configuration);
+
+            const configuration = this.configurations.find(
+              (configuration) => configuration.id === parseInt(this.$route.params.id, 10),
+            );
+            if (configuration) {
+              if (this.$route.params.build === 'build') {
+                return this.openAddEditModal('build', configuration);
+              }
+              return this.openAddEditModal('update', configuration);
+            }
+
+            this.$M.toast({
+              html: 'This configuration does not exist!',
+              classes: 'toast-fail',
+            });
           }
 
-          this.$M.toast({ html: 'This configuration does not exist!', classes: 'toast-fail' });
-        }
-
-        return true;
-      });
+          return true;
+        });
     },
 
     openAddEditModal(action, configuration = {}) {
@@ -655,9 +662,10 @@ export default {
           }
 
           let errorText = '';
-          Object.values(error.response.data).forEach((value) => {
-            errorText += `${value.join('<br>')}<br>`;
-          });
+          Object.values(error.response.data)
+            .forEach((value) => {
+              errorText += `${value.join('<br>')}<br>`;
+            });
 
           this.$M.toast({
             html: errorText,
@@ -742,14 +750,29 @@ export default {
         .then(() => {
           this.removed = true;
           this.showRemoveModal = false;
-          this.$M.toast({ html: 'The configuration has been removed!', classes: 'toast-seccess' });
+          this.$M.toast({
+            html: 'The configuration has been removed!',
+            classes: 'toast-seccess',
+          });
         })
         .catch((error) => {
           if (error.response.status === 403) {
             this.error = 'You do not have insufficient rights to remove this configuration';
           }
         })
-        .finally(() => { this.removing = false; });
+        .finally(() => {
+          this.removing = false;
+        });
+    },
+    getAdditionalInfoLink(data) {
+      if (!data) {
+        return null;
+      }
+      if (!data.includes('http')) {
+        return data;
+      }
+      const dataToDisplay = `${data.substring(0, 15)}..`;
+      return `<a href="${data}" target="_blank"> ${dataToDisplay} </a>`;
     },
   },
   mounted() {
@@ -759,9 +782,9 @@ export default {
 </script>
 
 <style lang="scss" >
-  .log {
-    height: 60vh;
-    overflow: auto;
-    white-space: pre;
-  }
+.log {
+  height: 60vh;
+  overflow: auto;
+  white-space: pre;
+}
 </style>

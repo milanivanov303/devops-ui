@@ -26,6 +26,9 @@
               <li :class="{ active: isActive('extranet/configurations') }">
                 <router-link to="/extranet/configurations"> DevOps Matrix</router-link>
               </li>
+              <li :class="{ active: isActive('extranet/soa-modification') }">
+                <router-link to="/extranet/soa-modification"> SOA Modification</router-link>
+              </li>
               <li><div class="divider"></div></li>
             </ul>
           </div>

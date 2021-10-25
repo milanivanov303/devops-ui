@@ -71,7 +71,7 @@
                   <i class="material-icons">launch</i>
                 </a>
                 <a
-                  @click="openInfoModal(build)"
+                  @click="openBuildDetailsModal(build)"
                   data-tooltip="Details"
                   class="blue-text tooltipped"
                 >
@@ -125,11 +125,10 @@
       <p class="right right-align">Items per page:</p>
     </div>
 
-    <component
-      v-if="showInfoModal"
-      :is="infoComponent"
+    <BuildDetails
+      v-if="showBuildDetailsModal"
       :build="build"
-      @close="closeInfoModal()"
+      @close="closeBuildDetailsModal()"
     />
 
     <Modal v-if="showRemoveModal" @close="showRemoveModal = false" class="confirm">
@@ -181,11 +180,13 @@ import config from '@/config';
 
 const Paginate = () => import('@/components/partials/Paginate');
 const BuildProgress = () => import('@/components/BuildProgress');
+const BuildDetails = () => import('@/components/BuildDetails');
 
 export default {
   components: {
     Paginate,
     BuildProgress,
+    BuildDetails,
   },
 
   props: {
@@ -199,13 +200,6 @@ export default {
     },
   },
 
-  computed: {
-    infoComponent() {
-      // eslint-disable-next-line
-      return () => import('@/views/' + this.build.module + '/components/BuildInfo');
-    },
-  },
-
   data() {
     return {
       builds: [],
@@ -216,9 +210,9 @@ export default {
 
       status: ['active'],
 
-      showInfoModal: false,
       showRemoveModal: false,
       showProgressModal: false,
+      showBuildDetailsModal: false,
 
       updating: false,
       removing: false,
@@ -291,28 +285,6 @@ export default {
         return `<span class="new badge red" data-badge-caption="">${build.status}</span>`;
       }
       return `<span class="new badge" data-badge-caption="">${build.status}</span>`;
-    },
-
-    openInfoModal(build) {
-      this.build = { ...build };
-
-      this.build.created_on = this.$date(build.created_on).toHuman();
-
-      if (this.build.removed_on) {
-        this.build.removed_on = this.$date(this.build.removed_on).toHuman();
-      }
-
-      if (this.build.removed_on && !this.build.removed_by) {
-        this.build.removed_by = 'auto-removed';
-      }
-
-      this.showInfoModal = true;
-    },
-
-    closeInfoModal() {
-      this.build = {};
-
-      this.showInfoModal = false;
     },
 
     openProgressModal(build) {
@@ -406,6 +378,33 @@ export default {
         })
         .finally(() => { this.removing = false; });
     },
+
+    openBuildDetailsModal(build) {
+      this.build = { ...build };
+
+      this.build.created_on = this.$date(build.created_on).toHuman();
+
+      if (this.build.removed_on) {
+        this.build.removed_on = this.$date(this.build.removed_on).toHuman();
+      }
+
+      if (this.build.removed_on && !this.build.removed_by) {
+        this.build.removed_by = 'auto-removed';
+      }
+
+      if (this.build.details.java_version) {
+        this.build.details.java_version = this.build.details.java_version.toString();
+      }
+
+      this.showBuildDetailsModal = true;
+    },
+
+    closeBuildDetailsModal() {
+      this.build = {};
+
+      this.showBuildDetailsModal = false;
+    },
+
   },
 
   watch: {
