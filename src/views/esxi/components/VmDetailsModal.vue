@@ -16,7 +16,7 @@
         <li>
           <div class="collapsible-header"><i class="material-icons">apps</i>Instances</div>
           <div class="collapsible-body ">
-            <div class="validator" v-if="vm.instances.error">
+            <div v-if="vm.instances.error" class="validator">
               <div class="red-text">
                 <p>{{ vm.instances.error }}</p>
               </div>
@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import Instances from './Instances';
+import Instances from '../instances/Instances';
 
 export default {
 

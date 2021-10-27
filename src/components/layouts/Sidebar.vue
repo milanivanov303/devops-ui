@@ -149,6 +149,12 @@
               <li :class="{ active: isActive('inventory/esxiHosts') }">
                 <router-link to="/inventory/esxiHosts"> ESXi Hosts</router-link>
               </li>
+              <li :class="{ active: isActive('inventory/virtualMachines') }">
+                <router-link to="/inventory/virtualMachines"> Virtual Machines</router-link>
+              </li>
+              <li :class="{ active: isActive('inventory/instances') }">
+                <router-link to="/inventory/instances"> Instances</router-link>
+              </li>
               <li><div class="divider"></div></li>
             </ul>
           </div>

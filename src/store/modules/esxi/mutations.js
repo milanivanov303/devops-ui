@@ -5,6 +5,15 @@ export default {
   esxiHosts(state, esxiHosts) {
     state.esxiHosts = esxiHosts;
   },
+  allVirtualMachines(state, virtualMachines) {
+    state.allVirtualMachines = virtualMachines;
+  },
+  virtualMachines(state, virtualMachines) {
+    state.virtualMachines = virtualMachines;
+  },
+  instances(state, instances) {
+    state.instances = instances;
+  },
   error(state, error) {
     state.error = error;
   },

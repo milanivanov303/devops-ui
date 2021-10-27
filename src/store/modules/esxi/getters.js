@@ -11,7 +11,7 @@ export default {
 
     return host.vms_details.reduce((accumulator, currentValue) => {
       let sum = accumulator;
-      if (currentValue.powered !== 'off') {
+      if (currentValue.powered === 'on') {
         sum += currentValue.hardware.memory;
       }
       return sum;
@@ -48,6 +48,81 @@ export default {
       return 0;
     }
     return host.details.memory.physical_memory - getters.getVmsMemory(host);
+  },
+
+  // get array with VMs from the esxiHosts
+  getAllVirtualMachines: (state) => {
+    const vms = [];
+    if (state.esxiHosts.length > 0) {
+      state.esxiHosts.forEach((h) => {
+        h.vms_details.forEach((vm) => {
+          vms.push({
+            id: vm.vm_id,
+            name: vm.main_info.name,
+            powered: vm.powered,
+            details: vm.main_info,
+            hardware: vm.hardware,
+            components: (h.vms_components && h.vms_components.length > 0)
+              ? h.vms_components[vm.main_info.name] : null,
+            flags: vm.flags,
+            // To Do: add components into each instance
+            instances: (vm.instances && vm.instances.length > 0) ? vm.instances : null,
+          });
+        });
+      });
+    }
+    return vms;
+  },
+  getVirtualMachines: (state, getters) => {
+    const vms = {};
+    if (state.esxiHosts.length > 0) {
+      state.esxiHosts.forEach((h) => {
+        h.vms_details.forEach((vm) => {
+          if (vm.powered === 'off' && Object.prototype.hasOwnProperty.call(vms, vm.main_info.name)) {
+            return;
+          }
+          vms[vm.main_info.name] = {
+            id: vm.vm_id,
+            name: vm.main_info.name,
+            powered: vm.powered,
+            details: vm.main_info,
+            hardware: vm.hardware,
+            components: vm.powered === 'on' ? getters.getVMsComponents(h, vm) : null,
+            flags: vm.flags,
+            instances: (vm.instances && vm.instances.length > 0) ? vm.instances : null,
+          };
+        });
+      });
+    }
+    return Object.values(vms).sort((a, b) => a.name.localeCompare(b.name));
+  },
+  getVMsComponents: () => (host, virtualMachine) => {
+    if (!host.vms_components) {
+      return null;
+    }
+    if (host.vms_components[virtualMachine.main_info.name]) {
+      return host.vms_components[virtualMachine.main_info.name];
+    }
+    return { error: host.vms_components.error[virtualMachine.main_info.name] };
+  },
+  getInstances: (state) => {
+    const instances = [];
+    if (state.esxiHosts.length > 0) {
+      state.esxiHosts.forEach((h) => {
+        h.vms_details.forEach((vm) => {
+          if (vm.instances.length > 0) {
+            vm.instances.forEach((i) => {
+              i.components = !h.instances_components || h.instances_components[i.name].length <= 0
+                ? null : h.instances_components[i.name];
+              i.vm = { name: vm.main_info.name };
+              i.esxi = { name: h.hostname };
+              instances.push(i);
+            });
+          }
+        });
+      });
+    }
+    return instances;
   },
 
 };

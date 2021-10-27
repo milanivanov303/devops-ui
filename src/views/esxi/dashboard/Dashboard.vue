@@ -20,10 +20,10 @@
 </template>
 
 <script>
-import CPUcoresCounter from '@/views/esxi/components/statistics/CPUcoresCounter';
-import CPUcoresStatistics from '@/views/esxi/components/statistics/CPUcoresStatistics';
-import RAMbyHostsStatistics from '@/views/esxi/components/statistics/RAMbyHostsStatistics';
-import PieChartRAMStatistics from '@/views/esxi/components/statistics/PieChartRAMStatistics';
+import CPUcoresCounter from '@/views/esxi/dashboard/statistics/CPUcoresCounter';
+import CPUcoresStatistics from '@/views/esxi/dashboard/statistics/CPUcoresStatistics';
+import RAMbyHostsStatistics from '@/views/esxi/dashboard/statistics/RAMbyHostsStatistics';
+import PieChartRAMStatistics from '@/views/esxi/dashboard/statistics/PieChartRAMStatistics';
 
 export default {
   components: {

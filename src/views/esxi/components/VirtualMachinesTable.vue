@@ -1,7 +1,7 @@
 <template>
   <div class="data-table">
     <Table
-      :data="VMs"
+      :data="virtualMachines"
       sort-by="powered"
       sort-dir="asc"
       query-prefix="vm_"
@@ -12,32 +12,59 @@
       :delete-btn="false"
       @view="(vm) => showDetails(vm)"
     >
+      <template v-slot:top-actions-after>
+        <Select class="col s12 m4" v-model="status" :options="statusOptions" displayed="name"/>
+      </template>
       <Column label="Name" name="name" :show="(vm) => vm.main_info.name"/>
       <Column label="Powered" name="powered" :show="(vm) => getVMPoweredLabel(vm.powered)"/>
       <Column label="RAM" name="ram" :show="(vm) => $esxi(vm.hardware.memory).bytesToSizeLabel()"/>
       <Column label="CPUs" name="cpu" :show="(vm) => vm.hardware.num_c_p_u"/>
     </Table>
-    <VmDetails v-if="showModal" :vm="selectedVM" @close="showModal = false"/>
+    <VmDetailsModal v-if="showModal" :vm="selectedVM" @close="showModal = false"/>
   </div>
 </template>
 
 <script>
 
-const VmDetails = () => import('./VmDetails');
+const VmDetailsModal = () => import('./VmDetailsModal');
 
 export default {
   components: {
-    VmDetails,
+    VmDetailsModal,
   },
 
   props: {
     VMs: Array,
   },
 
+  computed: {
+    virtualMachines() {
+      return this.filterItemsByStatus(this.VMs);
+    },
+  },
+
   data() {
     return {
       selectedVM: {},
       showModal: false,
+      status: {
+        name: 'On',
+        value: 'on',
+      },
+      statusOptions: [
+        {
+          name: 'On',
+          value: 'on',
+        },
+        {
+          name: 'Off',
+          value: 'off',
+        },
+        {
+          name: 'All',
+          value: 'all',
+        },
+      ],
     };
   },
 
@@ -54,6 +81,13 @@ export default {
         return `<span class="new badge red" data-badge-caption="">${powered}</span>`;
       }
       return `<span class="new badge" data-badge-caption="">${powered}</span>`;
+    },
+    filterItemsByStatus(items) {
+      if (this.status.value === 'all') {
+        return items;
+      }
+
+      return items.filter((item) => item.powered === this.status.value);
     },
   },
 };

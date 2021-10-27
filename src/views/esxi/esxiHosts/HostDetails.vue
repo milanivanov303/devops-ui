@@ -2,30 +2,51 @@
   <div class="card" v-if="esxiHost">
     <div class="card-content">
       <div class="card-title truncate">
-        {{ esxiHost.hostname }}
-        <a class="right"
-           data-tooltip="Update info"
-           v-if="$auth.can('esxi.add')"
-           @click.prevent="updateEsxiInfo()">
-          <i class="material-icons">refresh</i>
-        </a>
-        <div v-if="esxiHost.updated_on" class="right updated-on">
-          Updated on {{ $date(esxiHost.updated_on).toHuman() }}
+        <div class="row">
+          <div class="col s12 m6 l9">
+            {{ esxiHost.hostname }}
+          </div>
+          <div class="col s12 m6 l3">
+            <a :href="`https://${esxiHost.hostname}.codixfr.private/`"
+                target="_blank"
+                data-tooltip="Go to link"
+                class="right">
+              <i class="material-icons">laptop_chromebook</i>
+            </a>
+            <div class="right updated-on">
+              ESXi for administration
+            </div>
+          </div>
+          <div class="col s12 m6 l3 offset-m6 offset-l9">
+            <a class="right"
+              data-tooltip="Update info"
+              v-if="$auth.can('esxi.add')"
+              @click.prevent="updateEsxiInfo()">
+              <i class="material-icons">refresh</i>
+            </a>
+            <div v-if="esxiHost.updated_on" class="right updated-on">
+              Updated on {{ $date(esxiHost.updated_on).toHuman() }}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div v-if="esxiHost.details && esxiHost.details.memory">
-        <b>Memory:</b>{{ esxiHost.details ?
-          $esxi(esxiHost.details.memory.physical_memory).bytesToSizeLabel() : '' }},
-        <b>Free:</b> {{ $esxi(getHostFreeMemory(esxiHost)).bytesToSizeLabel() }}
-      </div>
-      <div v-if="esxiHost.details" class="progress">
-        <div class="determinate" :style="{width: getFreeMemoryInPerc(esxiHost) + '%'}"></div>
+      <div class="row progress-bar">
+        <div class="col s12">
+          <div v-if="esxiHost.details && esxiHost.details.memory">
+            <b>Memory: </b>{{ esxiHost.details ?
+              $esxi(esxiHost.details.memory.physical_memory).bytesToSizeLabel() : '' }},
+            <b>Free: </b> {{ $esxi(getHostFreeMemory(esxiHost)).bytesToSizeLabel() }}
+          </div>
+          <div v-if="esxiHost.details" class="progress">
+            <div class="determinate" :style="{width: getFreeMemoryInPerc(esxiHost) + '%'}"></div>
+          </div>
+        </div>
       </div>
 
       <div class="row">
         <div class="col s12">
-          <ul class="tabs">
+          <ul class="tabs row">
             <li class="tab col s6">
               <a href="#esxi_details">DETAILS</a>
             </li>
@@ -37,7 +58,7 @@
             <EsxiDetails :esxiHost="esxiHost"/>
           </div>
           <div v-if="esxiHost.vms_details" id="vms">
-            <VirtualMachines :VMs="VMs"/>
+            <VirtualMachinesTable :VMs="VMs"/>
           </div>
         </div>
       </div>
@@ -46,12 +67,12 @@
 </template>
 
 <script>
-import VirtualMachines from './components/VirtualMachines';
-import EsxiDetails from './components/EsxiDetails';
+const VirtualMachinesTable = () => import('../components/VirtualMachinesTable');
+const EsxiDetails = () => import('./EsxiDetails');
 
 export default {
   components: {
-    VirtualMachines,
+    VirtualMachinesTable,
     EsxiDetails,
   },
 
@@ -144,13 +165,16 @@ export default {
 };
 </script>
 
-<style scoped>
-  .card-title{
+<style lang="scss" scoped>
+  .card-title {
+    .row {
+      margin-bottom: 0px;
+    }
     font-size: 2em;
   }
 
-  .updated-on{
+  .updated-on {
     font-size: 0.4em;
-    margin-top: 5px;
+    margin-right: 8px;
   }
 </style>

@@ -46,7 +46,7 @@ export default {
   methods: {
     getTo() {
       const query = { ...this.$route.query };
-      query.host = this.esxiHost.hostname;
+      query.esxiHost = this.esxiHost.hostname;
 
       return { query };
     },

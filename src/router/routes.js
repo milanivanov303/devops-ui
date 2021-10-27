@@ -15,8 +15,9 @@ const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templ
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
 
-const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/Dashboard');
-const EsxiHosts = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Hosts');
+const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
+const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
+const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
 
 const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
 const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
@@ -347,7 +348,7 @@ export default [
     component: EsxiDashboard,
   },
   {
-    path: '/inventory/esxiHosts/:host?',
+    path: '/inventory/esxiHosts/:esxiHost?',
     meta: {
       requiresAuth: true,
       name: 'esxi-esxiHosts',
@@ -362,10 +363,49 @@ export default [
         return title;
       },
     },
-    component: EsxiHosts,
+    component: Items,
     props: {
-      module: 'esxi',
+      module: 'esxiHosts',
     },
+  },
+  {
+    path: '/inventory/virtualMachines/:virtualMachine?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-virtualMachines',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Virtual Machines';
+
+        if (route.query.virtualMachine) {
+          title = `${route.query.virtualMachine} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Items,
+    props: {
+      module: 'virtualMachines',
+    },
+  },
+  {
+    path: '/inventory/instances/:instance?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-instances',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Instances';
+
+        if (route.query.instance) {
+          title = `${route.query.instance} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Instances,
   },
 
   // Devops Administration Tab
