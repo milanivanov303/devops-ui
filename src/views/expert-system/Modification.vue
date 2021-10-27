@@ -1,9 +1,10 @@
 <template>
   <div class="row">
     <h1 class="center">SE Transfer</h1>
-    <custom-confirm ref="custom-confirm"
-                    :message="confirmMsg"
-                    @selectedVal="customConfirm"/>
+    <custom-confirm
+        ref="custom-confirm"
+        :message="confirmMsg"
+        @selectedVal="customConfirm"/>
     <div class="col s6">
       <Alert
         v-if="error !== ''"
@@ -187,8 +188,7 @@
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import CustomConfirm from "@/components/partials/CustomConfirm";
 import config from '@/config';
-import client from '@/plugins/ws';
-
+import WebSocket from '@/plugins/ws';
 
 export default {
   components: {
@@ -198,6 +198,9 @@ export default {
     this.getIssue();
     this.getInstanceStatus();
     this.getESType();
+    // if (this.broadcast) {
+    //   this.subscribe();
+    // }
   },
   watch: {
     ttsKey(key) {
@@ -205,6 +208,9 @@ export default {
       this.deliveryChains = [];
       this.$router.history.replace({ params: { issue: key } });
     },
+    // broadcast() {
+    //   this.subscribe();
+    // },
   },
   created() {
     this.config = config;
@@ -260,6 +266,7 @@ export default {
         progress: null,
         log: '',
         error: null,
+        queue: null,
       },
     };
   },
@@ -359,7 +366,14 @@ export default {
       await this.$store.dispatch('mmpi/ociByOperation', data)
           .then((response) => {
             [this.texts] = Object.values(response.data);
-            loader.hide();
+            this.texts = this.texts.reduce((acc, text) => {
+              acc.push({
+                name: text,
+                value:text
+              })
+              return acc
+            }, [])
+           loader.hide();
           })
           .catch((error) => {
             loader.hide();
@@ -385,61 +399,110 @@ export default {
     },
     async onSubmit() {
       const loader = this.$loading.show({ container: this.$el });
+
+      const url = 'wss://ea-dev.codixfr.private/rabbitmq/ws';
+      const username = 'mmpi';
+      const password = 'ipmm';
+      const vhost = 'mmpi';
+
+      const ws = new WebSocket(url, username, password, vhost);
+
       this.exporting.status = 'running';
       if (this.se.doExport) {
         this.exporting.started = true;
         this.exporting.comments = 'Export will start shortly ...';
       }
       await this.$store.dispatch('mmpi/exportSeModification', this.se)
-        .then((response) => {
-          this.confirmMsg = ['Modification has been successfully created!',
-            'Do you want to proceed to MMPI?'];
-          if (response.data.id) {
-            this.$refs['custom-confirm'].openModal();
-          }
+          .then((response) => {
+            this.confirmMsg = ['Modification has been successfully created!', 'Do you want to proceed to MMPI?'];
+            if (response.data.id) {
+              this.$refs['custom-confirm'].openModal();
+            }
 
-          if (!client.connected) {
-            return;
-          }
+            if (!ws.client.connected) {
+              return;
+            }
 
-          const subscribe = client.subscribe(
-            `/queue/${response.data.broadcast.queue}`,
-            (message) => {
-              const data = JSON.parse(message.body);
-              this.exporting.status = data.status;
-              if (data.comments) {
-                this.exporting.comments = data.comments;
-              }
+            const subscribe = ws.client.subscribe(
+                `/queue/${response.data.broadcast.queue}`,
+                (message) => {
+                  const data = JSON.parse(message.body);
+                  this.exporting.status = data.status;
+                  if (data.comments) {
+                    this.exporting.comments = data.comments;
+                  }
 
-              if (data.log) {
-                this.exporting.log += data.log;
-                this.scrollLogContainer();
-              }
+                  if (data.log) {
+                    this.exporting.log += data.log;
+                    this.scrollLogContainer();
+                  }
 
-              if (data.status === 'failed') {
-                this.exporting.status = data.status;
-                this.exporting.error = data.error;
-                if (data.log.includes('THERE IS NOT ENOUGH SPACE')) {
-                  this.exporting.error = 'There is not enough space for the export!';
-                }
-                subscribe.unsubscribe();
-              }
+                  if (data.status === 'failed') {
+                    this.exporting.status = data.status;
+                    this.exporting.error = data.error;
+                    if (data.log.includes('THERE IS NOT ENOUGHT SPACE')) {
+                      this.exporting.error = 'There is not enought space for the export!';
+                    }
+                    subscribe.unsubscribe();
+                  }
 
-              if (this.exporting.status === 'success') {
-                this.$refs['custom-confirm'].openModal();
-              }
-            },
-            response.data.broadcast,
-          );
-        })
-        .catch((error) => {
-          this.exporting.status = 'failed';
-          this.exporting.summary = 'Could not start export';
-          this.exporting.error = error;
-        });
+                  if (this.exporting.status === 'success') {
+                    this.$refs['custom-confirm'].openModal();
+                  }
+                },
+                response.data.broadcast,
+            );
+          })
+          .catch((error) => {
+            this.exporting.status = 'failed';
+            this.exporting.summary = 'Could not start export';
+            this.exporting.error = error;
+          });
       this.exporting.log = '';
       loader.hide();
     },
+//     subscribe() {
+//
+//       const url = 'wss://ea-dev.codixfr.private/rabbitmq/ws';
+//       const username = 'mmpi';
+//       const password = 'ipmm';
+//       const vhost = 'mmpi';
+//
+//       const ws = new WebSocket(url, username, password, vhost);
+//
+//       if (!ws.isConnected()) {
+//         return;
+//       }
+// console.log(this.broadcast.queue);
+//       this.queue = ws.subscribe(
+//           `/queue/${this.broadcast.queue}`,
+//           (message) => {
+//             const data = JSON.parse(message.body);
+//             this.exporting.status = data.status;
+//             if (data.comments) {
+//               this.exporting.comments = data.comments;
+//             }
+//
+//             if (data.log) {
+//               this.exporting.log += data.log;
+//               this.scrollLogContainer();
+//             }
+//
+//             if (data.status === 'failed') {
+//               this.exporting.status = data.status;
+//               this.exporting.error = data.error;
+//               if (data.log.includes('THERE IS NOT ENOUGH SPACE')) {
+//                 this.exporting.error = 'There is not enough space for the export!';
+//               }
+//               this.queue.unsubscribe();
+//             }
+//             if (this.exporting.status === 'success') {
+//               this.$refs['custom-confirm'].openModal();
+//             }
+//           },
+//           this.broadcast,
+//       );
+//     },
     scrollLogContainer() {
       setTimeout(() => {
         const container = this.$refs.log;
