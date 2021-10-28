@@ -2,12 +2,9 @@
   <Modal
     @close="$emit('close')"
     class="right-sheet">
-    <template v-slot:header>
-      <div v-if="action === 'create'">
-        Add new ESXi host
-      </div>
-    </template>
+    <template v-slot:header>Add new ESXi host</template>
     <template v-slot:content>
+      <Alert v-if="error" :msg="error"/>
       <form class="col s12 l11">
         <div class="row">
           <div class="input-field col s12" :class="{invalid: $v.host.hostname.$error}">
@@ -17,7 +14,7 @@
               id="hostname"
               @blur="$v.host.hostname.$touch()"
               v-model="host.hostname">
-            <label :class="{active: host.hostname}" for="hostname">Hostname*</label>
+            <label :class="{active: host.hostname}" for="hostname">Hostname</label>
           </div>
           <div class="validator col s12 offset-l1 offset-m1">
             <div class="red-text" v-if="$v.host.hostname.$error">
@@ -26,9 +23,6 @@
           </div>
         </div>
       </form>
-      <div v-if="error" class="col s12 l11 error-message">
-        {{ error }}
-      </div>
     </template>
     <template v-slot:footer>
       <button
@@ -49,21 +43,16 @@ import { required } from 'vuelidate/lib/validators';
 export default {
   data() {
     return {
-      error: '',
+      host: {},
+      error: null,
     };
   },
 
-  props: {
-    newHost: {
-      type: Object,
-      required: true,
-    },
-    action: String,
-  },
-
-  computed: {
-    host() {
-      return this.newHost;
+  validations: {
+    host: {
+      hostname: {
+        required,
+      },
     },
   },
 
@@ -74,39 +63,16 @@ export default {
         return;
       }
 
-      const payload = { ...this.host };
-
-      this.$store.dispatch(`esxi/${this.action}Host`, payload)
+      this.$store.dispatch('esxi/createHost', this.host)
         .then(() => {
           this.$emit('close');
-          if (this.action === 'create') {
-            this.$M.toast({ html: 'ESXi host has been created!', classes: 'toast-seccess' });
-          }
+          this.$M.toast({ html: 'ESXi host has been created!', classes: 'toast-seccess' });
         })
         .catch((error) => {
           this.error = error;
         });
     },
   },
-
-  validations() {
-    const validations = {
-      host: {
-        hostname: {
-          required,
-        },
-      },
-    };
-
-    return validations;
-  },
-
 };
 
 </script>
-
-<style scoped>
-.error-message {
-  color: #eb344f;
-}
-</style>

@@ -1,11 +1,15 @@
+<script>
 import { mixins, Bar } from 'vue-chartjs';
 
 function dataHandler() {
-  const colors = [];
-  this.data.datasets[0].data.forEach(() => {
-    colors.push(this.generateRandomColor());
+  this.data.datasets.forEach((dataset) => {
+    if (!dataset.backgroundColor) {
+      dataset.backgroundColor = [];
+      dataset.data.forEach(() => {
+        dataset.backgroundColor.push(this.generateRandomColor());
+      });
+    }
   });
-  this.data.datasets[0].backgroundColor = colors;
 
   this.chartData = this.data;
 }
@@ -57,3 +61,4 @@ export default {
     this.renderChart(this.chartData, this.options);
   },
 };
+</script>
