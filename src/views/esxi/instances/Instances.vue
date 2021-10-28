@@ -19,6 +19,8 @@
       >
         <Column label="Instance" name="name" :show="(instance) => instance.name"/>
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
+        <Column label="Delivery Chain" name="delivery_chain"
+          :show="(instance) => getDeliveryChain(instance.name)"/>
         <Column label="Virtual Machine" name="vm"
           :show="(instance) => getVMLink(instance.vm.name)"/>
         <Column label="Esxi Host" name="esxi"
@@ -92,6 +94,19 @@ export default {
         });
       });
       return project ? project.name : '-';
+    },
+    getDeliveryChain(instance) {
+      let deliveryChain = null;
+      this.projects.forEach((p) => {
+        p.delivery_chains.forEach((d) => {
+          d.instances.forEach((i) => {
+            if (i.name === instance) {
+              deliveryChain = d;
+            }
+          });
+        });
+      });
+      return deliveryChain ? deliveryChain.title : '-';
     },
     getHostLink(name) {
       return `<a href="esxiHosts?esxiHost=${name}">${name}</a>`;
