@@ -40,7 +40,7 @@ export default {
     }
     return [];
   },
-  chainDevInstance: () => instances => Object.values(instances).filter((instance) => {
+  chainDevInstance: () => (instances) => Object.values(instances).filter((instance) => {
     if (instance.instance_type_id === 'DEV'
       && instance.owner.key === 'codix'
       && instance.status.key === 'active') {
@@ -48,5 +48,5 @@ export default {
     }
     return null;
   }),
-  getSeOperations: state => state.operationType.filter(type => type.subtype === 'SE'),
+  getSeOperations: (state) => state.operationType.filter((type) => type.subtype === 'SE'),
 };

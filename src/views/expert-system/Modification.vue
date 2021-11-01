@@ -191,7 +191,7 @@
 <script>
 
 import { required, requiredIf } from 'vuelidate/lib/validators';
-import CustomConfirm from "@/components/partials/CustomConfirm";
+import CustomConfirm from '@/components/partials/CustomConfirm';
 import config from '@/config';
 import WebSocket from '@/plugins/ws';
 
@@ -281,8 +281,8 @@ export default {
         required,
       },
       contents: {
-        required: requiredIf(formModel => ['bkg_trans_proc', 'bkg_trans_texte']
-            .includes(formModel.seType.key)),
+        required: requiredIf((formModel) => ['bkg_trans_proc', 'bkg_trans_texte']
+          .includes(formModel.seType.key)),
       },
     },
     ttsKey: {
@@ -301,7 +301,7 @@ export default {
     async selectedContents(value) {
       this.se.contents = value.name;
     },
-      changeIssue() {
+    changeIssue() {
       this.issueStatus = '';
       this.deliveryChains = [];
       this.deliveryChain = {};
@@ -312,17 +312,17 @@ export default {
       if (this.$route.params.issue) {
         const loader = this.$loading.show({ container: this.$el });
         await this.$store.dispatch('cms/getIssue', this.$route.params.issue)
-            .then(() => {
-              this.se.issue_id = this.$store.state.cms.issue.id;
-              if (this.$store.state.cms.issue) {
-                this.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
-              }
-              if (!this.$store.state.cms.issue
+          .then(() => {
+            this.se.issue_id = this.$store.state.cms.issue.id;
+            if (this.$store.state.cms.issue) {
+              this.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
+            }
+            if (!this.$store.state.cms.issue
                   || (this.ttsKey !== this.$store.state.cms.issue.tts_id)) {
-                this.issueStatus = 'ERROR';
-              }
-              loader.hide();
-            });
+              this.issueStatus = 'ERROR';
+            }
+            loader.hide();
+          });
       }
     },
     getInstanceStatus() {
@@ -363,22 +363,22 @@ export default {
         operation,
       };
       await this.$store.dispatch('mmpi/ociByOperation', data)
-          .then((response) => {
-            [this.texts] = Object.values(response.data);
-            this.texts = this.texts.reduce((acc, text) => {
-              acc.push({
-                name: text,
-                value: text
-              })
-              return acc
-            }, [])
-            loader.hide();
-          })
-          .catch((error) => {
-            loader.hide();
-            this.error = error;
-            return error;
-          });
+        .then((response) => {
+          [this.texts] = Object.values(response.data);
+          this.texts = this.texts.reduce((acc, text) => {
+            acc.push({
+              name: text,
+              value: text,
+            });
+            return acc;
+          }, []);
+          loader.hide();
+        })
+        .catch((error) => {
+          loader.hide();
+          this.error = error;
+          return error;
+        });
     },
     checkSeText(value) {
       if (!this.texts.includes(value)) {
@@ -399,7 +399,8 @@ export default {
     async onSubmit() {
       const loader = this.$loading.show({ container: this.$el });
 
-      const ws = new WebSocket(config.ws.url, config.ws.username_es, config.ws.password_es, config.ws.vhost_es);
+      const ws = new WebSocket(config.ws.url, config.ws.username_es, config.ws.password_es,
+        config.ws.vhost_es);
 
       this.exporting.status = 'running';
       if (this.se.doExport) {

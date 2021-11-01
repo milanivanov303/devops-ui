@@ -337,7 +337,7 @@ export default {
   async ociByOperation({ commit }, payload) {
     const promise = api('mmpi').post('oci', payload);
     await promise
-      .then(response => response.data.data)
+      .then((response) => response.data.data)
       .catch(() => commit('error', 'Could not get Oci data'));
     return promise;
   },

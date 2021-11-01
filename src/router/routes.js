@@ -1,4 +1,4 @@
-const SeTransferModif = () => import(/* webpackChunkName: "expert-system" */ '../views/expert-system/Modification.vue');
+const SeTransferModif = () => import(/* webpackChunkName: "expert-system" */ '../views/expert-system/Modification');
 const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
