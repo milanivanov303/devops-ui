@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Loading from 'vue-loading-overlay';
+import VueNumber from 'vue-number-animation';
 import Vuelidate from 'vuelidate';
 import * as M from 'materialize-css/dist/js/materialize';
 import * as VueComponents from '@enterpriseapps/vue-components';
@@ -13,21 +14,24 @@ import LoginLayout from './components/layouts/Login';
 import BasicLayout from './components/layouts/Basic';
 
 import '@/config';
-import config from '../config';
 import './plugins/backend';
-import { date } from './plugins/helpers';
-import 'vue-loading-overlay/dist/vue-loading.css';
+import config from '../config';
 import WebSocket from './plugins/ws';
+import 'vue-loading-overlay/dist/vue-loading.css';
 
-Vue.use(VueComponents);
-Vue.use(VueAdministration, { store, api: api('um') });
+import { date } from './helpers/DateHelper';
+import { esxi } from './helpers/EsxiHelper';
 
 Vue.use(Loading);
 Vue.use(Vuelidate);
+Vue.use(VueNumber);
+Vue.use(VueComponents);
+Vue.use(VueAdministration, { store, api: api('um') });
 
 Vue.prototype.$M = M;
 Vue.prototype.$auth = auth;
 Vue.prototype.$date = date;
+Vue.prototype.$esxi = esxi;
 
 const ws = new WebSocket(config.ws.url, config.ws.username, config.ws.password, config.ws.vhost);
 Vue.prototype.$ws = ws;

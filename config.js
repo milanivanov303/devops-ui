@@ -46,5 +46,4 @@ module.exports = {
   },
   instance: process.env.VUE_APP_ENV,
   ssh_port: process.env.VUE_APP_SSH_PORT,
-  project: process.env.VUE_APP_COMPOSE_PROJECT_NAME,
 };
