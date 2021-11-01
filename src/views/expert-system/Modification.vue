@@ -2,167 +2,171 @@
   <div class="row">
     <h1 class="center">SE Transfer</h1>
     <custom-confirm
-        ref="custom-confirm"
-        :message="confirmMsg"
-        @selectedVal="customConfirm"/>
+      ref="custom-confirm"
+      :message="confirmMsg"
+      @selectedVal="customConfirm"
+    />
     <div class="col s6">
       <Alert
         v-if="error !== ''"
         v-bind:msg="error"
       />
-    <div class="row">
-      <div class="input-field col s9">
-        <i class="material-icons prefix">label_outline</i>
+      <div class="row">
+        <div class="input-field col s9">
+          <i class="material-icons prefix">label_outline</i>
           <label for="tts_key" class="active">TTS Key</label>
-            <input
-              id="tts_key"
-              type="text"
-              v-model.trim="ttsKey"
-              @blur="$v.ttsKey.$touch()"
-              @change="$v.ttsKey.$touch()"
-            />
-        <div class="validator" v-if="$v.ttsKey.$anyError || issueStatus === 'ERROR'">
-           <div class="red-text" v-if="!$v.ttsKey.required">
+          <input
+            id="tts_key"
+            type="text"
+            v-model.trim="ttsKey"
+            @blur="$v.ttsKey.$touch()"
+            @change="$v.ttsKey.$touch()"
+          />
+          <div class="validator" v-if="$v.ttsKey.$anyError || issueStatus === 'ERROR'">
+            <div class="red-text" v-if="!$v.ttsKey.required">
               <p>Field is required</p>
-           </div>
-           <div class="red-text" v-if="!$v.ttsKey.validKey">
+            </div>
+            <div class="red-text" v-if="!$v.ttsKey.validKey">
               <p>Not a valid TTS key.</p>
-           </div>
-           <div class="red-text" v-if="issueStatus === 'ERROR'">
+            </div>
+            <div class="red-text" v-if="issueStatus === 'ERROR'">
               <p>TTS Key does not exist in MMPI!</p>
-           </div>
+            </div>
+          </div>
+        </div>
+        <div class="input-field col s1">
+          <a
+            class="btn-floating btn-small waves-effect waves-light tooltipped"
+            data-position="right"
+            data-tooltip="Change issue"
+            ref="tooltip"
+            @click="getIssue()">
+            <i class="material-icons">cached</i>
+          </a>
         </div>
       </div>
-      <div class="input-field col s1">
-        <a
-          class="btn-floating btn-small waves-effect waves-light tooltipped"
-          data-position="right"
-          data-tooltip="Change issue"
-          ref="tooltip"
-          @click="getIssue()">
-          <i class="material-icons">cached</i>
-        </a>
-      </div>
-    </div>
-    <div class="row"
-         v-if="deliveryChains.length
+      <div class="row"
+           v-if="deliveryChains.length
          && !$v.ttsKey.$anyError
          && issueStatus !== 'ERROR'">
-      <div class="col s10">
-        <Select
-          label="Delivery chains"
-          icon="linear_scale"
-          displayed="title"
-          v-model="deliveryChain"
-          :options="deliveryChains"
-          :invalid="$v.deliveryChain.$error"
-          @blur="$v.deliveryChain.$touch()"
-          @change="selectedDeliveryChain"
-        />
-        <div class="validator red-text" v-if="$v.deliveryChain.$error">
-          <p v-if="!$v.deliveryChain.required">Delivery chain field is required.</p>
+        <div class="col s10">
+          <Select
+            label="Delivery chains"
+            icon="linear_scale"
+            displayed="title"
+            v-model="deliveryChain"
+            :options="deliveryChains"
+            :invalid="$v.deliveryChain.$error"
+            @blur="$v.deliveryChain.$touch()"
+            @change="selectedDeliveryChain"
+          />
+          <div class="validator red-text" v-if="$v.deliveryChain.$error">
+            <p v-if="!$v.deliveryChain.required">Delivery chain field is required.</p>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row" v-if="se.delivery_chain">
-      <div class="col s10">
-        <Select
-          label="Instance status"
-          icon="power_settings_new"
-          displayed="value"
-          v-model="instanceStatus"
-          :options="instanceStatuses"
-          :invalid="$v.instanceStatus.$error"
-          @blur="$v.instanceStatus.$touch()"
-          @change="selectedInstanceStatus"
-        />
-        <div class="validator red-text" v-if="$v.instanceStatus.$error">
-          <p v-if="!$v.instanceStatus.required">Instance status field is required.</p>
+      <div class="row" v-if="se.delivery_chain">
+        <div class="col s10">
+          <Select
+            label="Instance status"
+            icon="power_settings_new"
+            displayed="value"
+            v-model="instanceStatus"
+            :options="instanceStatuses"
+            :invalid="$v.instanceStatus.$error"
+            @blur="$v.instanceStatus.$touch()"
+            @change="selectedInstanceStatus"
+          />
+          <div class="validator red-text" v-if="$v.instanceStatus.$error">
+            <p v-if="!$v.instanceStatus.required">Instance status field is required.</p>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row" v-if="se.instance && se.instance_status">
-      <div class="input-field col s10">
-        <i class="material-icons prefix">storage</i>
-         <input
+      <div class="row" v-if="se.instance && se.instance_status">
+        <div class="input-field col s10">
+          <i class="material-icons prefix">storage</i>
+          <input
             readonly
             type="text"
             :value="se.instance.name"
             id="instance">
-         <label :class="{active: se.instance.name}" for="instance">Instance</label>
-         <span class="helper-text">Instance on which the export will be done.</span>
-      </div>
-    </div>
-    <div class="row" v-if="se.instance_status && se.instance ">
-      <div class="col s10" >
-        <Select
-          label="SE Type"
-          icon="memory"
-          displayed="value"
-          v-model="seType"
-          :options="seTypes"
-          :invalid="$v.seType.$error"
-          @blur="$v.seType.$touch()"
-          @change="selectedType"
-        />
-        <div class="validator red-text" v-if="$v.seType.$error">
-          <p v-if="!$v.seType.required">SE Type field is required.</p>
+          <label :class="{active: se.instance.name}" for="instance">Instance</label>
+          <span class="helper-text">Instance on which the export will be done.</span>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col s10">
+      <div class="row" v-if="se.instance_status && se.instance ">
+        <div class="col s10" >
+          <Select
+            label="SE Type"
+            icon="memory"
+            displayed="value"
+            v-model="seType"
+            :options="seTypes"
+            :invalid="$v.seType.$error"
+            @blur="$v.seType.$touch()"
+            @change="selectedType"
+          />
+          <div class="validator red-text" v-if="$v.seType.$error">
+            <p v-if="!$v.seType.required">SE Type field is required.</p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s10">
         <span
           id="description"
           class="materialize-textarea"
           v-html="typeDescription">
         </span>
+        </div>
       </div>
-    </div>
-    <div class="row" v-if="texts && ociDependant.includes(seType.key)">
-      <div class="col s10">
-        <Autocomplete
-          label="Procedure/Letters"
-          icon="library_books"
-          :items="texts"
-          v-model="se.contents"
-          :invalid="$v.se.contents.$error"
-          @blur="checkSeText(se.contents)"
-        />
-         <div class="validator">
-          <div class="red-text" v-if="$v.se.contents.$invalid">
-            <p>SE texts field is required for selected operation.</p>
+      <div class="row" v-if="texts && ociDependant.includes(seType.key)">
+        <div class="col s10">
+          <Autocomplete
+            label="Procedure/Letters"
+            icon="library_books"
+            :items="texts"
+            v-model="se.contents"
+            :invalid="$v.se.contents.$error"
+            @blur="checkSeText(se.contents)"
+            @input="selectedContents"
+          />
+          <div class="validator">
+            <div class="red-text" v-if="$v.se.contents.$invalid">
+              <p>SE texts field is required for selected operation.</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="row" v-if="$v.deliveryChain.required">
-      <div class="col s5 exportCheckbox">
-        <label>
-         <input
-          ref="exportable"
-          type="checkbox"
-          @change="checkboxEvent(se.doExport)"
-          v-model="se.doExport"
-          :disabled="!exportable.includes(seType.key)"/>
-         <span>Do export on DEV instance</span>
-        </label>
+      <div class="row" v-if="$v.deliveryChain.required">
+        <div class="col s5 exportCheckbox">
+          <label>
+            <input
+              ref="exportable"
+              type="checkbox"
+              @change="checkboxEvent(se.doExport)"
+              v-model="se.doExport"
+              :disabled="!exportable.includes(seType.key)"
+            />
+            <span>Do export on DEV instance</span>
+          </label>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s5">
-        <button class="btn waves-effect waves-light right"
-          type="button"
-          name="action"
-          :disabled="$v.$invalid || exporting.status === 'running'"
-          @click="onSubmit">{{actionName}}
-        </button>
+      <div class="row">
+        <div class="input-field col s5">
+          <button
+            class="btn waves-effect waves-light right"
+            type="button"
+            name="action"
+            :disabled="$v.$invalid || exporting.status === 'running'"
+            @click="onSubmit">{{ actionName }}
+          </button>
         </div>
       </div>
     </div>
     <div class="col s6" v-if="exporting.started && se.doExport">
       <div class="row">
-        <div class="col s6">
+        <div class>
           <div v-if="exporting.status === 'success'" class="center" >
             <i class="material-icons large green-text">check_circle_outline</i>
             <p>Export completed successfully</p>
@@ -185,6 +189,7 @@
   </div>
 </template>
 <script>
+
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import CustomConfirm from "@/components/partials/CustomConfirm";
 import config from '@/config';
@@ -198,9 +203,6 @@ export default {
     this.getIssue();
     this.getInstanceStatus();
     this.getESType();
-    // if (this.broadcast) {
-    //   this.subscribe();
-    // }
   },
   watch: {
     ttsKey(key) {
@@ -208,12 +210,6 @@ export default {
       this.deliveryChains = [];
       this.$router.history.replace({ params: { issue: key } });
     },
-    // broadcast() {
-    //   this.subscribe();
-    // },
-  },
-  created() {
-    this.config = config;
   },
   data() {
     return {
@@ -286,7 +282,7 @@ export default {
       },
       contents: {
         required: requiredIf(formModel => ['bkg_trans_proc', 'bkg_trans_texte']
-          .includes(formModel.subtype_id.key)),
+            .includes(formModel.seType.key)),
       },
     },
     ttsKey: {
@@ -302,7 +298,10 @@ export default {
     },
   },
   methods: {
-    changeIssue() {
+    async selectedContents(value) {
+      this.se.contents = value.name;
+    },
+      changeIssue() {
       this.issueStatus = '';
       this.deliveryChains = [];
       this.deliveryChain = {};
@@ -313,17 +312,17 @@ export default {
       if (this.$route.params.issue) {
         const loader = this.$loading.show({ container: this.$el });
         await this.$store.dispatch('cms/getIssue', this.$route.params.issue)
-          .then(() => {
-            this.se.issue_id = this.$store.state.cms.issue.id;
-            if (this.$store.state.cms.issue) {
-              this.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
-            }
-            if (!this.$store.state.cms.issue
-              || (this.ttsKey !== this.$store.state.cms.issue.tts_id)) {
-              this.issueStatus = 'ERROR';
-            }
-            loader.hide();
-          });
+            .then(() => {
+              this.se.issue_id = this.$store.state.cms.issue.id;
+              if (this.$store.state.cms.issue) {
+                this.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
+              }
+              if (!this.$store.state.cms.issue
+                  || (this.ttsKey !== this.$store.state.cms.issue.tts_id)) {
+                this.issueStatus = 'ERROR';
+              }
+              loader.hide();
+            });
       }
     },
     getInstanceStatus() {
@@ -369,11 +368,11 @@ export default {
             this.texts = this.texts.reduce((acc, text) => {
               acc.push({
                 name: text,
-                value:text
+                value: text
               })
               return acc
             }, [])
-           loader.hide();
+            loader.hide();
           })
           .catch((error) => {
             loader.hide();
@@ -400,12 +399,7 @@ export default {
     async onSubmit() {
       const loader = this.$loading.show({ container: this.$el });
 
-      const url = 'wss://ea-dev.codixfr.private/rabbitmq/ws';
-      const username = 'mmpi';
-      const password = 'ipmm';
-      const vhost = 'mmpi';
-
-      const ws = new WebSocket(url, username, password, vhost);
+      const ws = new WebSocket(config.ws.url, config.ws.username_es, config.ws.password_es, config.ws.vhost_es);
 
       this.exporting.status = 'running';
       if (this.se.doExport) {
@@ -413,96 +407,54 @@ export default {
         this.exporting.comments = 'Export will start shortly ...';
       }
       await this.$store.dispatch('mmpi/exportSeModification', this.se)
-          .then((response) => {
-            this.confirmMsg = ['Modification has been successfully created!', 'Do you want to proceed to MMPI?'];
-            if (response.data.id) {
-              this.$refs['custom-confirm'].openModal();
-            }
+        .then((response) => {
+          this.confirmMsg = ['Modification has been successfully created!', 'Do you want to proceed to MMPI?'];
+          if (response.data.id) {
+            this.$refs['custom-confirm'].openModal();
+          }
 
-            if (!ws.client.connected) {
-              return;
-            }
+          if (!ws.client.connected) {
+            return;
+          }
 
-            const subscribe = ws.client.subscribe(
-                `/queue/${response.data.broadcast.queue}`,
-                (message) => {
-                  const data = JSON.parse(message.body);
-                  this.exporting.status = data.status;
-                  if (data.comments) {
-                    this.exporting.comments = data.comments;
-                  }
+          const subscribe = ws.client.subscribe(
+            `/queue/${response.data.broadcast.queue}`,
+            (message) => {
+              const data = JSON.parse(message.body);
+              this.exporting.status = data.status;
+              if (data.comments) {
+                this.exporting.comments = data.comments;
+              }
 
-                  if (data.log) {
-                    this.exporting.log += data.log;
-                    this.scrollLogContainer();
-                  }
+              if (data.log) {
+                this.exporting.log += data.log;
+                this.scrollLogContainer();
+              }
 
-                  if (data.status === 'failed') {
-                    this.exporting.status = data.status;
-                    this.exporting.error = data.error;
-                    if (data.log.includes('THERE IS NOT ENOUGHT SPACE')) {
-                      this.exporting.error = 'There is not enought space for the export!';
-                    }
-                    subscribe.unsubscribe();
-                  }
+              if (data.status === 'failed') {
+                this.exporting.status = data.status;
+                this.exporting.error = data.error;
+                if (data.log.includes('THERE IS NOT ENOUGH SPACE')) {
+                  this.exporting.error = 'There is not enough space for the export!';
+                }
+                subscribe.unsubscribe();
+              }
 
-                  if (this.exporting.status === 'success') {
-                    this.$refs['custom-confirm'].openModal();
-                  }
-                },
-                response.data.broadcast,
-            );
-          })
-          .catch((error) => {
-            this.exporting.status = 'failed';
-            this.exporting.summary = 'Could not start export';
-            this.exporting.error = error;
-          });
+              if (this.exporting.status === 'success') {
+                this.$refs['custom-confirm'].openModal();
+              }
+            },
+            response.data.broadcast,
+          );
+        })
+        .catch((error) => {
+          this.exporting.status = 'failed';
+          this.exporting.summary = 'Could not start export';
+          this.exporting.error = error;
+        });
       this.exporting.log = '';
       loader.hide();
     },
-//     subscribe() {
-//
-//       const url = 'wss://ea-dev.codixfr.private/rabbitmq/ws';
-//       const username = 'mmpi';
-//       const password = 'ipmm';
-//       const vhost = 'mmpi';
-//
-//       const ws = new WebSocket(url, username, password, vhost);
-//
-//       if (!ws.isConnected()) {
-//         return;
-//       }
-// console.log(this.broadcast.queue);
-//       this.queue = ws.subscribe(
-//           `/queue/${this.broadcast.queue}`,
-//           (message) => {
-//             const data = JSON.parse(message.body);
-//             this.exporting.status = data.status;
-//             if (data.comments) {
-//               this.exporting.comments = data.comments;
-//             }
-//
-//             if (data.log) {
-//               this.exporting.log += data.log;
-//               this.scrollLogContainer();
-//             }
-//
-//             if (data.status === 'failed') {
-//               this.exporting.status = data.status;
-//               this.exporting.error = data.error;
-//               if (data.log.includes('THERE IS NOT ENOUGH SPACE')) {
-//                 this.exporting.error = 'There is not enough space for the export!';
-//               }
-//               this.queue.unsubscribe();
-//             }
-//             if (this.exporting.status === 'success') {
-//               this.$refs['custom-confirm'].openModal();
-//             }
-//           },
-//           this.broadcast,
-//       );
-//     },
     scrollLogContainer() {
       setTimeout(() => {
         const container = this.$refs.log;
@@ -513,7 +465,7 @@ export default {
     },
     customConfirm(value) {
       if (value) {
-        window.location.href = `${this.config.mmpi.web}/issue/${this.$route.params.issue}`;
+        window.location.href = `${config.mmpi.web}/issue/${this.$route.params.issue}`;
       } else {
         this.confirmMsg = [];
       }
