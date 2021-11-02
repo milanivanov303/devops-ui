@@ -12,7 +12,7 @@
         v-bind:msg="error"
       />
       <div class="row">
-        <div class="input-field col s9">
+        <div class="input-field col s10">
           <i class="material-icons prefix">label_outline</i>
           <label for="tts_key" class="active">TTS Key</label>
           <input
@@ -49,7 +49,7 @@
            v-if="deliveryChains.length
          && !$v.ttsKey.$anyError
          && issueStatus !== 'ERROR'">
-        <div class="col s10">
+        <div class="col s11">
           <Select
             label="Delivery chains"
             icon="linear_scale"
@@ -66,7 +66,7 @@
         </div>
       </div>
       <div class="row" v-if="se.delivery_chain">
-        <div class="col s10">
+        <div class="col s11">
           <Select
             label="Instance status"
             icon="power_settings_new"
@@ -83,7 +83,7 @@
         </div>
       </div>
       <div class="row" v-if="se.instance && se.instance_status">
-        <div class="input-field col s10">
+        <div class="input-field col s11">
           <i class="material-icons prefix">storage</i>
           <input
             readonly
@@ -94,8 +94,8 @@
           <span class="helper-text">Instance on which the export will be done.</span>
         </div>
       </div>
-      <div class="row" v-if="se.instance_status && se.instance ">
-        <div class="col s10" >
+      <div class="row" v-if="se.instance_status && se.instance">
+        <div class="col s11">
           <Select
             label="SE Type"
             icon="memory"
@@ -112,7 +112,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col s10">
+        <div class="col s11">
         <span
           id="description"
           class="materialize-textarea"
@@ -121,7 +121,7 @@
         </div>
       </div>
       <div class="row" v-if="texts && ociDependant.includes(seType.key)">
-        <div class="col s10">
+        <div class="col s11">
           <Autocomplete
             label="Procedure/Letters"
             icon="library_books"
@@ -166,7 +166,7 @@
     </div>
     <div class="col s6" v-if="exporting.started && se.doExport">
       <div class="row">
-        <div class>
+        <div class="col s11">
           <div v-if="exporting.status === 'success'" class="center" >
             <i class="material-icons large green-text">check_circle_outline</i>
             <p>Export completed successfully</p>
@@ -282,7 +282,7 @@ export default {
       },
       contents: {
         required: requiredIf((formModel) => ['bkg_trans_proc', 'bkg_trans_texte']
-          .includes(formModel.seType.key)),
+          .includes(formModel.key)),
       },
     },
     ttsKey: {
@@ -397,6 +397,10 @@ export default {
       }
     },
     async onSubmit() {
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        return;
+      }
       const loader = this.$loading.show({ container: this.$el });
 
       const ws = new WebSocket(config.ws.url, config.ws.username_es, config.ws.password_es,
