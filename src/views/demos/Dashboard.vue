@@ -39,7 +39,7 @@
     </div>
 </template>
 <script>
-import BarChart from '@/components/BarChart';
+const BarChart = () => import('@/components/charts/BarChart');
 
 export default {
   components: {
