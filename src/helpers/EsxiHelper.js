@@ -11,7 +11,7 @@ class EsxiHelper {
     }
     const i = Math.floor(Math.log(this.value) / Math.log(1024));
 
-    return Math.round(this.value / 1024 ** i);
+    return Math.round((this.value / 1024 ** i) * 100) / 100;
   }
 
   bytesToSizeLabel() {
@@ -20,9 +20,8 @@ class EsxiHelper {
     }
 
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(this.value) / Math.log(1024));
-
-    return `${Math.round(this.value / 1024 ** i)}  ${sizes[i]}`;
+    const i = Math.round(Math.log(this.value) / Math.log(1024));
+    return `${Math.round((this.value / 1024 ** i) * 100) / 100}  ${sizes[i]}`;
   }
 
   hertzToGigahertz() {
