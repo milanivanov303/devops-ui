@@ -47,15 +47,21 @@
       <div class="row">
         <div class="col s12">
           <ul class="tabs row">
-            <li class="tab col s6">
+            <li class="tab col s4">
               <a href="#esxi_details">DETAILS</a>
             </li>
-            <li class="tab col s6">
+            <li class="tab col s4">
+              <a href="#memory_slots">MEMORY SLOTS</a>
+            </li>
+            <li class="tab col s4">
               <a href="#vms">VIRTUAL MACHINES</a>
             </li>
           </ul>
           <div v-if="esxiHost.details" id="esxi_details">
             <EsxiDetails :esxiHost="esxiHost"/>
+          </div>
+          <div v-if="esxiHost.details.memory_slots" id="memory_slots">
+            <MemorySlots :esxiHost="esxiHost"/>
           </div>
           <div v-if="esxiHost.vms_details" id="vms">
             <VirtualMachinesTable :VMs="VMs"/>
@@ -69,11 +75,13 @@
 <script>
 const VirtualMachinesTable = () => import('../components/VirtualMachinesTable');
 const EsxiDetails = () => import('./EsxiDetails');
+const MemorySlots = () => import('./MemorySlots');
 
 export default {
   components: {
     VirtualMachinesTable,
     EsxiDetails,
+    MemorySlots,
   },
 
   props: {
