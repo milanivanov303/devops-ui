@@ -1,6 +1,7 @@
 <template>
   <div class="data-table">
     <Table
+      v-if="VMs"
       :data="virtualMachines"
       sort-by="powered"
       sort-dir="asc"
@@ -20,6 +21,7 @@
       <Column label="RAM" name="ram" :show="(vm) => $esxi(vm.hardware.memory).bytesToSizeLabel()"/>
       <Column label="CPUs" name="cpu" :show="(vm) => vm.hardware.num_c_p_u"/>
     </Table>
+    <span v-else>Sorry! There is no data. Please update and try again.</span>
     <VmDetailsModal v-if="showModal" :vm="selectedVM" @close="showModal = false"/>
   </div>
 </template>

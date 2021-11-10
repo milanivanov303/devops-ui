@@ -57,13 +57,13 @@
               <a href="#vms">VIRTUAL MACHINES</a>
             </li>
           </ul>
-          <div v-if="esxiHost.details" id="esxi_details">
+          <div id="esxi_details">
             <EsxiDetails :esxiHost="esxiHost"/>
           </div>
-          <div v-if="esxiHost.details.memory_slots" id="memory_slots">
+          <div id="memory_slots">
             <MemorySlots :esxiHost="esxiHost"/>
           </div>
-          <div v-if="esxiHost.vms_details" id="vms">
+          <div id="vms">
             <VirtualMachinesTable :VMs="VMs"/>
           </div>
         </div>

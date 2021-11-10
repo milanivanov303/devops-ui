@@ -40,8 +40,8 @@
         </li>
       </div>
     </ul>
+    <span v-else>Sorry! There is no data. Please update and try again.</span>
   </div>
-
 </template>
 
 <script>
