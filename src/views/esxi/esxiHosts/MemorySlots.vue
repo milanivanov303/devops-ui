@@ -1,6 +1,6 @@
 <template>
   <div class="row memory-slots">
-    <ul v-if="esxiHost.details" class="collection with-header ul-collection">
+    <ul v-if="esxiHost.details && esxiHost.details.memory_slots" class="collection with-header ul-collection">
       <div class="col s12 l6" v-if="esxiHost.details.memory_slots">
         <li class="collection-header">
           <span class="collection-section">EMPTY MEMORY SLOTS</span>
@@ -43,8 +43,8 @@
         </div>
       </div>
     </ul>
+    <span v-else>Sorry! There is no data. Please update and try again.</span>
   </div>
-
 </template>
 
 <script>
