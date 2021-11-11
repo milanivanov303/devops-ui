@@ -26,22 +26,26 @@
         <li v-if="esxiHost.details.cpu_details" class="collection-item">
           <b>Brand: </b>{{ getCpuBrand(esxiHost.details.cpu_details) }}
         </li>
+        <li v-if="esxiHost.details.cpu_details" class="collection-item">
+          <b>Model: </b>{{ esxiHost.details.cpu.cpu_model }}
+        </li>
+
         <li v-if="esxiHost.details.cpu" class="collection-item">
-          <b>Packages: </b>{{ esxiHost.details.cpu.c_p_u_packages }}
+          <b>Packages: </b>{{ esxiHost.details.cpu.num_cpu_pkgs }}
         </li>
         <li v-if="esxiHost.details.cpu" class="collection-item">
-          <b>Cores: </b>{{ esxiHost.details.cpu.c_p_u_cores }}
+          <b>Cores: </b>{{ esxiHost.details.cpu.num_cpu_cores }}
           <span v-if="esxiHost.details.cpu_details">
             x {{ getCpuCoreSpeed(esxiHost.details.cpu_details) }}
           </span>
         </li>
         <li v-if="esxiHost.details.cpu" class="collection-item">
-          <b>Threads: </b>{{ esxiHost.details.cpu.c_p_u_threads }}
+          <b>Threads: </b>{{ esxiHost.details.cpu.num_cpu_threads }}
         </li>
       </div>
     </ul>
+    <span v-else>Sorry! There is no data. Please update and try again.</span>
   </div>
-
 </template>
 
 <script>
