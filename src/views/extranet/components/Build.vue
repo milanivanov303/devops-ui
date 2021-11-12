@@ -267,7 +267,7 @@ export default {
         java_version: this.form.javaVersion,
         instance: this.form.instance,
         fe_branch: this.form.feBranch,
-        image: this.form.image.value,
+        image: this.form.image,
       })
         .then((response) => {
           this.build.status = 'running';
