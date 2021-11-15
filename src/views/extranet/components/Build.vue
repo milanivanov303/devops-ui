@@ -230,6 +230,13 @@ export default {
     images() {
       [this.form.image] = this.images;
     },
+    form: {
+      deep: true,
+      handler() {
+        this.form.instance = this.form.client
+          ? this.instances.find((i) => i.name === this.form.client.db.toLowerCase()) : null;
+      },
+    },
   },
 
   methods: {
