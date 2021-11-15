@@ -42,7 +42,7 @@ export default {
       if (!host.details) {
         return 0;
       }
-      return parseInt(host.details.cpu.c_p_u_cores, 10);
+      return parseInt(host.details.cpu.num_cpu_cores, 10);
     },
   },
 };

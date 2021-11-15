@@ -23,7 +23,7 @@
       </div>
 
       <div v-if="!item" class="row">
-        <div v-for="(item, id) in items" :key="id" class="col s12 m6 l4">
+        <div v-for="item in paginatedItems" :key="item.name" class="col s12 m6 l4">
           <Host v-if="module === 'esxiHosts'" :esxiHost="item"/>
           <VirtualMachine v-if="module === 'virtualMachines'" :vm="item"/>
         </div>
@@ -133,7 +133,18 @@ export default {
         items = this.filterItemsByStatus(items);
       }
 
-      return this.paginatedItems(items);
+      return items;
+    },
+
+    paginatedItems() {
+      const { items } = this;
+
+      const from = (this.page * this.perPage) - this.perPage;
+      const to = (this.page * this.perPage);
+
+      this.setLastPage(Math.ceil(items.length / this.perPage));
+
+      return items.slice(from, to);
     },
 
     item() {
@@ -202,14 +213,6 @@ export default {
       return items.filter((item) => item.powered === this.status.value);
     },
 
-    paginatedItems(items) {
-      const from = (this.page * this.perPage) - this.perPage;
-      const to = (this.page * this.perPage);
-
-      this.setLastPage(Math.ceil(items.length / this.perPage));
-
-      return items.slice(from, to);
-    },
   },
 
   watch: {

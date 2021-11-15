@@ -5,7 +5,10 @@
         {{ vm.name }}
       </div>
 
-<!--      check the ifs-->
+      <div v-if="vm.esxi">
+        <b>Esxi: </b>
+        <a class="esxi-name" :href="`esxiHosts?esxiHost=${vm.esxi.name}`">{{ vm.esxi.name}}</a>
+      </div>
       <div v-if="vm.details && vm.details['guest_full_name']">
         <b>OS: </b><span>{{ vm.details['guest_full_name'] }}</span>
       </div>
@@ -148,5 +151,10 @@ export default {
 .updated-on{
   font-size: 0.4em;
   margin-top: 5px;
+}
+
+.esxi-name {
+  text-decoration: underline;
+  font-size: 15px;
 }
 </style>

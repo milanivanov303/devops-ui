@@ -65,6 +65,7 @@ export default {
             components: (h.vms_components && h.vms_components.length > 0)
               ? h.vms_components[vm.main_info.name] : null,
             flags: vm.flags,
+            esxi: { name: h.hostname },
             // To Do: add components into each instance
             instances: (vm.instances && vm.instances.length > 0) ? vm.instances : null,
           });
@@ -89,6 +90,7 @@ export default {
             hardware: vm.hardware,
             components: vm.powered === 'on' ? getters.getVMsComponents(h, vm) : null,
             flags: vm.flags,
+            esxi: { name: h.hostname },
             instances: (vm.instances && vm.instances.length > 0) ? vm.instances : null,
           };
         });
