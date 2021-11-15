@@ -39,7 +39,7 @@ export default {
         if (!host.details) {
           return;
         }
-        count += parseInt(host.details.cpu.c_p_u_cores, 10);
+        count += parseInt(host.details.cpu.num_cpu_cores, 10);
       });
       return count;
     },
