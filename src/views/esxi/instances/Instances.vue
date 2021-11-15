@@ -21,9 +21,9 @@
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
-        <Column label="Virtual Machine" name="vm"
+        <Column v-if="!instances" label="Virtual Machine" name="vm"
           :show="(instance) => getVMLink(instance.vm.name)"/>
-        <Column label="Esxi Host" name="esxi"
+        <Column v-if="!instances" label="Esxi Host" name="esxi"
           :show="(instance) => getHostLink(instance.esxi.name)"/>
         <Column label="Home path" name="home-path" :show="(instance) => instance.home_path"/>
         <Column label="Patch config path" name="patch-conf"
@@ -109,10 +109,10 @@ export default {
       return deliveryChain ? deliveryChain.title : '-';
     },
     getHostLink(name) {
-      return `<a href="esxiHosts?esxiHost=${name}">${name}</a>`;
+      return `<a href="esxiHosts?esxiHost=${name}" style="text-decoration: underline">${name}</a>`;
     },
     getVMLink(name) {
-      return `<a href="virtualMachines?virtualMachine=${name}">${name}</a>`;
+      return `<a href="virtualMachines?virtualMachine=${name}" style="text-decoration: underline">${name}</a>`;
     },
     getExtranetLink() {
       return '';
