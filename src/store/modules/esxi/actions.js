@@ -7,7 +7,6 @@ export default {
     promise
       .then((response) => {
         commit('esxiHosts', response.data.data);
-        commit('allVirtualMachines', getters.getAllVirtualMachines);
         commit('virtualMachines', getters.getVirtualMachines);
         commit('instances', getters.getInstances);
       })
