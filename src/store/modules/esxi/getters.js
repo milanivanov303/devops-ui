@@ -95,7 +95,8 @@ export default {
             if (vm.instances.length > 0) {
               vm.instances.forEach((i) => {
                 i.components = !h.instances_components || !h.instances_components[i.name] ||
-                h.instances_components[i.name].length <= 0 ? null : h.instances_components[i.name];
+                  h.instances_components[i.name].length <= 0 ?
+                    null : h.instances_components[i.name];
                 i.vm = { name: vm.main_info.name };
                 i.esxi = { name: h.hostname };
                 instances.push(i);
