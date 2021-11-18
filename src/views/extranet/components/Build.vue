@@ -230,6 +230,13 @@ export default {
     images() {
       [this.form.image] = this.images;
     },
+    form: {
+      deep: true,
+      handler() {
+        this.form.instance = this.form.client
+          ? this.instances.find((i) => i.name === this.form.client.db.toLowerCase()) : null;
+      },
+    },
   },
 
   methods: {
@@ -267,7 +274,7 @@ export default {
         java_version: this.form.javaVersion,
         instance: this.form.instance,
         fe_branch: this.form.feBranch,
-        image: this.form.image.value,
+        image: this.form.image,
       })
         .then((response) => {
           this.build.status = 'running';
