@@ -230,12 +230,12 @@ export default {
     images() {
       [this.form.image] = this.images;
     },
-    form: {
-      deep: true,
-      handler() {
-        this.form.instance = this.form.client
-          ? this.instances.find((i) => i.name === this.form.client.db.toLowerCase()) : null;
-      },
+    /* eslint func-names: ["error", "as-needed"] */
+    'form.client': function () {
+      if (this.form.client === '') {
+        this.form.instance = null;
+      }
+      this.getDefaultInstance();
     },
   },
 
@@ -246,6 +246,14 @@ export default {
       this.$store.dispatch('extranet/getClients');
       this.$store.dispatch('extranet/getImages');
       this.$store.dispatch('mmpi/getInstances');
+    },
+
+    getDefaultInstance() {
+      const db = this.instances
+        .find((i) => i.name.toLowerCase() === this.form.client.db.toLowerCase());
+      if (db && !this.form.instance) {
+        this.form.instance = db;
+      }
     },
 
     open() {
