@@ -45,20 +45,25 @@
           </a>
         </div>
       </div>
+<!--      <Issue-->
+<!--        ref="select-issue"-->
+<!--        @changeIssue="changeIssue"-->
+<!--        :formData="form">-->
+<!--      </Issue>-->
       <div class="row"
            v-if="deliveryChains.length
-         && !$v.ttsKey.$anyError
-         && issueStatus !== 'ERROR'">
+           && !$v.ttsKey.$anyError
+           && issueStatus !== 'ERROR'">
         <div class="col s11">
           <Select
-            label="Delivery chains"
-            icon="linear_scale"
-            displayed="title"
-            v-model="deliveryChain"
-            :options="deliveryChains"
-            :invalid="$v.deliveryChain.$error"
-            @blur="$v.deliveryChain.$touch()"
-            @change="selectedDeliveryChain"
+              label="Delivery chains"
+              icon="linear_scale"
+              displayed="title"
+              v-model="deliveryChain"
+              :options="deliveryChains"
+              :invalid="$v.deliveryChain.$error"
+              @blur="$v.deliveryChain.$touch()"
+              @change="selectedDeliveryChain"
           />
           <div class="validator red-text" v-if="$v.deliveryChain.$error">
             <p v-if="!$v.deliveryChain.required">Delivery chain field is required.</p>
@@ -68,43 +73,31 @@
       <div class="row" v-if="se.delivery_chain">
         <div class="col s11">
           <Select
-            label="Instance status"
-            icon="power_settings_new"
-            displayed="value"
-            v-model="instanceStatus"
-            :options="instanceStatuses"
-            :invalid="$v.instanceStatus.$error"
-            @blur="$v.instanceStatus.$touch()"
-            @change="selectedInstanceStatus"
+              label="Instance status"
+              icon="power_settings_new"
+              displayed="value"
+              v-model="defaultValue"
+              :options="instanceStatuses"
+              :invalid="$v.instanceStatus.$error"
+              @blur="$v.instanceStatus.$touch()"
+              @change="selectedInstanceStatus"
           />
           <div class="validator red-text" v-if="$v.instanceStatus.$error">
             <p v-if="!$v.instanceStatus.required">Instance status field is required.</p>
           </div>
         </div>
       </div>
-      <div class="row" v-if="se.instance && se.instance_status">
-        <div class="input-field col s11">
-          <i class="material-icons prefix">storage</i>
-          <input
-            readonly
-            type="text"
-            :value="se.instance.name"
-            id="instance">
-          <label :class="{active: se.instance.name}" for="instance">Instance</label>
-          <span class="helper-text">Instance on which the export will be done.</span>
-        </div>
-      </div>
-      <div class="row" v-if="se.instance_status && se.instance">
+      <div class="row"  v-if="se.delivery_chain">
         <div class="col s11">
           <Select
-            label="SE Type"
-            icon="memory"
-            displayed="value"
-            v-model="seType"
-            :options="seTypes"
-            :invalid="$v.seType.$error"
-            @blur="$v.seType.$touch()"
-            @change="selectedType"
+              label="SE Type"
+              icon="memory"
+              displayed="value"
+              v-model="seType"
+              :options="seTypes"
+              :invalid="$v.seType.$error"
+              @blur="$v.seType.$touch()"
+              @change="selectedType"
           />
           <div class="validator red-text" v-if="$v.seType.$error">
             <p v-if="!$v.seType.required">SE Type field is required.</p>
@@ -114,22 +107,22 @@
       <div class="row">
         <div class="col s11">
         <span
-          id="description"
-          class="materialize-textarea"
-          v-html="typeDescription">
+            id="description"
+            class="materialize-textarea"
+            v-html="typeDescription">
         </span>
         </div>
       </div>
       <div class="row" v-if="texts && ociDependant.includes(seType.key)">
         <div class="col s11">
           <Autocomplete
-            label="Procedure/Letters"
-            icon="library_books"
-            :items="texts"
-            v-model="se.contents"
-            :invalid="$v.se.contents.$error"
-            @blur="checkSeText(se.contents)"
-            @input="selectedContents"
+              label="Procedure/Letters"
+              icon="library_books"
+              :items="texts"
+              v-model="se.contents"
+              :invalid="$v.se.contents.$error"
+              @blur="checkSeText(se.contents)"
+              @input="selectedContents"
           />
           <div class="validator">
             <div class="red-text" v-if="$v.se.contents.$invalid">
@@ -167,7 +160,7 @@
     <div class="col s6" v-if="exporting.started && se.doExport">
       <div class="row">
         <div class="col s11">
-          <div v-if="exporting.status === 'success'" class="center" >
+          <div v-if="exporting.status === 'success'" class="center">
             <i class="material-icons large green-text">check_circle_outline</i>
             <p>Export completed successfully</p>
           </div>
@@ -192,31 +185,28 @@
 
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import CustomConfirm from '@/components/partials/CustomConfirm';
+import Issue from '@/components/partials/Issue';
 import config from '@/config';
 import WebSocket from '@/plugins/ws';
 
 export default {
   components: {
     'custom-confirm': CustomConfirm,
+    Issue,
   },
   mounted() {
     this.getIssue();
     this.getInstanceStatus();
     this.getESType();
   },
-  watch: {
-    ttsKey(key) {
-      this.issueStatus = '';
-      this.deliveryChains = [];
-      this.$router.history.replace({ params: { issue: key } });
-    },
-  },
   data() {
     return {
       error: '',
       actionName: 'Submit',
       ttsKey: this.$route.params.issue,
-      issueStatus: {},
+      deliveryChains: [],
+      deliveryChain: {},
+      issueStatus: '',
       instanceStatuses: [],
       ociDependant: ['bkg_trans_proc', 'bkg_trans_texte'],
       exportable: [
@@ -239,18 +229,11 @@ export default {
         doExport: '',
         contents: '',
       },
-      deliveryChains: [],
-      deliveryChain: {},
       seType: {},
       seTypes: [],
       typeDescription: '',
+      defaultValue: {},
       instanceStatus: {
-        id: 'select_instance_status',
-        name: 'select_instance_status',
-        displayed: 'value',
-        icon: 'power_settings_new',
-        options: [],
-        label: 'Instance status',
         selected: {},
       },
       confirmMsg: [],
@@ -282,7 +265,7 @@ export default {
       },
       contents: {
         required: requiredIf((formModel) => ['bkg_trans_proc', 'bkg_trans_texte']
-          .includes(formModel.key)),
+            .includes(formModel.key)),
       },
     },
     ttsKey: {
@@ -292,9 +275,19 @@ export default {
       },
     },
   },
+  watch: {
+    ttsKey(key) {
+      this.issueStatus = '';
+      this.deliveryChains = [];
+      this.$router.history.replace({ params: { issue: key } });
+    },
+  },
   computed: {
     issue() {
       return '';
+    },
+    selectedInstanceStatus(){
+      return this.se.instance_status = this.defaultValue.id;
     },
   },
   methods: {
@@ -318,7 +311,7 @@ export default {
               this.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
             }
             if (!this.$store.state.cms.issue
-                  || (this.ttsKey !== this.$store.state.cms.issue.tts_id)) {
+                || (this.ttsKey !== this.$store.state.cms.issue.tts_id)) {
               this.issueStatus = 'ERROR';
             }
             loader.hide();
@@ -328,6 +321,7 @@ export default {
     getInstanceStatus() {
       this.$store.dispatch('mmpi/getInstanceStatus').then(() => {
         this.instanceStatuses = this.$store.state.mmpi.instanceStatus;
+        this.defaultValue = this.instanceStatuses.find( ({ value }) => value === 'Installer decision' );
       });
     },
     getESType() {
@@ -363,32 +357,32 @@ export default {
         operation,
       };
       await this.$store.dispatch('mmpi/ociByOperation', data)
-        .then((response) => {
-          [this.texts] = Object.values(response.data);
-          this.texts = this.texts.reduce((acc, text) => {
-            acc.push({
-              name: text,
-              value: text,
-            });
-            return acc;
-          }, []);
-          loader.hide();
-        })
-        .catch((error) => {
-          loader.hide();
-          this.error = error;
-          return error;
-        });
+          .then((response) => {
+            [this.texts] = Object.values(response.data);
+            this.texts = this.texts.reduce((acc, text) => {
+              acc.push({
+                name: text,
+                value: text,
+              });
+              return acc;
+            }, []);
+            loader.hide();
+          })
+          .catch((error) => {
+            loader.hide();
+            this.error = error;
+            return error;
+          });
     },
     checkSeText(value) {
       if (!this.texts.includes(value)) {
         this.se.contents = '';
       }
     },
-    selectedInstanceStatus(value) {
-      this.se.instance_status = value.id;
-      this.instanceStatus.selected = value;
-    },
+    // selectedInstanceStatus(value) {
+    //   this.se.instance_status = value.id;
+    //   this.instanceStatus.selected = value;
+    // },
     checkboxEvent(event) {
       if (event) {
         this.actionName = 'Export';
@@ -404,7 +398,7 @@ export default {
       const loader = this.$loading.show({ container: this.$el });
 
       const ws = new WebSocket(config.ws.url, config.ws.username_es, config.ws.password_es,
-        config.ws.vhost_es);
+          config.ws.vhost_es);
 
       this.exporting.status = 'running';
       if (this.se.doExport) {
@@ -495,3 +489,4 @@ export default {
   margin-top: 1.5rem !important;
 }
 </style>
+
