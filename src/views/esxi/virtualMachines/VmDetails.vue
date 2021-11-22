@@ -7,7 +7,7 @@
 
       <div v-if="vm.esxi">
         <b>Esxi: </b>
-        <a class="esxi-name" :href="`esxiHosts?esxiHost=${vm.esxi.name}`">{{ vm.esxi.name}}</a>
+        <a class="esxi-name" :href="`../esxiHosts/${vm.esxi.id}`">{{ vm.esxi.name}}</a>
       </div>
       <div v-if="vm.details && vm.details['guest_full_name']">
         <b>OS: </b><span>{{ vm.details['guest_full_name'] }}</span>

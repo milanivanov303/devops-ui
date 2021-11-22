@@ -60,14 +60,14 @@ export default {
               return;
             }
             vms[vm.main_info.name] = {
-              id: vm.vm_id,
+              id: parseInt(vm.vm_id, 10),
               name: vm.main_info.name,
               powered: vm.powered,
               details: vm.main_info,
               hardware: vm.hardware,
               components: vm.powered === 'on' && h.vms_components ? getters.getVMsComponents(h, vm) : null,
               flags: vm.flags,
-              esxi: { name: h.hostname },
+              esxi: { id: h.id, name: h.hostname },
               instances: vm.instances ? vm.instances : null,
             };
           });
@@ -96,8 +96,8 @@ export default {
                 i.components = !h.instances_components || !h.instances_components[i.name]
                   || h.instances_components[i.name].length <= 0
                   ? null : h.instances_components[i.name];
-                i.vm = { name: vm.main_info.name };
-                i.esxi = { name: h.hostname };
+                i.vm = { id: vm.vm_id, name: vm.main_info.name };
+                i.esxi = { id: h.id, name: h.hostname };
                 instances.push(i);
               });
             }
