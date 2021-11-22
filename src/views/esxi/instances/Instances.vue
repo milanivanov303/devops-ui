@@ -11,6 +11,7 @@
         sort-by="name"
         sort-dir="asc"
         query-prefix="instances_"
+        :noDataText="getNoDataText()"
         :export-btn="false"
         :view-btn="false"
         :add-btn="false"
@@ -82,6 +83,15 @@ export default {
     },
   },
   methods: {
+    getNoDataText() {
+      if (this.$store.state.esxi.esxiHosts.length === 0) {
+        return 'There are no ESXi Host created.';
+      }
+      if (this.$store.state.esxi.virtualMachines.length === 0) {
+        return 'There are no Virtual Machines. Please update and try again in a few minutes.';
+      }
+      return 'There are no records';
+    },
     getProjectName(instance) {
       let project = null;
       this.projects.forEach((p) => {
@@ -113,9 +123,6 @@ export default {
     },
     getVMLink(name) {
       return `<a href="virtualMachines?virtualMachine=${name}" style="text-decoration: underline">${name}</a>`;
-    },
-    getExtranetLink() {
-      return '';
     },
 
     getEsxiHosts() {

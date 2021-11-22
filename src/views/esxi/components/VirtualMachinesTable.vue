@@ -94,3 +94,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.data-table {
+  padding-top: 20px;
+}
+</style>
