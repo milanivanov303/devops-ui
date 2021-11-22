@@ -23,12 +23,19 @@ export default {
 
     return promise;
   },
+  updateHost({ commit }, payload) {
+    const promise = api('devops').put(`esxi/${payload.id}`, payload);
+    promise
+      .then((response) => commit('updateHost', response.data.data))
+      .catch((error) => commit('error', error));
 
-  updateEsxiHost({ commit }, payload) {
+    return promise;
+  },
+
+  updateHostInfo({ commit }, payload) {
     const promise = api('devops').post('esxi/start-update', payload);
 
     promise
-      .then((response) => commit('updateHost', response.data))
       .catch((error) => commit('error', error));
 
     return promise;

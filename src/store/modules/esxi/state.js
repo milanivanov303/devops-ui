@@ -3,7 +3,6 @@
 export default {
   esxiHosts: [],
   error: '',
-  allVirtualMachines: [],
   virtualMachines: [],
   instances: [],
 };
