@@ -35,10 +35,9 @@ export default {
   },
   methods: {
     getTo() {
-      const query = { ...this.$route.query };
-      query.virtualMachine = this.vm.name;
-
-      return { query };
+      return {
+        path: `/inventory/virtualMachines/${encodeURIComponent(this.vm.id)}`,
+      };
     },
     getOnOffLabel(status) {
       if (status === 'on') {
