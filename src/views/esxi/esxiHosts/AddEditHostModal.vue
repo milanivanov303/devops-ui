@@ -18,6 +18,14 @@
           <div class="row">
             <TextInput
                 class="col s12"
+                label="Documentation URL"
+                icon="import_contacts"
+                v-model="host.doc_url"
+            />
+          </div>
+          <div class="row">
+            <TextInput
+                class="col s12"
                 label="Notes"
                 icon="subject"
                 v-model="host.notes"
@@ -69,6 +77,7 @@ export default {
       this.$store.dispatch(`esxi/${this.action}Host`, {
         id: this.host.id,
         hostname: this.host.hostname,
+        doc_url: this.host.doc_url,
         notes: this.host.notes,
       })
         .then(() => {
