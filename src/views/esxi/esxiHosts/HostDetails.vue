@@ -7,12 +7,19 @@
             <div class="col s12 m6 l9">
               {{ esxiHost.hostname }}
             </div>
-            <div class="col s12 m6 l3">
+            <div class="col s12 m6 l3 esxi-icons">
               <a :href="`https://${esxiHost.hostname}.codixfr.private/`"
                  target="_blank"
                  data-tooltip="ESXi for administration"
                  class="right">
                 <i class="material-icons">laptop_chromebook</i>
+              </a>
+              <a v-if="esxiHost.doc_url"
+                 :href="esxiHost.doc_url"
+                 target="_blank"
+                 data-tooltip="Documentation"
+                 class="right">
+                <i class="material-icons">chrome_reader_mode</i>
               </a>
               <a @click="openModal()"
                  v-if="$auth.can('esxi.add')"
@@ -210,6 +217,11 @@ export default {
     margin-right: 8px;
   }
 
+  .esxi-icons {
+    a {
+      padding: 0 2px 0 2px;
+    }
+  }
   .notes {
     font-size: 13px !important;
   }
