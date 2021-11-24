@@ -32,6 +32,7 @@ import WebSocket from '@/plugins/ws';
 
 export default {
   props: {
+    ws: null,
     broadcast: null,
     status: { default: 'running', String },
     summary: { default: 'Export is running ...', String },
@@ -40,6 +41,7 @@ export default {
   },
   data() {
     return {
+      currentWsConnect: this.ws,
       currentStatus: this.status,
       currentSummary: this.summary,
       currentError: this.error,
@@ -58,14 +60,14 @@ export default {
     },
 
     subscribe() {
-      const ws = new WebSocket(config.ws.url, config.ws.username_es, config.ws.password_es,
+      this.currentWsConnect = new WebSocket(config.ws.url, config.ws.username_es, config.ws.password_es,
           config.ws.vhost_es);
 
-      if (!ws.client.connected) {
+      if (!this.currentWsConnect.client.connected) {
         return;
       }
 
-      this.queue = ws.client.subscribe(
+      this.queue = this.currentWsConnect.client.subscribe(
           `/queue/${this.broadcast.queue}`,
           (message) => {
             const data = JSON.parse(message.body);
@@ -82,7 +84,7 @@ export default {
               this.currentStatus = data.status;
               this.queue.unsubscribe();
 
-              // EventBus.$emit('build.created');
+              this.$emit('openModal');
             }
           },
           this.broadcast,

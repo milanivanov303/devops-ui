@@ -8,18 +8,18 @@
           <input
               id="tts_key"
               type="text"
-              v-model.trim="formData.ttsKey"
-              @blur="$v.formData.ttsKey.$touch()"
-              @change="$v.formData.ttsKey.$touch()"
+              v-model.trim="formTtsKey"
+              @blur="$v.formTtsKey.$touch()"
+              @change="$v.formTtsKey.$touch()"
           />
-          <div class="validator" v-if="$v.formData.ttsKey.$anyError || formData.submitStatus === 'ERROR'">
-            <div class="red-text" v-if="!$v.formData.ttsKey.required">
+          <div class="validator" v-if="$v.formTtsKey.$anyError || submitStatus === 'ERROR'">
+            <div class="red-text" v-if="!$v.formTtsKey.required">
               <p>Field is required</p>
             </div>
-            <div class="red-text" v-if="!$v.formData.ttsKey.validKey">
+            <div class="red-text" v-if="!$v.formTtsKey.validKey">
               <p>Not a valid TTS key.</p>
             </div>
-            <div class="red-text" v-if="formData.submitStatus === 'ERROR'">
+            <div class="red-text" v-if="submitStatus === 'ERROR'">
               <p>TTS Key does not exist in MMPI!</p>
             </div>
           </div>
@@ -44,23 +44,32 @@ import { required } from 'vuelidate/lib/validators';
 
 export default {
   props: {
-    formData: {
+    deliveryChains: {
+      type: Array,
+    },
+    ttsKey: {
+      type: String,
+      required: true,
+    },
+    issueStatus: {
+      type: String,
+    },
+    se: {
       type: Object,
-    }
+    },
   },
   data() {
     return {
-      ttsKey: this.$route.params.issue,
-      submitStatus: '',
-      issueId: '',
-      deliveryChains: [],
-      deliveryChain: {},
+      formTtsKey: this.ttsKey,
+      submitStatus: this.issueStatus,
+      formDeliveryChains: this.deliveryChains,
+      issueId: this.se.issue_id,
     }
   },
   watch: {
-    'formData.ttsKey'(key) {
-      this.formData.submitStatus = '';
-      this.formData.deliveryChains = [];
+    formTtsKey(key) {
+      this.submitStatus = '';
+      this.formDeliveryChains = [];
       this.$router.history.replace({ params: { issue: key } });
     },
   },
@@ -73,12 +82,10 @@ export default {
     this.getIssue();
   },
   validations: {
-    formData: {
-      ttsKey: {
-        required,
-        validKey(value) {
-          return /^[A-Z]+-[0-9]+$/.test(value);
-        },
+    formTtsKey: {
+      required,
+      validKey(value) {
+        return /^[A-Z]+-[0-9]+$/.test(value);
       },
     },
   },
@@ -114,20 +121,20 @@ export default {
     // },
     async getIssue() {
       this.$emit('changeIssue');
-      if (this.$route.params.issue) {
+        if (this.$route.params.issue) {
         const loader = this.$loading.show({ container: this.$el });
-         await this.$store.dispatch('cms/getIssue', this.$route.params.issue)
-            .then(() => {
-              this.formData.issueId = this.$store.state.cms.issue.id;
-              if (this.$store.state.cms.issue) {
-                this.formData.deliveryChains = this.$store.state.cms.issue.project.delivery_chains;
-              }
-              if (!this.$store.state.cms.issue
-                  || (this.formData.ttsKey !== this.$store.state.cms.issue.tts_id)) {
-                this.formData.submitStatus = 'ERROR';
-              }
-              loader.hide();
-            });
+        await this.$store.dispatch('cms/getIssue', this.$route.params.issue)
+         .then(() => {
+          this.issueId = this.$store.state.cms.issue.id;
+          if (this.$store.state.cms.issue) {
+            this.formDeliveryChains = this.$store.state.cms.issue.project.delivery_chains;
+          }
+          if (!this.$store.state.cms.issue
+              || (this.formTtsKey !== this.$store.state.cms.issue.tts_id)) {
+            this.submitStatus = 'ERROR';
+          }
+          loader.hide();
+          });
       }
     },
   },

@@ -45,16 +45,18 @@
           </a>
         </div>
       </div>
-<!--      <Issue-->
-<!--        ref="select-issue"-->
-<!--        @changeIssue="changeIssue"-->
-<!--        :formData="form">-->
-<!--      </Issue>-->
+<!--        <Issue-->
+<!--            ref="select-issue"-->
+<!--            @changeIssue="changeIssue"-->
+<!--            :formTtsKey="ttsKey"-->
+<!--            :formDeliveryChains="deliveryChains"-->
+<!--            :submitStatus="issueStatus">-->
+<!--        </Issue>-->
       <div class="row"
            v-if="deliveryChains.length
            && !$v.ttsKey.$anyError
            && issueStatus !== 'ERROR'">
-        <div class="col s11">
+      <div class="col s11">
           <Select
               label="Delivery chains"
               icon="linear_scale"
@@ -185,14 +187,14 @@
 
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import CustomConfirm from '@/components/partials/CustomConfirm';
-import Issue from '@/components/partials/Issue';
+// import Issue from '@/components/partials/Issue';
 import config from '@/config';
 import WebSocket from '@/plugins/ws';
 
 export default {
   components: {
     'custom-confirm': CustomConfirm,
-    Issue,
+    // Issue,
   },
   mounted() {
     this.getIssue();
