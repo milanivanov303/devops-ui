@@ -7,7 +7,7 @@
 
       <div v-if="vm.esxi">
         <b>Esxi: </b>
-        <a class="esxi-name" :href="`esxiHosts?esxiHost=${vm.esxi.name}`">{{ vm.esxi.name}}</a>
+        <a class="esxi-name" :href="`../esxiHosts/${vm.esxi.id}`">{{ vm.esxi.name}}</a>
       </div>
       <div v-if="vm.details && vm.details['guest_full_name']">
         <b>OS: </b><span>{{ vm.details['guest_full_name'] }}</span>
@@ -29,11 +29,12 @@
             </li>
           </ul>
           <div id="instances">
-            <Instances v-if="vm.instances" :instances="vm.instances"/>
+            <Instances v-if="vm.instances && vm.instances.length > 0" :instances="vm.instances"/>
             <div v-else class="validator">
               <div class="red-text">
                 <br>
-                <p>There are no instances for this virtual machine</p>
+                <p v-if="vm.instances.error">{{ vm.instances.error }}</p>
+                <p v-else>There are no instances for this virtual machine</p>
               </div>
             </div>
           </div>

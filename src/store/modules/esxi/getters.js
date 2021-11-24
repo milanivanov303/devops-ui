@@ -60,15 +60,15 @@ export default {
               return;
             }
             vms[vm.main_info.name] = {
-              id: vm.vm_id,
+              id: parseInt(vm.vm_id, 10),
               name: vm.main_info.name,
               powered: vm.powered,
               details: vm.main_info,
               hardware: vm.hardware,
-              components: vm.powered === 'on' ? getters.getVMsComponents(h, vm) : null,
+              components: vm.powered === 'on' && h.vms_components ? getters.getVMsComponents(h, vm) : null,
               flags: vm.flags,
-              esxi: { name: h.hostname },
-              instances: (vm.instances && vm.instances.length > 0) ? vm.instances : null,
+              esxi: { id: h.id, name: h.hostname },
+              instances: vm.instances ? vm.instances : null,
             };
           });
         }
@@ -84,7 +84,6 @@ export default {
       return { error: host.vms_components.error[virtualMachine.main_info.name] };
     }
     return null;
-
   },
   getInstances: (state) => {
     const instances = [];
@@ -94,11 +93,11 @@ export default {
           h.vms_details.forEach((vm) => {
             if (vm.instances.length > 0) {
               vm.instances.forEach((i) => {
-                i.components = !h.instances_components || !h.instances_components[i.name] ||
-                  h.instances_components[i.name].length <= 0 ?
-                    null : h.instances_components[i.name];
-                i.vm = { name: vm.main_info.name };
-                i.esxi = { name: h.hostname };
+                i.components = !h.instances_components || !h.instances_components[i.name]
+                  || h.instances_components[i.name].length <= 0
+                  ? null : h.instances_components[i.name];
+                i.vm = { id: vm.vm_id, name: vm.main_info.name };
+                i.esxi = { id: h.id, name: h.hostname };
                 instances.push(i);
               });
             }
