@@ -1,92 +1,124 @@
 <template>
-  <div class="card" v-if="esxiHost">
-    <div class="card-content">
-      <div class="card-title truncate">
+  <div ref="host-details">
+    <div class="card" v-if="esxiHost">
+      <div class="card-content">
+        <div class="card-title truncate">
+          <div class="row">
+            <div class="col s12 m6 l9">
+              {{ esxiHost.hostname }}
+            </div>
+            <div class="col s12 m6 l3 esxi-icons">
+              <a :href="`https://${esxiHost.hostname}.codixfr.private/`"
+                 target="_blank"
+                 data-tooltip="ESXi for administration"
+                 class="right">
+                <i class="material-icons">laptop_chromebook</i>
+              </a>
+              <a v-if="esxiHost.doc_url"
+                 :href="esxiHost.doc_url"
+                 target="_blank"
+                 data-tooltip="Documentation"
+                 class="right">
+                <i class="material-icons">chrome_reader_mode</i>
+              </a>
+              <a @click="openModal()"
+                 v-if="$auth.can('esxi.add')"
+                 target="_blank"
+                 data-tooltip="Edit ESXi"
+                 class="right">
+                <i class="material-icons">create</i>
+              </a>
+            </div>
+            <div class="col s12 m6 l8">
+              <div v-if="esxiHost.notes" class="notes">
+                <b>Notes: </b>{{ esxiHost.notes }}
+              </div>
+            </div>
+            <div class="col s12 m6 l4">
+              <a class="right"
+                 data-tooltip="Refresh info"
+                 v-if="$auth.can('esxi.add')"
+                 @click.prevent="updateEsxiInfo()">
+                <i class="material-icons">refresh</i>
+              </a>
+              <div v-if="esxiHost.updated_on" class="right updated-on">
+                Last updated on {{ $date(esxiHost.updated_on).toHuman() }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row progress-bar">
+          <div class="col s12">
+            <div v-if="esxiHost.details && esxiHost.details.memory">
+              <b>Memory: </b>{{ esxiHost.details ?
+                $esxi(esxiHost.details.memory.physical_memory).bytesToSizeLabel() : '' }},
+              <b>Free: </b> {{ $esxi(getHostFreeMemory(esxiHost)).bytesToSizeLabel() }}
+            </div>
+            <div v-if="esxiHost.details" class="progress">
+              <div class="determinate" :style="{width: getFreeMemoryInPerc(esxiHost) + '%'}"></div>
+            </div>
+          </div>
+        </div>
         <div class="row">
-          <div class="col s12 m6 l9">
-            {{ esxiHost.hostname }}
-          </div>
-          <div class="col s12 m6 l3">
-            <a :href="`https://${esxiHost.hostname}.codixfr.private/`"
-                target="_blank"
-                data-tooltip="Go to link"
-                class="right">
-              <i class="material-icons">laptop_chromebook</i>
-            </a>
-            <div class="right updated-on">
-              ESXi for administration
+          <div class="col s12">
+            <ul class="tabs row">
+              <li class="tab col s4">
+                <a href="#esxi_details">DETAILS</a>
+              </li>
+              <li class="tab col s4">
+                <a href="#memory_slots">MEMORY SLOTS</a>
+              </li>
+              <li class="tab col s4">
+                <a href="#vms">VIRTUAL MACHINES</a>
+              </li>
+            </ul>
+            <div id="esxi_details">
+              <EsxiDetails :esxiHost="esxiHost"/>
             </div>
-          </div>
-          <div class="col s12 m6 l3 offset-m6 offset-l9">
-            <a class="right"
-              data-tooltip="Update info"
-              v-if="$auth.can('esxi.add')"
-              @click.prevent="updateEsxiInfo()">
-              <i class="material-icons">refresh</i>
-            </a>
-            <div v-if="esxiHost.updated_on" class="right updated-on">
-              Updated on {{ $date(esxiHost.updated_on).toHuman() }}
+            <div id="memory_slots">
+              <MemorySlots :esxiHost="esxiHost"/>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row progress-bar">
-        <div class="col s12">
-          <div v-if="esxiHost.details && esxiHost.details.memory">
-            <b>Memory: </b>{{ esxiHost.details ?
-              $esxi(esxiHost.details.memory.physical_memory).bytesToSizeLabel() : '' }},
-            <b>Free: </b> {{ $esxi(getHostFreeMemory(esxiHost)).bytesToSizeLabel() }}
-          </div>
-          <div v-if="esxiHost.details" class="progress">
-            <div class="determinate" :style="{width: getFreeMemoryInPerc(esxiHost) + '%'}"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col s12">
-          <ul class="tabs row">
-            <li class="tab col s6">
-              <a href="#esxi_details">DETAILS</a>
-            </li>
-            <li class="tab col s6">
-              <a href="#vms">VIRTUAL MACHINES</a>
-            </li>
-          </ul>
-          <div v-if="esxiHost.details" id="esxi_details">
-            <EsxiDetails :esxiHost="esxiHost"/>
-          </div>
-          <div v-if="esxiHost.vms_details" id="vms">
-            <VirtualMachinesTable :VMs="VMs"/>
+            <div id="vms">
+              <VirtualMachinesTable :VMs="VMs"/>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <AddEditHostModal
+        v-if="showModal"
+        action="update"
+        :currentHost="this.currentHost"
+        @close="showModal = false"
+    />
   </div>
 </template>
 
 <script>
 const VirtualMachinesTable = () => import('../components/VirtualMachinesTable');
 const EsxiDetails = () => import('./EsxiDetails');
+const MemorySlots = () => import('./MemorySlots');
+const AddEditHostModal = () => import('./AddEditHostModal');
 
 export default {
   components: {
     VirtualMachinesTable,
     EsxiDetails,
+    MemorySlots,
+    AddEditHostModal,
   },
 
   props: {
-    module: String,
     esxiHost: Object,
   },
 
   data() {
     return {
       vmsearch: this.$route.query.vmsearch,
+      currentHost: {},
+      showModal: false,
     };
   },
-
   computed: {
     VMs() {
       if (!this.esxiHost.vms_details) {
@@ -115,10 +147,17 @@ export default {
   },
 
   methods: {
+    openModal() {
+      this.currentHost = { ...this.esxiHost };
+      this.showModal = true;
+      // this.$router.push({
+      //   path: `${encodeURIComponent('edit')}`,
+      // });
+    },
     updateEsxiInfo() {
-      const loader = this.$loading.show({ container: this.$el });
+      const loader = this.$loading.show({ container: this.$refs['host-details'] });
 
-      this.$store.dispatch('esxi/updateEsxiHost', this.esxiHost)
+      this.$store.dispatch('esxi/updateHostInfo', this.esxiHost)
         .then((response) => {
           if (response.data.error) {
             this.$M.toast({ html: response.data.error });
@@ -126,7 +165,7 @@ export default {
           }
           this.$M.toast({
             html: `Updating ESXi host ${this.esxiHost.hostname} details in background.
-             Please, check in a few minutes.`,
+             Please check in a few minutes.`,
             classes: 'toast-seccess',
           });
         })
@@ -176,5 +215,14 @@ export default {
   .updated-on {
     font-size: 0.4em;
     margin-right: 8px;
+  }
+
+  .esxi-icons {
+    a {
+      padding: 0 2px 0 2px;
+    }
+  }
+  .notes {
+    font-size: 13px !important;
   }
 </style>

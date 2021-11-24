@@ -230,6 +230,10 @@ export default {
     images() {
       [this.form.image] = this.images;
     },
+    /* eslint func-names: ["error", "as-needed"] */
+    'form.client': function () {
+      this.getDefaultInstance();
+    },
   },
 
   methods: {
@@ -239,6 +243,16 @@ export default {
       this.$store.dispatch('extranet/getClients');
       this.$store.dispatch('extranet/getImages');
       this.$store.dispatch('mmpi/getInstances');
+    },
+
+    getDefaultInstance() {
+      this.form.instance = null;
+
+      const db = this.instances
+        .find((i) => i.name.toLowerCase() === this.form.client.db.toLowerCase());
+      if (db) {
+        this.form.instance = db;
+      }
     },
 
     open() {
@@ -267,7 +281,7 @@ export default {
         java_version: this.form.javaVersion,
         instance: this.form.instance,
         fe_branch: this.form.feBranch,
-        image: this.form.image.value,
+        image: this.form.image,
       })
         .then((response) => {
           this.build.status = 'running';

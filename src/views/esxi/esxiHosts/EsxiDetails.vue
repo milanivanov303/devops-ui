@@ -5,20 +5,16 @@
         <li class="collection-header">
           <span class="collection-section">MAIN DETAILS</span>
         </li>
-
         <li v-if="esxiHost.details.version" class="collection-item">
           <b>OS: </b>{{ esxiHost.details.version.product }}, {{ esxiHost.details.version.version }}
         </li>
-
         <li v-if="esxiHost.details.platform" class="collection-item">
           <b>Platform: </b>{{esxiHost.details.platform.product_name}}
             {{ esxiHost.details.platform.vendor_name }}
         </li>
-
         <li v-if="esxiHost.details.platform" class="collection-item">
           <b>Serial Num: </b>{{ esxiHost.details.platform.serial_number }}
         </li>
-
         <li v-if="esxiHost.details.date" class="collection-item">
           <b>ESXi date: </b>{{ $date(esxiHost.details.date).toHuman() }}
         </li>
@@ -27,29 +23,29 @@
         <li v-if="esxiHost.details.cpu" class="collection-header">
           <span class="collection-section">CPU DETAILS</span>
         </li>
-
         <li v-if="esxiHost.details.cpu_details" class="collection-item">
           <b>Brand: </b>{{ getCpuBrand(esxiHost.details.cpu_details) }}
         </li>
-
-        <li v-if="esxiHost.details.cpu" class="collection-item">
-          <b>Packages: </b>{{ esxiHost.details.cpu.c_p_u_packages }}
+        <li v-if="esxiHost.details.cpu_details" class="collection-item">
+          <b>Model: </b>{{ esxiHost.details.cpu.cpu_model }}
         </li>
 
         <li v-if="esxiHost.details.cpu" class="collection-item">
-          <b>Cores: </b>{{ esxiHost.details.cpu.c_p_u_cores }}
+          <b>Packages: </b>{{ esxiHost.details.cpu.num_cpu_pkgs }}
+        </li>
+        <li v-if="esxiHost.details.cpu" class="collection-item">
+          <b>Cores: </b>{{ esxiHost.details.cpu.num_cpu_cores }}
           <span v-if="esxiHost.details.cpu_details">
             x {{ getCpuCoreSpeed(esxiHost.details.cpu_details) }}
           </span>
         </li>
-
         <li v-if="esxiHost.details.cpu" class="collection-item">
-          <b>Threads: </b>{{ esxiHost.details.cpu.c_p_u_threads }}
+          <b>Threads: </b>{{ esxiHost.details.cpu.num_cpu_threads }}
         </li>
       </div>
     </ul>
+    <span v-else>Sorry! There is no data. Please update and try again.</span>
   </div>
-
 </template>
 
 <script>
@@ -81,11 +77,10 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .collection-section{
     font-size: 1.2em;
   }
-
   .ul-collection{
     border-color: #fcfafa;
   }

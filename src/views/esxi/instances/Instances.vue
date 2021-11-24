@@ -11,6 +11,7 @@
         sort-by="name"
         sort-dir="asc"
         query-prefix="instances_"
+        :noDataText="getNoDataText()"
         :export-btn="false"
         :view-btn="false"
         :add-btn="false"
@@ -21,10 +22,10 @@
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
-        <Column label="Virtual Machine" name="vm"
-          :show="(instance) => getVMLink(instance.vm.name)"/>
-        <Column label="Esxi Host" name="esxi"
-          :show="(instance) => getHostLink(instance.esxi.name)"/>
+        <Column v-if="!instances" label="Virtual Machine" name="vm"
+          :show="(instance) => getVMLink(instance.vm.id, instance.vm.name)"/>
+        <Column v-if="!instances" label="Esxi Host" name="esxi"
+          :show="(instance) => getHostLink(instance.esxi.id, instance.esxi.name)"/>
         <Column label="Home path" name="home-path" :show="(instance) => instance.home_path"/>
         <Column label="Patch config path" name="patch-conf"
           :show="(instance) => instance.patch_conf"/>
@@ -82,6 +83,15 @@ export default {
     },
   },
   methods: {
+    getNoDataText() {
+      if (this.$store.state.esxi.esxiHosts.length === 0) {
+        return 'There are no ESXi Host created.';
+      }
+      if (this.$store.state.esxi.virtualMachines.length === 0) {
+        return 'There are no Virtual Machines. Please update and try again in a few minutes.';
+      }
+      return 'There are no records';
+    },
     getProjectName(instance) {
       let project = null;
       this.projects.forEach((p) => {
@@ -108,14 +118,11 @@ export default {
       });
       return deliveryChain ? deliveryChain.title : '-';
     },
-    getHostLink(name) {
-      return `<a href="esxiHosts?esxiHost=${name}">${name}</a>`;
+    getHostLink(id, name) {
+      return `<a href="esxiHosts/${id}" style="text-decoration: underline">${name}</a>`;
     },
-    getVMLink(name) {
-      return `<a href="virtualMachines?virtualMachine=${name}">${name}</a>`;
-    },
-    getExtranetLink() {
-      return '';
+    getVMLink(id, name) {
+      return `<a href="virtualMachines/${id}" style="text-decoration: underline">${name}</a>`;
     },
 
     getEsxiHosts() {

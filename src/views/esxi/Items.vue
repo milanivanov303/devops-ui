@@ -5,25 +5,34 @@
         <div class="col s12 m6">
           <TextInput label="Search..." icon="search" v-model="search"/>
         </div>
-        <div class="col s12 m6 l1 right" >
+        <div class="col s12 m6">
           <button
-            v-if="module === 'esxiHosts' && $auth.can('esxi.add')"
-            class="btn-floating waves-effect waves-light right"
-            data-tooltip="Add"
-            @click="showAddHostModal=true"
-          >
-            <i class="material-icons left">add</i>
+              v-if="module === 'esxiHosts' && $auth.can('esxi.add') && !item"
+              class="btn-floating waves-effect waves-light right"
+              data-tooltip="Add"
+              @click="showModal=true"
+            >
+              <i class="material-icons left">add</i>
           </button>
-          <Select v-if="module === 'virtualMachines'"
-                  v-model="status"
-                  :options="statusOptions"
-                  displayed="name"
-          />
+          <div class="row" v-if="module === 'virtualMachines'">
+            <button v-if="showUpdateBtn"
+                    class="btn waves-effect waves-light right"
+                    style="margin-top: 7px;"
+                    data-tooltip="Add"
+                    @click.prevent="$store.dispatch('esxi/updateHostInfo')">
+              Update </button>
+            <Select
+                class="col s12 m2 right"
+                v-model="status"
+                :options="statusOptions"
+                displayed="name"
+            />
+          </div>
         </div>
       </div>
 
       <div v-if="!item" class="row">
-        <div v-for="(item, id) in items" :key="id" class="col s12 m6 l4">
+        <div v-for="item in paginatedItems" :key="item.id" class="col s12 m6 l4">
           <Host v-if="module === 'esxiHosts'" :esxiHost="item"/>
           <VirtualMachine v-if="module === 'virtualMachines'" :vm="item"/>
         </div>
@@ -46,7 +55,7 @@
 
       <div v-if="item" class="row">
         <div class="col s12 m6 l5 scroll">
-          <div v-for="(item, id) in items" :key="id">
+          <div v-for="item in items" :key="item.id">
             <Host v-if="module === 'esxiHosts'" :esxiHost="item"/>
             <VirtualMachine v-if="module === 'virtualMachines'" :vm="item"/>
           </div>
@@ -60,9 +69,13 @@
         </div>
       </div>
 
-      <AddHostModal
-        v-if="module === 'esxiHosts' && showAddHostModal"
-        @close="showAddHostModal = false"
+      <span class="no-data-text" v-if="!loading && getNoDataText()" v-html="getNoDataText()"></span>
+
+      <AddEditHostModal
+          v-if="showModal"
+          action="create"
+          :currentHost="{}"
+          @close="showModal = false"
       />
     </div>
   </div>
@@ -74,7 +87,7 @@ const Paginate = () => import('@/components/partials/Paginate');
 
 const Host = () => import('./esxiHosts/Host');
 const HostDetails = () => import('./esxiHosts/HostDetails');
-const AddHostModal = () => import('./esxiHosts/AddHostModal');
+const AddEditHostModal = () => import('./esxiHosts/AddEditHostModal');
 
 const VirtualMachine = () => import('./virtualMachines/VirtualMachine');
 const VmDetails = () => import('./virtualMachines/VmDetails');
@@ -85,7 +98,7 @@ export default {
     Paginate,
     Host,
     HostDetails,
-    AddHostModal,
+    AddEditHostModal,
     VirtualMachine,
     VmDetails,
   },
@@ -96,31 +109,16 @@ export default {
 
   data() {
     return {
+      showUpdateBtn: false,
       loading: false,
       search: this.$route.query.search,
       page: 1,
       perPage: 9,
       lastPage: 0,
       perPageOptions: [6, 9, 12, 15],
-      showAddHostModal: false,
-      status: {
-        name: 'On',
-        value: 'on',
-      },
-      statusOptions: [
-        {
-          name: 'On',
-          value: 'on',
-        },
-        {
-          name: 'Off',
-          value: 'off',
-        },
-        {
-          name: 'All',
-          value: 'all',
-        },
-      ],
+      showModal: false,
+      status: 'on',
+      statusOptions: ['on', 'off', 'all'],
     };
   },
   computed: {
@@ -133,24 +131,43 @@ export default {
         items = this.filterItemsByStatus(items);
       }
 
-      return this.paginatedItems(items);
+      return items;
+    },
+
+    paginatedItems() {
+      const { items } = this;
+
+      const from = (this.page * this.perPage) - this.perPage;
+      const to = (this.page * this.perPage);
+
+      this.setLastPage(Math.ceil(items.length / this.perPage));
+
+      return items.slice(from, to);
     },
 
     item() {
-      const query = this.$route.query[this.module.slice(0, -1)];
-      if (!query || !this.items.length) {
+      const { id } = this.$route.params;
+      if (!id || !this.items.length) {
         return null;
       }
 
-      const item = this.items.find(
-        (i) => decodeURIComponent(query) === (i.hostname || i.name),
-      );
-
+      const item = this.items.find((i) => parseInt(id, 10) === i.id);
       return item;
     },
   },
 
   methods: {
+    getNoDataText() {
+      if (!this.$store.state.esxi.esxiHosts.length) {
+        return 'There are no ESXi Host created.';
+      }
+      if (this.module === 'virtualMachines' && !this.$store.state.esxi.virtualMachines.length) {
+        this.showUpdateBtn = true;
+        return 'There are no Virtual Machines. Please update and try again later.';
+      }
+      return null;
+    },
+
     getItems() {
       this.loading = true;
 
@@ -195,21 +212,13 @@ export default {
     },
 
     filterItemsByStatus(items) {
-      if (this.status.value === 'all') {
+      if (this.status === 'all') {
         return items;
       }
 
-      return items.filter((item) => item.powered === this.status.value);
+      return items.filter((item) => item.powered === this.status);
     },
 
-    paginatedItems(items) {
-      const from = (this.page * this.perPage) - this.perPage;
-      const to = (this.page * this.perPage);
-
-      this.setLastPage(Math.ceil(items.length / this.perPage));
-
-      return items.slice(from, to);
-    },
   },
 
   watch: {
@@ -234,7 +243,9 @@ export default {
   },
 
   updated() {
-    this.$M.Tooltip.init(this.$el.querySelectorAll('[data-tooltip]'));
+    if (this.$el) {
+      this.$M.Tooltip.init(this.$el.querySelectorAll('[data-tooltip]'));
+    }
   },
 };
 
@@ -252,5 +263,8 @@ export default {
     p {
       margin: 13px 0;
     }
+  }
+  .no-data-text {
+    padding-left: 40px;
   }
 </style>
