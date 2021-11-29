@@ -45,10 +45,9 @@ export default {
 
   methods: {
     getTo() {
-      const query = { ...this.$route.query };
-      query.esxiHost = this.esxiHost.hostname;
-
-      return { query };
+      return {
+        path: `/inventory/esxiHosts/${encodeURIComponent(this.esxiHost.id)}`,
+      };
     },
     getOnOffVMsCount(host, status) {
       let counter = 0;

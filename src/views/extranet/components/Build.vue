@@ -232,9 +232,6 @@ export default {
     },
     /* eslint func-names: ["error", "as-needed"] */
     'form.client': function () {
-      if (this.form.client === '') {
-        this.form.instance = null;
-      }
       this.getDefaultInstance();
     },
   },
@@ -249,9 +246,11 @@ export default {
     },
 
     getDefaultInstance() {
+      this.form.instance = null;
+
       const db = this.instances
         .find((i) => i.name.toLowerCase() === this.form.client.db.toLowerCase());
-      if (db && !this.form.instance) {
+      if (db) {
         this.form.instance = db;
       }
     },

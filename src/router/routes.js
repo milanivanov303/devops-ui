@@ -348,7 +348,7 @@ export default [
     component: EsxiDashboard,
   },
   {
-    path: '/inventory/esxiHosts/:esxiHost?',
+    path: '/inventory/esxiHosts/:id?',
     meta: {
       requiresAuth: true,
       name: 'esxi-esxiHosts',
@@ -369,7 +369,7 @@ export default [
     },
   },
   {
-    path: '/inventory/virtualMachines/:virtualMachine?',
+    path: '/inventory/virtualMachines/:id?',
     meta: {
       requiresAuth: true,
       name: 'esxi-virtualMachines',
@@ -390,7 +390,7 @@ export default [
     },
   },
   {
-    path: '/inventory/instances/:instance?',
+    path: '/inventory/instances/:id?',
     meta: {
       requiresAuth: true,
       name: 'esxi-instances',
