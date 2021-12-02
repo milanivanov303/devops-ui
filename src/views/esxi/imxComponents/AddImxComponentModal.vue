@@ -73,12 +73,6 @@
         </div>
 
         <div class="row">
-          <div v-if="versions" class="col s12 l12">
-            <p><b>Versions:</b></p>
-          </div>
-        </div>
-
-        <div class="row">
           <div v-if="versions" class="data-table col s12 l12">
             <table>
               <thead>
