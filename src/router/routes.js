@@ -29,6 +29,7 @@ const CmsRolesAdministration = () => import(/* webpackChunkName: "administration
 const CmsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/cms/Actions');
 
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
+const ImxComponents = () => import('../views/esxi/imxComponents/ImxComponents');
 
 export default [
   {
@@ -407,7 +408,24 @@ export default [
     },
     component: Instances,
   },
+  {
+    path: '/inventory/imxComponents/:imxComponent?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-components',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Components';
 
+        if (route.query.imxComponent) {
+          title = `${route.query.imxComponent} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: ImxComponents,
+  },
   // Devops Administration Tab
   {
     path: '/administration/devops/users/:id?',
