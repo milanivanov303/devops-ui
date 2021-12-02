@@ -82,7 +82,7 @@
           class="col s12 readonly"
           label="Docker image"
           icon="adjust"
-          :value="build.details.image"
+          :value="build.details.image.label"
         />
       </div>
     </div>
