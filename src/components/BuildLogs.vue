@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <pre>{{logs}}</pre>
-  </div>
+  <pre ref="build-logs">{{logs}}</pre>
 </template>
 
 <script>
@@ -22,12 +20,14 @@ export default {
 
   methods: {
     getLogsByBuild() {
+      const loader = this.$loading.show({ container: this.$refs['build-logs'] });
       api('devops')
         .post(`builds/${this.build.id}/logs`)
         .then((response) => {
           this.logs = response.data;
         })
-        .catch((error) => error.message);
+        .catch((error) => error.message)
+        .finally(() => loader.hide());
     },
   },
 
@@ -39,10 +39,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
-pre {
-  width: 100%;
-  height: 70%;
-  overflow: auto;
-  //white-space: pre-wrap;
-}
+  pre {
+    white-space: pre-line;
+    height: 60vh;
+    overflow-y:scroll;
+    overflow-x:hidden;
+  }
 </style>
