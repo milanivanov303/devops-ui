@@ -5,15 +5,14 @@
         <div class="col s12 m6">
           <p class="components-title">iMX Components</p>
         </div>
-        <div class="col s12 m6 l1 right" >
-          <button
+        <div class="col s12 m6 l1 right">
+          <TooltipButton
             v-if="$auth.can('imx-component.add')"
-            class="btn-floating waves-effect waves-light right"
-            data-tooltip="Add"
-            @click="showAddImxComponentModal=true"
-          >
-            <i class="material-icons left">add</i>
-          </button>
+            class="btn-floating right"
+            :icon="'add'"
+            :tooltip="'Add'"
+            @click="showAddImxComponentModal=true">
+          </TooltipButton>
         </div>
       </div>
 
@@ -25,14 +24,13 @@
             </div>
             <div class="collapsible-body">
               <div class="col s12 m6 l1 right">
-                <button
+                <TooltipButton
                   v-if="$auth.can('imx-component.add')"
-                  class="btn-floating waves-effect waves-light right btn-small"
-                  data-tooltip="Edit"
-                  @click="editComponent(component)"
-                >
-                  <i class="material-icons left">edit</i>
-                </button>
+                  class="btn-floating right"
+                  :icon="'edit'"
+                  :tooltip="'Edit'"
+                  @click="editComponent(component)">
+                </TooltipButton>
               </div>
               <p>
                 <b>Maintenance team: </b>
@@ -88,11 +86,14 @@
 
 <script>
 
+import TooltipButton from '@/components/partials/TooltipButton';
+
 const AddImxComponentModal = () => import('./AddImxComponentModal');
 
 export default {
 
   components: {
+    TooltipButton,
     AddImxComponentModal,
   },
 
@@ -134,10 +135,6 @@ export default {
     globalM.Collapsible.init(elem, {
       accordion: false,
     });
-  },
-
-  updated() {
-    this.$M.Tooltip.init(this.$el.querySelectorAll('[data-tooltip]'));
   },
 
 };

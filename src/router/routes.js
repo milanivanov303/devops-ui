@@ -18,6 +18,7 @@ const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Mo
 const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
 const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
+const ImxComponents = () => import('../views/esxi/imxComponents/ImxComponents');
 
 const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
 const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
@@ -29,7 +30,6 @@ const CmsRolesAdministration = () => import(/* webpackChunkName: "administration
 const CmsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/cms/Actions');
 
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
-const ImxComponents = () => import('../views/esxi/imxComponents/ImxComponents');
 
 export default [
   {

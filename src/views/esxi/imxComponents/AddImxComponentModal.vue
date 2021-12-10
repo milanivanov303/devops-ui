@@ -101,11 +101,12 @@
                     </span>
                   </td>
                   <td>
-                    <a class="btn-floating btn-large waves-effect btn-small red"
-                       data-tooltip="Remove version"
-                       @click="removeFromVersions(index)">
-                      <i class="material-icons">remove</i>
-                    </a>
+                    <TooltipButton
+                      class="btn-floating btn-small red"
+                      :icon="'remove'"
+                      :tooltip="'Remove version'"
+                      @click="removeFromVersions(index)">
+                    </TooltipButton>
                   </td>
                 </tr>
               </tbody>
@@ -166,11 +167,12 @@
           </div>
 
           <div class="col s12 l2 right-align">
-            <a class="btn-floating btn-large waves-effect btn-medium"
-               data-tooltip="Add version"
-               @click="addToVersions()">
-            <i class="material-icons">add</i>
-            </a>
+            <TooltipButton
+              class="btn-floating"
+              :icon="'add'"
+              :tooltip="'Add version'"
+              @click="addToVersions()">
+            </TooltipButton>
           </div>
         </div>
 
@@ -201,11 +203,13 @@
 import { required } from 'vuelidate/lib/validators';
 import { Datetime } from 'vue-datetime';
 import 'vue-datetime/dist/vue-datetime.css';
+import TooltipButton from '@/components/partials/TooltipButton';
 
 export default {
 
   components: {
     datetime: Datetime,
+    TooltipButton,
   },
 
   props: {
@@ -327,10 +331,6 @@ export default {
         this.versions = null;
       }
     },
-  },
-
-  updated() {
-    this.$M.Tooltip.init(this.$el.querySelectorAll('[data-tooltip]'));
   },
 
 };
