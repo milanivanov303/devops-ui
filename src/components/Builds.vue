@@ -78,6 +78,16 @@
                   <i class="material-icons">error_outline</i>
                 </a>
                 <a
+                    v-if="build.details.artifactory_url"
+                    :href="build.details.artifactory_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-tooltip="Download"
+                    class="teal-text text-darken-1 tooltipped"
+                >
+                  <i class="material-icons">file_download</i>
+                </a>
+                <a
                   @click="openProgressModal(build)"
                   target="_blank"
                   data-tooltip="Progress"
