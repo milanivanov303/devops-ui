@@ -1,19 +1,16 @@
 <template>
-  <div>
     <div class="row">
-        <div class="col s4 offset-s8" >
-          <Select
-            v-model="numberOfLines"
-            :options="[50,100,200,500,1000]"
-            icon="cloud_upload"
-            label="Number of lines"
-            :default-option="false"
-          />
+        <div class="col s4 offset-s8">
+            <Select
+              v-model="numberOfLines"
+              :options="[50,100,200,500,1000]"
+              icon="cloud_upload"
+              label="Number of lines"
+              :default-option="false"
+            />
         </div>
-      </div>
-      <br>
-      <pre>{{logs}}</pre>
-  </div>
+        <pre class="col s12" ref="service-logs">{{logs}}</pre>
+    </div>
 </template>
 
 <script>
@@ -36,6 +33,7 @@ export default {
 
   methods: {
     getServiceLogsByBuild() {
+      const loader = this.$loading.show({ container: this.$refs['service-logs'] });
       const parameters = `?stderr=1&stdout=1&timestamps=0&tail=${this.numberOfLines}`;
 
       if (this.build.status !== 'running') {
@@ -50,7 +48,10 @@ export default {
             .map((line) => line.slice(8))
             .join('\n');
         })
-        .catch((error) => error.message);
+        .catch((error) => {
+          this.logs = error.message;
+        })
+        .finally(() => loader.hide());
     },
 
     close() {
@@ -77,9 +78,9 @@ export default {
 
 <style scoped lang="scss">
   pre {
-    width: 100%;
-    height: 70%;
-    overflow: auto;
-    //white-space: pre-wrap;
+    white-space: pre-line;
+    height: 45vh;
+    overflow-y:scroll;
+    overflow-x:hidden;
   }
 </style>
