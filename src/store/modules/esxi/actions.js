@@ -41,4 +41,34 @@ export default {
     return promise;
   },
 
+  getImxComponents({ commit }) {
+    const promise = api('devops').get('imx-components');
+
+    promise
+      .then((response) => {
+        commit('imxComponents', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get iMX components', { root: true }));
+
+    return promise;
+  },
+
+  createImxComponent({ commit }, payload) {
+    const promise = api('devops').post('imx-components', payload);
+    promise
+      .then((response) => commit('createImxComponent', response.data.data))
+      .catch((error) => commit('error', error));
+
+    return promise;
+  },
+
+  updateImxComponent({ commit }, payload) {
+    const promise = api('devops').put(`imx-components/${payload.id}`, payload);
+    promise
+      .then((response) => commit('updateImxComponent', response.data.data))
+      .catch((error) => commit('error', error));
+
+    return promise;
+  },
+
 };
