@@ -2,25 +2,25 @@
   <div class="row">
     <h1 class="center">SE Transfer</h1>
     <custom-confirm
-      ref="custom-confirm"
-      :message="confirmMsg"
-      @selectedVal="customConfirm"
+        ref="custom-confirm"
+        :message="confirmMsg"
+        @selectedVal="customConfirm"
     />
     <div class="col s6">
       <Alert
-        v-if="error !== ''"
-        v-bind:msg="error"
+          v-if="error !== ''"
+          v-bind:msg="error"
       />
       <div class="row">
         <div class="input-field col s10">
           <i class="material-icons prefix">label_outline</i>
           <label for="tts_key" class="active">TTS Key</label>
           <input
-            id="tts_key"
-            type="text"
-            v-model.trim="ttsKey"
-            @blur="$v.ttsKey.$touch()"
-            @change="$v.ttsKey.$touch()"
+              id="tts_key"
+              type="text"
+              v-model.trim="ttsKey"
+              @blur="$v.ttsKey.$touch()"
+              @change="$v.ttsKey.$touch()"
           />
           <div class="validator" v-if="$v.ttsKey.$anyError || issueStatus === 'ERROR'">
             <div class="red-text" v-if="!$v.ttsKey.required">
@@ -36,27 +36,27 @@
         </div>
         <div class="input-field col s1">
           <a
-            class="btn-floating btn-small waves-effect waves-light tooltipped"
-            data-position="right"
-            data-tooltip="Change issue"
-            ref="tooltip"
-            @click="getIssue()">
+              class="btn-floating btn-small waves-effect waves-light tooltipped"
+              data-position="right"
+              data-tooltip="Change issue"
+              ref="tooltip"
+              @click="getIssue()">
             <i class="material-icons">cached</i>
           </a>
         </div>
       </div>
-<!--        <Issue-->
-<!--            ref="select-issue"-->
-<!--            @changeIssue="changeIssue"-->
-<!--            :formTtsKey="ttsKey"-->
-<!--            :formDeliveryChains="deliveryChains"-->
-<!--            :submitStatus="issueStatus">-->
-<!--        </Issue>-->
+      <!--        <Issue-->
+      <!--            ref="select-issue"-->
+      <!--            @changeIssue="changeIssue"-->
+      <!--            :formTtsKey="ttsKey"-->
+      <!--            :formDeliveryChains="deliveryChains"-->
+      <!--            :submitStatus="issueStatus">-->
+      <!--        </Issue>-->
       <div class="row"
            v-if="deliveryChains.length
            && !$v.ttsKey.$anyError
            && issueStatus !== 'ERROR'">
-      <div class="col s11">
+        <div class="col s11">
           <Select
               label="Delivery chains"
               icon="linear_scale"
@@ -137,11 +137,11 @@
         <div class="col s5 exportCheckbox">
           <label>
             <input
-              ref="exportable"
-              type="checkbox"
-              @change="checkboxEvent(se.doExport)"
-              v-model="se.doExport"
-              :disabled="!exportable.includes(seType.key)"
+                ref="exportable"
+                type="checkbox"
+                @change="checkboxEvent(se.doExport)"
+                v-model="se.doExport"
+                :disabled="!exportable.includes(seType.key)"
             />
             <span>Do export on DEV instance</span>
           </label>
@@ -150,11 +150,11 @@
       <div class="row">
         <div class="input-field col s5">
           <button
-            class="btn waves-effect waves-light right"
-            type="button"
-            name="action"
-            :disabled="$v.$invalid || exporting.status === 'running'"
-            @click="onSubmit">{{ actionName }}
+              class="btn waves-effect waves-light right"
+              type="button"
+              name="action"
+              :disabled="$v.$invalid || exporting.status === 'running'"
+              @click="onSubmit">{{ actionName }}
           </button>
         </div>
       </div>
@@ -408,51 +408,51 @@ export default {
         this.exporting.comments = 'Export will start shortly ...';
       }
       await this.$store.dispatch('mmpi/exportSeModification', this.se)
-        .then((response) => {
-          this.confirmMsg = ['Modification has been successfully created!', 'Do you want to proceed to MMPI?'];
-          if (response.data.id) {
-            this.$refs['custom-confirm'].openModal();
-          }
+          .then((response) => {
+            this.confirmMsg = ['Modification has been successfully created!', 'Do you want to proceed to MMPI?'];
+            if (response.data.id) {
+              this.$refs['custom-confirm'].openModal();
+            }
 
-          if (!ws.client.connected) {
-            return;
-          }
+            if (!ws.client.connected) {
+              return;
+            }
 
-          const subscribe = ws.client.subscribe(
-            `/queue/${response.data.broadcast.queue}`,
-            (message) => {
-              const data = JSON.parse(message.body);
-              this.exporting.status = data.status;
-              if (data.comments) {
-                this.exporting.comments = data.comments;
-              }
+            const subscribe = ws.client.subscribe(
+                `/queue/${response.data.broadcast.queue}`,
+                (message) => {
+                  const data = JSON.parse(message.body);
+                  this.exporting.status = data.status;
+                  if (data.comments) {
+                    this.exporting.comments = data.comments;
+                  }
 
-              if (data.log) {
-                this.exporting.log += data.log;
-                this.scrollLogContainer();
-              }
+                  if (data.log) {
+                    this.exporting.log += data.log;
+                    this.scrollLogContainer();
+                  }
 
-              if (data.status === 'failed') {
-                this.exporting.status = data.status;
-                this.exporting.error = data.error;
-                if (data.log.includes('THERE IS NOT ENOUGH SPACE')) {
-                  this.exporting.error = 'There is not enough space for the export!';
-                }
-                subscribe.unsubscribe();
-              }
+                  if (data.status === 'failed') {
+                    this.exporting.status = data.status;
+                    this.exporting.error = data.error;
+                    if (data.log.includes('THERE IS NOT ENOUGH SPACE')) {
+                      this.exporting.error = 'There is not enough space for the export!';
+                    }
+                    subscribe.unsubscribe();
+                  }
 
-              if (this.exporting.status === 'success') {
-                this.$refs['custom-confirm'].openModal();
-              }
-            },
-            response.data.broadcast,
-          );
-        })
-        .catch((error) => {
-          this.exporting.status = 'failed';
-          this.exporting.summary = 'Could not start export';
-          this.exporting.error = error;
-        });
+                  if (this.exporting.status === 'success') {
+                    this.$refs['custom-confirm'].openModal();
+                  }
+                },
+                response.data.broadcast,
+            );
+          })
+          .catch((error) => {
+            this.exporting.status = 'failed';
+            this.exporting.summary = 'Could not start export';
+            this.exporting.error = error;
+          });
       this.exporting.log = '';
       loader.hide();
     },
@@ -491,4 +491,3 @@ export default {
   margin-top: 1.5rem !important;
 }
 </style>
-

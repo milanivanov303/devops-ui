@@ -64,7 +64,7 @@ export default {
       submitStatus: this.issueStatus,
       formDeliveryChains: this.deliveryChains,
       issueId: this.se.issue_id,
-    }
+    };
   },
   watch: {
     formTtsKey(key) {
@@ -121,19 +121,19 @@ export default {
     // },
     async getIssue() {
       this.$emit('changeIssue');
-        if (this.$route.params.issue) {
+      if (this.$route.params.issue) {
         const loader = this.$loading.show({ container: this.$el });
         await this.$store.dispatch('cms/getIssue', this.$route.params.issue)
-         .then(() => {
-          this.issueId = this.$store.state.cms.issue.id;
-          if (this.$store.state.cms.issue) {
-            this.formDeliveryChains = this.$store.state.cms.issue.project.delivery_chains;
-          }
-          if (!this.$store.state.cms.issue
+          .then(() => {
+            this.issueId = this.$store.state.cms.issue.id;
+            if (this.$store.state.cms.issue) {
+              this.formDeliveryChains = this.$store.state.cms.issue.project.delivery_chains;
+            }
+            if (!this.$store.state.cms.issue
               || (this.formTtsKey !== this.$store.state.cms.issue.tts_id)) {
-            this.submitStatus = 'ERROR';
-          }
-          loader.hide();
+              this.submitStatus = 'ERROR';
+            }
+            loader.hide();
           });
       }
     },

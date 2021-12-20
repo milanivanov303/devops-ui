@@ -26,7 +26,7 @@
 </template>
 
 <script lang="js">
-import EventBus from '@/event-bus';
+
 import config from '@/config';
 import WebSocket from '@/plugins/ws';
 
@@ -60,34 +60,38 @@ export default {
     },
 
     subscribe() {
-      this.currentWsConnect = new WebSocket(config.ws.url, config.ws.username_es, config.ws.password_es,
-          config.ws.vhost_es);
+      this.currentWsConnect = new WebSocket(
+        config.ws.url,
+        config.ws.username_es,
+        config.ws.password_es,
+        config.ws.vhost_es,
+      );
 
       if (!this.currentWsConnect.client.connected) {
         return;
       }
 
       this.queue = this.currentWsConnect.client.subscribe(
-          `/queue/${this.broadcast.queue}`,
-          (message) => {
-            const data = JSON.parse(message.body);
+        `/queue/${this.broadcast.queue}`,
+        (message) => {
+          const data = JSON.parse(message.body);
 
-            this.currentSummary = data.summary;
-            this.progress = data.progress || null;
+          this.currentSummary = data.summary;
+          this.progress = data.progress || null;
 
-            if (data.log) {
-              this.currentLog += data.log;
-              this.scrollLogContainer();
-            }
+          if (data.log) {
+            this.currentLog += data.log;
+            this.scrollLogContainer();
+          }
 
-            if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
-              this.currentStatus = data.status;
-              this.queue.unsubscribe();
+          if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
+            this.currentStatus = data.status;
+            this.queue.unsubscribe();
 
-              this.$emit('openModal');
-            }
-          },
-          this.broadcast,
+            this.$emit('openModal');
+          }
+        },
+        this.broadcast,
       );
     },
   },
