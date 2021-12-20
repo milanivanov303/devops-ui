@@ -19,6 +19,7 @@ const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Mo
 const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
 const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
+const ImxComponents = () => import('../views/esxi/imxComponents/ImxComponents');
 
 const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
 const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
@@ -408,7 +409,24 @@ export default [
     },
     component: Instances,
   },
+  {
+    path: '/inventory/imxComponents/:imxComponent?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-components',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Components';
 
+        if (route.query.imxComponent) {
+          title = `${route.query.imxComponent} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: ImxComponents,
+  },
   // Devops Administration Tab
   {
     path: '/expert-system/modification/:issue?',

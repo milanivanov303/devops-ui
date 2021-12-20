@@ -28,13 +28,9 @@
           </ul>
         </div>
         <div id="component" class="col s12 tab-content">
-          <div class="row">
-            <div class="col s12">
-              <keep-alive>
-                <component :is="currentTabComponent" :build="build"></component>
-              </keep-alive>
-            </div>
-          </div>
+          <keep-alive>
+            <component :is="currentTabComponent" :build="build"></component>
+          </keep-alive>
         </div>
       </div>
     </template>
@@ -86,10 +82,6 @@ export default {
 
 <style lang="scss" scoped>
 #component {
-  margin-top: 50px;
-  width:100%;
-  overflow-y:scroll;
-  position:relative;
-  height: 800px;
+  margin-top: 40px;
 }
 </style>

@@ -8,8 +8,8 @@ class DateHelper {
     this.format = 'dd LLL yyyy HH:mm';
   }
 
-  toHuman() {
-    return this.getDate().toFormat(this.format);
+  toHuman(format) {
+    return format ? this.getDate().toFormat(format) : this.getDate().toFormat(this.format);
   }
 
   toISO() {

@@ -6,10 +6,11 @@
           <span class="collection-section">MAIN DETAILS</span>
         </li>
         <li v-if="esxiHost.details.version" class="collection-item">
-          <b>OS: </b>{{ esxiHost.details.version.product }}, {{ esxiHost.details.version.version }}
+          <b>Hypervisor: </b>{{ esxiHost.details.version.product }},
+                             {{ esxiHost.details.version.version }}
         </li>
         <li v-if="esxiHost.details.platform" class="collection-item">
-          <b>Platform: </b>{{esxiHost.details.platform.product_name}}
+          <b>Model: </b>{{esxiHost.details.platform.product_name}}
             {{ esxiHost.details.platform.vendor_name }}
         </li>
         <li v-if="esxiHost.details.platform" class="collection-item">
@@ -27,7 +28,7 @@
           <b>Brand: </b>{{ getCpuBrand(esxiHost.details.cpu_details) }}
         </li>
         <li v-if="esxiHost.details.cpu_details" class="collection-item">
-          <b>Model: </b>{{ esxiHost.details.cpu.cpu_model }}
+          <b>Processor Type: </b>{{ esxiHost.details.cpu.cpu_model }}
         </li>
 
         <li v-if="esxiHost.details.cpu" class="collection-item">
@@ -77,10 +78,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
   .collection-section{
     font-size: 1.2em;
   }
+
   .ul-collection{
     border-color: #fcfafa;
   }
