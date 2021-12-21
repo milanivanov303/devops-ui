@@ -45,13 +45,6 @@
           </a>
         </div>
       </div>
-      <!--        <Issue-->
-      <!--            ref="select-issue"-->
-      <!--            @changeIssue="changeIssue"-->
-      <!--            :formTtsKey="ttsKey"-->
-      <!--            :formDeliveryChains="deliveryChains"-->
-      <!--            :submitStatus="issueStatus">-->
-      <!--        </Issue>-->
       <div class="row"
            v-if="deliveryChains.length
            && !$v.ttsKey.$anyError
@@ -78,7 +71,7 @@
               label="Instance status"
               icon="power_settings_new"
               displayed="value"
-              v-model="defaultValue"
+              v-model="instanceStatus"
               :options="instanceStatuses"
               :invalid="$v.instanceStatus.$error"
               @blur="$v.instanceStatus.$touch()"
@@ -187,14 +180,12 @@
 
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import CustomConfirm from '@/components/partials/CustomConfirm';
-// import Issue from '@/components/partials/Issue';
 import config from '@/config';
 import WebSocket from '@/plugins/ws';
 
 export default {
   components: {
     'custom-confirm': CustomConfirm,
-    // Issue,
   },
   mounted() {
     this.getIssue();
@@ -234,10 +225,7 @@ export default {
       seType: {},
       seTypes: [],
       typeDescription: '',
-      defaultValue: {},
-      instanceStatus: {
-        selected: {},
-      },
+      instanceStatus: {},
       confirmMsg: [],
       config: {},
       exporting: {
@@ -267,7 +255,7 @@ export default {
       },
       contents: {
         required: requiredIf((formModel) => ['bkg_trans_proc', 'bkg_trans_texte']
-            .includes(formModel.key)),
+          .includes(formModel.key)),
       },
     },
     ttsKey: {
@@ -278,6 +266,9 @@ export default {
     },
   },
   watch: {
+    instanceStatus(newValue) {
+      this.se.instance_status = newValue.id;
+    },
     ttsKey(key) {
       this.issueStatus = '';
       this.deliveryChains = [];
@@ -287,9 +278,6 @@ export default {
   computed: {
     issue() {
       return '';
-    },
-    selectedInstanceStatus(){
-      return this.se.instance_status = this.defaultValue.id;
     },
   },
   methods: {
@@ -323,7 +311,8 @@ export default {
     getInstanceStatus() {
       this.$store.dispatch('mmpi/getInstanceStatus').then(() => {
         this.instanceStatuses = this.$store.state.mmpi.instanceStatus;
-        this.defaultValue = this.instanceStatuses.find( ({ value }) => value === 'Installer decision' );
+         const defaultValue = this.instanceStatuses.find(({ value }) => value === 'Installer decision');
+        this.selectedInstanceStatus(defaultValue);
       });
     },
     getESType() {
@@ -359,32 +348,32 @@ export default {
         operation,
       };
       await this.$store.dispatch('mmpi/ociByOperation', data)
-          .then((response) => {
-            [this.texts] = Object.values(response.data);
-            this.texts = this.texts.reduce((acc, text) => {
-              acc.push({
-                name: text,
-                value: text,
-              });
-              return acc;
-            }, []);
-            loader.hide();
-          })
-          .catch((error) => {
-            loader.hide();
-            this.error = error;
-            return error;
-          });
+        .then((response) => {
+          [this.texts] = Object.values(response.data);
+          this.texts = this.texts.reduce((acc, text) => {
+            acc.push({
+              name: text,
+              value: text,
+            });
+            return acc;
+          }, []);
+          loader.hide();
+        })
+        .catch((error) => {
+          loader.hide();
+          this.error = error;
+          return error;
+        });
     },
     checkSeText(value) {
       if (!this.texts.includes(value)) {
         this.se.contents = '';
       }
     },
-    // selectedInstanceStatus(value) {
-    //   this.se.instance_status = value.id;
-    //   this.instanceStatus.selected = value;
-    // },
+    selectedInstanceStatus(value) {
+      this.instanceStatus = value;
+      this.se.instance_status = value.id;
+    },
     checkboxEvent(event) {
       if (event) {
         this.actionName = 'Export';
@@ -400,7 +389,7 @@ export default {
       const loader = this.$loading.show({ container: this.$el });
 
       const ws = new WebSocket(config.ws.url, config.ws.username_es, config.ws.password_es,
-          config.ws.vhost_es);
+        config.ws.vhost_es);
 
       this.exporting.status = 'running';
       if (this.se.doExport) {
@@ -408,51 +397,51 @@ export default {
         this.exporting.comments = 'Export will start shortly ...';
       }
       await this.$store.dispatch('mmpi/exportSeModification', this.se)
-          .then((response) => {
-            this.confirmMsg = ['Modification has been successfully created!', 'Do you want to proceed to MMPI?'];
-            if (response.data.id) {
-              this.$refs['custom-confirm'].openModal();
-            }
+        .then((response) => {
+          this.confirmMsg = ['Modification has been successfully created!', 'Do you want to proceed to MMPI?'];
+          if (response.data.id) {
+            this.$refs['custom-confirm'].openModal();
+          }
 
-            if (!ws.client.connected) {
-              return;
-            }
+          if (!ws.client.connected) {
+            return;
+          }
 
-            const subscribe = ws.client.subscribe(
-                `/queue/${response.data.broadcast.queue}`,
-                (message) => {
-                  const data = JSON.parse(message.body);
-                  this.exporting.status = data.status;
-                  if (data.comments) {
-                    this.exporting.comments = data.comments;
-                  }
+          const subscribe = ws.client.subscribe(
+            `/queue/${response.data.broadcast.queue}`,
+            (message) => {
+              const data = JSON.parse(message.body);
+              this.exporting.status = data.status;
+              if (data.comments) {
+                this.exporting.comments = data.comments;
+              }
 
-                  if (data.log) {
-                    this.exporting.log += data.log;
-                    this.scrollLogContainer();
-                  }
+              if (data.log) {
+                this.exporting.log += data.log;
+                this.scrollLogContainer();
+              }
 
-                  if (data.status === 'failed') {
-                    this.exporting.status = data.status;
-                    this.exporting.error = data.error;
-                    if (data.log.includes('THERE IS NOT ENOUGH SPACE')) {
-                      this.exporting.error = 'There is not enough space for the export!';
-                    }
-                    subscribe.unsubscribe();
-                  }
+              if (data.status === 'failed') {
+                this.exporting.status = data.status;
+                this.exporting.error = data.error;
+                if (data.log.includes('THERE IS NOT ENOUGH SPACE')) {
+                  this.exporting.error = 'There is not enough space for the export!';
+                }
+                subscribe.unsubscribe();
+              }
 
-                  if (this.exporting.status === 'success') {
-                    this.$refs['custom-confirm'].openModal();
-                  }
-                },
-                response.data.broadcast,
-            );
-          })
-          .catch((error) => {
-            this.exporting.status = 'failed';
-            this.exporting.summary = 'Could not start export';
-            this.exporting.error = error;
-          });
+              if (this.exporting.status === 'success') {
+                this.$refs['custom-confirm'].openModal();
+              }
+            },
+            response.data.broadcast,
+          );
+        })
+        .catch((error) => {
+          this.exporting.status = 'failed';
+          this.exporting.summary = 'Could not start export';
+          this.exporting.error = error;
+        });
       this.exporting.log = '';
       loader.hide();
     },
