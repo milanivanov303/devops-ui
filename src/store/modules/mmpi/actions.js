@@ -300,4 +300,55 @@ export default {
 
     return promise;
   },
+  // Instance Status
+  getInstanceStatus({ commit }) {
+    const name = 'instanceStatus';
+    const payload = {
+      type: 'instance_status',
+    };
+
+    const promise = api('mmpi').get('enum-values', payload);
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((resp) => {
+        commit('instanceStatus', resp.data.data);
+      })
+      .catch(() => commit('error', 'Could not get instance status'));
+
+    return promise;
+  },
+  getOperationTypes({ commit }) {
+    const name = 'operationType';
+    const payload = {
+      type: 'operation_types',
+    };
+    const promise = api('mmpi').get('enum-values', payload);
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((resp) => {
+        commit('operationType', resp.data.data);
+      })
+      .catch(() => commit('error', 'Could not get SE Type'));
+
+    return promise;
+  },
+  async ociByOperation({ commit }, payload) {
+    const promise = api('mmpi').post('oci', payload);
+    await promise
+      .then((response) => response.data.data)
+      .catch(() => commit('error', 'Could not get Oci data'));
+    return promise;
+  },
+  exportSeModification({ commit }, payload) {
+    try {
+      const response = api('mmpi').post('modifications/se-transfers', payload);
+      return response;
+    } catch (error) {
+      console.log(error);
+      commit('error', error);
+      return error;
+    }
+  },
 };

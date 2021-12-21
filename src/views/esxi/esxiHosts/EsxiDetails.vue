@@ -83,10 +83,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
   .collection-section{
     font-size: 1.2em;
   }
+
   .ul-collection{
     border-color: #fcfafa;
   }
