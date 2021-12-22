@@ -136,7 +136,6 @@
             </ul>
           </div>
         </li>
-        <li :class="{ active: isActive('inventory') }">
         <li :class="{ active: isActive('expert-system/modification') }">
           <a class="collapsible-header">
             <i class="material-icons">assessment</i> Expert System
@@ -157,7 +156,7 @@
           v-if="$auth.can('can-manage-authorizations')"
           :class="{ active: isActive('administration') }"
         >
-        <li :class="{ active: isActive('esxi') }">
+        <li :class="{ active: isActive('inventory') }">
           <a class="collapsible-header">
             <i class="material-icons">view_list</i> Inventory
             <i class="material-icons right">arrow_drop_down</i>

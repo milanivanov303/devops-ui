@@ -32,7 +32,7 @@
       </div>
 
       <div v-if="!item" class="row">
-        <div v-for="item in paginatedItems" :key="item.id" class="col s12 m6 l4">
+        <div v-for="item in paginatedItems" :key="item.name" class="col s12 m6 l4">
           <Host v-if="module === 'esxiHosts'" :esxiHost="item"/>
           <VirtualMachine v-if="module === 'virtualMachines'" :vm="item"/>
         </div>
@@ -55,7 +55,7 @@
 
       <div v-if="item" class="row">
         <div class="col s12 m6 l5 scroll">
-          <div v-for="item in items" :key="item.id">
+          <div v-for="item in items" :key="item.name">
             <Host v-if="module === 'esxiHosts'" :esxiHost="item"/>
             <VirtualMachine v-if="module === 'virtualMachines'" :vm="item"/>
           </div>
@@ -146,12 +146,12 @@ export default {
     },
 
     item() {
-      const { id } = this.$route.params;
-      if (!id || !this.items.length) {
+      const { name } = this.$route.params;
+      if (!name || !this.items.length) {
         return null;
       }
 
-      const item = this.items.find((i) => parseInt(id, 10) === i.id);
+      const item = this.items.find((i) => name === i.name || name === i.hostname);
       return item;
     },
   },

@@ -311,7 +311,7 @@ export default {
     getInstanceStatus() {
       this.$store.dispatch('mmpi/getInstanceStatus').then(() => {
         this.instanceStatuses = this.$store.state.mmpi.instanceStatus;
-         const defaultValue = this.instanceStatuses.find(({ value }) => value === 'Installer decision');
+        const defaultValue = this.instanceStatuses.find(({ value }) => value === 'Installer decision');
         this.selectedInstanceStatus(defaultValue);
       });
     },

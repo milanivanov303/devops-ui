@@ -2,7 +2,14 @@
 
 export default {
   getEsxiHosts({ commit, getters }) {
+    const name = 'esxi';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
     const promise = api('devops').get('esxi');
+    commit('promise', { name, promise }, { root: true });
 
     promise
       .then((response) => {
