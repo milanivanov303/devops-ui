@@ -23,9 +23,9 @@
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
         <Column v-if="!instances" label="Virtual Machine" name="vm"
-          :show="(instance) => getVMLink(instance.vm.id, instance.vm.name)"/>
+          :show="(instance) => getVMLink(instance.vm.name)"/>
         <Column v-if="!instances" label="Esxi Host" name="esxi"
-          :show="(instance) => getHostLink(instance.esxi.id, instance.esxi.name)"/>
+          :show="(instance) => getHostLink(instance.esxi.name)"/>
         <Column label="Home path" name="home-path" :show="(instance) => instance.home_path"/>
         <Column label="Patch config path" name="patch-conf"
           :show="(instance) => instance.patch_conf"/>
@@ -118,11 +118,11 @@ export default {
       });
       return deliveryChain ? deliveryChain.title : '-';
     },
-    getHostLink(id, name) {
-      return `<a href="esxiHosts/${id}" style="text-decoration: underline">${name}</a>`;
+    getHostLink(name) {
+      return `<a href="esxiHosts/${name}" style="text-decoration: underline">${name}</a>`;
     },
-    getVMLink(id, name) {
-      return `<a href="virtualMachines/${id}" style="text-decoration: underline">${name}</a>`;
+    getVMLink(name) {
+      return `<a href="virtualMachines/${name}" style="text-decoration: underline">${name}</a>`;
     },
 
     getEsxiHosts() {

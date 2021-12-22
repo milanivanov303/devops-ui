@@ -46,7 +46,7 @@ export default {
   methods: {
     getTo() {
       return {
-        path: `/inventory/esxiHosts/${encodeURIComponent(this.esxiHost.id)}`,
+        path: `/inventory/esxiHosts/${encodeURIComponent(this.esxiHost.hostname)}`,
       };
     },
     getOnOffVMsCount(host, status) {
