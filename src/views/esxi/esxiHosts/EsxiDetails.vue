@@ -5,6 +5,11 @@
         <li class="collection-header">
           <span class="collection-section">MAIN DETAILS</span>
         </li>
+        <li v-if="esxiHost.details.board_info" class="collection-item">
+          <b>Motherboard: </b>{{ esxiHost.details.board_info.product }},
+          {{ esxiHost.details.board_info.version }},
+          {{ esxiHost.details.board_info.manufacturer }}
+        </li>
         <li v-if="esxiHost.details.version" class="collection-item">
           <b>Hypervisor: </b>{{ esxiHost.details.version.product }},
                              {{ esxiHost.details.version.version }}
@@ -78,10 +83,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
   .collection-section{
     font-size: 1.2em;
   }
+
   .ul-collection{
     border-color: #fcfafa;
   }

@@ -36,7 +36,7 @@ export default {
   methods: {
     getTo() {
       return {
-        path: `/inventory/virtualMachines/${encodeURIComponent(this.vm.id)}`,
+        path: `/inventory/virtualMachines/${encodeURIComponent(this.vm.name)}`,
       };
     },
     getOnOffLabel(status) {

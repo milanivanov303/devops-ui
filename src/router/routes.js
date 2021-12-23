@@ -1,3 +1,4 @@
+const SeTransferModif = () => import(/* webpackChunkName: "expert-system" */ '../views/expert-system/Modification');
 const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
@@ -349,7 +350,7 @@ export default [
     component: EsxiDashboard,
   },
   {
-    path: '/inventory/esxiHosts/:id?',
+    path: '/inventory/esxiHosts/:name?',
     meta: {
       requiresAuth: true,
       name: 'esxi-esxiHosts',
@@ -370,7 +371,7 @@ export default [
     },
   },
   {
-    path: '/inventory/virtualMachines/:id?',
+    path: '/inventory/virtualMachines/:name?',
     meta: {
       requiresAuth: true,
       name: 'esxi-virtualMachines',
@@ -427,6 +428,17 @@ export default [
     component: ImxComponents,
   },
   // Devops Administration Tab
+  {
+    path: '/expert-system/modification/:issue?',
+    meta: {
+      alias: '/expert-system-modification',
+      name: 'expert-system modification',
+      requiresAuth: true,
+      title: 'SE Transfer Modification',
+      breadcrumb: 'Expert system modification',
+    },
+    component: SeTransferModif,
+  },
   {
     path: '/administration/devops/users/:id?',
     meta: {
