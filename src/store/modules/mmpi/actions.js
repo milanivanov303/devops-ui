@@ -346,7 +346,6 @@ export default {
       const response = api('mmpi').post('modifications/se-transfers', payload);
       return response;
     } catch (error) {
-      console.log(error);
       commit('error', error);
       return error;
     }
