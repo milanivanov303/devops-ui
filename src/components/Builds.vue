@@ -78,7 +78,11 @@
                   <i class="material-icons">error_outline</i>
                 </a>
                 <a
-                    v-if="build.details.artifactory_url"
+                    v-if="
+                      (build.status === 'running' || build.status === 'stopped')
+                      &&
+                      build.details.artifactory_url
+                    "
                     :href="build.details.artifactory_url"
                     target="_blank"
                     rel="noopener noreferrer"
