@@ -247,7 +247,6 @@ export default {
 
       this.$store.dispatch('builds/getBuildsByStatus', {
         branch: this.branch,
-        ttsKey: this.ttsKey,
         module: this.module,
         status: this.getStatus(),
         createdBy: this.createdBy,
