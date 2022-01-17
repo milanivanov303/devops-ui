@@ -137,7 +137,7 @@ export default {
           {
             name: {
               operator: 'like',
-              value: ''.concat('%', search, '%'),
+              value: `%${search}%`,
             },
           },
           {
