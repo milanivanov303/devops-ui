@@ -20,55 +20,17 @@
           </a>
           <div class="collapsible-body">
             <ul class="collapsible">
+              <li :class="{ active: isActive('extranet') }">
+                <router-link to="/extranet/dashboard"> Extranet</router-link>
+              </li>
+              <li :class="{ active: isActive('debiteur') }">
+                <router-link to="/debiteur/dashboard"> Debiteur</router-link>
+              </li>
               <li :class="{ active: isActive('pas/configurations') }">
                 <router-link to="/pas/configurations"> DevOps Matrix</router-link>
               </li>
               <li :class="{ active: isActive('pas/soa-modification') }">
                 <router-link to="/pas/soa-modification"> SOA Modification</router-link>
-              </li>
-              <li>
-                <a
-                  class="collapsible-header-pas"
-                  @click="
-                  (showExtranetAccordion = !showExtranetAccordion) &&
-                  (showDebiteurAccordion = false)"
-                >
-                  <i class="material-icons white-text">laptop_chromebook</i> Extranet
-                  <i class="material-icons white-text right">arrow_drop_down</i>
-                </a>
-                <div class="collapsible-body" v-if="showExtranetAccordion">
-                  <ul>
-                    <li :class="{ active: isActive('extranet/dashboard') }">
-                      <router-link to="/extranet/dashboard"> Dashboard</router-link>
-                    </li>
-                    <li :class="{ active: isActive('extranet/branches') }">
-                      <router-link to="/extranet/branches"> Branches</router-link>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-            <ul class="collapsible">
-              <li>
-                <a
-                  class="collapsible-header-pas"
-                  @click="(showDebiteurAccordion = !showDebiteurAccordion)
-                   && (showExtranetAccordion = false)"
-                >
-                  <i class="material-icons white-text">laptop_chromebook</i> Debiteur
-                  <i class="material-icons white-text right">arrow_drop_down</i>
-                </a>
-                <div class="collapsible-body" v-if="showDebiteurAccordion">
-                  <ul>
-                    <li :class="{ active: isActive('debiteur/dashboard') }">
-                      <router-link to="/debiteur/dashboard"> Dashboard</router-link>
-                    </li>
-                    <li :class="{ active: isActive('debiteur/branches') }">
-                      <router-link to="/debiteur/branches"> Branches</router-link>
-                    </li>
-                    <li><div class="divider"></div></li>
-                  </ul>
-                </div>
               </li>
             </ul>
           </div>
@@ -265,12 +227,6 @@
 import config from '@/config';
 
 export default {
-  data() {
-    return {
-      showExtranetAccordion: false,
-      showDebiteurAccordion: false,
-    };
-  },
   methods: {
     isActive(path) {
       const regexp = RegExp(`^/${path}`);
@@ -285,21 +241,11 @@ export default {
     getApplicationCode(application) {
       return config[application].code;
     },
-
-    showPasAccordeonMenu() {
-      if (this.isActive('extranet')) {
-        this.showExtranetAccordion = true;
-      }
-      if (this.isActive('debiteur')) {
-        this.showDebiteurAccordion = true;
-      }
-    },
   },
 
   mounted() {
     this.$M.Sidenav.init(document.querySelector('.sidenav'));
     this.$M.Collapsible.init(document.querySelector('.collapsible'));
-    this.showPasAccordeonMenu();
   },
 };
 </script>
@@ -308,11 +254,6 @@ export default {
 li.active {
   .collapsible-body {
     display: block;
-  }
-  .collapsible-body:hover {
-    .collapsible-header-pas {
-      color: white !important;
-    }
   }
 }
 
