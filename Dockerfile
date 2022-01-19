@@ -10,6 +10,8 @@ RUN npm set progress=false \
   && npm config set depth 0 \
   && npm ci
 
+RUN npx browserslist@latest --update-db
+
 COPY --chown=node:node . .
 
 RUN npm run lint \
