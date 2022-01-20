@@ -8,9 +8,9 @@
         sort-dir="asc"
         :export-btn="false"
         :view-btn="false"
-        :add-btn="$auth.can('extranet.manage-configurations')"
-        :edit-btn="$auth.can('extranet.manage-configurations')"
-        :delete-btn="$auth.can('extranet.manage-configurations')"
+        :add-btn="$auth.can('pas.manage-configurations')"
+        :edit-btn="$auth.can('pas.manage-configurations')"
+        :delete-btn="$auth.can('pas.manage-configurations')"
         @add="openAddEditModal('create')"
         @edit="(row) => openAddEditModal('update', row)"
         @delete="openDeleteModal"
@@ -415,7 +415,7 @@ export default {
   },
   computed: {
     configurations() {
-      return this.$store.state.extranet.configurations;
+      return this.$store.state.pas.configurations;
     },
     projects() {
       return this.$store.state.mmpi.projects;
@@ -507,7 +507,7 @@ export default {
     getData() {
       const loader = this.$loading.show({ container: this.$el });
       const promises = [];
-      promises.push(this.$store.dispatch('extranet/getConfigurations'));
+      promises.push(this.$store.dispatch('pas/getConfigurations'));
       promises.push(this.$store.dispatch('mmpi/getProjects'));
       promises.push(this.$store.dispatch('mmpi/getDeployInstances'));
       promises.push(this.$store.dispatch('extranet/getBranches'));
@@ -599,11 +599,11 @@ export default {
 
       if (action === 'build') {
         this.$router.push({
-          path: `/extranet/configurations/${encodeURIComponent(this.configuration.id)}/build`,
+          path: `/pas/configurations/${encodeURIComponent(this.configuration.id)}/build`,
         });
       } else {
         this.$router.push({
-          path: `/extranet/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
+          path: `/pas/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
         });
       }
     },
@@ -614,7 +614,7 @@ export default {
       this.$v.$reset();
 
       this.$router.push({
-        path: '/extranet/configurations',
+        path: '/pas/configurations',
       });
     },
 
@@ -644,7 +644,7 @@ export default {
       payload.branch = this.configuration.branch.name;
       payload.prefix = this.configuration.prefix.package;
 
-      this.$store.dispatch(`extranet/${this.action}Configuration`, payload)
+      this.$store.dispatch(`pas/${this.action}Configuration`, payload)
         .then(() => {
           this.$M.toast({
             html: `The configuration has been ${this.action}d!`,
@@ -684,7 +684,7 @@ export default {
         client: this.clients.find((client) => client.package === this.configuration.prefix),
       };
 
-      this.$store.dispatch('extranet/buildConfiguration', {
+      this.$store.dispatch('pas/buildConfiguration', {
         id: this.configuration.id,
         payload,
       })
@@ -746,7 +746,7 @@ export default {
 
     remove() {
       this.removing = true;
-      this.$store.dispatch('extranet/deleteConfiguration', this.configuration.id)
+      this.$store.dispatch('pas/deleteConfiguration', this.configuration.id)
         .then(() => {
           this.removed = true;
           this.showRemoveModal = false;

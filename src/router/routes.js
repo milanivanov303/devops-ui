@@ -4,7 +4,7 @@ const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 
-const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations');
+const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/pas/Configurations');
 const SoaModification = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/components/SOAdeployment');
 
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
@@ -106,7 +106,7 @@ export default [
     },
   },
   {
-    path: '/extranet/configurations/:id?/:build?',
+    path: '/pas/configurations/:id?/:build?',
     meta: {
       requiresAuth: true,
       name: 'extranet-configurations',
@@ -117,7 +117,7 @@ export default [
     component: ExtranetConfigurations,
   },
   {
-    path: '/extranet/soa-modification/:issue?',
+    path: '/pas/soa-modification/:issue?',
     meta: {
       requiresAuth: true,
       name: 'extranet',

@@ -1,52 +1,37 @@
 <template>
   <ul id="nav-mobile" class="sidenav sidenav-fixed">
     <li class="logo">
-        <img src="/applications/yTjvXuxGM5i/big_logo" alt="DevOps Management">
+      <img src="/applications/yTjvXuxGM5i/big_logo" alt="DevOps Management">
+    </li>
+    <li :class="{ active: isActive('dashboard') }">
+      <router-link to="/dashboard">
+        <i class="material-icons">web</i> Dashboard
+      </router-link>
     </li>
     <li>
       <ul class="collapsible collapsible-accordion">
-        <li :class="{ active: isActive('dashboard') }">
-          <router-link to="/dashboard">
-            <i class="material-icons">web</i> Dashboard
-          </router-link>
-        </li>
-        <li :class="{ active: isActive('extranet') }">
+        <li v-bind:class="{
+      active:
+        isActive('pas') || isActive('extranet') || isActive('debiteur')}"
+        >
           <a class="collapsible-header">
-            <i class="material-icons">laptop_chromebook</i> Extranet
+            <i class="material-icons">business_center</i> PAS
             <i class="material-icons right">arrow_drop_down</i>
           </a>
           <div class="collapsible-body">
-            <ul>
-              <li :class="{ active: isActive('extranet/dashboard') }">
-                <router-link to="/extranet/dashboard"> Dashboard</router-link>
+            <ul class="collapsible">
+              <li :class="{ active: isActive('extranet') }">
+                <router-link to="/extranet/dashboard"> Extranet</router-link>
               </li>
-              <li v-bind:class="{ active: isActive('extranet/branches') }">
-                <router-link to="/extranet/branches"> Branches</router-link>
+              <li :class="{ active: isActive('debiteur') }">
+                <router-link to="/debiteur/dashboard"> Debiteur</router-link>
               </li>
-              <li :class="{ active: isActive('extranet/configurations') }">
-                <router-link to="/extranet/configurations"> DevOps Matrix</router-link>
+              <li :class="{ active: isActive('pas/configurations') }">
+                <router-link to="/pas/configurations"> DevOps Matrix</router-link>
               </li>
-              <li :class="{ active: isActive('extranet/soa-modification') }">
-                <router-link to="/extranet/soa-modification"> SOA Modification</router-link>
+              <li :class="{ active: isActive('pas/soa-modification') }">
+                <router-link to="/pas/soa-modification"> SOA Modification</router-link>
               </li>
-              <li><div class="divider"></div></li>
-            </ul>
-          </div>
-        </li>
-        <li :class="{ active: isActive('debiteur') }">
-          <a class="collapsible-header">
-            <i class="material-icons">laptop_chromebook</i> Debiteur
-            <i class="material-icons right">arrow_drop_down</i>
-          </a>
-          <div class="collapsible-body">
-            <ul>
-              <li :class="{ active: isActive('debiteur/dashboard') }">
-                <router-link to="/debiteur/dashboard"> Dashboard</router-link>
-              </li>
-              <li v-bind:class="{ active: isActive('debiteur/branches') }">
-                <router-link to="/debiteur/branches"> Branches</router-link>
-              </li>
-              <li><div class="divider"></div></li>
             </ul>
           </div>
         </li>
@@ -120,11 +105,11 @@
               </li>
               <li :class="{ active: isActive('cms/templates') }">
                 <router-link to="/cms/templates">
-                   Templates
+                  Templates
                 </router-link>
               <li :class="{ active: isActive('cms/inventory') }">
                 <router-link to="/cms/inventory">
-                   Inventory
+                  Inventory
                 </router-link>
               </li>
               <li :class="{ active: isActive('cms/modification') }">
@@ -266,16 +251,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  li.active {
-    .collapsible-body {
-      display: block;
-    }
+li.active {
+  .collapsible-body {
+    display: block;
   }
+}
 
-  .sidenav {
-    .subheader {
-      color: white;
-      padding: 0 15px;
-    }
+.sidenav {
+  .subheader {
+    color: white;
+    padding: 0 15px;
   }
+}
 </style>
