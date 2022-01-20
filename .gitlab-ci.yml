@@ -19,7 +19,7 @@ before_script:
   - export PORT=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/.*://g")
   - |
     curl \
-      --request PUT $WEB_PROXY_URL/devops \
+      --request PUT "${WEB_PROXY_URL}/devops" \
       --header "Content-Type: application/json" \
       --header "Authorization: Bearer $WEB_PROXY_TOKEN" \
       --insecure \
