@@ -17,9 +17,6 @@ before_script:
   #- export SERVER=$(echo $DEPLOY_HOST | sed "s/http:\/\///g" | sed "s/:[0-9]*//g")
   - export SERVER=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/:.*//g")
   - export PORT=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/.*://g")
-
-  - echo $WEB_PROXY_URL/devops
-
   - |
     curl \
       --request PUT $WEB_PROXY_URL/devops \
