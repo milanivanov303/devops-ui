@@ -1,55 +1,54 @@
 <template>
-  <div class="card" v-if="vm">
-    <div class="card-content">
-      <div class="card-title truncate">
-        {{ vm.name }}
-      </div>
+  <div>
 
-      <div v-if="vm.esxi">
-        <b>Esxi: </b>
-        <a class="esxi-name" :href="`../esxiHosts/${vm.esxi.name}`">{{ vm.esxi.name}}</a>
-      </div>
-      <div v-if="vm.details && vm.details['guest_full_name']">
-        <b>OS: </b><span>{{ vm.details['guest_full_name'] }}</span>
-      </div>
-      <div v-if="vm.hardware && vm.hardware.num_c_p_u">
-        <b>RAM: </b><span>{{ $esxi(vm.hardware.memory).bytesToSizeLabel()}}</span>,
-        <b>CPU: </b><span>{{ vm.hardware.num_c_p_u }} cores</span>
-      </div>
-      <br>
+    <div v-if="vm.esxi">
+      <b>Esxi: </b>
+      <a class="esxi-name" :href="`../esxiHosts/${vm.esxi.name}`">{{ vm.esxi.name}}</a>
+    </div>
+    <div v-if="vm.os && vm.os.name">
+      <b>OS: </b><span>{{ vm.os.name + ' ' + vm.os.version }}</span>
+    </div>
+    <div v-if="vm.hardware && vm.hardware.num_c_p_u">
+      <b>RAM: </b><span>{{ $esxi(vm.hardware.memory).bytesToSizeLabel()}}</span>,
+      <b>CPU: </b><span>{{ vm.hardware.num_c_p_u }} cores</span>
+    </div>
+    <br>
 
-      <div class="row">
-        <div class="col s12">
-          <ul class="tabs">
-            <li class="tab col s6">
-              <a href="#instances">INSTANCES</a>
-            </li>
-            <li class="tab col s6">
-              <a href="#components">COMPONENTS</a>
-            </li>
-          </ul>
-          <div id="instances">
-            <Instances v-if="vm.instances && vm.instances.length > 0" :instances="vm.instances"/>
-            <div v-else class="validator">
-              <div class="red-text">
-                <br>
-                <p v-if="vm.instances.error">{{ vm.instances.error }}</p>
-                <p v-else>There are no instances for this virtual machine</p>
-              </div>
+    <ul class="tabs row">
+      <li class="tab col s6">
+        <a href="#instances">INSTANCES</a>
+      </li>
+      <li class="tab col s6">
+        <a href="#components">COMPONENTS</a>
+      </li>
+    </ul>
+
+    <div class="row">
+      <div class="col s12">
+        <div id="instances">
+          <Instances v-if="vm.instances && vm.instances.length > 0"
+                     :instances="vm.instances" :hideActions="true"
+          />
+          <div v-else class="validator">
+            <div class="red-text">
+              <br>
+              <p v-if="vm.instances.error">{{ vm.instances.error }}</p>
+              <p v-else>There are no instances for this virtual machine</p>
             </div>
           </div>
-          <div id="components">
-            <ComponentsTable v-if="vm.components" :components="vm.components"/>
-            <div v-else class="validator">
-              <div class="red-text">
-                <br>
-                <p>There are no components for this virtual machine</p>
-              </div>
+        </div>
+        <div id="components">
+          <ComponentsTable v-if="vm.components" :components="vm.components"/>
+          <div v-else class="validator">
+            <div class="red-text">
+              <br>
+              <p>There are no components for this virtual machine</p>
             </div>
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -92,26 +91,6 @@ export default {
   },
 
   methods: {
-    // esxiHosts
-    updateEsxiInfo() {
-      const loader = this.$loading.show({ container: this.$el });
-
-      this.$store.dispatch('esxi/updateEsxiHost', this.item)
-        .then((response) => {
-          if (response.data.error) {
-            this.$M.toast({ html: response.data.error });
-            return;
-          }
-          this.$M.toast({
-            html: `Updating ESXi host ${this.item.name} details in background.
-             Please, check in a few minutes.`,
-            classes: 'toast-seccess',
-          });
-        })
-        .catch((error) => {
-          this.$M.toast({ html: error });
-        }).finally(() => loader.hide());
-    },
     getFreeMemoryInPerc() {
       if (!this.item.details.memory) {
         return null;

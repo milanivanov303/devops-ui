@@ -18,6 +18,7 @@ const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Mo
 
 const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
+const VirtualMachines = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/virtualMachines/VirtualMachines');
 const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
 const ImxComponents = () => import('../views/esxi/imxComponents/ImxComponents');
 
@@ -386,10 +387,7 @@ export default [
         return title;
       },
     },
-    component: Items,
-    props: {
-      module: 'virtualMachines',
-    },
+    component: VirtualMachines,
   },
   {
     path: '/inventory/instances/:id?',

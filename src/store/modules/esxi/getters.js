@@ -49,7 +49,6 @@ export default {
     }
     return host.details.memory.physical_memory - getters.getVmsMemory(host);
   },
-
   getVirtualMachines: (state, getters) => {
     const vms = {};
     if (state.esxiHosts.length > 0) {
@@ -64,6 +63,7 @@ export default {
               name: vm.main_info.name,
               powered: vm.powered,
               details: vm.main_info,
+              os: vm.os,
               hardware: vm.hardware,
               components: vm.powered === 'on' && h.vms_components ? getters.getVMsComponents(h, vm) : null,
               flags: vm.flags,
