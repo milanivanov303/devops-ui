@@ -3,7 +3,7 @@
     <div class="col s12">
       <div class="row">
         <div class="col s11">
-          <button v-if="true"
+          <button v-if="showUpdateBtn"
                   class="btn waves-effect waves-light right"
                   @click.prevent="updateEsxiInfo()">
             Update </button>
