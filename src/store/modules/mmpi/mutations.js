@@ -31,6 +31,12 @@ export default {
   deliveryChainsCMS(state, deliveryChains) {
     state.deliveryChains = deliveryChains;
   },
+  instanceStatus(state, instanceStatus) {
+    state.instanceStatus = instanceStatus;
+  },
+  operationType(state, operationType) {
+    state.operationType = operationType;
+  },
   binaryTypes(state, binaryTypes) {
     state.binaryTypes = binaryTypes;
   },

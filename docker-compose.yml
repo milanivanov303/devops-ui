@@ -10,16 +10,10 @@ services:
     volumes:
       - proxy_config:/etc/nginx/conf.d/proxy
 
-  webssh2:
-    image: gitlab.codixfr.private:5005/enterpriseapps/devops-ui/webssh2:1.0
-    environment:
-      WEBSSH2_USERNAME: enterprise
-      WEBSSH2_PASSWORD: Sofphia
-    restart: always
-
 volumes:
   proxy_config:
     driver_opts:
       type: "nfs"
       o: "addr=${NFS_HOST},vers=4,port=${NFS_PORT}"
       device: ":/proxy_config"
+

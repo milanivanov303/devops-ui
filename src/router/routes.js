@@ -1,27 +1,35 @@
+const SeTransferModif = () => import(/* webpackChunkName: "expert-system" */ '../views/expert-system/Modification');
 const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
-const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/Configurations');
+
+const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
+const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
+
+const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/pas/Configurations');
+const SoaModification = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/components/SOAdeployment');
+
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
+
 const ConfigDefaults = () => import(/* webpackChunkName: "cms" */ '../views/cms/ConfigDefaults');
 const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/ResponseFile');
 const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates');
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
-const EsxiDashboard = () => import(/* webpackChunkName: "cms" */ '../views/esxi/Dashboard');
+
+const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
+const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
+const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
+const ImxComponents = () => import('../views/esxi/imxComponents/ImxComponents');
 
 const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
 const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
 const DevopsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/devops/Actions');
+const DevopsLogsAdministration = () => import(/* webpackChunkName: "administration-logs" */ '../views/administration/devops/Logs');
 
 const CmsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/cms/Users');
 const CmsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/cms/Roles');
 const CmsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/cms/Actions');
 
-const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
-const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
-const Hosts = () => import(/* webpackChunkName: "hosts" */ '@/views/esxi/Hosts');
-
-const Login = () => import(/* webpackChunkName: "login" */ '../views/Login');
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
 export default [
@@ -32,14 +40,12 @@ export default [
       layout: 'login',
       requiresAuth: false,
     },
-    component: Login,
     // redirect if already signed in
     beforeEnter: (to, from, next) => {
       if (auth.getUser()) {
         next('/dashbaord');
         return;
       }
-
       next();
     },
   },
@@ -55,6 +61,7 @@ export default [
     component: MainDashboard,
   },
 
+  // Extranet Tab
   {
     path: '/extranet',
     redirect: '/extranet/dashboard',
@@ -99,7 +106,7 @@ export default [
     },
   },
   {
-    path: '/extranet/configurations/:id?/:build?',
+    path: '/pas/configurations/:id?/:build?',
     meta: {
       requiresAuth: true,
       name: 'extranet-configurations',
@@ -109,7 +116,22 @@ export default [
     },
     component: ExtranetConfigurations,
   },
+  {
+    path: '/pas/soa-modification/:issue?',
+    meta: {
+      requiresAuth: true,
+      name: 'extranet',
+      transitionName: 'slide',
+      title: 'SOA Modification',
+      breadcrumb: 'SOA Modification',
+    },
+    component: SoaModification,
+    props: {
+      module: 'extranet',
+    },
+  },
 
+  // Debiteur Tab
   {
     path: '/debiteur',
     redirect: '/debiteur/dashboard',
@@ -143,6 +165,7 @@ export default [
     },
   },
 
+  // iMX BE Tab
   {
     path: '/imx_be',
     redirect: '/imx_be/dashboard',
@@ -185,6 +208,8 @@ export default [
       module: 'imx_be',
     },
   },
+
+  // iMX FE Tab
   {
     path: '/imx_fe',
     redirect: '/imx_fe/dashboard',
@@ -216,6 +241,7 @@ export default [
     },
   },
 
+  // Demos Tab
   {
     path: '/demos',
     meta: {
@@ -252,6 +278,11 @@ export default [
     component: DemosList,
   },
 
+  // CMS Tab
+  {
+    path: '/cms',
+    redirect: '/cms/config-defaults',
+  },
   {
     path: '/cms/config-defaults',
     meta: {
@@ -273,16 +304,6 @@ export default [
     component: ResponseFile,
   },
   {
-    path: '/cms/inventory',
-    meta: {
-      alias: '/inventory',
-      name: 'inventory',
-      requiresAuth: true,
-      breadcrumb: 'Inventory',
-    },
-    component: Inventory,
-  },
-  {
     path: '/cms/templates',
     meta: {
       alias: '/templates',
@@ -291,6 +312,16 @@ export default [
       breadcrumb: 'Templates',
     },
     component: Templates,
+  },
+  {
+    path: '/cms/inventory',
+    meta: {
+      alias: '/inventory',
+      name: 'inventory',
+      requiresAuth: true,
+      breadcrumb: 'Inventory',
+    },
+    component: Inventory,
   },
   {
     path: '/cms/modification/:issue?',
@@ -303,6 +334,111 @@ export default [
     component: Modification,
   },
 
+  // Inventory Tab
+  {
+    path: '/inventory',
+    redirect: '/inventory/dashboard',
+  },
+  {
+    path: '/inventory/dashboard',
+    meta: {
+      requiresAuth: true,
+      name: 'inventory',
+      transitionName: 'slide',
+      title: 'ESXI Dashboard',
+    },
+    component: EsxiDashboard,
+  },
+  {
+    path: '/inventory/esxiHosts/:name?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-esxiHosts',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'ESXi Hosts';
+
+        if (route.query.esxiHost) {
+          title = `${route.query.esxiHost} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Items,
+    props: {
+      module: 'esxiHosts',
+    },
+  },
+  {
+    path: '/inventory/virtualMachines/:name?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-virtualMachines',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Virtual Machines';
+
+        if (route.query.virtualMachine) {
+          title = `${route.query.virtualMachine} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Items,
+    props: {
+      module: 'virtualMachines',
+    },
+  },
+  {
+    path: '/inventory/instances/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-instances',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Instances';
+
+        if (route.query.instance) {
+          title = `${route.query.instance} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Instances,
+  },
+  {
+    path: '/inventory/imxComponents/:imxComponent?',
+    meta: {
+      requiresAuth: true,
+      name: 'esxi-components',
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Components';
+
+        if (route.query.imxComponent) {
+          title = `${route.query.imxComponent} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: ImxComponents,
+  },
+  // Devops Administration Tab
+  {
+    path: '/expert-system/modification/:issue?',
+    meta: {
+      alias: '/expert-system-modification',
+      name: 'expert-system modification',
+      requiresAuth: true,
+      title: 'SE Transfer Modification',
+      breadcrumb: 'Expert system modification',
+    },
+    component: SeTransferModif,
+  },
   {
     path: '/administration/devops/users/:id?',
     meta: {
@@ -337,6 +473,19 @@ export default [
     component: DevopsActionsAdministration,
   },
   {
+    path: '/administration/devops/logs',
+    meta: {
+      requiresAuth: true,
+      name: 'administration-logs',
+      transitionName: 'slide',
+      title: 'Logs Administration',
+      breadcrumb: 'Logs',
+    },
+    component: DevopsLogsAdministration,
+  },
+
+  // CMS Administration Tab
+  {
     path: '/administration/cms/users/:id?',
     meta: {
       requiresAuth: true,
@@ -370,41 +519,7 @@ export default [
     component: CmsActionsAdministration,
   },
 
-  {
-    path: '/esxi',
-    redirect: '/esxi/dashboard',
-  },
-  {
-    path: '/esxi/dashboard',
-    meta: {
-      requiresAuth: true,
-      name: 'esxi',
-      transitionName: 'slide',
-      title: 'ESXI Dashboard',
-    },
-    component: EsxiDashboard,
-  },
-  {
-    path: '/esxi/esxiHosts/:esxiHost?',
-    meta: {
-      requiresAuth: true,
-      name: 'esxi-esxiHosts',
-      transitionName: 'slide',
-      title: (route) => {
-        let title = 'ESXi Hosts';
-
-        if (route.query.esxiHost) {
-          title = `${route.query.esxiHost} - ${title}`;
-        }
-
-        return title;
-      },
-    },
-    component: Hosts,
-    props: {
-      module: 'esxi',
-    },
-  },
+  // Builds
   {
     path: '/builds/:name(.*_\\d+)/:uri(.*)?',
     meta: {

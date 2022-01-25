@@ -81,12 +81,33 @@
               </div>
             </div>
             <div class="row">
-              <div class="col s12" >
+              <div class="col s12">
                 <Autocomplete
                   label="Fe branch"
                   icon="dynamic_feed"
                   :items="feBranches"
                   v-model="form.feBranch"
+                  :invalid="$v.form.feBranch.$error"
+                  @blur="$v.form.feBranch.$touch()"
+                />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.feBranch.$error">
+                  <p v-if="!$v.form.feBranch.required">
+                    Fe branch field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12" >
+                <Select
+                  :options="images"
+                  icon="cloud_upload"
+                  label="Deploy on"
+                  displayed="label"
+                  :default-option="false"
+                  v-model="form.image"
                 />
               </div>
             </div>
@@ -123,7 +144,10 @@ function initialState() {
       client: null,
       javaVersion: 8,
       instance: null,
-      fe_branch: null,
+      feBranch: {
+        name: 'X3',
+      },
+      image: null,
     },
     build: {
       started: false,
@@ -161,6 +185,9 @@ export default {
     feBranches() {
       return this.$store.state.extranet.feBranches;
     },
+    images() {
+      return this.$store.state.extranet.images;
+    },
   },
 
   validations() {
@@ -173,6 +200,12 @@ export default {
           },
         },
         instance: {
+          required,
+          name: {
+            required,
+          },
+        },
+        feBranch: {
           required,
           name: {
             required,
@@ -193,12 +226,33 @@ export default {
     return validations;
   },
 
+  watch: {
+    images() {
+      [this.form.image] = this.images;
+    },
+    /* eslint func-names: ["error", "as-needed"] */
+    'form.client': function () {
+      this.getDefaultInstance();
+    },
+  },
+
   methods: {
     getData() {
       this.$store.dispatch('extranet/getBranches');
       this.$store.dispatch('extranet/getFeBranches');
       this.$store.dispatch('extranet/getClients');
+      this.$store.dispatch('extranet/getImages');
       this.$store.dispatch('mmpi/getInstances');
+    },
+
+    getDefaultInstance() {
+      this.form.instance = null;
+
+      const db = this.instances
+        .find((i) => i.name.toLowerCase() === this.form.client.db.toLowerCase());
+      if (db) {
+        this.form.instance = db;
+      }
     },
 
     open() {
@@ -226,7 +280,8 @@ export default {
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-        fe_branch: this.form.feBranch ? this.form.feBranch.name : '',
+        fe_branch: this.form.feBranch,
+        image: this.form.image,
       })
         .then((response) => {
           this.build.status = 'running';

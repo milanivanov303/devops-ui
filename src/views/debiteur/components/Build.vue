@@ -80,6 +80,18 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col s12" >
+                <Select
+                  :options="images"
+                  icon="cloud_upload"
+                  label="Deploy on"
+                  displayed="label"
+                  :default-option="false"
+                  v-model="form.image"
+                />
+              </div>
+            </div>
           </div>
           <BuildProgress
             v-else
@@ -117,6 +129,7 @@ function initialState() {
       client: null,
       javaVersion: 8,
       instance: null,
+      image: null,
     },
     build: {
       started: false,
@@ -152,6 +165,9 @@ export default {
     instances() {
       return this.$store.state.mmpi.instances;
     },
+    images() {
+      return this.$store.state.extranet.images;
+    },
   },
 
   validations() {
@@ -184,10 +200,17 @@ export default {
     return validations;
   },
 
+  watch: {
+    images() {
+      [this.form.image] = this.images;
+    },
+  },
+
   methods: {
     getData() {
       this.$store.dispatch('debiteur/getClients');
       this.$store.dispatch('debiteur/getBranches');
+      this.$store.dispatch('extranet/getImages');
       this.$store.dispatch('mmpi/getInstances');
     },
 
@@ -216,6 +239,7 @@ export default {
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
+        image: this.form.image,
       })
         .then((response) => {
           this.build.status = 'running';

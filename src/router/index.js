@@ -10,6 +10,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
+import config from '@/config';
+
 // Routes
 import paths from './routes';
 
@@ -35,10 +37,9 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!auth.getUser()) {
-      return next(`/login?return_uri=${to.fullPath}`);
+      return window.location.replace(`/login-in-app?code=${config.auth.code}&return_uri=${to.fullPath}`);
     }
   }
-
   return next();
 });
 

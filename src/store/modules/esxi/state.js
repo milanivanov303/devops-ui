@@ -3,4 +3,7 @@
 export default {
   esxiHosts: [],
   error: '',
+  virtualMachines: [],
+  instances: [],
+  imxComponents: [],
 };

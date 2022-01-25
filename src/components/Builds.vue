@@ -71,11 +71,25 @@
                   <i class="material-icons">launch</i>
                 </a>
                 <a
-                  @click="openInfoModal(build)"
+                  @click="openBuildDetailsModal(build)"
                   data-tooltip="Details"
                   class="blue-text tooltipped"
                 >
                   <i class="material-icons">error_outline</i>
+                </a>
+                <a
+                    v-if="
+                      (build.status === 'running' || build.status === 'stopped')
+                      &&
+                      build.details.artifactory_url
+                    "
+                    :href="build.details.artifactory_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-tooltip="Download"
+                    class="teal-text text-darken-1 tooltipped"
+                >
+                  <i class="material-icons">file_download</i>
                 </a>
                 <a
                   @click="openProgressModal(build)"
@@ -125,11 +139,10 @@
       <p class="right right-align">Items per page:</p>
     </div>
 
-    <component
-      v-if="showInfoModal"
-      :is="infoComponent"
+    <BuildDetails
+      v-if="showBuildDetailsModal"
       :build="build"
-      @close="closeInfoModal()"
+      @close="closeBuildDetailsModal()"
     />
 
     <Modal v-if="showRemoveModal" @close="showRemoveModal = false" class="confirm">
@@ -177,14 +190,17 @@
 
 <script>
 import EventBus from '@/event-bus';
+import config from '@/config';
 
 const Paginate = () => import('@/components/partials/Paginate');
 const BuildProgress = () => import('@/components/BuildProgress');
+const BuildDetails = () => import('@/components/BuildDetails');
 
 export default {
   components: {
     Paginate,
     BuildProgress,
+    BuildDetails,
   },
 
   props: {
@@ -198,13 +214,6 @@ export default {
     },
   },
 
-  computed: {
-    infoComponent() {
-      // eslint-disable-next-line
-      return () => import('@/views/' + this.build.module + '/components/BuildInfo');
-    },
-  },
-
   data() {
     return {
       builds: [],
@@ -215,9 +224,9 @@ export default {
 
       status: ['active'],
 
-      showInfoModal: false,
       showRemoveModal: false,
       showProgressModal: false,
+      showBuildDetailsModal: false,
 
       updating: false,
       removing: false,
@@ -238,7 +247,6 @@ export default {
 
       this.$store.dispatch('builds/getBuildsByStatus', {
         branch: this.branch,
-        ttsKey: this.ttsKey,
         module: this.module,
         status: this.getStatus(),
         createdBy: this.createdBy,
@@ -275,10 +283,10 @@ export default {
     },
 
     getWebssh2Url(build) {
-      const { host } = this.$store.state[build.module];
-      const port = this.getPublishedPort(build, 22);
+      const serviceID = build.details.service.ID;
+      const port = config.ssh_port;
 
-      return this.$router.resolve(`/ssh/host/${host}?port=${port}`).href;
+      return `/ssh/host/${serviceID}?port=${port}&source=devops`;
     },
 
     getStatusText(build) {
@@ -290,28 +298,6 @@ export default {
         return `<span class="new badge red" data-badge-caption="">${build.status}</span>`;
       }
       return `<span class="new badge" data-badge-caption="">${build.status}</span>`;
-    },
-
-    openInfoModal(build) {
-      this.build = { ...build };
-
-      this.build.created_on = this.$date(build.created_on).toHuman();
-
-      if (this.build.removed_on) {
-        this.build.removed_on = this.$date(this.build.removed_on).toHuman();
-      }
-
-      if (this.build.removed_on && !this.build.removed_by) {
-        this.build.removed_by = 'auto-removed';
-      }
-
-      this.showInfoModal = true;
-    },
-
-    closeInfoModal() {
-      this.build = {};
-
-      this.showInfoModal = false;
     },
 
     openProgressModal(build) {
@@ -405,6 +391,33 @@ export default {
         })
         .finally(() => { this.removing = false; });
     },
+
+    openBuildDetailsModal(build) {
+      this.build = { ...build };
+
+      this.build.created_on = this.$date(build.created_on).toHuman();
+
+      if (this.build.removed_on) {
+        this.build.removed_on = this.$date(this.build.removed_on).toHuman();
+      }
+
+      if (this.build.removed_on && !this.build.removed_by) {
+        this.build.removed_by = 'auto-removed';
+      }
+
+      if (this.build.details.java_version) {
+        this.build.details.java_version = this.build.details.java_version.toString();
+      }
+
+      this.showBuildDetailsModal = true;
+    },
+
+    closeBuildDetailsModal() {
+      this.build = {};
+
+      this.showBuildDetailsModal = false;
+    },
+
   },
 
   watch: {

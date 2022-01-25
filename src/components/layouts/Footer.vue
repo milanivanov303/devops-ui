@@ -10,8 +10,7 @@
         </div>
         <div class="col s4 center-align"></div>
         <div class="col s4 right-align">
-          <img class="codix-logo" src="../../assets/images/logo.png"/>
-          <div>Copyright © 2019 Codix | Devops Management v1.0</div>
+          <p>Copyright © 2019 Codix | Devops Management v1.0</p>
         </div>
       </div>
     </div>

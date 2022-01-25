@@ -7,6 +7,8 @@ export default {
   delivery_chains: [],
   devInstances: [],
   deliveryChains: [],
+  instanceStatus: [],
+  operationType: [],
   error: '',
   binaryTypes: [],
 };
