@@ -18,7 +18,9 @@
         :edit-btn="false"
         :delete-btn="false"
       >
-        <Column label="Instance" name="name" :show="(instance) => instance.name"/>
+        <Column label="Instance" name="name"
+                :show="(instance) => hideActions ? instance.name : getInstanceLink(instance.name)"
+        />
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
@@ -26,6 +28,8 @@
           :show="(instance) => getVMLink(instance.vm.name)"/>
         <Column v-if="!instances" label="Esxi Host" name="esxi"
           :show="(instance) => getHostLink(instance.esxi.name)"/>
+        <Column show="version"/>
+        <Column show="pwd_hash_type"/>
         <Column label="Home path" name="home-path" :show="(instance) => instance.home_path"/>
         <Column label="Patch config path" name="patch-conf"
           :show="(instance) => instance.patch_conf"/>
@@ -66,6 +70,10 @@ export default {
   props: {
     instances: {
       type: [Array, String],
+    },
+    hideActions: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -123,6 +131,9 @@ export default {
     },
     getVMLink(name) {
       return `<a href="virtualMachines/${name}" style="text-decoration: underline">${name}</a>`;
+    },
+    getInstanceLink(name) {
+      return `<a href="../instances?instances_search=${name}" style="text-decoration: underline">${name}</a>`;
     },
 
     getEsxiHosts() {

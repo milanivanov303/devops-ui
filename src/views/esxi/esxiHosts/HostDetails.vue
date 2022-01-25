@@ -130,7 +130,7 @@ export default {
       if (this.vmsearch) {
         const regexp = new RegExp(this.vmsearch, 'i');
         VMs = VMs.filter(
-          (virtualMachine) => virtualMachine.main_info.name.match(regexp),
+          (virtualMachine) => virtualMachine.name.match(regexp),
         );
       }
 

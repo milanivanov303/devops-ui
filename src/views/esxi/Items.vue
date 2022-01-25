@@ -14,27 +14,12 @@
             >
               <i class="material-icons left">add</i>
           </button>
-          <div class="row" v-if="module === 'virtualMachines'">
-            <button v-if="showUpdateBtn"
-                    class="btn waves-effect waves-light right"
-                    style="margin-top: 7px;"
-                    data-tooltip="Add"
-                    @click.prevent="$store.dispatch('esxi/updateHostInfo')">
-              Update </button>
-            <Select
-                class="col s12 m2 right"
-                v-model="status"
-                :options="statusOptions"
-                displayed="name"
-            />
-          </div>
         </div>
       </div>
 
       <div v-if="!item" class="row">
         <div v-for="item in paginatedItems" :key="item.name" class="col s12 m6 l4">
           <Host v-if="module === 'esxiHosts'" :esxiHost="item"/>
-          <VirtualMachine v-if="module === 'virtualMachines'" :vm="item"/>
         </div>
         <div v-if="loading && items.length <= 0">
           <div v-for="index in perPage" :key="index" class="col s12 m6 l4">
@@ -57,7 +42,6 @@
         <div class="col s12 m6 l5 scroll">
           <div v-for="item in items" :key="item.name">
             <Host v-if="module === 'esxiHosts'" :esxiHost="item"/>
-            <VirtualMachine v-if="module === 'virtualMachines'" :vm="item"/>
           </div>
           <div v-if="loading && items.length <= 0">
             <BranchSkeleton v-for="index in perPage" :key="index"/>
@@ -65,7 +49,6 @@
         </div>
         <div class="col s12 m6 l7" >
           <HostDetails v-if="module === 'esxiHosts'" :esxiHost="item"/>
-          <VmDetails v-if="module === 'virtualMachines'" :vm="item"/>
         </div>
       </div>
 
@@ -89,9 +72,6 @@ const Host = () => import('./esxiHosts/Host');
 const HostDetails = () => import('./esxiHosts/HostDetails');
 const AddEditHostModal = () => import('./esxiHosts/AddEditHostModal');
 
-const VirtualMachine = () => import('./virtualMachines/VirtualMachine');
-const VmDetails = () => import('./virtualMachines/VmDetails');
-
 export default {
   components: {
     BranchSkeleton,
@@ -99,8 +79,6 @@ export default {
     Host,
     HostDetails,
     AddEditHostModal,
-    VirtualMachine,
-    VmDetails,
   },
 
   props: {
@@ -126,10 +104,6 @@ export default {
       let items = this.$store.state.esxi[this.module];
 
       items = this.filterItemsBySearch(items);
-
-      if (this.module === 'virtualMachines') {
-        items = this.filterItemsByStatus(items);
-      }
 
       return items;
     },
@@ -209,14 +183,6 @@ export default {
 
         return false;
       });
-    },
-
-    filterItemsByStatus(items) {
-      if (this.status === 'all') {
-        return items;
-      }
-
-      return items.filter((item) => item.powered === this.status);
     },
 
   },
