@@ -19,7 +19,7 @@
         :delete-btn="false"
       >
         <Column label="Instance" name="name"
-                :show="(instance) => !hideActions ? instance.name : getInstanceLink(instance.name)"
+                :show="(instance) => hideActions ? instance.name : getInstanceLink(instance.name)"
         />
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
         <Column label="Delivery Chain" name="delivery_chain"
@@ -28,10 +28,12 @@
           :show="(instance) => getVMLink(instance.vm.name)"/>
         <Column v-if="!instances" label="Esxi Host" name="esxi"
           :show="(instance) => getHostLink(instance.esxi.name)"/>
+        <Column show="version"/>
+        <Column show="pwd_hash_type"/>
         <Column label="Home path" name="home-path" :show="(instance) => instance.home_path"/>
         <Column label="Patch config path" name="patch-conf"
           :show="(instance) => instance.patch_conf"/>
-        <template v-if="!hideActions" v-slot:actions-before="{ row }">
+        <template v-slot:actions-before="{ row }">
 <!--          <a target="_blank"-->
 <!--             data-tooltip="Extranet"-->
 <!--             class="tooltipped">-->
@@ -71,7 +73,7 @@ export default {
     },
     hideActions: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   data() {

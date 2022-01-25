@@ -26,26 +26,22 @@
               @view="(row) => openVmDetails(row)"
             >
               <Column label="Virtual machine" name="name"
-                      :show="(virtualMachine) => virtualMachine.name"/>
+                :show="(vm) => vm.name"/>
               <Column label="CPU cores" name="cpu_cores"
-                      :show="(virtualMachine) => virtualMachine.hardware.num_c_p_u"/>
-              <Column
-                label="RAM" name="ram"
-                :show="(virtualMachine) => $esxi(virtualMachine.hardware.memory).bytesToSizeLabel()"
+                :show="(vm) => vm.hardware.num_c_p_u"/>
+              <Column label="RAM" name="ram"
+                :show="(vm) => $esxi(vm.hardware.memory).bytesToSizeLabel()"
               />
               <Column label="OS" name="os" :sortable="false" filter-type="dropdown"
-                      :show="(virtualMachine) => checkOs(virtualMachine.os)"/>
+                :show="(vm) => (vm.os && vm.os.name) ? vm.os.name : ''"/>
+              <Column label="OS Version" name="os_version" :sortable="false" filter-type="dropdown"
+                :show="(vm) => vm.os && vm.os.version ? vm.os.version : ''"/>
               <Column label="Status" name="status" :sortable="false" filter-type="dropdown"
-                      :show="(virtualMachine) => virtualMachine.powered"/>
+                :show="(vm) => getVmStatus(vm.powered)"/>
             </Table>
           </div>
 
-          <Modal v-if="vm" @close="closeVmDetails()" class="right-sheet">
-            <template v-slot:header>{{ vm.name }}</template>
-            <template v-slot:content>
-              <VmDetails :vm="vm"/>
-            </template>
-          </Modal>
+          <VmDetailsModal v-if="showVmDetails" :vm="selected" @close="closeVmDetails()"/>
 
         </div>
       </div>
@@ -54,13 +50,15 @@
 </template>
 
 <script>
-const VmDetails = () => import('./VmDetails');
+const VmDetailsModal = () => import('../components/VmDetailsModal');
 
 export default {
-  components: { VmDetails },
+  components: { VmDetailsModal },
   data() {
     return {
       showUpdateBtn: false,
+      showVmDetails: false,
+      selected: {},
     };
   },
   computed: {
@@ -75,7 +73,7 @@ export default {
         return null;
       }
 
-      return this.virtualMachines.find((i) => name === i.name || name === i.hostname);
+      return this.virtualMachines.find((i) => name === i.name);
     },
   },
   methods: {
@@ -89,29 +87,38 @@ export default {
       }
       return null;
     },
-    checkOs(os) {
-      if (!os || Object.keys(os).length === 0) {
-        return '';
+    getVmStatus(status) {
+      if (status === 'on') {
+        return `<span class="new badge green" data-badge-caption="">${status}</span>`;
       }
-
-      if (os.error) {
-        return 'Could not login';
+      if (status === 'off') {
+        return `<span class="new badge red" data-badge-caption="">${status}</span>`;
       }
-
-      return `${os.name} ${os.version}`;
+      return `<span class="new badge" data-badge-caption="">${status}</span>`;
     },
     getEsxiHosts() {
       const loader = this.$loading.show({ container: this.$refs.virtualMachines });
 
       this.$store.dispatch('esxi/getEsxiHosts')
+        .then(() => {
+          if (this.vm) {
+            this.showVmDetails = true;
+            this.selected = this.vm;
+          }
+        })
         .finally(() => loader.hide());
     },
     openVmDetails(vm) {
+      this.selected = vm;
+      this.showVmDetails = true;
+
       this.$router.push({
         path: `/inventory/virtualMachines/${encodeURIComponent(vm.name)}`,
       });
     },
     closeVmDetails() {
+      this.showVmDetails = false;
+
       this.$router.push({
         path: '/inventory/virtualMachines',
       });
