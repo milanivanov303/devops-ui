@@ -127,13 +127,13 @@ export default {
       return deliveryChain ? deliveryChain.title : '-';
     },
     getHostLink(name) {
-      return `<a href="esxiHosts/${name}" style="text-decoration: underline">${name}</a>`;
+      return `<a href="esxiHosts/${name}" class="tbl-link">${name}</a>`;
     },
     getVMLink(name) {
-      return `<a href="virtualMachines/${name}" style="text-decoration: underline">${name}</a>`;
+      return `<a href="virtualMachines/${name}" class="tbl-link">${name}</a>`;
     },
     getInstanceLink(name) {
-      return `<a href="../instances?instances_search=${name}" style="text-decoration: underline">${name}</a>`;
+      return `<a href="../instances?instances_search=${name}" class="tbl-link">${name}</a>`;
     },
 
     getEsxiHosts() {

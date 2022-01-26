@@ -14,7 +14,7 @@
           <div class="collapsible-header"><i class="material-icons">laptop</i>Main details</div>
           <div class="collapsible-body">
             <p v-if="vm.esxi"><b>ESXi Host: </b>
-              <a :href="'../esxiHosts/' + vm.esxi.name" style="text-decoration: underline">
+              <a :href="'../esxiHosts/' + vm.esxi.name" class="tbl-link">
                 {{ vm.esxi.name }}
               </a>
             </p>
