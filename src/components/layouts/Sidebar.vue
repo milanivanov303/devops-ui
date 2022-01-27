@@ -20,17 +20,18 @@
           </a>
           <div class="collapsible-body">
             <ul class="collapsible">
+              <li :class="{ active: isActive('pas/configurations') }">
+                <router-link to="/pas/configurations"> DevOps Matrix</router-link>
+              </li>
               <li :class="{ active: isActive('extranet') }">
                 <router-link to="/extranet/dashboard"> Extranet</router-link>
               </li>
               <li :class="{ active: isActive('debiteur') }">
                 <router-link to="/debiteur/dashboard"> Debiteur</router-link>
               </li>
-              <li :class="{ active: isActive('pas/configurations') }">
-                <router-link to="/pas/configurations"> DevOps Matrix</router-link>
-              </li>
+
               <li :class="{ active: isActive('pas/soa-modification') }">
-                <router-link to="/pas/soa-modification"> SOA Modification</router-link>
+                <router-link to="/pas/soa-modification"> SOA</router-link>
               </li>
             </ul>
           </div>
