@@ -2,7 +2,7 @@
   <ul id="nav-mobile" class="sidenav sidenav-fixed">
     <li class="logo">
       <img
-        src="${config.um.url}/applications/${config.devops.code}/big_logo"
+        :src="`${config.um.url}/applications/${config.devops.code}/big_logo`"
         alt="DevOps Management"
       >
     </li>
