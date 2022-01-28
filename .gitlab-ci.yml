@@ -55,9 +55,6 @@ review_app:
     # Generate unique compose project name
     - export COMPOSE_PROJECT_NAME=devops-ui-$CI_ENVIRONMENT_SLUG
 
-    # Unset container ip so we can deploy on all hosts
-    - export WEB_CONTAINER_IP=0.0.0.0
-
     # Generate random ports
     - export WEB_CONTAINER_HTTP_PORT=$(shuf -i 2000-65000 -n 1)
     - export WEB_CONTAINER_HTTPS_PORT=$(shuf -i 2000-65000 -n 1)
