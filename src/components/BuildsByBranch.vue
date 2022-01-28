@@ -1,7 +1,12 @@
 <template>
   <div class="card">
     <div class="card-content">
-      <span class="card-title">Builds by branch</span>
+      <span class="card-title">
+        Builds by branch
+        <router-link :to="`/${module}/branches`" class="tbl-link right">
+          View all branches
+        </router-link>
+      </span>
       <table>
         <thead>
         <tr>
@@ -14,7 +19,8 @@
         <tr v-for="(build, index) in builds" :key="index">
           <td>{{ index + 1 }}</td>
           <td>
-            <router-link :to="`/${module}/branches?branch=${encodeURIComponent(build.branch)}`">
+            <router-link class="tbl-link"
+                :to="`/${module}/branches?branch=${encodeURIComponent(build.branch)}`">
               {{ build.branch }}
             </router-link>
           </td>
@@ -74,3 +80,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.card-title {
+  a {
+    font-size: 13px;
+  }
+}
+</style>

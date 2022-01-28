@@ -37,4 +37,7 @@ export default {
   operationType(state, operationType) {
     state.operationType = operationType;
   },
+  binaryTypes(state, binaryTypes) {
+    state.binaryTypes = binaryTypes;
+  },
 };
