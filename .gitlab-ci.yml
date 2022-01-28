@@ -31,7 +31,7 @@ before_script:
   - docker-compose --host $DEPLOY_HOST up --no-build --detach
 
 .add-to-proxy-script: &add-to-proxy-script
-  - export $(cat .env | xargs)
+  - export $(grep -v '^#' .env | xargs)
   - |
     curl \
       --request POST $WEB_PROXY_URL \
