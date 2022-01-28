@@ -31,14 +31,14 @@ before_script:
   - docker-compose --host $DEPLOY_HOST up --no-build --detach
 
 .add-to-proxy-script: &add-to-proxy-script
-  - . .env
+  - export PORT=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/.*://g")
   - |
     curl \
       --request POST $WEB_PROXY_URL \
       --header "Content-Type: application/json" \
       --header "Authorization: Bearer $WEB_PROXY_TOKEN" \
       --insecure \
-      --data-raw '{"path": "devops'", "servers": ["'$SERVER:$WEB_CONTAINER_HTTP_PORT'"]}'
+      --data-raw '{"path": "devops'", "servers": ["'$SERVER:$PORT'"]}'
 
 stages:
   - review
