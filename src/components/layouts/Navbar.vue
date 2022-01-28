@@ -43,7 +43,7 @@ export default {
   methods: {
     logout() {
       this.$auth.logout();
-      return window.location.replace(`/login-in-app?code=${this.$config.auth.code}`);
+      this.$router.go('/');
     },
   },
   mounted() {
