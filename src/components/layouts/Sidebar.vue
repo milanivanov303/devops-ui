@@ -1,7 +1,10 @@
 <template>
   <ul id="nav-mobile" class="sidenav sidenav-fixed">
     <li class="logo">
-      <img src="${config.um.url}/applications/${config.devops.code}/big_logo" alt="DevOps Management">
+      <img
+        src="${config.um.url}/applications/${config.devops.code}/big_logo"
+        alt="DevOps Management"
+      >
     </li>
     <li :class="{ active: isActive('dashboard') }">
       <router-link to="/dashboard">
