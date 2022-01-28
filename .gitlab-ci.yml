@@ -51,12 +51,13 @@ review_app:
   stage: review
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: https://ea-dev.codixfr.private/devops-$CI_ENVIRONMENT_SLUG
+    url: https://${SERVER}:${WEB_CONTAINER_HTTPS_PORT}/devops
     on_stop: stop_review_app
     auto_stop_in: 1 week
   script:
     - cp .env.dev .env
     - export COMPOSE_PROJECT_NAME=devops-ui-$CI_ENVIRONMENT_SLUG
+    - export SERVER=$(echo $DEPLOY_HOST | sed "s/http:\/\///g" | sed "s/:[0-9]*//g")
 
     - *build-script
 
