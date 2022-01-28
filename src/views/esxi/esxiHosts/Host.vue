@@ -70,27 +70,6 @@ export default {
       return this.$store.getters['esxi/getHostFreeMemory'](host);
     },
 
-    updateEsxiInfo() {
-      const loader = this.$loading.show({ container: this.$el });
-      const payload = { ...this.esxiHost };
-
-      this.$store.dispatch('esxi/updateEsxiHost', payload)
-        .then((response) => {
-          if (response.data.error) {
-            this.$M.toast({ html: response.data.error });
-            return;
-          }
-
-          this.$M.toast({
-            html: `Updating ESXi host ${this.esxiHost.hostname} details in background.
-             Please, check in a few minutes.`,
-            classes: 'toast-seccess',
-          });
-        })
-        .catch((error) => {
-          this.$M.toast({ html: error });
-        }).finally(() => loader.hide());
-    },
   },
 };
 

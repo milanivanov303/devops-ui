@@ -16,7 +16,7 @@
       <template v-slot:top-actions-after>
         <Select class="col s12 m4" v-model="status" :options="statusOptions" displayed="name"/>
       </template>
-      <Column label="Name" name="name" :show="(vm) => vm.main_info.name"/>
+      <Column label="Name" name="name" :show="(vm) => vm.name"/>
       <Column label="Powered" name="powered" :show="(vm) => getVMPoweredLabel(vm.powered)"/>
       <Column label="RAM" name="ram" :show="(vm) => $esxi(vm.hardware.memory).bytesToSizeLabel()"/>
       <Column label="CPUs" name="cpu" :show="(vm) => vm.hardware.num_c_p_u"/>

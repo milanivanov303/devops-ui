@@ -49,26 +49,29 @@ export default {
     }
     return host.details.memory.physical_memory - getters.getVmsMemory(host);
   },
-
   getVirtualMachines: (state, getters) => {
     const vms = {};
     if (state.esxiHosts.length > 0) {
       state.esxiHosts.forEach((h) => {
         if (h.vms_details) {
           h.vms_details.forEach((vm) => {
-            if (vm.powered === 'off' && Object.prototype.hasOwnProperty.call(vms, vm.main_info.name)) {
+            if (vm.powered === 'off' && Object.prototype.hasOwnProperty.call(vms, vm.name)) {
               return;
             }
-            vms[vm.main_info.name] = {
-              id: parseInt(vm.vm_id, 10),
-              name: vm.main_info.name,
+            vms[vm.name] = {
+              id: parseInt(vm.id, 10),
+              name: vm.name,
+              file: vm.file,
               powered: vm.powered,
-              details: vm.main_info,
+              os: vm.os,
               hardware: vm.hardware,
+              openssl: vm.openssl,
+              vgdisplay: vm.vgdisplay,
               components: vm.powered === 'on' && h.vms_components ? getters.getVMsComponents(h, vm) : null,
               flags: vm.flags,
               esxi: { id: h.id, name: h.hostname },
               instances: vm.instances ? vm.instances : null,
+              error: vm.error ?? null,
             };
           });
         }
@@ -77,11 +80,11 @@ export default {
     return Object.values(vms).sort((a, b) => a.name.localeCompare(b.name));
   },
   getVMsComponents: () => (host, virtualMachine) => {
-    if (host.vms_components[virtualMachine.main_info.name]) {
-      return host.vms_components[virtualMachine.main_info.name];
+    if (host.vms_components[virtualMachine.name]) {
+      return host.vms_components[virtualMachine.name];
     }
-    if (host.vms_components.error && host.vms_components.error[virtualMachine.main_info.name]) {
-      return { error: host.vms_components.error[virtualMachine.main_info.name] };
+    if (host.vms_components.error && host.vms_components.error[virtualMachine.name]) {
+      return { error: host.vms_components.error[virtualMachine.name] };
     }
     return null;
   },
@@ -91,12 +94,12 @@ export default {
       state.esxiHosts.forEach((h) => {
         if (h.vms_details) {
           h.vms_details.forEach((vm) => {
-            if (vm.instances.length > 0) {
+            if (vm.instances && vm.instances.length > 0) {
               vm.instances.forEach((i) => {
                 i.components = !h.instances_components || !h.instances_components[i.name]
                   || h.instances_components[i.name].length <= 0
                   ? null : h.instances_components[i.name];
-                i.vm = { id: vm.vm_id, name: vm.main_info.name };
+                i.vm = { id: vm.id, name: vm.name };
                 i.esxi = { id: h.id, name: h.hostname };
                 instances.push(i);
               });
