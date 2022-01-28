@@ -31,7 +31,7 @@ before_script:
   - docker-compose --host $DEPLOY_HOST up --no-build --detach
 
 .add-to-proxy-script: &add-to-proxy-script
-  - export $(grep -v '^#' .env | xargs)
+  - . .env
   - |
     curl \
       --request POST $WEB_PROXY_URL \
@@ -80,6 +80,9 @@ review_app:
 stop_review_app:
   stage: review
   script:
+    # Generate unique compose project name
+    - export COMPOSE_PROJECT_NAME=devops-ui-$CI_ENVIRONMENT_SLUG
+
     - docker-compose --host $DEPLOY_HOST down
   environment:
     name: review/$CI_COMMIT_REF_SLUG
