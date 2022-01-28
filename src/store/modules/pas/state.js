@@ -2,4 +2,6 @@
 
 export default {
   configurations: [],
+  hashes: [],
+  feHashes: [],
 };

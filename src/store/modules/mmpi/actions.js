@@ -37,6 +37,9 @@ export default {
       orders: JSON.stringify({
         name: 'asc',
       }),
+      with: JSON.stringify({
+        environment_type: [],
+      }),
     });
 
     commit('promise', { name, promise }, { root: true });

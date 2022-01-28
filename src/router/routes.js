@@ -4,8 +4,8 @@ const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 
-const ExtranetConfigurations = () => import(/* webpackChunkName: "extranet" */ '../views/pas/Configurations');
-const SoaModification = () => import(/* webpackChunkName: "extranet" */ '../views/extranet/components/SOAdeployment');
+const Configurations = () => import(/* webpackChunkName: "extranet" */ '../views/pas/configurations/Configurations');
+const SoaModification = () => import(/* webpackChunkName: "extranet" */ '../views/pas/SOAdeployment');
 
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
@@ -18,6 +18,7 @@ const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Mo
 
 const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
+const VirtualMachines = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/virtualMachines/VirtualMachines');
 const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
 const ImxComponents = () => import('../views/esxi/imxComponents/ImxComponents');
 
@@ -109,12 +110,12 @@ export default [
     path: '/pas/configurations/:id?/:build?',
     meta: {
       requiresAuth: true,
-      name: 'extranet-configurations',
+      name: 'configurations',
       transitionName: 'slide',
-      title: 'Extranet Configurations',
+      title: 'Configurations',
       breadcrumb: 'Configurations',
     },
-    component: ExtranetConfigurations,
+    component: Configurations,
   },
   {
     path: '/pas/soa-modification/:issue?',
@@ -127,7 +128,7 @@ export default [
     },
     component: SoaModification,
     props: {
-      module: 'extranet',
+      module: 'pas',
     },
   },
 
@@ -386,10 +387,7 @@ export default [
         return title;
       },
     },
-    component: Items,
-    props: {
-      module: 'virtualMachines',
-    },
+    component: VirtualMachines,
   },
   {
     path: '/inventory/instances/:id?',

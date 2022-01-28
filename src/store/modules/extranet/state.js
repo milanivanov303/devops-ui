@@ -7,6 +7,4 @@ export default {
   configurations: [],
   host: '',
   images: [],
-  hashes: [],
-  feHashes: [],
 };

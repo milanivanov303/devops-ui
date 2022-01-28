@@ -445,11 +445,11 @@ export default {
       payload.branch = this.form.branch.name;
       payload.prefix = this.form.prefix.package;
 
-      this.$store.dispatch(`extranet/${this.action}Configuration`, payload)
+      this.$store.dispatch(`pas/${this.action}Configuration`, payload)
         .then(() => {
           this.$M.toast({
             html: `The configuration has been ${this.action}d!`,
-            classes: 'toast-seccess',
+            classes: 'toast-success',
           });
           this.$emit('close');
         })

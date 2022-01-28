@@ -154,7 +154,7 @@
 </template>
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
-// import client from '@/plugins/ws';
+import client from '@/plugins/ws';
 import _ from 'lodash';
 
 import TextArea from '@/components/TextArea';
@@ -216,13 +216,47 @@ export default {
   },
   computed: {
     feHashes() {
-      return this.$store.state.extranet.feHashes;
+      return this.$store.state.pas.feHashes;
     },
     hashes() {
-      return this.$store.state.extranet.hashes;
+      return this.$store.state.pas.hashes;
     },
     binaryTypes() {
       return this.$store.state.mmpi.binaryTypes;
+    },
+    deploy_instances() {
+      return this.$store.state.mmpi.deploy_instances;
+    },
+    instances() {
+      return this.$store.state.mmpi.instances;
+    },
+    client() {
+      if (this.configuration.app_type === 'extranet') {
+        const extranetClients = this.$store.state.extranet.clients;
+        return extranetClients
+          .find((client) => client.name === this.configuration.project);
+      }
+
+      if (this.configuration.app_type === 'debiteur') {
+        const debiteurClients = this.store.state.debiteur.clients;
+        return debiteurClients
+          .find((client) => client.name === this.configuration.project);
+      }
+      return null;
+    },
+    deployInstance() {
+      if (this.configuration.deploy_instance) {
+        return this.deploy_instances
+          .find((instance) => instance.name === this.configuration.deploy_instance);
+      }
+      return null;
+    },
+    instance() {
+      if (this.configuration.dev_instance) {
+        return this.instances
+          .find((instance) => instance.name === this.configuration.dev_instance);
+      }
+      return null;
     },
   },
 
@@ -267,9 +301,9 @@ export default {
       const payload = {
         branch: this.hash.commit,
         fe_branch: this.feHash.commit,
-        instance: this.configuration.dev_instance,
-        deploy_instance: this.configuration.deploy_instance,
-        client: this.configuration.prefix,
+        instance: this.instance,
+        deploy_instance: this.deployInstance,
+        client: this.client,
         mmpi: {
           binaryType: {
             type: this.binaryTypes,
@@ -283,57 +317,60 @@ export default {
           ttsKey: this.ttsKey,
         },
       };
-      console.log(payload);
 
-      // this.$store.dispatch('extranet/buildConfiguration', {
-      //   id: this.configuration.id,
-      //   payload,
-      // })
-      //   .then((response) => {
-      //     this.build.status = 'running';
-      //
-      //     if (!client.connected) {
-      //       return;
-      //     }
-      //
-      //     const subscribe = client.subscribe(
-      //       `/queue/${response.data.broadcast.queue}`,
-      //       (message) => {
-      //         const data = JSON.parse(message.body);
-      //
-      //         if (data.summary) {
-      //           this.build.summary = data.summary;
-      //         }
-      //         this.build.progress = data.progress || null;
-      //
-      //         if (data.log) {
-      //           this.build.log += data.log;
-      //           this.scrollLogContainer();
-      //         }
-      //
-      //  if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
-      //           this.build.status = data.status;
-      //           subscribe.unsubscribe();
-      //         }
-      //       },
-      //       response.data.broadcast,
-      //     );
-      //   })
-      //   .catch((error) => {
-      //     this.build.status = 'failed';
-      //     this.build.summary = 'Could not start build';
-      //     if (error.response.status === 403) {
-      //       this.build.error = 'You do not have insufficient rights to create build';
-      //     } else {
-      //       this.build.error = error;
-      //     }
-      //   });
+      this.$store.dispatch('pas/buildConfiguration', {
+        id: this.configuration.id,
+        payload,
+      })
+        .then((response) => {
+          this.build.status = 'running';
+
+          if (!client.connected) {
+            return;
+          }
+
+          const subscribe = client.subscribe(
+            `/queue/${response.data.broadcast.queue}`,
+            (message) => {
+              const data = JSON.parse(message.body);
+
+              if (data.summary) {
+                this.build.summary = data.summary;
+              }
+              this.build.progress = data.progress || null;
+
+              if (data.log) {
+                this.build.log += data.log;
+                this.scrollLogContainer();
+              }
+
+              if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
+                this.build.status = data.status;
+                subscribe.unsubscribe();
+              }
+            },
+            response.data.broadcast,
+          );
+        })
+        .catch((error) => {
+          this.build.status = 'failed';
+          this.build.summary = 'Could not start build';
+          if (error.response.status === 403) {
+            this.build.error = 'You do not have insufficient rights to create build';
+          } else {
+            this.build.error = error;
+          }
+        });
     },
   },
   created() {
     this.$store.dispatch('mmpi/getBinaryTypes');
-    this.$store.dispatch('extranet/getHashes');
-    this.$store.dispatch('extranet/getFeHashes');
+    this.$store.dispatch('mmpi/getDeployInstances');
+    this.$store.dispatch('mmpi/getInstances');
+    this.$store.dispatch('pas/getHashes');
+    this.$store.dispatch('pas/getFeHashes');
+    this.$store.dispatch('extranet/getClients');
+    this.$store.dispatch('debiteur/getClients');
   },
 };
 </script>

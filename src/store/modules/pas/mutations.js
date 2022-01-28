@@ -23,4 +23,10 @@ export default {
     const configurations = state.configurations.filter((d) => d.id !== id);
     Vue.set(state, 'configurations', configurations);
   },
+  hashes(state, hashes) {
+    state.hashes = hashes;
+  },
+  feHashes(state, hashes) {
+    state.feHashes = hashes;
+  },
 };

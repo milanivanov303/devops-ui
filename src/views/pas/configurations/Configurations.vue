@@ -33,7 +33,7 @@
           :show="(row) => getAdditionalInfoLink(row.additional_info)"
           />
         <template v-slot:actions-before="{ row }">
-          <a @click="openAddEditModal('build', row)" class="green-text" title="Start Build">
+          <a @click="openBuildModal('build', row)" class="green-text" title="Start Build">
             <i class="material-icons">send</i>
           </a>
         </template>
@@ -66,9 +66,9 @@
 
 <script>
 
-import BuildConfiguration from '@/views/extranet/components/BuildConfiguration';
-import AddUpdateConfig from '@/views/extranet/components/AddUpdateConfig';
-import DeleteConfig from '@/views/extranet/components/DeleteConfig';
+import BuildConfiguration from '@/views/pas/configurations/BuildConfiguration';
+import AddUpdateConfig from '@/views/pas/configurations/AddUpdateConfig';
+import DeleteConfig from '@/views/pas/configurations/DeleteConfig';
 
 export default {
   components: {
@@ -111,11 +111,11 @@ export default {
             return this.openAddEditModal('update', configuration);
           }
 
-            this.$M.toast({
-              html: 'This configuration does not exist!',
-              classes: 'toast-fail',
-            });
-          }
+          this.$M.toast({
+            html: 'This configuration does not exist!',
+            classes: 'toast-fail',
+          });
+        }
 
         return true;
       });
@@ -165,6 +165,16 @@ export default {
       this.showRemoveModal = false;
     },
 
+    getAdditionalInfoLink(data) {
+      if (!data) {
+        return null;
+      }
+      if (!data.includes('http')) {
+        return data;
+      }
+      const dataToDisplay = `${data.substring(0, 15)}..`;
+      return `<a href="${data}" target="_blank"> ${dataToDisplay} </a>`;
+    },
   },
   mounted() {
     this.getData();

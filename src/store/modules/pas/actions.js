@@ -2,7 +2,7 @@
 
 export default {
   getConfigurations({ commit }) {
-    const name = 'extranet-configurations';
+    const name = 'configurations';
 
     if (this.state.promises[name]) {
       return this.state.promises[name];
@@ -51,6 +51,39 @@ export default {
       .then(() => commit('deleteConfiguration', id))
       .catch(() => commit('error', 'Could not delete configuration', { root: true }));
 
+    return promise;
+  },
+  getHashes({ commit }) {
+    const name = 'extranet-hashes';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('devops').get('extranet/hashes');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => commit('hashes', response.data))
+      .catch(() => commit('error', 'Could not get hashes list', { root: true }));
+    return promise;
+  },
+
+  getFeHashes({ commit }) {
+    const name = 'extranet-fe-hashes';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('devops').get('extranet/fe-hashes');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => commit('feHashes', response.data))
+      .catch(() => commit('error', 'Could not get hashes list', { root: true }));
     return promise;
   },
 };
