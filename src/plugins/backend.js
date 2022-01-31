@@ -21,7 +21,7 @@ window.api = (name) => apiSdk.api(
 const apiSdkAuto = () => {
   if (!window.apiSdkAuto) {
     window.apiSdkAuto = new ApiSdk({
-      url: config.um.url,
+      url: config.um.api_url,
       code: config.auth.code,
       applications: config.auth.applications,
       session_name: config.auth.session_name.concat('_auto'),
