@@ -10,7 +10,8 @@ module.exports = {
     password: process.env.VUE_APP_AUTH_AUTO_PASSWORD,
   },
   um: {
-    url: process.env.VUE_APP_USER_MANAGEMENT_API_URL,
+    url: process.env.VUE_APP_USER_MANAGEMENT_URL,
+    api_url: process.env.VUE_APP_USER_MANAGEMENT_API_URL,
     code: process.env.VUE_APP_USER_MANAGEMENT_API_CODE,
   },
   cms: {

@@ -3,7 +3,7 @@ import config from '../../config';
 
 // Main api sdk instance. It is used for authentication and requests with logged in user
 const apiSdk = new ApiSdk({
-  url: config.um.url,
+  url: config.um.api_url,
   code: config.auth.code,
   applications: config.auth.applications,
   session_name: config.auth.session_name,

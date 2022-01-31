@@ -10,4 +10,5 @@ export default {
   instanceStatus: [],
   operationType: [],
   error: '',
+  binaryTypes: [],
 };

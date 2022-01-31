@@ -1,41 +1,92 @@
 image: gitlab.codixfr.private:5005/enterpriseapps/images/docker:1.1
 
 before_script:
+  # Fix docker API version
+  - export DOCKER_API_VERSION=1.39
+
+  # Get server as we will need it for UM proxy and for review app
+  - export SERVER=$(echo $DEPLOY_HOST | sed "s|http[s]\?://||g" | sed "s|:[0-9]*||g")
+
+  # Login to docker registry so we can push/pull new images
   - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  - export IMAGE=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-  - export IMAGE_TAG=$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-  - cp .env.$CI_ENVIRONMENT_NAME .env
+
+  # Set image tag to use for new builds
+  - export IMAGE=$(echo $CI_REGISTRY_IMAGE:${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA})
+
+  # Set WEB_CONTAINER_IMAGE, so we can deploy with docker-compose
+  - export WEB_CONTAINER_IMAGE=$IMAGE-$CI_ENVIRONMENT_SLUG
+
+  # Copy environment env file as default if exists
+  - |
+    if [ -f ".env.$CI_ENVIRONMENT_NAME" ]; then
+      cp .env.$CI_ENVIRONMENT_NAME .env
+    fi
 
 .build-script: &build-script
-  - docker build --pull --tag $IMAGE-$CI_ENVIRONMENT_NAME .
-  - docker push $IMAGE-$CI_ENVIRONMENT_NAME
+  - docker build --pull --tag $WEB_CONTAINER_IMAGE .
+  - docker push $WEB_CONTAINER_IMAGE
 
 .deploy-script: &deploy-script
-  - export WEB_CONTAINER_IMAGE=$IMAGE-$CI_ENVIRONMENT_NAME
   - docker-compose --host $DEPLOY_HOST pull
   - docker-compose --host $DEPLOY_HOST up --no-build --detach
-  #- export SERVER=$(echo $DEPLOY_HOST | sed "s/http:\/\///g" | sed "s/:[0-9]*//g")
-  - export SERVER=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/:.*//g")
-  - export PORT=$(docker-compose --host $DEPLOY_HOST port web 80 | sed "s/.*://g")
+
+.add-to-proxy-script: &add-to-proxy-script
+  - . .env
   - |
     curl \
       --request POST $WEB_PROXY_URL \
       --header "Content-Type: application/json" \
       --header "Authorization: Bearer $WEB_PROXY_TOKEN" \
       --insecure \
-      --data-raw '{"path": "devops", "servers": ["'$SERVER:$PORT'"]}'
+      --data-raw '{"path": "devops", "servers": ["'$SERVER:$WEB_CONTAINER_HTTP_PORT'"]}'
 
 stages:
+  - review
   - build
   - deploy
 
-test:
-  stage: build
-  environment: dev
+review_app:
+  stage: review
   script:
+    - cp .env.dev .env
+
     - *build-script
+
+    # Generate unique compose project name
+    - export COMPOSE_PROJECT_NAME=devops-ui-$CI_ENVIRONMENT_SLUG
+
+    # Generate random ports
+    - export WEB_CONTAINER_HTTP_PORT=$(shuf -i 2000-65000 -n 1)
+    - export WEB_CONTAINER_HTTPS_PORT=$(shuf -i 2000-65000 -n 1)
+
+    - *deploy-script
+
+    # Generate dynamic environment url
+    - echo "DYNAMIC_ENVIRONMENT_URL=https://$SERVER:$WEB_CONTAINER_HTTPS_PORT" >> deploy.env
+  artifacts:
+    reports:
+      dotenv: deploy.env
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    url: $DYNAMIC_ENVIRONMENT_URL
+    on_stop: stop_review_app
+    auto_stop_in: 1 week
   only:
     - merge_requests
+
+stop_review_app:
+  stage: review
+  script:
+    # Generate unique compose project name
+    - export COMPOSE_PROJECT_NAME=devops-ui-$CI_ENVIRONMENT_SLUG
+
+    - docker-compose --host $DEPLOY_HOST down
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: stop
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
 
 build for dev:
   stage: build
@@ -49,9 +100,8 @@ deploy on dev:
   stage: deploy
   environment: dev
   script:
-    - export WEB_PROXY_URL=$WEB_PROXY_URL_DEV
-    - export WEB_PROXY_TOKEN=$WEB_PROXY_TOKEN_DEV
     - *deploy-script
+    - *add-to-proxy-script
   dependencies:
     - build for dev
   only:
@@ -61,7 +111,6 @@ build for prod:
   stage: build
   environment: prod
   script:
-    - export IMAGE=$IMAGE_TAG
     - *build-script
   only:
     - tags
@@ -70,10 +119,8 @@ deploy on prod:
   stage: deploy
   environment: prod
   script:
-    - export IMAGE=$IMAGE_TAG
-    - export WEB_PROXY_URL=$WEB_PROXY_URL_PROD
-    - export WEB_PROXY_TOKEN=$WEB_PROXY_TOKEN_PROD
     - *deploy-script
+    - *add-to-proxy-script
   only:
     - tags
   dependencies:

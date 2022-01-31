@@ -14,7 +14,7 @@
         <tr v-for="(build, index) in builds" :key="index">
           <td>{{ index + 1 }}</td>
           <td>
-            <router-link :to="`/${build.module}/dashboard`">
+            <router-link :to="`/${build.module}/dashboard`" class="tbl-link">
               {{ build.module }}
             </router-link>
           </td>

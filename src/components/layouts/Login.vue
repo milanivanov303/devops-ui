@@ -2,8 +2,18 @@
 export default {
   methods: {
     async login() {
+      // If there is token in url set it in auth storage
+      if (this.$route.query.token) {
+        auth.storage.set('token', this.$route.query.token);
+      }
+
       await auth.getIdentity()
         .then((response) => {
+          // If there is token in response set it in auth storage
+          if (response.data.token) {
+            auth.storage.set('token', response.data.token);
+          }
+
           auth.setUser({
             username: response.data.username,
             name: response.data.name,

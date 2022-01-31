@@ -37,6 +37,9 @@ export default {
       orders: JSON.stringify({
         name: 'asc',
       }),
+      with: JSON.stringify({
+        environment_type: [],
+      }),
     });
 
     commit('promise', { name, promise }, { root: true });
@@ -103,19 +106,7 @@ export default {
             inactive: 0,
           },
           {
-            delivery_chains: {
-              allOf: [
-                {
-                  status: {
-                    allOf: [
-                      {
-                        active: 1,
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
+            'delivery_chains.status.active': 1,
           },
         ],
       }),
@@ -180,22 +171,10 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            owner: {
-              allOf: [
-                {
-                  key: 'codix',
-                },
-              ],
-            },
+            'owner.key': 'codix',
           },
           {
-            status: {
-              allOf: [
-                {
-                  key: 'active',
-                },
-              ],
-            },
+            'status.key': 'active',
           },
         ],
       }),
@@ -246,13 +225,7 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            status: {
-              allOf: [
-                {
-                  active: 1,
-                },
-              ],
-            },
+            'status.active': 1,
           },
         ],
       }),
@@ -349,5 +322,45 @@ export default {
       commit('error', error);
       return error;
     }
+  },
+  getBinaryTypes({ commit }) {
+    const name = 'binaryTypes';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('enum-values', {
+      fields: JSON.stringify({
+        type: [],
+        value: [],
+      }),
+      filters: JSON.stringify({
+        allOf: [
+          {
+            type: {
+              allOf: [
+                'binary_types',
+              ],
+            },
+            value: {
+              allOf: [],
+            },
+          },
+        ],
+      }),
+      with: JSON.stringify({
+        type: [],
+        value: [],
+      }),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => commit('binaryTypes', response.data.data))
+      .catch(() => commit('error', 'Could not get binary types', { root: true }));
+
+    return promise;
   },
 };

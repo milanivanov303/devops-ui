@@ -100,7 +100,7 @@ export default {
   },
 
   getBuildsByStatus({ commit }, {
-    branch, ttsKey, module, status, createdBy, perPage, page, search,
+    branch, module, status, createdBy, perPage, page, search,
   }) {
     const devopsApi = api('devops');
 
@@ -117,26 +117,33 @@ export default {
           value: status,
         },
       },
-      {
-        module,
-      },
-      {
-        'details->tts_key': ttsKey,
-      },
-      {
-        'details->branch': branch,
-      },
-      {
-        created_by: createdBy,
-      },
     ];
+
+    if (module) {
+      filters.push({ module });
+    }
+
+    if (branch) {
+      filters.push({ 'details->branch': branch });
+    }
+
+    if (createdBy) {
+      filters.push({ created_by: createdBy });
+    }
 
     if (search) {
       filters.push({
-        name: {
-          operator: 'like',
-          value: ''.concat('%', search, '%'),
-        },
+        anyOf: [
+          {
+            name: {
+              operator: 'like',
+              value: `%${search}%`,
+            },
+          },
+          {
+            created_by: search,
+          },
+        ],
       });
     }
 
