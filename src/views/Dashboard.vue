@@ -12,7 +12,6 @@
 </template>
 
 <script>
-import Builds from '@/components/Builds';
 import EventBus from '@/event-bus';
 import BuildsStatistics from '@/components/BuildsStatistics';
 import MyBuilds from '@/components/MyBuilds';
@@ -23,7 +22,6 @@ export default {
     BuildsByModule,
     MyBuilds,
     BuildsStatistics,
-    Builds,
   },
 
   data() {
