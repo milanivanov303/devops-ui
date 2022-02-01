@@ -3,16 +3,6 @@
     <div class="col s12 l8">
       <MyBuilds/>
       <BuildsByModule :loading="loading"/>
-      <div class="card" ref="search_build">
-        <div class="card-content">
-          <span class="card-title">Search all builds</span>
-          <div class="row">
-            <div class="col s12">
-              <Builds :fetch-on-create="false"></Builds>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
     <div class="col s12 l4">
       <BuildsStatistics aggregate-by="user"/>

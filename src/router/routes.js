@@ -1,5 +1,6 @@
 const SeTransferModif = () => import(/* webpackChunkName: "expert-system" */ '../views/expert-system/Modification');
 const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
+const Builds = () => import(/* webpackChunkName: "dashboard" */ '../views/Builds');
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
@@ -60,6 +61,18 @@ export default [
       breadcrumb: 'Dashboard',
     },
     component: MainDashboard,
+  },
+
+  {
+    path: '/builds',
+    meta: {
+      requiresAuth: true,
+      alias: '/builds',
+      name: 'builds',
+      title: 'Builds',
+      breadcrumb: 'Builds',
+    },
+    component: Builds,
   },
 
   // Extranet Tab

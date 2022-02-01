@@ -208,10 +208,6 @@ export default {
     branch: String,
     ttsKey: String,
     createdBy: String,
-    fetchOnCreate: {
-      type: Boolean,
-      default: true,
-    },
   },
 
   data() {
@@ -286,7 +282,7 @@ export default {
       const serviceID = build.details.service.ID;
       const port = config.ssh_port;
 
-      return `/ssh/host/${serviceID}?port=${port}&source=devops`;
+      return `${config.um.url}/ssh/host/${serviceID}?port=${port}&source=devops`;
     },
 
     getStatusText(build) {
@@ -449,9 +445,7 @@ export default {
   },
 
   mounted() {
-    if (this.fetchOnCreate) {
-      this.getBuilds();
-    }
+    this.getBuilds();
 
     if (this.module) {
       this.$store.dispatch(`${this.module}/getHost`);
