@@ -1,86 +1,88 @@
 <template>
-  <div ref="imxComponents" class="row">
+  <div class="row" ref="imxComponents">
     <div class="col s12">
       <div class="row">
-        <div class="col s12 m6">
-          <p class="components-title">iMX Components</p>
-        </div>
-        <div class="col s12 m6 l1 right">
+        <div class="col s12">
           <TooltipButton
-            v-if="$auth.can('imx-component.add')"
-            class="btn-floating right"
-            :icon="'add'"
-            :tooltip="'Add'"
-            @click="showAddImxComponentModal=true"
+              v-if="$auth.can('imx-component.add')"
+              class="btn-floating right"
+              icon="add"
+              tooltip="Add"
+              @click="openAddEditModal({}, 'create')"
           />
+          <h4>iMX Components</h4>
         </div>
       </div>
 
-      <div class="row">
-        <ul id="imxComponents" class="collapsible expandable">
-          <li v-for="component in imxComponents" :key="component.name">
-            <div class="collapsible-header">
-              <i class="material-icons">blur_on</i> {{ component.name }}
-            </div>
-            <div class="collapsible-body">
-              <div class="col s12 m6 l1 right">
-                <TooltipButton
+      <ul id="imxComponents" class="collapsible expandable">
+        <li v-for="component in imxComponents" :key="component.name">
+          <div class="collapsible-header">
+            <i class="material-icons">blur_on</i> {{ component.name }}
+          </div>
+          <div class="collapsible-body">
+            <div class="right">
+              <TooltipButton
+                  v-if="component.url"
+                  :href="component.url"
+                  target="_blank"
+                  icon="laptop_chromebook"
+                  tooltip="Lifecycle URL"
+              />
+              <TooltipButton
                   v-if="$auth.can('imx-component.add')"
-                  class="btn-floating right"
-                  :icon="'edit'"
-                  :tooltip="'Edit'"
-                  @click="editComponent(component)"
-                />
-              </div>
-              <p v-if="component.maintenance_team">
-                <b>Maintenance team: </b><span>{{ component.maintenance_team }}</span>
-              </p>
-              <p v-if="component.intranet_command">
-                <b>Intranet command: </b><span>{{ component.intranet_command }}</span>
-              </p>
-              <p v-if="component.extranet_command">
-                <b>Extranet command: </b><span>{{ component.extranet_command }}</span>
-              </p>
-              <div class="data-table" v-if="component.versions">
-                <Table
-                    :data="component.versions"
-                    :searchField="false"
-                    :pagination="false"
-                    :export-btn="false"
-                    :view-btn="false"
-                    :add-btn="false"
-                    :edit-btn="false"
-                    :delete-btn="false"
-                >
-                  <Column show="version" :sortable="false"/>
-                  <Column label="End of support date (regular)" name="regular_eos_date"
-                          :sortable="false" :show="(v) => v.regular_eos_date
-                          ? $date(v.regular_eos_date).toHuman('dd-MM-yyyy') : ''"/>
-                  <Column label="End of support date (extended)" name="extended_eos_date"
-                          :sortable="false" :show="(v) => v.extended_eos_date
-                          ? $date(v.extended_eos_date).toHuman('dd-MM-yyyy') : ''"/>
-                </Table>
-              </div>
+                  icon="create"
+                  tooltip="Edit component"
+                  @click="openAddEditModal(component, 'update')"
+              />
             </div>
-          </li>
-        </ul>
-      </div>
+            <p v-if="component.maintenance_team">
+              <b>Maintenance team: </b><span>{{ component.maintenance_team }}</span>
+            </p>
+            <p v-if="component.intranet_command">
+              <b>Intranet command: </b><span>{{ component.intranet_command }}</span>
+            </p>
+            <p v-if="component.extranet_command">
+              <b>Extranet command: </b><span>{{ component.extranet_command }}</span>
+            </p>
+            <div class="data-table" v-if="component.versions">
+              <Table
+                  :data="component.versions"
+                  sort-by="version"
+                  sort-dir="asc"
+                  :searchField="false"
+                  :pagination="false"
+                  :export-btn="false"
+                  :view-btn="false"
+                  :add-btn="false"
+                  :edit-btn="false"
+                  :delete-btn="false"
+              >
+                <Column show="version" :sortable="false"/>
+                <Column label="End of support date (regular)" name="regular_eos_date"
+                        :sortable="false" :show="(v) => v.regular_eos_date
+                      ? $date(v.regular_eos_date).toHuman('dd-MM-yyyy') : ''"/>
+                <Column label="End of support date (extended)" name="extended_eos_date"
+                        :sortable="false" :show="(v) => v.extended_eos_date
+                      ? $date(v.extended_eos_date).toHuman('dd-MM-yyyy') : ''"/>
+              </Table>
+            </div>
+          </div>
+        </li>
+      </ul>
 
       <AddImxComponentModal
-        v-if="showAddImxComponentModal"
-        :imxComponent="imxComponent"
+        v-if="showAddEditModal"
+        :component="imxComponent"
         :action="action"
-        @close="updateAtClose()"
+        @close="close()"
       />
     </div>
   </div>
 </template>
 
 <script>
-
-import TooltipButton from '@/components/partials/TooltipButton';
-
-const AddImxComponentModal = () => import('./AddImxComponentModal');
+const TooltipButton = () => import('@/components/partials/TooltipButton');
+const AddImxComponentModal = () => import('./AddEditComponentModal');
 
 export default {
   components: {
@@ -89,9 +91,9 @@ export default {
   },
   data() {
     return {
+      showAddEditModal: false,
       imxComponent: {},
-      action: 'save',
-      showAddImxComponentModal: false,
+      action: '',
     };
   },
   computed: {
@@ -100,34 +102,59 @@ export default {
     },
   },
   methods: {
-    editComponent(component) {
+    getImxComponents() {
+      const loader = this.$loading.show({ container: this.$refs.imxComponents });
+
+      this.$store.dispatch('esxi/getImxComponents')
+        .then(() => {
+          if (this.$route.params.id) {
+            if (this.$route.params.id === 'new') {
+              return this.openAddEditModal({}, 'create');
+            }
+
+            const component = this.imxComponents.find((c) => {
+              if (c.id === parseInt(this.$route.params.id, 10)) {
+                return true;
+              }
+              return false;
+            });
+
+            if (component) {
+              return this.openAddEditModal(component, 'update');
+            }
+            this.$M.toast({ html: 'This component does not exist!', classes: 'toast-fail' });
+          }
+          return false;
+        })
+        .catch((error) => {
+          this.$M.toast({ html: `${error}`, classes: 'toast-fail' });
+        })
+        .finally(() => loader.hide());
+    },
+    openAddEditModal(component, action) {
+      this.showAddEditModal = true;
       this.imxComponent = component;
-      this.action = 'edit';
-      this.showAddImxComponentModal = true;
+      this.action = action;
+
+      this.$router.push({
+        path: `/inventory/imxComponents/${encodeURIComponent(component.id) || 'new'}`,
+      });
     },
-    updateAtClose() {
-      this.showAddImxComponentModal = false;
-      this.imxComponent = {};
-      this.action = 'save';
+    close() {
+      this.showAddEditModal = false;
+
+      this.$router.push({
+        path: '/inventory/imxComponents',
+      });
     },
   },
-  created() {
-    this.$store.dispatch('esxi/getImxComponents');
-  },
+
   mounted() {
-    const elem = document.querySelector('.collapsible.expandable');
-    const globalM = window.M;
-    globalM.Collapsible.init(elem, {
+    this.getImxComponents();
+    this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'), {
       accordion: false,
     });
   },
 };
 
 </script>
-
-<style lang="scss" scooped>
-.components-title {
-  font-weight: bold;
-  font-size: large;
-}
-</style>

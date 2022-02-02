@@ -408,7 +408,7 @@ export default [
     component: Instances,
   },
   {
-    path: '/inventory/imxComponents/:imxComponent?',
+    path: '/inventory/imxComponents/:id?',
     meta: {
       requiresAuth: true,
       name: 'esxi-components',
