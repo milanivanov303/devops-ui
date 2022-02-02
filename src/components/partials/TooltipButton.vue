@@ -1,22 +1,26 @@
 <template>
-    <button class="btn waves-effect btn-medium"
-       type="button"
-       :data-tooltip=tooltip
-       @click="$emit('click')">
+    <a @click="$emit('click')">
       <i v-if="icon" class="material-icons">{{icon}}</i>
-    </button>
+    </a>
 </template>
 
 <script>
 
 export default {
   props: {
+    href: String,
     icon: String,
     tooltip: String,
   },
 
   mounted() {
-    this.$M.Tooltip.init(this.$el);
+    if (this.tooltip) {
+      this.$M.Tooltip.init(this.$el);
+      this.$el.setAttribute('data-tooltip', this.tooltip);
+    }
+    if (this.href) {
+      this.$el.setAttribute('href', this.href);
+    }
   },
 };
 

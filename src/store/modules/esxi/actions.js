@@ -59,7 +59,6 @@ export default {
 
     return promise;
   },
-
   createImxComponent({ commit }, payload) {
     const promise = api('devops').post('imx-components', payload);
     promise
@@ -68,7 +67,6 @@ export default {
 
     return promise;
   },
-
   updateImxComponent({ commit }, payload) {
     const promise = api('devops').put(`imx-components/${payload.id}`, payload);
     promise
