@@ -245,9 +245,9 @@ export default {
       return null;
     },
     deployInstance() {
-      if (this.configuration.deploy_instance) {
+      if (this.configuration.deploy_dev_instance) {
         return this.deploy_instances
-          .find((instance) => instance.name === this.configuration.deploy_instance);
+          .find((instance) => instance.name === this.configuration.deploy_dev_instance);
       }
       return null;
     },
