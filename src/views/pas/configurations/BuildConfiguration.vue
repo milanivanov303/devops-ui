@@ -244,7 +244,7 @@ export default {
       }
       return null;
     },
-    deployDevInstance() {
+    deployInstance() {
       if (this.configuration.deploy_dev_instance) {
         return this.deploy_instances
           .find((instance) => instance.name === this.configuration.deploy_dev_instance);
@@ -302,7 +302,7 @@ export default {
         branch: this.hash.commit,
         fe_branch: this.feHash.commit,
         instance: this.instance,
-        deploy_dev_instance: this.deployDevInstance,
+        deploy_instance: this.deployInstance,
         client: this.client,
         mmpi: {
           binaryType: {
