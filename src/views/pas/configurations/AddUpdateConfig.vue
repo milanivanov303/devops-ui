@@ -57,7 +57,9 @@
                 &&
                 delete form.val_instance
                 &&
-                delete form.deploy_instance
+                delete form.deploy_dev_instance
+                &&
+                delete form.deploy_val_instance
               "
               @blur="$v.form.delivery_chain.$touch()"
           />
@@ -99,10 +101,19 @@
         <div class="row">
           <Autocomplete
               class="col s12"
-              label="Deploy Instance"
+              label="Deploy Dev Instance"
               icon="dynamic_feed"
               :items="deploy_instances"
-              v-model="form.deploy_instance"
+              v-model="form.deploy_dev_instance"
+          />
+        </div>
+        <div class="row">
+          <Autocomplete
+            class="col s12"
+            label="Deploy Val Instance"
+            icon="dynamic_feed"
+            :items="deploy_instances"
+            v-model="form.deploy_val_instance"
           />
         </div>
         <div class="row">
@@ -406,9 +417,14 @@ export default {
           .find((instance) => instance.name === this.configuration.val_instance);
       }
 
-      if (this.configuration.deploy_instance) {
-        this.form.deploy_instance = this.deploy_instances
-          .find((instance) => instance.name === this.configuration.deploy_instance);
+      if (this.configuration.deploy_dev_instance) {
+        this.form.deploy_dev_instance = this.deploy_instances
+          .find((instance) => instance.name === this.configuration.deploy_dev_instance);
+      }
+
+      if (this.configuration.deploy_val_instance) {
+        this.form.deploy_val_instance = this.deploy_instances
+          .find((instance) => instance.name === this.configuration.deploy_val_instance);
       }
 
       if (this.configuration.project_type) {
@@ -439,8 +455,11 @@ export default {
       if (this.form.val_instance) {
         payload.val_instance = this.form.val_instance.name;
       }
-      if (this.form.deploy_instance) {
-        payload.deploy_instance = this.form.deploy_instance.name;
+      if (this.form.deploy_dev_instance) {
+        payload.deploy_dev_instance = this.form.deploy_dev_instance.name;
+      }
+      if (this.form.deploy_val_instance) {
+        payload.deploy_val_instance = this.form.deploy_val_instance.name;
       }
       payload.branch = this.form.branch.name;
       payload.prefix = this.form.prefix.package;
