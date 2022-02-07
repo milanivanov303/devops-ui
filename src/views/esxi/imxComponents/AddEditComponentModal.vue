@@ -203,7 +203,6 @@ export default {
 
   methods: {
     save() {
-      debugger;
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
