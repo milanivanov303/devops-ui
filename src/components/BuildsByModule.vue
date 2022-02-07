@@ -1,7 +1,10 @@
 <template>
   <div class="card" ref="builds_by_branch">
     <div class="card-content">
-      <span class="card-title">Builds by module</span>
+      <span class="card-title">
+        Builds by module
+        <router-link to="/builds" class="tbl-link right">View all builds</router-link>
+      </span>
       <table>
         <thead>
         <tr>
@@ -75,3 +78,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.card-title {
+  a {
+    font-size: 13px;
+  }
+}
+</style>

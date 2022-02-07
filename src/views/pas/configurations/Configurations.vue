@@ -20,7 +20,8 @@
         <Column show="delivery_chain"/>
         <Column show="dev_instance"/>
         <Column show="val_instance"/>
-        <Column show="deploy_instance"/>
+        <Column show="deploy_dev_instance"/>
+        <Column show="deploy_val_instance"/>
         <Column show="app_type" :sortable="false" filter-type="dropdown"/>
         <Column show="app_version" :sortable="false" filter-type="dropdown"/>
         <Column show="branch" :sortable="false" filter-type="search"/>

@@ -39,34 +39,50 @@
 <!--             class="tooltipped">-->
 <!--            <i class="material-icons">laptop_chromebook</i>-->
 <!--          </a>-->
+          <a v-if="row.filesystem && row.filesystem.files"
+             @click="openDetailsModal(row)"
+             target="_blank"
+             data-tooltip="Filesystem"
+             class="tooltipped">
+            <i class="material-icons">view_list</i>
+          </a>
           <a v-if="row.components"
-            @click="showComponentsModal = true, instance = row"
+            @click="showComponentsModal = true, selected = row"
              target="_blank"
              data-tooltip="Components"
              class="tooltipped">
             <i class="material-icons">widgets</i>
           </a>
+
         </template>
       </Table>
     </div>
 
     <Modal v-if="showComponentsModal" @close="showComponentsModal = false" class="right-sheet">
        <template v-slot:header>
-        {{ instance.name.toUpperCase() }}'s components
+        {{ selected.name.toUpperCase() }}'s components
       </template>
       <template v-slot:content>
         <ComponentsTable :components="getInstanceComponents()"/>
       </template>
       <template v-slot:footer></template>
     </Modal>
+
+    <InstanceDetailsModal
+        v-if="showDetailsModal"
+        @close="showDetailsModal=false"
+        :instance="selected"
+    />
+
   </div>
 </template>
 
 <script>
+const InstanceDetailsModal = () => import('../components/InstanceDetailsModal');
 const ComponentsTable = () => import('../components/ComponentsTable');
 
 export default {
-  components: { ComponentsTable },
+  components: { InstanceDetailsModal, ComponentsTable },
   props: {
     instances: {
       type: [Array, String],
@@ -78,8 +94,9 @@ export default {
   },
   data() {
     return {
+      showDetailsModal: false,
       showComponentsModal: false,
-      instance: null,
+      selected: null,
     };
   },
   computed: {
@@ -145,13 +162,18 @@ export default {
 
     getInstanceComponents() {
       const components = [];
-      Object.entries(this.instance.components).forEach(([component, version]) => {
+      Object.entries(this.selected.components).forEach(([component, version]) => {
         components.push({
           name: component,
           version,
         });
       });
       return components;
+    },
+
+    openDetailsModal(instance) {
+      this.showDetailsModal = true;
+      this.selected = instance;
     },
   },
 
