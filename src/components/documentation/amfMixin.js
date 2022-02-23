@@ -26,7 +26,7 @@ export default {
       const parser = amf.Core.parser(this.type, 'application/raml');
 
       const ramlDoc = await parser.parseFileAsync(
-        `${window.location.origin}/${config.devops.url}/specs?repo=${this.repo}&branch=${this.branch}&file=${this.file}`,
+        `${config.devops.url}/specs?repo=${this.repo}&branch=${this.branch}&file=${this.file}`,
       );
 
       const doc = amf.Core.resolver(this.type).resolve(ramlDoc, 'editing');
