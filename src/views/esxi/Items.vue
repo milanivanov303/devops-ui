@@ -125,7 +125,7 @@ export default {
         return null;
       }
 
-      const item = this.items.find((i) => name === i.name || name === i.hostname);
+      const item = this.items.find((i) => name === i.name);
       return item;
     },
   },
@@ -173,9 +173,6 @@ export default {
       const regexp = new RegExp(this.search, 'i');
 
       return items.filter((item) => {
-        if (item.hostname && item.hostname.match(regexp)) {
-          return true;
-        }
         if (item.name && item.name.match(regexp)) {
           return true;
         }

@@ -29,7 +29,7 @@ export default {
     chartData() {
       const labels = [];
       this.esxiHosts.forEach((esxiHost) => {
-        labels.push(esxiHost.hostname);
+        labels.push(esxiHost.name);
       });
 
       const usedMemory = [];

@@ -1,10 +1,5 @@
 <template>
   <div ref="instances">
-    <div v-if="currentInstances.error" class="validator">
-      <div class="red-text">
-        <p>{{ currentInstances.error }}</p>
-      </div>
-    </div>
     <div class="data-table">
       <Table
         :data="currentInstances"
@@ -25,20 +20,25 @@
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
         <Column v-if="!instances" label="Virtual Machine" name="vm"
-          :show="(instance) => getVMLink(instance.vm.name)"/>
-        <Column v-if="!instances" label="Esxi Host" name="esxi"
-          :show="(instance) => getHostLink(instance.esxi.name)"/>
+          :show="(instance) => getVMLink(instance.virtual_machine.name)"/>
+<!--        <Column v-if="!instances" label="Esxi Host" name="esxi"-->
+<!--          :show="(instance) => getHostLink(instance.virtual_machine.name)"/>-->
         <Column show="version"/>
         <Column show="pwd_hash_type"/>
         <Column label="Home path" name="home-path" :show="(instance) => instance.home_path"/>
-        <Column label="Patch config path" name="patch-conf"
-          :show="(instance) => instance.patch_conf"/>
+        <Column show="patch_config_path"/>
         <template v-slot:actions-before="{ row }">
 <!--          <a target="_blank"-->
 <!--             data-tooltip="Extranet"-->
 <!--             class="tooltipped">-->
 <!--            <i class="material-icons">laptop_chromebook</i>-->
 <!--          </a>-->
+          <a v-if="row.error"
+             target="_blank"
+             :data-tooltip="row.error"
+             class="tooltipped">
+            <i class="material-icons red-text">error</i>
+          </a>
           <a v-if="row.filesystem && row.filesystem.files"
              @click="openDetailsModal(row)"
              target="_blank"
@@ -53,7 +53,6 @@
              class="tooltipped">
             <i class="material-icons">widgets</i>
           </a>
-
         </template>
       </Table>
     </div>
@@ -153,10 +152,10 @@ export default {
       return `<a href="../instances?instances_search=${name}" class="tbl-link">${name}</a>`;
     },
 
-    getEsxiHosts() {
+    getInstances() {
       const loader = this.$loading.show({ container: this.$refs.instances });
 
-      this.$store.dispatch('esxi/getEsxiHosts')
+      this.$store.dispatch('esxi/getInstances')
         .finally(() => loader.hide());
     },
 
@@ -178,7 +177,7 @@ export default {
   },
 
   created() {
-    this.getEsxiHosts();
+    this.getInstances();
     this.$store.dispatch('mmpi/getProjects');
   },
 };

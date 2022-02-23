@@ -2,6 +2,10 @@
 import Vue from 'vue';
 
 export default {
+  error(state, error) {
+    state.error = error;
+  },
+
   esxiHosts(state, esxiHosts) {
     state.esxiHosts = esxiHosts;
   },
@@ -14,9 +18,7 @@ export default {
   instances(state, instances) {
     state.instances = instances;
   },
-  error(state, error) {
-    state.error = error;
-  },
+
   createHost(state, host) {
     const { esxiHosts } = state;
     esxiHosts.push(host);
@@ -30,6 +32,16 @@ export default {
       return state.esxiHosts;
     });
   },
+
+  updateVirtualMachine(state, virtualMachine) {
+    state.virtualMachines.map((vm) => {
+      if (vm.id === virtualMachine.id) {
+        Vue.set(state.virtualMachines, state.virtualMachines.indexOf(vm), virtualMachine);
+      }
+      return state.virtualMachines;
+    });
+  },
+
   imxComponents(state, imxComponents) {
     state.imxComponents = imxComponents;
   },

@@ -30,7 +30,7 @@ export default {
       };
 
       this.esxiHosts.forEach((host) => {
-        chartData.labels.push(host.hostname);
+        chartData.labels.push(host.name);
         chartData.datasets[0].data.push(this.getCPUcoresByHost(host));
       });
 
@@ -39,10 +39,10 @@ export default {
   },
   methods: {
     getCPUcoresByHost(host) {
-      if (!host.details) {
+      if (!host.cpu) {
         return 0;
       }
-      return parseInt(host.details.cpu.num_cpu_cores, 10);
+      return parseInt(host.cpu.num_cpu_cores, 10);
     },
   },
 };

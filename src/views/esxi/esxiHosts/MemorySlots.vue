@@ -1,12 +1,12 @@
 <template>
   <div class="row memory-slots">
-    <ul v-if="esxiHost.details && esxiHost.details.memory_slots"
+    <ul v-if="esxiHost.memory_slots"
         class="collection with-header ul-collection">
-      <div class="col s12 l6" v-if="esxiHost.details.memory_slots">
+      <div class="col s12 l6" v-if="esxiHost.memory_slots">
         <li class="collection-header">
           <span class="collection-section">EMPTY MEMORY SLOTS</span>
         </li>
-        <div v-for="empty in esxiHost.details.memory_slots.empty" :key="empty.id">
+        <div v-for="empty in esxiHost.memory_slots.empty" :key="empty.id">
           <div class="slots">
             <li class="collection-item">
               <b>Location: </b>{{ empty.location }}
@@ -25,7 +25,7 @@
         <li class="collection-header">
           <span class="collection-section">FILLED MEMORY SLOTS</span>
         </li>
-        <div v-for="filled in esxiHost.details.memory_slots.filled" :key="filled.id">
+        <div v-for="filled in esxiHost.memory_slots.filled" :key="filled.id">
           <div class="slots">
             <li class="collection-item">
               <b>Location: </b>{{ filled.location }}

@@ -12,7 +12,7 @@
                 class="col s12"
                 label="Hostname"
                 icon="laptop"
-                v-model="host.hostname"
+                v-model="host.name"
             />
           </div>
           <div class="row">
@@ -62,7 +62,7 @@ export default {
   },
   validations: {
     host: {
-      hostname: {
+      name: {
         required,
       },
     },
@@ -76,7 +76,7 @@ export default {
 
       this.$store.dispatch(`esxi/${this.action}Host`, {
         id: this.host.id,
-        hostname: this.host.hostname,
+        name: this.host.name,
         doc_url: this.host.doc_url,
         notes: this.host.notes,
       })

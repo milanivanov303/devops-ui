@@ -1,52 +1,52 @@
 <template>
   <div class="row esxi-details">
-    <ul v-if="esxiHost.details" class="collection with-header ul-collection">
+    <ul v-if="esxiHost" class="collection with-header ul-collection">
       <div class="col s12 l6">
         <li class="collection-header">
           <span class="collection-section">MAIN DETAILS</span>
         </li>
-        <li v-if="esxiHost.details.board_info" class="collection-item">
-          <b>Motherboard: </b>{{ esxiHost.details.board_info.product }},
-          {{ esxiHost.details.board_info.version }},
-          {{ esxiHost.details.board_info.manufacturer }}
+        <li v-if="esxiHost.board_info" class="collection-item">
+          <b>Motherboard: </b>{{ esxiHost.board_info.product }},
+          {{ esxiHost.board_info.version }},
+          {{ esxiHost.board_info.manufacturer }}
         </li>
-        <li v-if="esxiHost.details.version" class="collection-item">
-          <b>Hypervisor: </b>{{ esxiHost.details.version.product }},
-                             {{ esxiHost.details.version.version }}
+        <li v-if="esxiHost.version" class="collection-item">
+          <b>Hypervisor: </b>{{ esxiHost.version.product }},
+                             {{ esxiHost.version.version }}
         </li>
-        <li v-if="esxiHost.details.platform" class="collection-item">
-          <b>Model: </b>{{esxiHost.details.platform.product_name}}
-            {{ esxiHost.details.platform.vendor_name }}
+        <li v-if="esxiHost.platform" class="collection-item">
+          <b>Model: </b>{{esxiHost.platform.product_name}}
+            {{ esxiHost.platform.vendor_name }}
         </li>
-        <li v-if="esxiHost.details.platform" class="collection-item">
-          <b>Serial Num: </b>{{ esxiHost.details.platform.serial_number }}
+        <li v-if="esxiHost.platform" class="collection-item">
+          <b>Serial Num: </b>{{ esxiHost.platform.serial_number }}
         </li>
-        <li v-if="esxiHost.details.date" class="collection-item">
-          <b>ESXi date: </b>{{ $date(esxiHost.details.date).toHuman() }}
+        <li v-if="esxiHost.created_on" class="collection-item">
+          <b>Created on: </b>{{ $date(esxiHost.created_on).toHuman() }}
         </li>
       </div>
       <div class="col s12 l6">
-        <li v-if="esxiHost.details.cpu" class="collection-header">
+        <li v-if="esxiHost.cpu" class="collection-header">
           <span class="collection-section">CPU DETAILS</span>
         </li>
-        <li v-if="esxiHost.details.cpu_details" class="collection-item">
-          <b>Brand: </b>{{ getCpuBrand(esxiHost.details.cpu_details) }}
+        <li v-if="esxiHost.cpu_details" class="collection-item">
+          <b>Brand: </b>{{ getCpuBrand(esxiHost.cpu_details) }}
         </li>
-        <li v-if="esxiHost.details.cpu_details" class="collection-item">
-          <b>Processor Type: </b>{{ esxiHost.details.cpu.cpu_model }}
+        <li v-if="esxiHost.cpu_details" class="collection-item">
+          <b>Processor Type: </b>{{ esxiHost.cpu.cpu_model }}
         </li>
 
-        <li v-if="esxiHost.details.cpu" class="collection-item">
-          <b>Packages: </b>{{ esxiHost.details.cpu.num_cpu_pkgs }}
+        <li v-if="esxiHost.cpu" class="collection-item">
+          <b>Packages: </b>{{ esxiHost.cpu.num_cpu_pkgs }}
         </li>
-        <li v-if="esxiHost.details.cpu" class="collection-item">
-          <b>Cores: </b>{{ esxiHost.details.cpu.num_cpu_cores }}
-          <span v-if="esxiHost.details.cpu_details">
-            x {{ getCpuCoreSpeed(esxiHost.details.cpu_details) }}
+        <li v-if="esxiHost.cpu" class="collection-item">
+          <b>Cores: </b>{{ esxiHost.cpu.num_cpu_cores }}
+          <span v-if="esxiHost.cpu_details">
+            x {{ getCpuCoreSpeed(esxiHost.cpu_details) }}
           </span>
         </li>
-        <li v-if="esxiHost.details.cpu" class="collection-item">
-          <b>Threads: </b>{{ esxiHost.details.cpu.num_cpu_threads }}
+        <li v-if="esxiHost.cpu" class="collection-item">
+          <b>Threads: </b>{{ esxiHost.cpu.num_cpu_threads }}
         </li>
       </div>
     </ul>
