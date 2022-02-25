@@ -48,7 +48,7 @@
               <Table
                   :data="component.versions"
                   sort-by="version"
-                  sort-dir="asc"
+                  sort-dir="desc"
                   :perPage="5"
                   :searchField="false"
                   :export-btn="false"
