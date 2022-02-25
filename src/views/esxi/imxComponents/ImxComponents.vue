@@ -48,9 +48,9 @@
               <Table
                   :data="component.versions"
                   sort-by="version"
-                  sort-dir="asc"
+                  sort-dir="desc"
+                  :perPage="5"
                   :searchField="false"
-                  :pagination="false"
                   :export-btn="false"
                   :view-btn="false"
                   :add-btn="false"
@@ -137,7 +137,7 @@ export default {
       this.action = action;
 
       this.$router.push({
-        path: `/inventory/imxComponents/${encodeURIComponent(component.id) || 'new'}`,
+        path: `/inventory/imxComponents/${encodeURIComponent(component.id || 'new') }`,
       });
     },
     close() {
