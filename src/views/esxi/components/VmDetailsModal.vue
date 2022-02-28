@@ -42,6 +42,9 @@
         <li>
           <div class="collapsible-header"><i class="material-icons">camera</i>Hardware</div>
           <div class="collapsible-body">
+            <div v-if="vm.hardware.memoryReservation" class="row validator">
+              <div class="col s12 red-text"> <span>{{ vm.hardware.memoryReservation }}</span></div>
+            </div>
             <p><b>CPUs: </b> {{ vm.hardware.num_c_p_u }}</p>
             <p><b>Cores per socket: </b> {{ vm.hardware.num_cores_per_socket }}</p>
             <p><b>RAM: </b>

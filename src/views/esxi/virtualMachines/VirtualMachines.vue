@@ -11,11 +11,10 @@
               query-prefix="vms_"
               :noDataText="getNoDataText()"
               :export-btn="false"
-              :view-btn="true"
+              :view-btn="false"
               :add-btn="false"
               :edit-btn="false"
               :delete-btn="false"
-              @view="(row) => openVmDetails(row)"
             >
               <template v-slot:top-actions-before>
                 <div class="table-btns right">
@@ -40,6 +39,20 @@
                 :show="(vm) => vm.os && vm.os.version ? vm.os.version : ''"/>
               <Column label="Status" name="status" :sortable="false" filter-type="dropdown"
                 :show="(vm) => getVmStatus(vm.powered)"/>
+              <template v-slot:actions-before="{ row }">
+                <a @click="openVmDetails(row)"
+                   target="_blank"
+                   data-tooltip="View details"
+                   class="tooltipped">
+                  <i class="material-icons">view_list</i>
+                </a>
+                <a v-if="row.hardware && row.hardware.memoryReservation"
+                       target="_blank"
+                       :data-tooltip="row.hardware.memoryReservation"
+                       class="tooltipped">
+                <i class="material-icons red-text">error</i>
+              </a>
+              </template>
             </Table>
           </div>
 
