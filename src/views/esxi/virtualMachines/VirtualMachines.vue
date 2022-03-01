@@ -88,7 +88,8 @@ export default {
         return null;
       }
 
-      return this.virtualMachines.find((i) => name === i.name);
+      const vms = this.virtualMachines.filter((vm) => vm.name === name);
+      return vms.find((vm) => vm.powered === 'on') || vms[0];
     },
   },
   methods: {
