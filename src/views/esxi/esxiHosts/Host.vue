@@ -4,7 +4,7 @@
       <div class="card-content">
         <div class="row">
           <div class="col s8 card-title truncate">
-            {{ esxiHost.hostname }}
+            {{ esxiHost.name }}
           </div>
           <div class="col s4">
             <span class="new badge red" data-badge-caption="">
@@ -14,21 +14,25 @@
           </div>
         </div>
 
-        <div v-if="esxiHost.details && esxiHost.details.cpu">
-          <b>CPU:</b>
-          <span v-if="esxiHost.details.cpu.num_cpu_cores">
-            {{ esxiHost.details.cpu.num_cpu_cores }} cores
-          </span>
-          <span v-if="esxiHost.details.cpu_details">
-            x {{ getCpuCoreSpeed(esxiHost.details.cpu_details) }}
-          </span>
+        <div v-if="esxiHost.error">
+          <b class="red-text">{{ esxiHost.error }}</b>
+        </div>
+        <div v-else>
+          <div v-if="esxiHost.cpu">
+            <b>CPU:</b>
+            <span v-if="esxiHost.cpu.num_cpu_cores">
+              {{ esxiHost.cpu.num_cpu_cores }} cores
+            </span>
+              <span v-if="esxiHost.cpu_details">
+              x {{ getCpuCoreSpeed(esxiHost.cpu_details) }}
+            </span>
+          </div>
+          <div v-if="esxiHost.memory">
+            <b>RAM:</b> {{ $esxi(esxiHost.memory.physical_memory).bytesToSizeLabel()}},
+            <b>Free:</b> {{ $esxi(getHostFreeMemory(esxiHost)).bytesToSizeLabel() }}
+          </div>
         </div>
 
-        <div v-if="esxiHost.details && esxiHost.details.memory">
-          <b>RAM:</b> {{ esxiHost.details.memory ?
-          $esxi(esxiHost.details.memory.physical_memory).bytesToSizeLabel() : '' }},
-          <b>Free:</b> {{ $esxi(getHostFreeMemory(esxiHost)).bytesToSizeLabel() }}
-        </div>
       </div>
     </div>
   </router-link>
@@ -46,14 +50,14 @@ export default {
   methods: {
     getTo() {
       return {
-        path: `/inventory/esxiHosts/${encodeURIComponent(this.esxiHost.hostname)}`,
+        path: `/inventory/esxiHosts/${encodeURIComponent(this.esxiHost.name)}`,
       };
     },
     getOnOffVMsCount(host, status) {
       let counter = 0;
-      if (host.vms_details && host.vms_details.length > 0) {
-        host.vms_details.forEach((vms) => {
-          if (vms.powered === status) {
+      if (host.virtual_machines && host.virtual_machines.length > 0) {
+        host.virtual_machines.forEach((vm) => {
+          if (vm.powered === status) {
             counter += 1;
           }
         });
