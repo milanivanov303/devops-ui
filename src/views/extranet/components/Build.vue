@@ -118,7 +118,7 @@
             :status="build.status"
             :summary="build.summary"
             :error="build.error"
-          ></BuildProgress>
+          />
         </template>
         <template v-slot:footer>
           <button v-if="!build.started" class="waves-effect btn" @click="start()">

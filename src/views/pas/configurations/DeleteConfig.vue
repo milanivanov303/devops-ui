@@ -41,11 +41,11 @@ export default {
   methods: {
     remove() {
       this.removing = true;
-      this.$store.dispatch('extranet/deleteConfiguration', this.configuration.id)
+      this.$store.dispatch('pas/deleteConfiguration', this.configuration.id)
         .then(() => {
           this.removed = true;
           this.$emit('close');
-          this.$M.toast({ html: 'The configuration has been removed!', classes: 'toast-seccess' });
+          this.$M.toast({ html: 'The configuration has been removed!', classes: 'toast-success' });
         })
         .catch((error) => {
           if (error.response.status === 403) {

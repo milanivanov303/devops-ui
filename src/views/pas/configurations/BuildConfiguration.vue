@@ -4,7 +4,7 @@
       <span v-if="action === 'build'">Build configuration</span>
     </template>
     <template v-slot:content>
-      <form>
+      <form v-if="!build.started">
         <div class="row">
           <div class="input-field col s12">
             <i class="material-icons prefix">label_outline</i>
@@ -63,7 +63,7 @@
               icon="details"
               displayed="name"
               v-model="repack"
-              :options="repackOpt"
+              :options="['Yes', 'No']"
           />
           <div></div>
           <div class="col s6"></div>
@@ -72,7 +72,7 @@
                 class="filled-in col s6"
                 type="checkbox"
                 id="repack-only"
-                :disabled="repack.name !== 'Yes'"
+                :disabled="repack !== 'Yes'"
                 name="repack-only"
                 v-model="repack_only"/>
             <span>Repack Only</span>
@@ -140,6 +140,14 @@
             </div>
         </div>
       </form>
+      <BuildProgress
+        v-else
+        :stages="['build', 'repack', 'deploy', 'verify']"
+        :broadcast="build.broadcast"
+        :status="build.status"
+        :summary="build.summary"
+        :error="build.error"
+      />
     </template>
     <template v-slot:footer>
       <button
@@ -152,35 +160,32 @@
     </template>
   </Modal>
 </template>
-<script>
-import { required, requiredIf } from 'vuelidate/lib/validators';
-import client from '@/plugins/ws';
-import _ from 'lodash';
 
+<script>
+
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import _ from 'lodash';
 import TextArea from '@/components/TextArea';
+import BuildProgress from '@/components/BuildProgress';
+import EventBus from '@/event-bus';
 
 export default {
   components: {
     TextArea,
+    BuildProgress,
   },
+
   props: {
     configuration: Object,
     action: String,
   },
+
   data() {
     return {
       mmpi: {},
       binaryType: '',
       configName: '',
       repack: '',
-      repackOpt: [
-        {
-          name: 'Yes',
-        },
-        {
-          name: 'No',
-        },
-      ],
       repack_only: false,
       comments: '',
       feHash: '',
@@ -198,12 +203,12 @@ export default {
         started: false,
         status: '',
         summary: '',
-        progress: null,
-        log: '',
         error: null,
+        broadcast: null,
       },
     };
   },
+
   watch: {
     ttsKey(key) {
       this.issueStatus = '';
@@ -214,6 +219,7 @@ export default {
       this.getIssue();
     },
   },
+
   computed: {
     feHashes() {
       return this.$store.state.pas.feHashes;
@@ -232,16 +238,15 @@ export default {
     },
     client() {
       if (this.configuration.app_type === 'extranet') {
-        const extranetClients = this.$store.state.extranet.clients;
-        return extranetClients
-          .find((client) => client.name === this.configuration.project);
+        return this.$store.state.extranet.clients
+          .find((client) => client.package === this.configuration.prefix);
       }
 
       if (this.configuration.app_type === 'debiteur') {
-        const debiteurClients = this.store.state.debiteur.clients;
-        return debiteurClients
-          .find((client) => client.name === this.configuration.project);
+        return this.store.state.debiteur.clients
+          .find((client) => client.package === this.configuration.prefix);
       }
+
       return null;
     },
     deployInstance() {
@@ -249,6 +254,7 @@ export default {
         return this.deploy_instances
           .find((instance) => instance.name === this.configuration.deploy_dev_instance);
       }
+
       return null;
     },
     instance() {
@@ -305,14 +311,9 @@ export default {
         deploy_instance: this.deployInstance,
         client: this.client,
         mmpi: {
-          binaryType: {
-            type: this.binaryTypes,
-            value: this.binaryType.value,
-          },
+          binaryType: this.binaryType,
           comments: this.comments,
-          repack: {
-            name: this.repack.name,
-          },
+          repack: this.repack,
           repack_only: this.repack_only,
           ttsKey: this.ttsKey,
         },
@@ -324,33 +325,9 @@ export default {
       })
         .then((response) => {
           this.build.status = 'running';
-
-          if (!client.connected) {
-            return;
-          }
-
-          const subscribe = client.subscribe(
-            `/queue/${response.data.broadcast.queue}`,
-            (message) => {
-              const data = JSON.parse(message.body);
-
-              if (data.summary) {
-                this.build.summary = data.summary;
-              }
-              this.build.progress = data.progress || null;
-
-              if (data.log) {
-                this.build.log += data.log;
-                this.scrollLogContainer();
-              }
-
-              if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
-                this.build.status = data.status;
-                subscribe.unsubscribe();
-              }
-            },
-            response.data.broadcast,
-          );
+          this.build.summary = 'Build will start shortly ...';
+          this.build.broadcast = response.data.broadcast;
+          EventBus.$emit('build.created');
         })
         .catch((error) => {
           this.build.status = 'failed';
@@ -360,7 +337,8 @@ export default {
           } else {
             this.build.error = error;
           }
-        });
+        })
+        .finally(() => { this.build.started = true; });
     },
   },
   created() {
