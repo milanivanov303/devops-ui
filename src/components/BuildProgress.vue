@@ -1,38 +1,36 @@
 <template>
   <div>
-
+    <Alert v-if="currentError" :msg="currentError"/>
     <div class="row stages">
-      <div class="col s4" v-for="stage in stages" :key="stage">
+      <div class="col s4 stage" v-for="stage in stages" :key="stage" :class="getStageResult(stage)">
         <div v-if="currentStages.hasOwnProperty(stage)">
-          <Preloader  v-if="currentStages[stage] === 'running'"/>
-          <i v-else-if="currentStages[stage] === 'success'" class="material-icons green-text">
-            check_circle_outline
+          <Preloader v-if="currentStages[stage] === 'running'"/>
+          <i v-else-if="currentStages[stage] === 'success'" class="material-icons">
+            check_circle
           </i>
-          <i v-else-if="currentStages[stage] === 'failed'" class="material-icons red-text">
-            error_outline
+          <i v-else-if="currentStages[stage] === 'failed'" class="material-icons">
+            cancel
           </i>
         </div>
         <div v-else>
           <i class="material-icons">radio_button_unchecked</i>
         </div>
-        <span>{{ stage }}</span>
+        <h6>{{ stage }}</h6>
       </div>
     </div>
 
-    <div v-if="currentStatus === 'success'" class="center" >
-      <i class="material-icons large green-text">check_circle_outline</i>
-      <p>Build completed successfully</p>
-    </div>
+<!--    <div v-if="currentStatus === 'success'" class="center" >-->
+<!--      <i class="material-icons large success">check_circle_outline</i>-->
+<!--      <p>Build completed successfully</p>-->
+<!--    </div>-->
+<!--    <div v-else-if="currentStatus === 'failed'" class="center">-->
+<!--      <i class="material-icons large fail">error_outline</i>-->
+<!--      <p>{{ currentError || currentSummary }}</p>-->
+<!--    </div>-->
 
-    <div v-else-if="currentStatus === 'failed'" class="center">
-      <i class="material-icons large red-text">error_outline</i>
-      <p>{{ currentError || currentSummary }}</p>
-    </div>
-
-    <div v-else class="row">
+    <div class="row">
       <div class="col s12">
-        <p>{{ currentSummary }}</p>
-        <Progress v-if="currentStatus === 'running'" :progress="progress"></Progress>
+        <h6>{{ currentSummary }} <i class="material-icons">flight_takeoff</i> </h6>
       </div>
     </div>
 
@@ -90,6 +88,17 @@ export default {
 
       this.currentStages[action] = data.status;
     },
+    getStageResult(stage) {
+      if (Object.prototype.hasOwnProperty.call(this.currentStages, stage)) {
+        if (this.currentStages[stage] === 'success') {
+          return 'success';
+        }
+        if (this.currentStages[stage] === 'failed') {
+          return 'fail';
+        }
+      }
+      return '';
+    },
 
     subscribe() {
       if (!this.$ws.isConnected()) {
@@ -142,17 +151,92 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+:after, :before {
+  right:100%;
+}
+
 .stages {
   text-align: center;
-  i {
-    font-size: 10em;
+  white-space:nowrap;
+  .stage {
+    display: inline-block;
+    position: relative;
+    filter: drop-shadow(6px 3px 4px #00000054);
+    i {
+      position: relative;
+      display: inline-block;
+      font-size: 6em;
+      color: #22283136;
+    }
+    &:before {
+      content: '';
+      width: 70%;
+      position:absolute;
+      top:30%;
+      right: 65%;
+      z-index: -10;
+      border-bottom: 5px solid;
+      color: #0000;
+    }
+    &:first-of-type:before {
+      display:none;
+    }
+    &.success {
+      &:before {
+        color: #29A19C;
+      }
+      i {
+        color: #29A19C;
+      };
+    }
+    &.fail {
+      &:before {
+        color: #C40147;
+      }
+      i {
+        color: #C40147;
+      };
+    }
+  //.stage {
+  //  i {
+  //    position: relative;
+  //    display: inline-block;
+  //    font-size: 6em;
+  //    color: #22283136;
+  //    &.success {
+  //      color: #29A19C;
+  //      &:before {
+  //        color: #29A19C;
+  //      }
+  //    }
+  //    &.fail {
+  //      color: #C40147;
+  //      &:before {
+  //        color: #C40147;
+  //      }
+  //    }
+  //    &:before {
+  //      color: #0000;
+  //      content: ' ';
+  //      width: 300%;
+  //      border-bottom: 7px solid;
+  //      position: absolute;
+  //      top: 50%;
+  //      right: 94%;
+  //    }
+  //  }
+  //}
   }
-
-  span {
+  h6 {
     text-transform: capitalize;
   }
 }
-
+.preloader-wrapper.active {
+  margin-bottom: 8.5px;
+  margin-top: 8.55px;
+  width: 60px;
+  height: 60px;
+}
 .log {
   height: 60vh;
   overflow: auto;
