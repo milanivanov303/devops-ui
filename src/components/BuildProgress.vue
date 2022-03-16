@@ -2,7 +2,8 @@
   <div>
     <Alert v-if="currentError" :msg="currentError"/>
     <div class="row stages">
-      <div class="col s4 stage" v-for="stage in stages" :key="stage" :class="getStageResult(stage)">
+      <div class="col stage" v-for="stage in stages" :key="stage"
+          :class="['s'.concat( 12 / stages.length ), getStageResult(stage)]">
         <div v-if="currentStages.hasOwnProperty(stage)">
           <Preloader v-if="currentStages[stage] === 'running'"/>
           <i v-else-if="currentStages[stage] === 'success'" class="material-icons">
@@ -154,7 +155,6 @@ export default {
 :after, :before {
   right:100%;
 }
-
 .stages {
   text-align: center;
   white-space:nowrap;
@@ -197,35 +197,6 @@ export default {
         color: #C40147;
       };
     }
-  //.stage {
-  //  i {
-  //    position: relative;
-  //    display: inline-block;
-  //    font-size: 6em;
-  //    color: #22283136;
-  //    &.success {
-  //      color: #29A19C;
-  //      &:before {
-  //        color: #29A19C;
-  //      }
-  //    }
-  //    &.fail {
-  //      color: #C40147;
-  //      &:before {
-  //        color: #C40147;
-  //      }
-  //    }
-  //    &:before {
-  //      color: #0000;
-  //      content: ' ';
-  //      width: 300%;
-  //      border-bottom: 7px solid;
-  //      position: absolute;
-  //      top: 50%;
-  //      right: 94%;
-  //    }
-  //  }
-  //}
   }
   h6 {
     text-transform: capitalize;

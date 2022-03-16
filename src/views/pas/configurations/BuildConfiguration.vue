@@ -142,7 +142,7 @@
       </form>
       <BuildProgress
         v-else
-        :stages="['build', 'repack', 'deploy', 'verify']"
+        :stages="getBuildStages()"
         :broadcast="build.broadcast"
         :status="build.status"
         :summary="build.summary"
@@ -185,7 +185,7 @@ export default {
       mmpi: {},
       binaryType: '',
       configName: '',
-      repack: '',
+      repack: 'Yes',
       repack_only: false,
       comments: '',
       feHash: '',
@@ -293,6 +293,18 @@ export default {
             this.issueStatus = 'ERROR';
           }
         });
+    },
+
+    getBuildStages() {
+      if (this.repack === 'Yes' && this.repack_only) {
+        return ['build', 'repack'];
+      }
+
+      if (this.repack === 'No') {
+        return ['build', 'deploy', 'verify'];
+      }
+
+      return ['build', 'repack', 'deploy', 'verify'];
     },
 
     buildConfiguration() {
