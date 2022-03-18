@@ -1,56 +1,72 @@
 <template>
   <div class="row esxi-details">
-    <ul v-if="esxiHost" class="collection with-header ul-collection">
-      <div class="col s12 l6">
-        <li class="collection-header">
-          <span class="collection-section">MAIN DETAILS</span>
-        </li>
-        <li v-if="esxiHost.board_info" class="collection-item">
-          <b>Motherboard: </b>{{ esxiHost.board_info.product }},
-          {{ esxiHost.board_info.version }},
-          {{ esxiHost.board_info.manufacturer }}
-        </li>
-        <li v-if="esxiHost.version" class="collection-item">
-          <b>Hypervisor: </b>{{ esxiHost.version.product }},
-                             {{ esxiHost.version.version }}
-        </li>
-        <li v-if="esxiHost.platform" class="collection-item">
-          <b>Model: </b>{{esxiHost.platform.product_name}}
+    <ul v-if="esxiHost" class="col s12 collection with-header ul-collection">
+      <div class="row">
+        <div class="col s12 l6">
+          <li class="collection-header">
+            <span class="collection-section">MAIN DETAILS</span>
+          </li>
+          <li v-if="esxiHost.board_info" class="collection-item">
+            <b>Motherboard: </b>{{ esxiHost.board_info.product }},
+            {{ esxiHost.board_info.version }},
+            {{ esxiHost.board_info.manufacturer }}
+          </li>
+          <li v-if="esxiHost.version" class="collection-item">
+            <b>Hypervisor: </b>{{ esxiHost.version.product }},
+            {{ esxiHost.version.version }}
+          </li>
+          <li v-if="esxiHost.platform" class="collection-item">
+            <b>Model: </b>{{esxiHost.platform.product_name}}
             {{ esxiHost.platform.vendor_name }}
-        </li>
-        <li v-if="esxiHost.platform" class="collection-item">
-          <b>Serial Num: </b>{{ esxiHost.platform.serial_number }}
-        </li>
-        <li v-if="esxiHost.created_on" class="collection-item">
-          <b>Created on: </b>{{ $date(esxiHost.created_on).toHuman() }}
-        </li>
-      </div>
-      <div class="col s12 l6">
-        <li v-if="esxiHost.cpu" class="collection-header">
-          <span class="collection-section">CPU DETAILS</span>
-        </li>
-        <li v-if="esxiHost.cpu_details" class="collection-item">
-          <b>Brand: </b>{{ getCpuBrand(esxiHost.cpu_details) }}
-        </li>
-        <li v-if="esxiHost.cpu_details" class="collection-item">
-          <b>Processor Type: </b>{{ esxiHost.cpu.cpu_model }}
-        </li>
+          </li>
+          <li v-if="esxiHost.platform" class="collection-item">
+            <b>Serial Num: </b>{{ esxiHost.platform.serial_number }}
+          </li>
+          <li v-if="esxiHost.created_on" class="collection-item">
+            <b>Created on: </b>{{ $date(esxiHost.created_on).toHuman() }}
+          </li>
+          <li v-if="esxiHost.installation_date" class="collection-item">
+            <b>Installed on: </b>{{ esxiHost.installation_date }}
+          </li>
+        </div>
+        <div class="col s12 l6">
+          <li v-if="esxiHost.cpu" class="collection-header">
+            <span class="collection-section">CPU DETAILS</span>
+          </li>
+          <li v-if="esxiHost.cpu_details" class="collection-item">
+            <b>Brand: </b>{{ getCpuBrand(esxiHost.cpu_details) }}
+          </li>
+          <li v-if="esxiHost.cpu_details" class="collection-item">
+            <b>Processor Type: </b>{{ esxiHost.cpu.cpu_model }}
+          </li>
 
-        <li v-if="esxiHost.cpu" class="collection-item">
-          <b>Packages: </b>{{ esxiHost.cpu.num_cpu_pkgs }}
-        </li>
-        <li v-if="esxiHost.cpu" class="collection-item">
-          <b>Cores: </b>{{ esxiHost.cpu.num_cpu_cores }}
-          <span v-if="esxiHost.cpu_details">
+          <li v-if="esxiHost.cpu" class="collection-item">
+            <b>Packages: </b>{{ esxiHost.cpu.num_cpu_pkgs }}
+          </li>
+          <li v-if="esxiHost.cpu" class="collection-item">
+            <b>Cores: </b>{{ esxiHost.cpu.num_cpu_cores }}
+            <span v-if="esxiHost.cpu_details">
             x {{ getCpuCoreSpeed(esxiHost.cpu_details) }}
           </span>
-        </li>
-        <li v-if="esxiHost.cpu" class="collection-item">
-          <b>Threads: </b>{{ esxiHost.cpu.num_cpu_threads }}
-        </li>
+          </li>
+          <li v-if="esxiHost.cpu" class="collection-item">
+            <b>Threads: </b>{{ esxiHost.cpu.num_cpu_threads }}
+          </li>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12 l6" v-if="esxiHost.account_list" >
+          <li class="collection-header">
+            <span class="collection-section">ACCOUNT LIST</span>
+          </li>
+          <li class="collection-item"
+              v-for="[key, value] in Object.entries(esxiHost.account_list)" :key="key.id">
+            <b>{{ key }} </b>- {{ value }}
+          </li>
+        </div>
       </div>
     </ul>
-    <span v-else>Sorry! There is no data. Please update and try again.</span>
+    <span v-else class="col s12">Sorry! There is no data. Please update and try again.</span>
   </div>
 </template>
 
