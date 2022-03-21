@@ -18,9 +18,9 @@
             >
               <template v-slot:top-actions-before>
                 <div class="table-btns right">
-                  <a @click="updateVmsInfo()"
+                  <a @click="updateInfo()"
                      class="btn-floating waves-effect waves-light right"
-                     data-tooltip="Update"
+                     data-tooltip="Refresh details for all hosts"
                   >
                     <i class="material-icons">refresh</i>
                   </a>
@@ -139,17 +139,17 @@ export default {
         path: '/inventory/virtualMachines',
       });
     },
-    updateVmsInfo() {
+    updateInfo() {
       const loader = this.$loading.show({ container: this.$refs.virtualMachines });
 
-      this.$store.dispatch('esxi/updateHostInfo')
+      this.$store.dispatch('esxi/updateInfo')
         .then((response) => {
           if (response.data.error) {
             this.$M.toast({ html: response.data.error });
             return;
           }
           this.$M.toast({
-            html: 'Updating virtual machines in background. Please check in a few minutes.',
+            html: 'Updating all hosts and virtual machines in background. Please check in a few minutes.',
             classes: 'toast-seccess',
           });
         })

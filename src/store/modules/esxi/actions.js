@@ -1,9 +1,20 @@
 // https://vuex.vuejs.org/en/actions.html
 
 export default {
-  updateHostInfo({ commit }, payload) {
-    const promise = api('devops').post('inventory/start-update', payload);
-
+  updateSingleHost({ commit }, payload) {
+    const promise = api('devops').post('inventory/start-single-update', payload);
+    promise
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+  updateInfo({ commit }, payload) {
+    const promise = api('devops').post('inventory/start-info-update', payload);
+    promise
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+  updateComponents({ commit }, payload) {
+    const promise = api('devops').post('inventory/start-components-update', payload);
     promise
       .catch((error) => commit('error', error));
     return promise;

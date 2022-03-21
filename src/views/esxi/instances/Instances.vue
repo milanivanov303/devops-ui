@@ -13,6 +13,16 @@
         :edit-btn="false"
         :delete-btn="false"
       >
+        <template v-slot:top-actions-before>
+          <div class="table-btns right">
+            <a @click="updateComponents()"
+               class="btn-floating waves-effect waves-light right"
+               data-tooltip="Refresh components"
+            >
+              <i class="material-icons">refresh</i>
+            </a>
+          </div>
+        </template>
         <Column label="Instance" name="name"
                 :show="(instance) => hideActions ? instance.name : getInstanceLink(instance.name)"
         />
@@ -173,6 +183,24 @@ export default {
     openDetailsModal(instance) {
       this.showDetailsModal = true;
       this.selected = instance;
+    },
+    updateComponents() {
+      const loader = this.$loading.show({ container: this.$refs.virtualMachines });
+
+      this.$store.dispatch('esxi/updateComponents')
+        .then((response) => {
+          if (response.data.error) {
+            this.$M.toast({ html: response.data.error });
+            return;
+          }
+          this.$M.toast({
+            html: 'Updating all components in background. Please check in a few minutes.',
+            classes: 'toast-seccess',
+          });
+        })
+        .catch((error) => {
+          this.$M.toast({ html: error });
+        }).finally(() => loader.hide());
     },
   },
 
