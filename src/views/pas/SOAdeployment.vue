@@ -296,7 +296,7 @@ export default {
               this.importIssue();
             }
             loader.hide();
-          })
+          });
       }
     },
     importIssue() {
