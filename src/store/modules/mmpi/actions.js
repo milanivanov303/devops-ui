@@ -363,4 +363,18 @@ export default {
 
     return promise;
   },
+  // get issue for SOA Modification tab in order to import it
+  getOneIssue({ commit }, ttsId) {
+    const promise = api('mmpi').get(`issues/${ttsId}`);
+    promise
+        .then((resp) => {
+          const [issue] = resp.data.data;
+          if (issue) {
+            commit('issue', issue);
+          }
+        })
+        .catch(() => commit('error', 'Could not import issue', { root: true }));
+
+    return promise;
+  },
 };
