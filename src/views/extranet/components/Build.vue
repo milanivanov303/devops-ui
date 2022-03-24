@@ -280,7 +280,7 @@ export default {
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-        fe_branch: this.form.feBranch,
+        fe_branch: this.form.feBranch.name,
         image: this.form.image,
       })
         .then((response) => {

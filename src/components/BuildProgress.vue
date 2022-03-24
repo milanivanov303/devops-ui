@@ -176,7 +176,7 @@ export default {
       right: 65%;
       z-index: -10;
       border-bottom: 5px solid;
-      color: #0000;
+      color: #bbbbbb;
     }
     &:first-of-type:before {
       display:none;

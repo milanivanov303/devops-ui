@@ -53,16 +53,8 @@ export default {
 
     return promise;
   },
-  getHashes({ commit }) {
-    const name = 'extranet-hashes';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
-    const promise = api('devops').get('extranet/hashes');
-
-    commit('promise', { name, promise }, { root: true });
+  getHashes({ commit }, branch) {
+    const promise = api('devops').get('extranet/hashes', { branch });
 
     promise
       .then((response) => commit('hashes', response.data))
@@ -70,16 +62,8 @@ export default {
     return promise;
   },
 
-  getFeHashes({ commit }) {
-    const name = 'extranet-fe-hashes';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
-    const promise = api('devops').get('extranet/fe-hashes');
-
-    commit('promise', { name, promise }, { root: true });
+  getFeHashes({ commit }, branch) {
+    const promise = api('devops').get('extranet/fe-hashes', { branch });
 
     promise
       .then((response) => commit('feHashes', response.data))
