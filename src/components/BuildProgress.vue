@@ -1,19 +1,37 @@
 <template>
   <div>
-    <div v-if="currentStatus === 'success'" class="center" >
-      <i class="material-icons large green-text">check_circle_outline</i>
-      <p>Build completed successfully</p>
+    <Alert v-if="currentError" :msg="currentError"/>
+    <div class="row stages">
+      <div class="col stage" v-for="stage in stages" :key="stage"
+          :class="['s'.concat( 12 / stages.length ), getStageResult(stage)]">
+        <div v-if="currentStages.hasOwnProperty(stage)">
+          <Preloader v-if="currentStages[stage] === 'running'"/>
+          <i v-else-if="currentStages[stage] === 'success'" class="material-icons">
+            check_circle
+          </i>
+          <i v-else-if="currentStages[stage] === 'failed'" class="material-icons">
+            cancel
+          </i>
+        </div>
+        <div v-else>
+          <i class="material-icons">radio_button_unchecked</i>
+        </div>
+        <h6>{{ stage }}</h6>
+      </div>
     </div>
 
-    <div v-else-if="currentStatus === 'failed'" class="center">
-      <i class="material-icons large red-text">error_outline</i>
-      <p>{{ currentError || currentSummary }}</p>
-    </div>
+<!--    <div v-if="currentStatus === 'success'" class="center" >-->
+<!--      <i class="material-icons large success">check_circle_outline</i>-->
+<!--      <p>Build completed successfully</p>-->
+<!--    </div>-->
+<!--    <div v-else-if="currentStatus === 'failed'" class="center">-->
+<!--      <i class="material-icons large fail">error_outline</i>-->
+<!--      <p>{{ currentError || currentSummary }}</p>-->
+<!--    </div>-->
 
-    <div v-else class="row">
+    <div class="row">
       <div class="col s12">
-        <p>{{ currentSummary }}</p>
-        <Progress v-if="currentStatus === 'running'" :progress="progress"></Progress>
+        <h6>{{ currentSummary }} <i class="material-icons">flight_takeoff</i> </h6>
       </div>
     </div>
 
@@ -30,6 +48,7 @@ import EventBus from '@/event-bus';
 
 export default {
   props: {
+    stages: { default: () => ['build', 'deploy', 'verify'], Array },
     broadcast: null,
     status: { default: 'running', String },
     summary: { default: 'Build is running ...', String },
@@ -38,6 +57,7 @@ export default {
   },
   data() {
     return {
+      currentStages: {},
       currentStatus: this.status,
       currentSummary: this.summary,
       currentError: this.error,
@@ -53,6 +73,32 @@ export default {
         const container = this.$refs.log;
         container.scrollTop = container.scrollHeight;
       }, 100);
+    },
+
+    setStagesData(data) {
+      if (data.action === undefined) {
+        return;
+      }
+
+      const action = data.action.split('.')[0];
+      const index = this.stages.indexOf(action);
+
+      this.stages.slice(0, index).forEach((stage) => {
+        this.currentStages[stage] = 'success';
+      });
+
+      this.currentStages[action] = data.status;
+    },
+    getStageResult(stage) {
+      if (Object.prototype.hasOwnProperty.call(this.currentStages, stage)) {
+        if (this.currentStages[stage] === 'success') {
+          return 'success';
+        }
+        if (this.currentStages[stage] === 'failed') {
+          return 'fail';
+        }
+      }
+      return '';
     },
 
     subscribe() {
@@ -73,7 +119,9 @@ export default {
             this.scrollLogContainer();
           }
 
-          if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
+          this.setStagesData(data);
+
+          if (data.status === 'failed' || (data.action === [...this.stages].pop() && data.status !== 'running')) {
             this.currentStatus = data.status;
             this.queue.unsubscribe();
 
@@ -104,6 +152,62 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+:after, :before {
+  right:100%;
+}
+.stages {
+  text-align: center;
+  white-space:nowrap;
+  .stage {
+    display: inline-block;
+    position: relative;
+    filter: drop-shadow(6px 3px 4px #00000054);
+    i {
+      position: relative;
+      display: inline-block;
+      font-size: 6em;
+      color: #22283136;
+    }
+    &:before {
+      content: '';
+      width: 70%;
+      position:absolute;
+      top:30%;
+      right: 65%;
+      z-index: -10;
+      border-bottom: 5px solid;
+      color: #bbbbbb;
+    }
+    &:first-of-type:before {
+      display:none;
+    }
+    &.success {
+      &:before {
+        color: #29A19C;
+      }
+      i {
+        color: #29A19C;
+      };
+    }
+    &.fail {
+      &:before {
+        color: #C40147;
+      }
+      i {
+        color: #C40147;
+      };
+    }
+  }
+  h6 {
+    text-transform: capitalize;
+  }
+}
+.preloader-wrapper.active {
+  margin-bottom: 8.5px;
+  margin-top: 8.55px;
+  width: 60px;
+  height: 60px;
+}
 .log {
   height: 60vh;
   overflow: auto;

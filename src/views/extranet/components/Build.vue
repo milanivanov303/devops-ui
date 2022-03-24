@@ -118,7 +118,7 @@
             :status="build.status"
             :summary="build.summary"
             :error="build.error"
-          ></BuildProgress>
+          />
         </template>
         <template v-slot:footer>
           <button v-if="!build.started" class="waves-effect btn" @click="start()">
@@ -280,7 +280,7 @@ export default {
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-        fe_branch: this.form.feBranch,
+        fe_branch: this.form.feBranch.name,
         image: this.form.image,
       })
         .then((response) => {

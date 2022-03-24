@@ -300,12 +300,12 @@ export default {
       }
     },
     importIssue() {
-      this.$store.dispatch('mmpi/getOneIssue', this.$route.params.issue)
-      .catch((error) => {
-        if (error.response.status === 404) {
-          this.issueStatus = 'ERROR';
-        }
-      })
+      this.$store.dispatch('mmpi/getIssue', this.$route.params.issue)
+        .catch((error) => {
+          if (error.response.status === 404) {
+            this.issueStatus = 'ERROR';
+          }
+        });
     },
     async getInstances(deliveryChain) {
       this.instances = [];
