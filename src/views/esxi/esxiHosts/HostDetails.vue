@@ -142,7 +142,7 @@ export default {
     updateEsxiInfo() {
       const loader = this.$loading.show({ container: this.$refs['host-details'] });
 
-      this.$store.dispatch('esxi/updateHostInfo', this.esxiHost)
+      this.$store.dispatch('esxi/updateSingleHost', this.esxiHost)
         .then((response) => {
           if (response.data.error) {
             this.$M.toast({ html: response.data.error });

@@ -29,7 +29,7 @@
               <p>Not a valid TTS key.</p>
             </div>
             <div class="red-text" v-if="issueStatus === 'ERROR'">
-              <p>TTS Key does not exist in MMPI!</p>
+              <p>TTS Key does not exist in MMPI and TTS!</p>
             </div>
           </div>
         </div>
@@ -293,11 +293,19 @@ export default {
             }
             if (!this.$store.state.cms.issue
                   || (this.ttsKey !== this.$store.state.cms.issue.tts_id)) {
-              this.issueStatus = 'ERROR';
+              this.importIssue();
             }
             loader.hide();
           });
       }
+    },
+    importIssue() {
+      this.$store.dispatch('mmpi/getIssue', this.$route.params.issue)
+        .catch((error) => {
+          if (error.response.status === 404) {
+            this.issueStatus = 'ERROR';
+          }
+        });
     },
     async getInstances(deliveryChain) {
       this.instances = [];
