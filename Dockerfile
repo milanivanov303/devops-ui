@@ -4,7 +4,6 @@ FROM gitlab.codixfr.private:5005/enterpriseapps/images/nodejs:1.0 AS base
 FROM base AS builder
 
 COPY --chown=node:node .npmrc ./package*.json ./
-COPY --chown=node:node .env.dev ./.env
 
 RUN npm set progress=false \
   && npm config set depth 0 \
