@@ -9,6 +9,7 @@ import App from './App';
 import router from './router';
 import store from './store';
 
+import LoadingLayout from './components/layouts/Loading';
 import DefaultLayout from './components/layouts/Default';
 import LoginLayout from './components/layouts/Login';
 import BasicLayout from './components/layouts/Basic';
@@ -36,6 +37,7 @@ Vue.prototype.$esxi = esxi;
 const ws = new WebSocket(config.ws.url, config.ws.username, config.ws.password, config.ws.vhost);
 Vue.prototype.$ws = ws;
 
+Vue.component('loading-layout', LoadingLayout);
 Vue.component('default-layout', DefaultLayout);
 Vue.component('basic-layout', BasicLayout);
 Vue.component('login-layout', LoginLayout);
