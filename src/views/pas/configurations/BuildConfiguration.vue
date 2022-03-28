@@ -82,10 +82,8 @@
                 <p v-if="!$v.hash.required"> BE hash field must not be empty.</p>
               </div>
             </div>
-            <div class="row" v-if="hash">
-              <div class="col s12">
-                <pre>{{ hash.description }}</pre>
-              </div>
+            <div v-if="hash" class="col s12">
+              <pre>{{ hash.description }}</pre>
             </div>
           </div>
           <div class="row" v-if="feHashes.length">
@@ -104,10 +102,8 @@
                 <p v-if="!$v.feHash.required">FE hash field must not be empty.</p>
               </div>
             </div>
-            <div class="row" v-if="feHash">
-              <div class="col s12">
-                <pre>{{ feHash.description }}</pre>
-              </div>
+            <div v-if="feHash" class="col s12">
+              <pre>{{ feHash.description }}</pre>
             </div>
           </div>
         </div>

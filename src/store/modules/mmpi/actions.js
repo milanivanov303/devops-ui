@@ -12,25 +12,16 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            environment_type: {
-              allOf: [{ type: 'IMX' }],
-            },
+            'environment_type.type': 'IMX',
           },
           {
-            instance_type_id: {
-              value: ['DEV', 'VAL', 'PATCH'],
-              operator: 'in',
-            },
+            instance_type_id: { operator: 'in', value: ['DEV', 'VAL', 'PATCH'] },
           },
           {
-            owner: {
-              allOf: [{ key: 'codix' }],
-            },
+            'owner.key': 'codix',
           },
           {
-            status: {
-              allOf: [{ key: 'active' }],
-            },
+            'status.key': 'active',
           },
         ],
       }),
@@ -62,19 +53,13 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            environment_type: {
-              allOf: [{ type: 'extranet' }],
-            },
+            'environment_type.type': { operator: 'in', value: ['extranet', 'XNET_CFG'] },
           },
           {
-            owner: {
-              allOf: [{ key: 'codix' }],
-            },
+            'owner.key': 'codix',
           },
           {
-            status: {
-              allOf: [{ key: 'active' }],
-            },
+            'status.key': 'active',
           },
         ],
       }),
@@ -338,10 +323,7 @@ export default {
           {
             type: 'binary_types',
             active: 1,
-            key: {
-              operator: 'like',
-              value: '%_file',
-            },
+            key: { operator: 'like', value: '%_file' },
           },
         ],
       }),
