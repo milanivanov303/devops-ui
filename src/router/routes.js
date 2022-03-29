@@ -132,7 +132,7 @@ export default [
   },
   {
     path: '/pas/soa-modification/:issue?',
-    name: 'extranet',
+    name: 'soa-modification',
     meta: {
       requiresAuth: true,
       transitionName: 'slide',
