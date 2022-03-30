@@ -16,19 +16,19 @@
         @delete="openDeleteModal"
       >
         <Column show="project" :sortable="false" filter-type="search"/>
-        <Column show="project_type" :sortable="false" filter-type="dropdown"/>
-        <Column show="delivery_chain"/>
+        <Column show="app_type" :sortable="false" filter-type="dropdown"/>
+        <Column show="branch" :sortable="false" filter-type="search"/>
         <Column show="dev_instance"/>
         <Column show="val_instance"/>
+        <Column show="delivery_chain"/>
+        <Column show="prefix"/>
         <Column show="deploy_dev_instance"/>
         <Column show="deploy_val_instance"/>
-        <Column show="app_type" :sortable="false" filter-type="dropdown"/>
-        <Column show="app_version" :sortable="false" filter-type="dropdown"/>
-        <Column show="branch" :sortable="false" filter-type="search"/>
-        <Column show="prefix"/>
         <Column show="servlet_container"/>
         <Column show="jdk"/>
         <Column show="jre"/>
+        <Column show="app_version" :sortable="false" filter-type="dropdown"/>
+        <Column show="project_type" :sortable="false" filter-type="dropdown"/>
         <Column
           label="Additional info"
           :show="(row) => getAdditionalInfoLink(row.additional_info)"

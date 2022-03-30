@@ -16,7 +16,12 @@ export default {
 
   computed: {
     layout() {
-      return `${this.$route.meta.layout || 'default'}-layout`;
+      let layout = 'loading';
+      if (this.$route.name !== null) {
+        layout = this.$route.meta.layout || 'default';
+      }
+
+      return `${layout}-layout`;
     },
   },
 

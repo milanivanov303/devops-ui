@@ -137,7 +137,7 @@ export default {
       this.action = action;
 
       this.$router.push({
-        path: `/inventory/imxComponents/${encodeURIComponent(component.id || 'new') }`,
+        path: `/inventory/imxComponents/${encodeURIComponent(component.id || 'new')}`,
       });
     },
     close() {

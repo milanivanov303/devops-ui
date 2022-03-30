@@ -1,12 +1,6 @@
 <template>
   <div ref="components">
-    <div v-if="components.error" class="validator">
-      <div class="red-text">
-        <br>
-        <p>{{ components.error }}</p>
-      </div>
-    </div>
-    <div v-else class="data-table">
+    <div class="data-table">
       <Table
         :data="components"
         sort-by="name"

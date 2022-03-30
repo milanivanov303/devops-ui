@@ -12,25 +12,16 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            environment_type: {
-              allOf: [{ type: 'IMX' }],
-            },
+            'environment_type.type': 'IMX',
           },
           {
-            instance_type_id: {
-              value: ['DEV', 'VAL', 'PATCH'],
-              operator: 'in',
-            },
+            instance_type_id: { operator: 'in', value: ['DEV', 'VAL', 'PATCH'] },
           },
           {
-            owner: {
-              allOf: [{ key: 'codix' }],
-            },
+            'owner.key': 'codix',
           },
           {
-            status: {
-              allOf: [{ key: 'active' }],
-            },
+            'status.key': 'active',
           },
         ],
       }),
@@ -62,19 +53,13 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            environment_type: {
-              allOf: [{ type: 'extranet' }],
-            },
+            'environment_type.type': { operator: 'in', value: ['extranet', 'XNET_CFG'] },
           },
           {
-            owner: {
-              allOf: [{ key: 'codix' }],
-            },
+            'owner.key': 'codix',
           },
           {
-            status: {
-              allOf: [{ key: 'active' }],
-            },
+            'status.key': 'active',
           },
         ],
       }),
@@ -153,9 +138,6 @@ export default {
     return promise;
   },
 
-  /**
-   * Get Dev Instances for CMS tab
-   */
   async getDevInstances({ commit }) {
     const name = 'devInstances';
 
@@ -214,7 +196,7 @@ export default {
 
     return promise;
   },
-  // Delivery Chanins for CMS Inventory page
+
   getDeliveryChainsCMS({ commit }) {
     const name = 'deliveryChainsCMS';
     const payload = {
@@ -273,7 +255,7 @@ export default {
 
     return promise;
   },
-  // Instance Status
+
   getInstanceStatus({ commit }) {
     const name = 'instanceStatus';
     const payload = {
@@ -291,6 +273,7 @@ export default {
 
     return promise;
   },
+
   getOperationTypes({ commit }) {
     const name = 'operationType';
     const payload = {
@@ -307,6 +290,7 @@ export default {
 
     return promise;
   },
+
   async ociByOperation({ commit }, payload) {
     const promise = api('mmpi').post('oci', payload);
     await promise
@@ -314,6 +298,7 @@ export default {
       .catch(() => commit('error', 'Could not get Oci data'));
     return promise;
   },
+
   exportSeModification({ commit }, payload) {
     try {
       const response = api('mmpi').post('modifications/se-transfers', payload);
@@ -323,6 +308,7 @@ export default {
       return error;
     }
   },
+
   getBinaryTypes({ commit }) {
     const name = 'binaryTypes';
 
@@ -331,27 +317,15 @@ export default {
     }
 
     const promise = api('mmpi').get('enum-values', {
-      fields: JSON.stringify({
-        type: [],
-        value: [],
-      }),
+      fields: JSON.stringify(['value', 'subtype']),
       filters: JSON.stringify({
         allOf: [
           {
-            type: {
-              allOf: [
-                'binary_types',
-              ],
-            },
-            value: {
-              allOf: [],
-            },
+            type: 'binary_types',
+            active: 1,
+            key: { operator: 'like', value: '%_file' },
           },
         ],
-      }),
-      with: JSON.stringify({
-        type: [],
-        value: [],
       }),
     });
 
@@ -360,6 +334,15 @@ export default {
     promise
       .then((response) => commit('binaryTypes', response.data.data))
       .catch(() => commit('error', 'Could not get binary types', { root: true }));
+
+    return promise;
+  },
+
+  getIssue({ commit }, ttsId) {
+    const promise = api('mmpi').get(`issues/${ttsId}`);
+
+    promise
+      .catch(() => commit('error', 'Could not get issue', { root: true }));
 
     return promise;
   },

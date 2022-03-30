@@ -5,10 +5,10 @@
         <div class="card-title truncate">
           <div class="row">
             <div class="col s12 m6 l9">
-              {{ esxiHost.hostname }}
+              <span>{{ esxiHost.name }}</span>
             </div>
             <div class="col s12 m6 l3 esxi-icons">
-              <a :href="`https://${esxiHost.hostname}.codixfr.private/`"
+              <a :href="`https://${esxiHost.name}.codixfr.private/`"
                  target="_blank"
                  data-tooltip="ESXi for administration"
                  class="right">
@@ -47,14 +47,11 @@
             </div>
           </div>
         </div>
-        <div class="row progress-bar">
+        <div v-if="esxiHost.memory" class="row progress-bar">
           <div class="col s12">
-            <div v-if="esxiHost.details && esxiHost.details.memory">
-              <b>Memory: </b>{{ esxiHost.details ?
-                $esxi(esxiHost.details.memory.physical_memory).bytesToSizeLabel() : '' }},
-              <b>Free: </b> {{ $esxi(getHostFreeMemory(esxiHost)).bytesToSizeLabel() }}
-            </div>
-            <div v-if="esxiHost.details" class="progress">
+            <b>Memory: </b>{{$esxi(esxiHost.memory.physical_memory).bytesToSizeLabel()}},
+            <b>Free: </b> {{ $esxi(getHostFreeMemory(esxiHost)).bytesToSizeLabel() }}
+            <div class="progress">
               <div class="determinate" :style="{width: getFreeMemoryInPerc(esxiHost) + '%'}"></div>
             </div>
           </div>
@@ -121,11 +118,7 @@ export default {
   },
   computed: {
     VMs() {
-      if (!this.esxiHost.vms_details) {
-        return null;
-      }
-
-      let VMs = this.esxiHost.vms_details;
+      let VMs = this.esxiHost.virtual_machines;
 
       if (this.vmsearch) {
         const regexp = new RegExp(this.vmsearch, 'i');
@@ -135,14 +128,6 @@ export default {
       }
 
       return VMs;
-    },
-
-    cpus() {
-      if (!this.esxiHost.details) {
-        return null;
-      }
-
-      return this.esxiHost.details.cpu_details;
     },
   },
 
@@ -157,14 +142,14 @@ export default {
     updateEsxiInfo() {
       const loader = this.$loading.show({ container: this.$refs['host-details'] });
 
-      this.$store.dispatch('esxi/updateHostInfo', this.esxiHost)
+      this.$store.dispatch('esxi/updateSingleHost', this.esxiHost)
         .then((response) => {
           if (response.data.error) {
             this.$M.toast({ html: response.data.error });
             return;
           }
           this.$M.toast({
-            html: `Updating ESXi host ${this.esxiHost.hostname} details in background.
+            html: `Updating ESXi host ${this.esxiHost.name} details in background.
              Please check in a few minutes.`,
             classes: 'toast-seccess',
           });
@@ -174,10 +159,10 @@ export default {
         }).finally(() => loader.hide());
     },
     getFreeMemoryInPerc() {
-      if (!this.esxiHost.details.memory) {
+      if (!this.esxiHost.memory) {
         return null;
       }
-      return (this.$store.getters['esxi/getVmsMemory'](this.esxiHost) * 100) / this.esxiHost.details.memory.physical_memory;
+      return (this.$store.getters['esxi/getVmsMemory'](this.esxiHost) * 100) / this.esxiHost.memory.physical_memory;
     },
     getHostFreeMemory(host) {
       return this.$store.getters['esxi/getHostFreeMemory'](host);

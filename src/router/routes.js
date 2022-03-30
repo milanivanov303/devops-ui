@@ -37,8 +37,8 @@ const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/Op
 export default [
   {
     path: '/login',
+    name: 'login',
     meta: {
-      name: 'login',
       layout: 'login',
       requiresAuth: false,
     },
@@ -53,10 +53,10 @@ export default [
   },
   {
     path: '/dashboard',
+    name: 'dashboard',
     meta: {
       requiresAuth: true,
       alias: '/dashboard',
-      name: 'dashboard',
       title: 'Dashboard',
       breadcrumb: 'Dashboard',
     },
@@ -65,10 +65,10 @@ export default [
 
   {
     path: '/builds',
+    name: 'builds',
     meta: {
       requiresAuth: true,
       alias: '/builds',
-      name: 'builds',
       title: 'Builds',
       breadcrumb: 'Builds',
     },
@@ -82,9 +82,9 @@ export default [
   },
   {
     path: '/extranet/dashboard',
+    name: 'extranet',
     meta: {
       requiresAuth: true,
-      name: 'extranet',
       transitionName: 'slide',
       title: 'Extranet Dashboard',
       breadcrumb: 'Dashboard',
@@ -96,9 +96,9 @@ export default [
   },
   {
     path: '/extranet/branches/:branch?',
+    name: 'extranet-branches',
     meta: {
       requiresAuth: true,
-      name: 'extranet-branches',
       transitionName: 'slide',
       title: (route) => {
         let title = 'Extranet Branches';
@@ -121,9 +121,9 @@ export default [
   },
   {
     path: '/pas/configurations/:id?/:build?',
+    name: 'configurations',
     meta: {
       requiresAuth: true,
-      name: 'configurations',
       transitionName: 'slide',
       title: 'Configurations',
       breadcrumb: 'Configurations',
@@ -132,9 +132,9 @@ export default [
   },
   {
     path: '/pas/soa-modification/:issue?',
+    name: 'soa-modification',
     meta: {
       requiresAuth: true,
-      name: 'extranet',
       transitionName: 'slide',
       title: 'SOA Modification',
       breadcrumb: 'SOA Modification',
@@ -152,9 +152,9 @@ export default [
   },
   {
     path: '/debiteur/dashboard',
+    name: 'debiteur',
     meta: {
       requiresAuth: true,
-      name: 'debiteur',
       transitionName: 'slide',
       title: 'Debiteur Dashboard',
       breadcrumb: 'Dashboard',
@@ -166,9 +166,9 @@ export default [
   },
   {
     path: '/debiteur/branches/:branch?',
+    name: 'debiteur-branches',
     meta: {
       requiresAuth: true,
-      name: 'debiteur-branches',
       transitionName: 'slide',
       title: 'Debiteur Branches',
       breadcrumb: 'Branches',
@@ -186,9 +186,9 @@ export default [
   },
   {
     path: '/imx_be/dashboard',
+    name: 'imx-be',
     meta: {
       requiresAuth: true,
-      name: 'imx-be',
       transitionName: 'slide',
       title: 'iMX BE Dashboard',
     },
@@ -199,9 +199,9 @@ export default [
   },
   {
     path: '/imx_be/branches',
+    name: 'imx-be-branches',
     meta: {
       requiresAuth: true,
-      name: 'imx-be-branches',
       transitionName: 'slide',
       title: (route) => {
         let title = 'iMX BE Branches';
@@ -230,9 +230,9 @@ export default [
   },
   {
     path: '/imx_fe/dashboard',
+    name: 'imx-fe',
     meta: {
       requiresAuth: true,
-      name: 'imx-fe',
       transitionName: 'slide',
       title: 'iMX FE Dashboard',
     },
@@ -243,9 +243,9 @@ export default [
   },
   {
     path: '/imx_fe/branches',
+    name: 'imx-fe-branches',
     meta: {
       requiresAuth: true,
-      name: 'imx-fe-branches',
       transitionName: 'slide',
       title: 'iMX-FE Branches',
     },
@@ -258,9 +258,9 @@ export default [
   // Demos Tab
   {
     path: '/demos',
+    name: 'demos',
     meta: {
       requiresAuth: true,
-      name: 'demos',
       transitionName: 'slide',
       title: 'Demos Dashboard',
       breadcrumb: 'Demos',
@@ -282,9 +282,9 @@ export default [
   },
   {
     path: '/demos/list/:id?',
+    name: 'demo',
     meta: {
       requiresAuth: true,
-      name: 'demo',
       transitionName: 'slide',
       title: 'Demo',
       breadcrumb: 'Demo',
@@ -299,9 +299,9 @@ export default [
   },
   {
     path: '/cms/config-defaults',
+    name: 'configDefaults',
     meta: {
       alias: '/configDefaults',
-      name: 'configDefaults',
       requiresAuth: true,
       breadcrumb: 'Config Defaults',
     },
@@ -309,9 +309,9 @@ export default [
   },
   {
     path: '/cms/response-file',
+    name: 'responseFile',
     meta: {
       alias: '/responseFile',
-      name: 'responseFile',
       requiresAuth: true,
       breadcrumb: 'Response File',
     },
@@ -319,9 +319,9 @@ export default [
   },
   {
     path: '/cms/templates',
+    name: 'templates',
     meta: {
       alias: '/templates',
-      name: 'templates',
       requiresAuth: true,
       breadcrumb: 'Templates',
     },
@@ -329,9 +329,9 @@ export default [
   },
   {
     path: '/cms/inventory',
+    name: 'inventory',
     meta: {
       alias: '/inventory',
-      name: 'inventory',
       requiresAuth: true,
       breadcrumb: 'Inventory',
     },
@@ -339,9 +339,9 @@ export default [
   },
   {
     path: '/cms/modification/:issue?',
+    name: 'modification',
     meta: {
       alias: '/modification',
-      name: 'modification',
       requiresAuth: true,
       breadcrumb: 'Modification',
     },
@@ -355,9 +355,9 @@ export default [
   },
   {
     path: '/inventory/dashboard',
+    name: 'inventory',
     meta: {
       requiresAuth: true,
-      name: 'inventory',
       transitionName: 'slide',
       title: 'ESXI Dashboard',
     },
@@ -365,9 +365,9 @@ export default [
   },
   {
     path: '/inventory/esxiHosts/:name?',
+    name: 'esxi-esxi-hosts',
     meta: {
       requiresAuth: true,
-      name: 'esxi-esxiHosts',
       transitionName: 'slide',
       title: (route) => {
         let title = 'ESXi Hosts';
@@ -386,9 +386,9 @@ export default [
   },
   {
     path: '/inventory/virtualMachines/:name?',
+    name: 'esxi-virtual-machines',
     meta: {
       requiresAuth: true,
-      name: 'esxi-virtualMachines',
       transitionName: 'slide',
       title: (route) => {
         let title = 'Virtual Machines';
@@ -404,9 +404,9 @@ export default [
   },
   {
     path: '/inventory/instances/:id?',
+    name: 'esxi-instances',
     meta: {
       requiresAuth: true,
-      name: 'esxi-instances',
       transitionName: 'slide',
       title: (route) => {
         let title = 'Instances';
@@ -422,9 +422,9 @@ export default [
   },
   {
     path: '/inventory/imxComponents/:id?',
+    name: 'esxi-components',
     meta: {
       requiresAuth: true,
-      name: 'esxi-components',
       transitionName: 'slide',
       title: (route) => {
         let title = 'Components';
@@ -441,9 +441,9 @@ export default [
   // Devops Administration Tab
   {
     path: '/expert-system/modification/:issue?',
+    name: 'expert-system modification',
     meta: {
       alias: '/expert-system-modification',
-      name: 'expert-system modification',
       requiresAuth: true,
       title: 'SE Transfer Modification',
       breadcrumb: 'Expert system modification',
@@ -452,9 +452,9 @@ export default [
   },
   {
     path: '/administration/devops/users/:id?',
+    name: 'administration-users',
     meta: {
       requiresAuth: true,
-      name: 'administration-users',
       transitionName: 'slide',
       title: 'Users Administration',
       breadcrumb: 'Users',
@@ -463,9 +463,9 @@ export default [
   },
   {
     path: '/administration/devops/roles/:id?',
+    name: 'administration-roles',
     meta: {
       requiresAuth: true,
-      name: 'administration-roles',
       transitionName: 'slide',
       title: 'Roles Administration',
       breadcrumb: 'Roles',
@@ -474,9 +474,9 @@ export default [
   },
   {
     path: '/administration/devops/actions/:id?',
+    name: 'administration-actions',
     meta: {
       requiresAuth: true,
-      name: 'administration-actions',
       transitionName: 'slide',
       title: 'Actions Administration',
       breadcrumb: 'Actions',
@@ -485,9 +485,9 @@ export default [
   },
   {
     path: '/administration/devops/logs',
+    name: 'administration-logs',
     meta: {
       requiresAuth: true,
-      name: 'administration-logs',
       transitionName: 'slide',
       title: 'Logs Administration',
       breadcrumb: 'Logs',
@@ -498,9 +498,9 @@ export default [
   // CMS Administration Tab
   {
     path: '/administration/cms/users/:id?',
+    name: 'administration-users',
     meta: {
       requiresAuth: true,
-      name: 'administration-users',
       transitionName: 'slide',
       title: 'Users Administration',
       breadcrumb: 'Users',
@@ -509,9 +509,9 @@ export default [
   },
   {
     path: '/administration/cms/roles/:id?',
+    name: 'administration-roles',
     meta: {
       requiresAuth: true,
-      name: 'administration-roles',
       transitionName: 'slide',
       title: 'Roles Administration',
       breadcrumb: 'Roles',
@@ -520,9 +520,9 @@ export default [
   },
   {
     path: '/administration/cms/actions/:id?',
+    name: 'administration-actions',
     meta: {
       requiresAuth: true,
-      name: 'administration-actions',
       transitionName: 'slide',
       title: 'Actions Administration',
       breadcrumb: 'Actions',

@@ -117,10 +117,6 @@
             </ul>
           </div>
         </li>
-        <li
-          v-if="$auth.can('can-manage-authorizations')"
-          :class="{ active: isActive('administration') }"
-        >
         <li :class="{ active: isActive('inventory') }">
           <a class="collapsible-header">
             <i class="material-icons">view_list</i> Inventory
