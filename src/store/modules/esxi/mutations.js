@@ -58,4 +58,21 @@ export default {
       Vue.set(state, 'imxComponents', imxComponents);
     }
   },
+
+  requestedInstances(state, instances) {
+    state.requestedInstances = instances;
+  },
+  requestInstance(state, instance) {
+    const { requestedInstances } = state;
+    requestedInstances.push(instance);
+    Vue.set(state, 'requestedInstances', requestedInstances);
+  },
+  updateRequestedInstances(state, instance) {
+    state.requestedInstances.map((i) => {
+      if (i.id === instance.id) {
+        Vue.set(state.requestedInstances, state.requestedInstances.indexOf(i), instance);
+      }
+      return state.requestedInstances;
+    });
+  }
 };

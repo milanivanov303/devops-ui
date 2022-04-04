@@ -99,6 +99,7 @@ export default {
         delivery_chains: {
           instances: ['environment_type'],
           status: [],
+          dc_role: [],
         },
       }),
       orders: JSON.stringify({

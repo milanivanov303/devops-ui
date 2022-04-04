@@ -6,4 +6,5 @@ export default {
   virtualMachines: [],
   instances: [],
   imxComponents: [],
+  requestedInstances: [],
 };

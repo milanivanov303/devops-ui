@@ -21,7 +21,8 @@ const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
 const VirtualMachines = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/virtualMachines/VirtualMachines');
 const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
-const ImxComponents = () => import('../views/esxi/imxComponents/ImxComponents');
+const ImxComponents = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/imxComponents/ImxComponents');
+const InstanceRequest = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/request/InstanceRequest');
 
 const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
 const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
@@ -437,6 +438,16 @@ export default [
       },
     },
     component: ImxComponents,
+  },
+  {
+    path: '/inventory/request/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'instance-request',
+      transitionName: 'slide',
+      title: 'Instance request',
+    },
+    component: InstanceRequest,
   },
   // Devops Administration Tab
   {
