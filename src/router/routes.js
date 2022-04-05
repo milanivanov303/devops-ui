@@ -8,6 +8,8 @@ const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/B
 const Configurations = () => import(/* webpackChunkName: "extranet" */ '../views/pas/configurations/Configurations');
 const SoaModification = () => import(/* webpackChunkName: "extranet" */ '../views/pas/SOAdeployment');
 
+const Documentation = () => import(/* webpackChunkName: "demos" */ '../views/documentation/Documentation');
+
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
 
@@ -253,6 +255,18 @@ export default [
     props: {
       module: 'imx_fe',
     },
+  },
+
+  // Documentation
+  {
+    path: '/documentation',
+    name: 'documentation',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Documentation',
+    },
+    component: Documentation,
   },
 
   // Demos Tab

@@ -49,6 +49,11 @@
             <i class="material-icons">devices</i> iMX FE
           </router-link>
         </li>
+        <li :class="{ active: isActive('documentation') }">
+          <router-link to="/documentation">
+            <i class="material-icons">library_books</i> Documentation
+          </router-link>
+        </li>
         <li :class="{ active: isActive('demos') }">
           <a class="collapsible-header">
             <i class="material-icons">event</i> Demos
