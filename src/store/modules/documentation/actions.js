@@ -6,25 +6,28 @@ const gitlab = Axios.create({
 });
 
 export default {
-  getSpecs({ commit }) { //, { branch, repo }) {
+  getFiles({ commit }) {
+    const promise = gitlab.get('api/v4/projects/495/repository/tree?path=API Catalog/Extranet&recursive=1&per_page=10000');
 
-    return gitlab.get('api/v4/projects/495/repository/tree?path=API Catalog/Extranet&recursive=1&per_page=10000');
-
-    // const promise = api('devops').get(`specs/?repo=${repo}&branch=${branch}`);
-    //
-    // promise
-    //   .catch(() => commit('error', 'Could not get apiDocumentationList', { root: true }));
-    // return promise;
+    promise
+      .catch(() => commit('error', 'Could not get documentation list', { root: true }));
+    return promise;
   },
 
   getRawFile({ commit }, file) {
-    return gitlab.get(`api/v4/projects/495/repository/blobs/${file.id}/raw`);
+    const promise = gitlab.get(`api/v4/projects/495/repository/blobs/${file.id}/raw`);
 
-    // const promise = api('devops').get(`specs/?repo=${repo}&branch=${branch}`);
-    //
-    // promise
-    //   .catch(() => commit('error', 'Could not get apiDocumentationList', { root: true }));
-    // return promise;
+    promise
+      .catch(() => commit('error', 'Could not get raw file', { root: true }));
+    return promise;
+  },
+
+  getSpecs({ commit }, { branch, repo }) {
+    const promise = api('devops').get(`specs/?repo=${repo}&branch=${branch}`);
+
+    promise
+      .catch(() => commit('error', 'Could not get apiDocumentationList', { root: true }));
+    return promise;
   },
 
   getDetails({ commit }, { branch, repo }) {

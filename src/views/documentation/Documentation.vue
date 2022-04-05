@@ -54,7 +54,7 @@ export default {
     getFiles() {
       const loader = this.$loading.show({ container: this.$refs.demos });
 
-      this.$store.dispatch('documentation/getSpecs')
+      this.$store.dispatch('documentation/getFiles')
         .then((response) => {
           const files = response.data.filter((spec) => spec.type === 'blob');
 

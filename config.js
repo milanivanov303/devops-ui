@@ -49,6 +49,6 @@ module.exports = {
   ssh_port: process.env.VUE_APP_SSH_PORT,
 
   gitlab: {
-    url: 'https://gitlab.codixfr.private', //process.env.VUE_APP_DEVOPS_API_URL,
+    url: 'https://gitlab.codixfr.private', // process.env.VUE_APP_DEVOPS_API_URL,
   },
 };
