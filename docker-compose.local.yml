@@ -8,14 +8,4 @@ services:
       target: base
     tty: true
     volumes:
-      - type: bind
-        source: ./
-        target: /app
-      - type: volume
-        source: nodemodules
-        target: /app/node_modules
-        volume:
-          nocopy: true
-
-volumes:
-  nodemodules:
+      - .:/app

@@ -120,7 +120,7 @@ export default [
     },
   },
   {
-    path: '/pas/configurations/:id?/:build?',
+    path: '/pas/configurations/:id?/:action?',
     name: 'configurations',
     meta: {
       requiresAuth: true,
