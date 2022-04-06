@@ -30,13 +30,13 @@
                 :show="(vm) => vm.name"/>
               <Column label="CPU cores" name="cpu_cores"
                 :show="(vm) => vm.hardware.num_c_p_u"/>
-              <Column label="RAM" name="ram"
+              <Column label="RAM" name="ram" sortBy="hardware.memory"
                 :show="(vm) => $esxi(vm.hardware.memory).bytesToSizeLabel()"
               />
               <Column label="OS" name="os" :sortable="false" filter-type="dropdown"
-                :show="(vm) => (vm.os && vm.os.name) ? vm.os.name : ''"/>
+                :show="(vm) => (vm.os && vm.os.name) ? vm.os.name : 'n/a'"/>
               <Column label="OS Version" name="os_version" :sortable="false" filter-type="dropdown"
-                :show="(vm) => vm.os && vm.os.version ? vm.os.version : ''"/>
+                :show="(vm) => vm.os && vm.os.version ? vm.os.version : 'n/a'"/>
               <Column label="Status" name="status" :sortable="false" filter-type="dropdown"
                 :show="(vm) => getVmStatus(vm.powered)"/>
               <template v-slot:actions-before="{ row }">
