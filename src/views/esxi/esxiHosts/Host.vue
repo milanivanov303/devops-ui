@@ -85,5 +85,8 @@ export default {
     font-size: 12px;
   }
 }
+.card-content {
+  height: 146.233px;
+}
 
 </style>
