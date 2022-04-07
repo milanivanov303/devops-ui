@@ -36,7 +36,9 @@
               />
               <div class="validator">
                 <div class="red-text" v-if="$v.selected.delivery_chain.$error">
-                  <p v-if="!$v.selected.delivery_chain.required">Delivery chain field must not be empty.</p>
+                  <p v-if="!$v.selected.delivery_chain.required">
+                    Delivery chain field must not be empty.
+                  </p>
                 </div>
               </div>
             </div>
@@ -50,7 +52,9 @@
               />
               <div class="validator">
                 <div class="red-text" v-if="$v.selected.delivery_chain.$error">
-                  <p v-if="!$v.selected.delivery_chain.required">Delivery chain type field must not be empty.</p>
+                  <p v-if="!$v.selected.delivery_chain.required">
+                    Delivery chain type field must not be empty.
+                  </p>
                 </div>
               </div>
             </div>
@@ -66,7 +70,9 @@
             />
             <div class="validator col s12">
               <div class="red-text" v-if="$v.selected.instance_type.$error">
-                <p v-if="!$v.selected.instance_type.required">Instance type field must not be empty.</p>
+                <p v-if="!$v.selected.instance_type.required">
+                  Instance type field must not be empty.
+                </p>
               </div>
             </div>
           </div>
@@ -120,7 +126,7 @@ export default {
       instance_type: {
         required,
       },
-    }
+    },
   },
   computed: {
     projects() {
@@ -128,8 +134,9 @@ export default {
     },
     deliveryChains() {
       if (this.selected.project && this.selected.project.delivery_chains) {
-        this.selected.project.delivery_chains.push({ title: 'NEW' })
-        return this.selected.project.delivery_chains || [];
+        const { deliveryChains } = this.selected.project.delivery_chains;
+        deliveryChains.push({ title: 'NEW' });
+        return deliveryChains || [];
       }
       return [];
     },
@@ -150,7 +157,7 @@ export default {
       ];
     },
     instanceTypes() {
-      //check with mmpi
+      // check with mmpi
       return [
         {
           name: 'Intranet',
@@ -176,22 +183,27 @@ export default {
 
       if (this.request.project) {
         this.selected.project = this.projects
-            .find((project) => project.name === this.request.project);
+          .find((project) => project.name === this.request.project);
       }
 
       if (this.request.delivery_chain) {
         this.selected.delivery_chain = this.deliveryChains
-            .find((deliveryChain) => deliveryChain.title === this.request.delivery_chain);
+          .find((deliveryChain) => deliveryChain.title === this.request.delivery_chain);
       }
 
       if (this.request.delivery_chain_type) {
         this.selected.delivery_chain_type = this.deliveryChainsTypes
-            .find((deliveryChainsType) => deliveryChainsType.name === this.request.delivery_chain_type);
+          .find((deliveryChainsType) => {
+            if (deliveryChainsType.name === this.request.delivery_chain_type) {
+              return true;
+            }
+            return false;
+          });
       }
 
       if (this.request.instance_type) {
         this.selected.instance_type = this.instanceTypes
-            .find((instanceType) => instanceType.name === this.request.instance_type);
+          .find((instanceType) => instanceType.name === this.request.instance_type);
       }
     },
 
@@ -207,7 +219,7 @@ export default {
         delivery_chain: this.selected.delivery_chain.title,
         delivery_chain_type: this.selected.delivery_chain_type.name,
         instance_type: this.selected.instance_type.name,
-        comments: this.selected.comments
+        comments: this.selected.comments,
       })
         .then(() => {
           this.$emit('close');
@@ -235,7 +247,7 @@ export default {
       .then(() => {
         if (this.action === 'update') this.setUpdateData();
       });
-  }
+  },
 };
 
 </script>

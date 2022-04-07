@@ -21,22 +21,6 @@
                     :show="(request) => $date(request.created_on).toHuman()"/>
             <Column label="Requested by" name="requested_by"
                     :show="(request) => request.created_by"/>
-
-<!--            <template v-slot:actions-before="{ row }">-->
-<!--              <a @click="openVmDetails(row)"-->
-<!--                 target="_blank"-->
-<!--                 data-tooltip="View details"-->
-<!--                 class="tooltipped">-->
-<!--                <i class="material-icons">view_list</i>-->
-<!--              </a>-->
-<!--              <a v-if="row.hardware && row.hardware.memoryReservation"-->
-<!--                 target="_blank"-->
-<!--                 :data-tooltip="row.hardware.memoryReservation"-->
-<!--                 class="tooltipped">-->
-<!--                <i class="material-icons red-text">error</i>-->
-<!--              </a>-->
-<!--            </template>-->
-
           </Table>
         </div>
 
