@@ -92,7 +92,8 @@
           name="action"
           @click="save()"
         >
-          Request
+          <span v-if="action==='create'">Request</span>
+          <span v-else>Save</span>
         </button>
       </template>
     </Modal>
@@ -134,7 +135,7 @@ export default {
     },
     deliveryChains() {
       if (this.selected.project && this.selected.project.delivery_chains) {
-        const { deliveryChains } = this.selected.project.delivery_chains;
+        const deliveryChains = this.selected.project.delivery_chains;
         deliveryChains.push({ title: 'NEW' });
         return deliveryChains || [];
       }
