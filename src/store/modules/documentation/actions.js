@@ -7,7 +7,7 @@ const gitlab = Axios.create({
 
 export default {
   getFiles({ commit }) {
-    const promise = gitlab.get('api/v4/projects/495/repository/tree?path=API Catalog/Extranet&recursive=1&per_page=10000');
+    const promise = gitlab.get('api/v4/projects/495/repository/tree?path=API Catalog/Extranet&recursive=1&per_page=100');
 
     promise
       .catch(() => commit('error', 'Could not get documentation list', { root: true }));

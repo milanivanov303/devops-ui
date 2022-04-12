@@ -11,6 +11,7 @@
         <Column label="Title" :show="getTitle" width="20%"/>
         <Column label="Description" :show="getDescription" width="40%"/>
         <Column show="path" width="25%"/>
+        <Column show="paths" class="hidden"/>
 
         <template v-slot:actions-before="{ row }">
           <a class="btn btn-tiny" @click="showRawFile(row)">View</a>
@@ -19,14 +20,14 @@
       </Table>
 
       <Modal v-if="showRawFileModal" class="fullscreen" @close="showRawFileModal=false">
-        <template slot="header">File {{ file.name }}</template>
-        <template slot="content"><pre>{{ file.raw_content }}</pre></template>
+        <template slot="header">{{ file.path }}</template>
+        <template slot="content"><pre>{{ file.content }}</pre></template>
       </Modal>
 
       <Modal v-if="showRedocModal" class="fullscreen" @close="showRedocModal=false">
-        <template slot="header">File {{ file.name }}</template>
+        <template slot="header">{{ file.path }}</template>
         <template slot="content">
-          <redoc-wrapper :spec-or-spec-url="file.content"></redoc-wrapper>
+          <redoc-wrapper :spec-or-spec-url="file.content" :options="redocOptions"></redoc-wrapper>
         </template>
       </Modal>
     </div>
@@ -35,9 +36,11 @@
 
 import yaml from 'js-yaml';
 import RedocWrapper from '@hnluu8/vue-redoc-wrapper';
+import Modal from '@/components/Modal';
 
 export default {
   components: {
+    Modal,
     RedocWrapper,
   },
 
@@ -47,12 +50,22 @@ export default {
       file: {},
       showRawFileModal: false,
       showRedocModal: false,
+      redocOptions: {
+        showExtensions: true,
+      },
     };
   },
 
   methods: {
     getFiles() {
       const loader = this.$loading.show({ container: this.$refs.demos });
+
+      this.$store.dispatch('documentation/getSpecs', { repo: 'specifications', branch: 'main' })
+        .then((response) => {
+          this.files = response.data;
+          loader.hide();
+        });
+      return;
 
       this.$store.dispatch('documentation/getFiles')
         .then((response) => {
@@ -105,6 +118,20 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+#redoc-container {
+  h3 {
+    font-size: 1rem !important;
+  }
+  .search-icon {
+    display: none;
+  }
+  .collapsible{
+    border: 0px;
+  }
+}
+</style>
 
 <style lang="scss" scoped>
 table {

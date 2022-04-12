@@ -14,16 +14,16 @@
       >
         <Column label="API Title" name="title" :show="spec => getTitle(spec)" width="20%"/>
         <Column label="Screens" name="screens" :show="spec => getScreens(spec)" width="20%"/>
-        <Column label="File" show="file" width="40%"/>
+        <Column show="path" width="40%"/>
         <Column label="Paths" :show="spec => getPaths(spec)" class="hidden"/>
         <template v-slot:actions-before="{ row }">
-          <a class="btn btn-tiny" @click="$emit('show', row.file, 'raml')">
+          <a class="btn btn-tiny" @click="$emit('show', row.path, 'raml')">
             RAML
           </a>
-          <a class="btn btn-tiny" @click="$emit('show', row.file, 'openapi')">
+          <a class="btn btn-tiny" @click="$emit('show', row.path, 'openapi')">
             OpenAPI
           </a>
-          <a class="btn btn-tiny" @click="$emit('show', row.file, 'api-console')">
+          <a class="btn btn-tiny" @click="$emit('show', row.path, 'api-console')">
             APIConsole
           </a>
         </template>
