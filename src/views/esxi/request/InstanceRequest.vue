@@ -14,8 +14,9 @@
           >
             <Column show="project"/>
             <Column show="delivery_chain"/>
-            <Column show="delivery_chain_type"/>
+            <Column show="dc_role"/>
             <Column show="instance_type"/>
+            <Column show="environment_type"/>
             <Column show="comments"/>
             <Column label="Requested on" name="requested_on"
                     :show="(request) => $date(request.created_on).toHuman()"/>

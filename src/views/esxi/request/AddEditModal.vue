@@ -29,7 +29,7 @@
               <Autocomplete
                   label="Delivery chain"
                   valueKey="title"
-                  :items="deliveryChains"
+                  :items="projectDeliveryChains"
                   v-model="selected.delivery_chain"
                   :invalid="$v.selected.delivery_chain.$error"
                   @blur="$v.selected.delivery_chain.$touch()"
@@ -44,35 +44,55 @@
             </div>
             <div class="col s12 m6">
               <Autocomplete
-                  label="Type"
-                  :items="deliveryChainsTypes"
-                  v-model="selected.delivery_chain_type"
-                  :invalid="$v.selected.delivery_chain_type.$error"
-                  @blur="$v.selected.delivery_chain_type.$touch()"
+                  label="Delivery chain role"
+                  :items="deliveryChainRoles"
+                  valueKey="value"
+                  v-model="selected.dc_role"
+                  :invalid="$v.selected.dc_role.$error"
+                  @blur="$v.selected.dc_role.$touch()"
               />
               <div class="validator">
-                <div class="red-text" v-if="$v.selected.delivery_chain.$error">
-                  <p v-if="!$v.selected.delivery_chain.required">
-                    Delivery chain type field must not be empty.
+                <div class="red-text" v-if="$v.selected.dc_role.$error">
+                  <p v-if="!$v.selected.dc_role.required">
+                    Delivery chain role field must not be empty.
                   </p>
                 </div>
               </div>
             </div>
           </div>
           <div class="row">
-            <Autocomplete
-                class="col s12"
-                label="Instance type"
-                :items="instanceTypes"
-                v-model="selected.instance_type"
-                :invalid="$v.selected.instance_type.$error"
-                @blur="$v.selected.instance_type.$touch()"
-            />
-            <div class="validator col s12">
-              <div class="red-text" v-if="$v.selected.instance_type.$error">
-                <p v-if="!$v.selected.instance_type.required">
-                  Instance type field must not be empty.
-                </p>
+            <div class="col s12 m6">
+              <Autocomplete
+                  label="Instance type"
+                  :items="instanceTypes"
+                  valueKey="type"
+                  v-model="selected.instance_type"
+                  :invalid="$v.selected.instance_type.$error"
+                  @blur="$v.selected.instance_type.$touch()"
+              />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.instance_type.$error">
+                  <p v-if="!$v.selected.instance_type.required">
+                    Instance type field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col s12 m6">
+              <Autocomplete
+                  label="Environment type"
+                  :items="environmentTypes"
+                  valueKey="title"
+                  v-model="selected.environment_type"
+                  :invalid="$v.selected.environment_type.$error"
+                  @blur="$v.selected.environment_type.$touch()"
+              />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.environment_type.$error">
+                  <p v-if="!$v.selected.environment_type.required">
+                    Environment type field must not be empty.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -121,19 +141,22 @@ export default {
       delivery_chain: {
         required,
       },
-      delivery_chain_type: {
+      dc_role: {
         required,
       },
       instance_type: {
+        required,
+      },
+      environment_type: {
         required,
       },
     },
   },
   computed: {
     projects() {
-      return this.$store.state.mmpi.projects;
+      return this.$store.state.mmpi.projects || [];
     },
-    deliveryChains() {
+    projectDeliveryChains() {
       if (this.selected.project && this.selected.project.delivery_chains) {
         const deliveryChains = this.selected.project.delivery_chains;
         deliveryChains.push({ title: 'NEW' });
@@ -141,43 +164,27 @@ export default {
       }
       return [];
     },
-    deliveryChainsTypes() {
-      return [
-        {
-          name: 'Validation',
-        },
-        {
-          name: 'HotFix',
-        },
-        {
-          name: 'MajorRelease',
-        },
-        {
-          name: 'MinorRelease',
-        },
-      ];
+    deliveryChainRoles() {
+      return this.$store.state.mmpi.delivery_chain_roles || [];
     },
     instanceTypes() {
-      // check with mmpi
-      return [
-        {
-          name: 'Intranet',
-        },
-        {
-          name: 'Extranet',
-        },
-        {
-          name: 'AD',
-        },
-      ];
+      return this.$store.state.mmpi.instanceTypes || [];
+    },
+    environmentTypes() {
+      return this.$store.state.mmpi.environmentTypes || [];
     },
   },
   methods: {
-    getDefaultDeliveryChainType() {
-      this.selected.delivery_chain_type = null;
-      if (this.selected.delivery_chain && this.selected.delivery_chain.dc_role) {
-        this.selected.delivery_chain_type = { name: this.selected.delivery_chain.dc_role.value };
-      }
+    loadData() {
+      const promise1 = this.$store.dispatch('mmpi/getProjects');
+      const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
+      const promise3 = this.$store.dispatch('mmpi/getInstanceTypes');
+      const promise4 = this.$store.dispatch('mmpi/getEnvironmentTypes');
+
+      Promise.all([promise1, promise2, promise3, promise4])
+        .then(() => {
+          if (this.action === 'update') this.setUpdateData();
+        });
     },
     setUpdateData() {
       this.selected = { ...this.request };
@@ -188,23 +195,30 @@ export default {
       }
 
       if (this.request.delivery_chain) {
-        this.selected.delivery_chain = this.deliveryChains
+        this.selected.delivery_chain = this.projectDeliveryChains
           .find((deliveryChain) => deliveryChain.title === this.request.delivery_chain);
       }
 
-      if (this.request.delivery_chain_type) {
-        this.selected.delivery_chain_type = this.deliveryChainsTypes
-          .find((deliveryChainsType) => {
-            if (deliveryChainsType.name === this.request.delivery_chain_type) {
-              return true;
-            }
-            return false;
-          });
+      if (this.request.dc_role) {
+        this.selected.dc_role = this.deliveryChainRoles
+          .find((dcRole) => dcRole.value === this.request.dc_role);
       }
 
       if (this.request.instance_type) {
         this.selected.instance_type = this.instanceTypes
-          .find((instanceType) => instanceType.name === this.request.instance_type);
+          .find((instanceType) => instanceType.type === this.request.instance_type);
+      }
+
+      if (this.request.environment_type) {
+        this.selected.environment_type = this.environmentTypes
+          .find((environmentType) => environmentType.title === this.request.environment_type);
+      }
+    },
+
+    getDefaultDeliveryChainRole() {
+      this.selected.dc_role = null;
+      if (this.selected.delivery_chain && this.selected.delivery_chain.dc_role) {
+        this.selected.dc_role = { value: this.selected.delivery_chain.dc_role.value };
       }
     },
 
@@ -218,8 +232,9 @@ export default {
         id: this.selected.id,
         project: this.selected.project.name,
         delivery_chain: this.selected.delivery_chain.title,
-        delivery_chain_type: this.selected.delivery_chain_type.name,
-        instance_type: this.selected.instance_type.name,
+        dc_role: this.selected.dc_role.value,
+        instance_type: this.selected.instance_type.type,
+        environment_type: this.selected.environment_type.title,
         comments: this.selected.comments,
       })
         .then(() => {
@@ -239,15 +254,12 @@ export default {
   watch: {
     /* eslint func-names: ["error", "as-needed"] */
     'selected.delivery_chain': function () {
-      this.getDefaultDeliveryChainType();
+      this.getDefaultDeliveryChainRole();
     },
   },
 
-  beforeCreate() {
-    this.$store.dispatch('mmpi/getProjects')
-      .then(() => {
-        if (this.action === 'update') this.setUpdateData();
-      });
+  mounted() {
+    this.loadData();
   },
 };
 
