@@ -24,6 +24,35 @@
             />
           </div>
           <div class="row">
+            <div class="input-field col s12 m6 l6">
+              <i class="material-icons prefix">date_range</i>
+              <datetime input-id="purchase_date"
+                        input-class="datetime-input"
+                        type="date"
+                        v-model="host.purchase_date"
+                        class="datetime-theme"
+                        :format="$date.format"
+                        :week-start="1"/>
+              <label :class="{active: host.purchase_date}"
+                     for="purchase_date">Purchase date
+              </label>
+            </div>
+            <div class="input-field col s12 m6 l6">
+              <i class="material-icons prefix">date_range</i>
+              <datetime input-id="expiration_date"
+                        input-class="datetime-input"
+                        type="date"
+                        v-model="host.expiration_date"
+                        class="datetime-theme"
+                        :format="$date.format"
+                        :week-start="1"/>
+              <label :class="{active: host.expiration_date}"
+                     for="expiration_date">Expiration date
+              </label>
+            </div>
+          </div>
+
+          <div class="row">
             <TextInput
                 class="col s12"
                 label="Notes"
@@ -48,11 +77,17 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import { Datetime } from 'vue-datetime';
+import { DateTime } from 'luxon';
+import 'vue-datetime/dist/vue-datetime.css';
 
 export default {
   props: {
     action: { default: 'create', String },
     currentHost: { Object },
+  },
+  components: {
+    datetime: Datetime,
   },
   data() {
     return {
@@ -78,6 +113,8 @@ export default {
         id: this.host.id,
         name: this.host.name,
         doc_url: this.host.doc_url,
+        purchase_date: this.$date(this.host.purchase_date).toSeconds(),
+        expiration_date: this.$date(this.host.expiration_date).toSeconds(),
         notes: this.host.notes,
       })
         .then(() => {

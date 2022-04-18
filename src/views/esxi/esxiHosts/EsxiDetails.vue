@@ -22,13 +22,29 @@
           <li v-if="esxiHost.platform" class="collection-item">
             <b>Serial Num: </b>{{ esxiHost.platform.serial_number }}
           </li>
-          <li v-if="esxiHost.created_on" class="collection-item">
-            <b>Created on: </b>{{ $date(esxiHost.created_on).toHuman() }}
-          </li>
-          <li v-if="esxiHost.installation_date" class="collection-item">
-            <b>Installed on: </b>{{ esxiHost.installation_date }}
+          <li v-if="esxiHost.ip_address" class="collection-item">
+            <b>IP Address: </b>{{ esxiHost.ip_address }}
           </li>
         </div>
+        <div class="col s12 l6">
+          <li class="collection-header">
+            <span class="collection-section">IMPORTANT DATES</span>
+          </li>
+          <li v-if="esxiHost.created_on" class="collection-item">
+            <b>Creation date: </b>{{ $date(esxiHost.created_on).toHuman() }}
+          </li>
+          <li v-if="esxiHost.purchase_date" class="collection-item">
+            <b>Purchase date: </b>{{ $date(esxiHost.purchase_date).toHuman() }}
+          </li>
+          <li v-if="esxiHost.installation_date" class="collection-item">
+            <b>Installation date: </b>{{ $date(esxiHost.installation_date).toHuman() }}
+          </li>
+          <li v-if="esxiHost.expiration_date" class="collection-item">
+            <b>Expiration date: </b>{{ $date(esxiHost.expiration_date).toHuman() }}
+          </li>
+        </div>
+      </div>
+      <div class="row">
         <div class="col s12 l6">
           <li v-if="esxiHost.cpu" class="collection-header">
             <span class="collection-section">CPU DETAILS</span>
@@ -39,7 +55,6 @@
           <li v-if="esxiHost.cpu_details" class="collection-item">
             <b>Processor Type: </b>{{ esxiHost.cpu.cpu_model }}
           </li>
-
           <li v-if="esxiHost.cpu" class="collection-item">
             <b>Packages: </b>{{ esxiHost.cpu.num_cpu_pkgs }}
           </li>
@@ -53,8 +68,6 @@
             <b>Threads: </b>{{ esxiHost.cpu.num_cpu_threads }}
           </li>
         </div>
-      </div>
-      <div class="row">
         <div class="col s12 l6" v-if="esxiHost.account_list" >
           <li class="collection-header">
             <span class="collection-section">ACCOUNT LIST</span>

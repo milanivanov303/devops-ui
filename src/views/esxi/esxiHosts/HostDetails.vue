@@ -8,12 +8,19 @@
               <span>{{ esxiHost.name }}</span>
             </div>
             <div class="col s12 m6 l3 esxi-icons">
+              <a :href="`https://${esxiHost.name}-idrac.codixfr.private/`"
+                 target="_blank"
+                 data-tooltip="Integrated Dell Remote Access Controller (iDRAC)"
+                 class="right">
+              <i class="material-icons">tv</i>
+            </a>
               <a :href="`https://${esxiHost.name}.codixfr.private/`"
                  target="_blank"
                  data-tooltip="ESXi for administration"
                  class="right">
                 <i class="material-icons">laptop_chromebook</i>
               </a>
+
               <a v-if="esxiHost.doc_url"
                  :href="esxiHost.doc_url"
                  target="_blank"
