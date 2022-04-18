@@ -78,7 +78,6 @@
 <script>
 import { required } from 'vuelidate/lib/validators';
 import { Datetime } from 'vue-datetime';
-import { DateTime } from 'luxon';
 import 'vue-datetime/dist/vue-datetime.css';
 
 export default {
