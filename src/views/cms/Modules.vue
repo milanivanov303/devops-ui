@@ -9,7 +9,6 @@
               v-model="abbrev.getModule"
               :options="getModules"
             />
-            
            </div>
      <div class="col s12 l8">
       <table  class="highlight striped responsive-table">

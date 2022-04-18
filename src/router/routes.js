@@ -16,6 +16,8 @@ const ResponseFile = () => import(/* webpackChunkName: "cms" */ '../views/cms/Re
 const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templates');
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
+const Modules = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modules');
+const CmsConfigurations = () => import(/* webpackChunkName: "cms" */ '../views/cms/Conf');
 
 const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
@@ -312,7 +314,6 @@ export default [
     name: 'responseFile',
     meta: {
       alias: '/responseFile',
-      name: 'responseFile',
       requiresAuth: true,
       breadcrumb: 'Response File',
     },
@@ -347,6 +348,26 @@ export default [
       breadcrumb: 'Modification',
     },
     component: Modification,
+  },
+  {
+    path: '/cms/modules/:id?',
+    meta: {
+      alias: '/modules',
+      name: 'modules',
+      requiresAuth: true,
+      breadcrumb: 'Modules',
+    },
+    component: Modules,
+  },
+  {
+    path: '/cms/configurations',
+    meta: {
+      alias: '/configurations',
+      name: 'configurations',
+      requiresAuth: true,
+      breadcrumb: 'Configurations',
+    },
+    component: CmsConfigurations,
   },
 
   // Inventory Tab
@@ -457,10 +478,10 @@ export default [
     meta: {
       requiresAuth: true,
       transitionName: 'slide',
-      title: 'Users',
+      title: 'Users Administration',
       breadcrumb: 'Users',
     },
-    component: AdministrationUsers,
+    component: DevopsUsersAdministration,
   },
   {
     path: '/administration/devops/roles/:id?',

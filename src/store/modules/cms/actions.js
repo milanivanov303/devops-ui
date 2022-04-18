@@ -35,7 +35,7 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('modules', response.data.data))
+      .then((response) => commit('modules', response.data.data))
     return promise;
   },
 
@@ -404,5 +404,5 @@ export default {
       return error;
     }
   },
- 
+
 };
