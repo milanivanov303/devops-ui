@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <component :is="layout">
-      <router-view />
+      <router-view :key="$route.meta.name"/>
     </component>
   </div>
 </template>
@@ -13,11 +13,18 @@ export default {
       defaultTitle: document.title,
     };
   },
+
   computed: {
     layout() {
-      return `${this.$route.meta.layout || 'default'}-layout`;
+      let layout = 'loading';
+      if (this.$route.name !== null) {
+        layout = this.$route.meta.layout || 'default';
+      }
+
+      return `${layout}-layout`;
     },
   },
+
   watch: {
     $route(to) {
       if (to.meta.title) {
@@ -25,13 +32,20 @@ export default {
       }
     },
   },
+
   methods: {
     getTitle(route) {
       if (typeof route.meta.title === 'function') {
-        return route.meta.title(this.$route.params);
+        return route.meta.title(this.$route);
       }
       return route.meta.title;
     },
+  },
+
+  mounted() {
+    // Set favicon url
+    document.querySelector("link[rel~='icon']")
+      .href = `${this.$config.um.url}/applications/${this.$config.devops.code}/favicon`;
   },
 };
 </script>

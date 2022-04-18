@@ -1,4 +1,5 @@
 // https://vuex.vuejs.org/en/actions.html
+
 export default {
   getVariables({ commit }) {
     const name = 'config-defaults';
@@ -14,7 +15,7 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('variables', response.data.data))
+      .then((response) => commit('variables', response.data.data))
       .catch(() => commit('error', 'Could not get config-defaults list', { root: true }));
     return promise;
   },
@@ -43,7 +44,7 @@ export default {
     const promise = api('cms').get(`default-variables/${variable}`);
 
     promise
-      .then(response => response.data.data)
+      .then((response) => response.data.data)
       .catch(() => commit('error', 'Could not get config-defaults variable', { root: true }));
     return promise;
   },
@@ -62,7 +63,7 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('modules', response.data.data))
+      .then((response) => commit('modules', response.data.data))
       .catch(() => commit('error', 'Could not get IMX Modules', { root: true }));
     return promise;
   },
@@ -78,7 +79,7 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('codixTeams', response.data.data))
+      .then((response) => commit('codixTeams', response.data.data))
       .catch(() => commit('error', 'Could not get Codix Teams', { root: true }));
     return promise;
   },
@@ -117,16 +118,16 @@ export default {
       payload.variable);
 
       promise
-        .then(response => commit('createVariable', response.data.data))
-        .catch(error => commit('error', error, { root: true }));
+        .then((response) => commit('createVariable', response.data.data))
+        .catch((error) => commit('error', error, { root: true }));
       return promise;
     }
 
     promise = api('cms').put(`default-variables/${payload.variable.name}`, payload.variable);
 
     promise
-      .then(response => commit('updateVariable', response.data.data))
-      .catch(error => commit('error', error, { root: true }));
+      .then((response) => commit('updateVariable', response.data.data))
+      .catch((error) => commit('error', error, { root: true }));
     return promise;
   },
   // getRspVariables({ commit }, payload) {
@@ -153,7 +154,6 @@ export default {
         const result = await api('cms').get('response-variables', payload);
         commit('rspVariables', result.data.data);
       } catch (error) {
-        console.log(error);
         commit('error', error);
       }
     }
@@ -163,7 +163,7 @@ export default {
     if (payload) {
       // convert instances to indexed array
       instances = Object.keys(payload.instances)
-        .map(item => payload.instances[item]);
+        .map((item) => payload.instances[item]);
     }
     commit('instances', instances);
   },
@@ -179,21 +179,21 @@ export default {
   getTemplates({ commit }, payload) {
     const promise = api('cms').get('cms/run-commands', payload);
     promise
-      .catch(error => commit('error', error));
+      .catch((error) => commit('error', error));
     return promise;
   },
 
   getDeliveryChains({ commit }, payload) {
     // convert delivery chains to indexed array
     commit('deliveryChains', Object.keys(payload.delivery_chains)
-      .map(item => payload.delivery_chains[item]));
+      .map((item) => payload.delivery_chains[item]));
   },
   getSelectedDeliveryChain({ commit }, payload) {
     commit('selectedDeliveryChain', payload);
   },
   async getUniqueInstancesId(payload) {
     const resp = await api('cms').get('response-variables/unique-instances-id', payload);
-    return resp.data.map(el => el.instance_id);
+    return resp.data.map((el) => el.instance_id);
   },
   async getProjects({ commit, state, dispatch }) {
     if (!state.projects.length) {
@@ -227,12 +227,11 @@ export default {
         });
         // convert projects to indexed array
         commit('projects', Object.keys(projects)
-          .map(item => projects[item])
+          .map((item) => projects[item])
           .sort((a, b) => a.name.localeCompare(b.name)));
 
         await api('mmpi').get(`instances?with[delivery_chains][]=projects&projects&id=in ${payload.join(',')}`);
       } catch (error) {
-        console.log(error);
         commit('error', error);
       }
     }
@@ -249,7 +248,6 @@ export default {
       }, []);
       commit('templates', result.sort((a, b) => a.source_name.localeCompare(b.source_name)));
     } catch (error) {
-      console.log(error);
       commit('error', error);
     }
   },
@@ -265,7 +263,6 @@ export default {
       const result = await api('cms').get('templates/template-content', payload);
       commit('templateContent', result.data);
     } catch (error) {
-      console.log(error);
       commit('error', error);
     }
   },
@@ -273,9 +270,8 @@ export default {
     if (state.instances) {
       const payload = await dispatch('cms/getUniqueInstancesId', null, { root: true });
       try {
-        commit('inventoryInstances', instances.filter(i => payload.some(id => id === i.id)));
+        commit('inventoryInstances', instances.filter((i) => payload.some((id) => id === i.id)));
       } catch (error) {
-        console.log(error);
         commit('error', error);
       }
     }
@@ -354,7 +350,6 @@ export default {
       const result = await api('cms').put(`response-variables/${payload.id}`, payload);
       commit('updateRspVariable', result.data.data);
     } catch (error) {
-      console.log(error);
       commit('error', error);
     }
   },
@@ -371,7 +366,6 @@ export default {
         });
       return response;
     } catch (error) {
-      console.log(error);
       return error;
     }
   },
@@ -381,7 +375,6 @@ export default {
       const resp = await api('cms').get(`response-variables?instance_id=${payload.id}`);
       commit('firstInstanceVariables', resp.data.data);
     } catch (error) {
-      console.log(error);
       commit('error', error);
     }
   },
@@ -390,27 +383,23 @@ export default {
       const resp = await api('cms').get(`response-variables?instance_id=${payload.id}`);
       commit('secondInstanceVariables', resp.data.data);
     } catch (error) {
-      console.log(error);
       commit('error', error);
     }
   },
-  // Add modification in CMS/Modification tab
+  // Add modification in CMS/Modification tab and Extranet/SoaDeployment tab
   async addModification({ commit }, payload) {
     try {
-      // Commented rows below, because work just on page cms/modification other two pages are not
-      // currently functional
-      // let uri = '';
-      // if (payload.type_id === 'binary') {
-      //   uri = 'binaries';
-      // } else if (payload.type_id === 'cmd') {
-      //   uri = 'commands';
-      // } else if (payload.type_id === 'cms') {
-      //   uri = 'cms';
-      // }
-      const response = await api('mmpi').post('modifications/cms', payload);
+      let uri = '';
+      if (payload.type_id === 'binary') {
+        uri = 'binaries';
+      } else if (payload.type_id === 'cmd') {
+        uri = 'commands';
+      } else if (payload.type_id === 'cms') {
+        uri = 'cms';
+      }
+      const response = await api('mmpi').post(`modifications/${uri}`, payload);
       return response.data.data;
     } catch (error) {
-      console.log(error);
       commit('error', error);
       return error;
     }

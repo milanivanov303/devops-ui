@@ -39,7 +39,7 @@
     </div>
 </template>
 <script>
-import BarChart from '@/components/BarChart';
+const BarChart = () => import('@/components/charts/BarChart');
 
 export default {
   components: {
@@ -64,12 +64,12 @@ export default {
         },
       ],
       demoStatisticsDays: {
-        name: 'Last 30 days',
-        value: 30,
+        name: 'Last 7 days',
+        value: 7,
       },
       statusStatisticsDays: {
-        name: 'Last 30 days',
-        value: 30,
+        name: 'Last 24 hours',
+        value: 1,
       },
       chartOptions: {
         legend: {

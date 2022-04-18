@@ -20,7 +20,7 @@ export default {
 
   remove(state, id) {
     state.active.splice(
-      state.active.findIndex(build => build.id === id),
+      state.active.findIndex((build) => build.id === id),
       1,
     );
   },

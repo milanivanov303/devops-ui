@@ -8,86 +8,120 @@
         <i class="material-icons left">add</i> New build
       </button>
 
-      <Modal v-if="showModal" @close="close()" @opened="initForm()" class="right-sheet">
+      <Modal v-if="showModal" @close="close()" class="right-sheet">
         <template v-slot:header>{{ branch }} // Create new build </template>
         <template v-slot:content>
-          <div v-if="build.started === false" class="col s12 l11" key="form" >
-              <div class="row">
-                <div class="col s12" >
-                  <Autocomplete
-                    label="Client"
-                    icon="people"
-                    :items="clients"
-                    v-model="form.client"
-                    :invalid="$v.form.client.$error"
-                    @blur="$v.form.client.$touch()"
-                  />
-                </div>
-                <div class="validator col s11 offset-s1">
-                  <div class="red-text" v-if="$v.form.client.$error">
-                    <p v-if="!$v.form.client.required">
-                      Client field must not be empty.
-                    </p>
-                  </div>
-                </div>
+          <div v-if="!build.started" class="col s12 l11" key="form" >
+            <div class="row" v-if="!branch">
+              <div class="col s12" >
+                <Autocomplete
+                  label="Branch"
+                  icon="dynamic_feed"
+                  :items="branches"
+                  v-model="form.branch"
+                  :invalid="$v.form.branch.$error"
+                  @blur="$v.form.branch.$touch()"
+                />
               </div>
-              <div class="row">
-                <div class="input-field col s12">
-                  <i class="material-icons prefix" >history</i>
-                  <select id="java-version" ref="java-version" v-model="form.javaVersion">
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                  </select>
-                  <label for="java-version">Java Version</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12">
-                  <Autocomplete
-                    label="Instance"
-                    icon="dynamic_feed"
-                    :items="instances"
-                    v-model="form.instance"
-                    :invalid="$v.form.instance.$error"
-                    @blur="$v.form.instance.$touch()"
-                  />
-                </div>
-                <div class="validator col s11 offset-s1">
-                  <div class="red-text" v-if="$v.form.instance.$error">
-                    <p v-if="!$v.form.instance.required">
-                      Instance field must not be empty.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12" >
-                  <Autocomplete
-                    label="Fe branch"
-                    icon="dynamic_feed"
-                    :items="feBranches"
-                    v-model="form.feBranch"
-                  />
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.branch.$error">
+                  <p v-if="!$v.form.branch.required">
+                    Branch field must not be empty.
+                  </p>
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col s12" >
+                <Autocomplete
+                  label="Client"
+                  icon="people"
+                  :items="clients"
+                  v-model="form.client"
+                  :invalid="$v.form.client.$error"
+                  @blur="$v.form.client.$touch()"
+                />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.client.$error">
+                  <p v-if="!$v.form.client.required">
+                    Client field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <Select
+                  v-model="form.javaVersion"
+                  :options="[4,5,6,7,8]"
+                  :defaultOption="false"
+                  label="Java Version"
+                  icon="history"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <Autocomplete
+                  label="Instance"
+                  icon="dynamic_feed"
+                  :items="instances"
+                  v-model="form.instance"
+                  :invalid="$v.form.instance.$error"
+                  @blur="$v.form.instance.$touch()"
+                />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.instance.$error">
+                  <p v-if="!$v.form.instance.required">
+                    Instance field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <Autocomplete
+                  label="Fe branch"
+                  icon="dynamic_feed"
+                  :items="feBranches"
+                  v-model="form.feBranch"
+                  :invalid="$v.form.feBranch.$error"
+                  @blur="$v.form.feBranch.$touch()"
+                />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.feBranch.$error">
+                  <p v-if="!$v.form.feBranch.required">
+                    Fe branch field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12" >
+                <Select
+                  :options="images"
+                  icon="cloud_upload"
+                  label="Deploy on"
+                  displayed="label"
+                  :default-option="false"
+                  v-model="form.image"
+                />
+              </div>
+            </div>
+          </div>
           <BuildProgress
             v-else
             :broadcast="build.broadcast"
             :status="build.status"
             :summary="build.summary"
             :error="build.error"
-          ></BuildProgress>
+          />
         </template>
         <template v-slot:footer>
-          <button
-            id="start-btn"
-            v-if="!build.started"
-            class="waves-effect btn"
-            @click="start()">
+          <button v-if="!build.started" class="waves-effect btn" @click="start()">
             <i class="material-icons left">play_arrow</i> Start
           </button>
         </template>
@@ -106,10 +140,14 @@ function initialState() {
   return {
     showModal: false,
     form: {
+      branch: null,
       client: null,
       javaVersion: 8,
       instance: null,
-      fe_branch: null,
+      feBranch: {
+        name: 'X3',
+      },
+      image: null,
     },
     build: {
       started: false,
@@ -122,62 +160,115 @@ function initialState() {
 }
 
 export default {
-  components: { BuildProgress },
+  components: {
+    BuildProgress,
+  },
+
+  props: {
+    branch: String,
+  },
+
   data() {
     return initialState();
   },
+
   computed: {
-    branch() {
-      return this.$route.params.branch;
-    },
     clients() {
       return this.$store.state.extranet.clients;
     },
     instances() {
       return this.$store.state.mmpi.instances;
     },
+    branches() {
+      return this.$store.state.extranet.branches;
+    },
     feBranches() {
       return this.$store.state.extranet.feBranches;
     },
-  },
-  validations: {
-    form: {
-      client: {
-        required,
-        name: {
-          required,
-        },
-      },
-      instance: {
-        required,
-        name: {
-          required,
-        },
-      },
+    images() {
+      return this.$store.state.extranet.images;
     },
   },
+
+  validations() {
+    const validations = {
+      form: {
+        client: {
+          required,
+          name: {
+            required,
+          },
+        },
+        instance: {
+          required,
+          name: {
+            required,
+          },
+        },
+        feBranch: {
+          required,
+          name: {
+            required,
+          },
+        },
+      },
+    };
+
+    if (!this.branch) {
+      validations.form.branch = {
+        required,
+        name: {
+          required,
+        },
+      };
+    }
+
+    return validations;
+  },
+
+  watch: {
+    images() {
+      [this.form.image] = this.images;
+    },
+    /* eslint func-names: ["error", "as-needed"] */
+    'form.client': function () {
+      this.getDefaultInstance();
+    },
+  },
+
   methods: {
-    getClients() {
+    getData() {
+      this.$store.dispatch('extranet/getBranches');
+      this.$store.dispatch('extranet/getFeBranches');
       this.$store.dispatch('extranet/getClients');
-    },
-    getInstances() {
+      this.$store.dispatch('extranet/getImages');
       this.$store.dispatch('mmpi/getInstances');
     },
-    getFeBranches() {
-      this.$store.dispatch('extranet/getFeBranches');
+
+    getDefaultInstance() {
+      this.form.instance = null;
+
+      const db = this.instances
+        .find((i) => i.name.toLowerCase() === this.form.client.db.toLowerCase());
+      if (db) {
+        this.form.instance = db;
+      }
     },
+
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
+
+      this.getData();
+
       this.showModal = true;
     },
+
     close() {
       this.showModal = false;
       this.$v.$reset();
     },
-    initForm() {
-      this.$M.FormSelect.init(this.$refs['java-version']);
-    },
+
     start() {
       this.$v.$touch();
       if (this.$v.$invalid) {
@@ -185,11 +276,12 @@ export default {
       }
 
       this.$store.dispatch('extranet/startBuild', {
-        branch: this.branch,
+        branch: this.form.branch ? this.form.branch.name : this.branch,
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-        fe_branch: this.form.feBranch,
+        fe_branch: this.form.feBranch.name,
+        image: this.form.image,
       })
         .then((response) => {
           this.build.status = 'running';
@@ -209,18 +301,5 @@ export default {
         .finally(() => { this.build.started = true; });
     },
   },
-  mounted() {
-    this.getClients();
-    this.getInstances();
-    this.getFeBranches();
-  },
 };
 </script>
-
-<style lang="scss" >
-  .log {
-    height: 60vh;
-    overflow: auto;
-    white-space: pre;
-  }
-</style>

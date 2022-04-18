@@ -8,91 +8,98 @@
         <i class="material-icons left">add</i> New build
       </button>
 
-      <Modal v-if="showModal" @close="close()" @opened="initForm()" class="right-sheet">
+      <Modal v-if="showModal" @close="close()" class="right-sheet">
         <template v-slot:header>{{ branch }} // Create new build </template>
         <template v-slot:content>
-          <template v-if="build.started === false">
-            <div  class="col s12 l11" key="form" >
-              <div class="row">
-                <div class="col s12" >
-                  <Autocomplete
-                    label="Client"
-                    icon="people"
-                    :items="clients"
-                    v-model="form.client"
-                    :invalid="$v.form.client.$error"
-                    @blur="$v.form.client.$touch()"
-                  />
-                </div>
-                <div class="validator col s11 offset-s1">
-                  <div class="red-text" v-if="$v.form.client.$error">
-                    <p v-if="!$v.form.client.required">
-                      Client field must not be empty.
-                    </p>
-                  </div>
-                </div>
+          <div v-if="!build.started"  class="col s12 l11" key="form" >
+            <div class="row" v-if="!branch">
+              <div class="col s12" >
+                <Autocomplete
+                  label="Branch"
+                  icon="dynamic_feed"
+                  :items="branches"
+                  v-model="form.branch"
+                  :invalid="$v.form.branch.$error"
+                  @blur="$v.form.branch.$touch()"
+                />
               </div>
-              <div class="row">
-                <div class="input-field col s12">
-                  <i class="material-icons prefix" >history</i>
-                  <select id="java-version" ref="java-version" v-model="form.javaVersion">
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                  </select>
-                  <label for="java-version">Java Version</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s12">
-                  <Autocomplete
-                    label="Instance"
-                    icon="dynamic_feed"
-                    :items="instances"
-                    v-model="form.instance"
-                    :invalid="$v.form.instance.$error"
-                    @blur="$v.form.instance.$touch()"
-                  />
-                </div>
-                <div class="validator col s11 offset-s1">
-                  <div class="red-text" v-if="$v.form.instance.$error">
-                    <p v-if="!$v.form.instance.required">
-                      Instance field must not be empty.
-                    </p>
-                  </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.branch.$error">
+                  <p v-if="!$v.form.branch.required">
+                    Branch field must not be empty.
+                  </p>
                 </div>
               </div>
             </div>
-          </template>
-          <template v-else>
-            <div key="build" >
-
-              <div v-if="build.status === 'success'" class="center" >
-                <i class="material-icons large green-text">check_circle_outline</i>
-                <p>Build completed successfully</p>
+            <div class="row">
+              <div class="col s12" >
+                <Autocomplete
+                  label="Client"
+                  icon="people"
+                  :items="clients"
+                  v-model="form.client"
+                  :invalid="$v.form.client.$error"
+                  @blur="$v.form.client.$touch()"
+                />
               </div>
-
-              <div v-else-if="build.status === 'failed'" class="center">
-                <i class="material-icons large red-text">error_outline</i>
-                <p>{{ build.error || build.summary }}</p>
-              </div>
-
-              <div v-else class="row">
-                <div class="col s12">
-                  <p>{{ build.summary }}</p>
-                  <Progress v-if="build.status === 'running'" :progress="build.progress"></Progress>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col s12">
-                  <div class="log">{{ build.log }}</div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.client.$error">
+                  <p v-if="!$v.form.client.required">
+                    Client field must not be empty.
+                  </p>
                 </div>
               </div>
             </div>
-          </template>
+            <div class="row">
+              <div class="col s12">
+                <Select
+                  v-model="form.javaVersion"
+                  :options="[4,5,6,7,8]"
+                  :defaultOption="false"
+                  label="Java Version"
+                  icon="history"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <Autocomplete
+                  label="Instance"
+                  icon="dynamic_feed"
+                  :items="instances"
+                  v-model="form.instance"
+                  :invalid="$v.form.instance.$error"
+                  @blur="$v.form.instance.$touch()"
+                />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.instance.$error">
+                  <p v-if="!$v.form.instance.required">
+                    Instance field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12" >
+                <Select
+                  :options="images"
+                  icon="cloud_upload"
+                  label="Deploy on"
+                  displayed="label"
+                  :default-option="false"
+                  v-model="form.image"
+                />
+              </div>
+            </div>
+          </div>
+          <BuildProgress
+            v-else
+            :broadcast="build.broadcast"
+            :status="build.status"
+            :summary="build.summary"
+            :error="build.error"
+          ></BuildProgress>
         </template>
         <template v-slot:footer>
           <button
@@ -111,14 +118,18 @@
 <script>
 
 import { required } from 'vuelidate/lib/validators';
+import BuildProgress from '@/components/BuildProgress';
+import EventBus from '@/event-bus';
 
 function initialState() {
   return {
     showModal: false,
     form: {
+      branch: null,
       client: null,
       javaVersion: 8,
       instance: null,
+      image: null,
     },
     build: {
       started: false,
@@ -132,107 +143,109 @@ function initialState() {
 }
 
 export default {
+  components: {
+    BuildProgress,
+  },
+
+  props: {
+    branch: String,
+  },
 
   data() {
     return initialState();
   },
+
   computed: {
-    branch() {
-      return this.$route.params.branch;
-    },
     clients() {
       return this.$store.state.debiteur.clients;
+    },
+    branches() {
+      return this.$store.state.debiteur.branches;
     },
     instances() {
       return this.$store.state.mmpi.instances;
     },
-  },
-  validations: {
-    form: {
-      client: {
-        required,
-        name: {
-          required,
-        },
-      },
-      instance: {
-        required,
-        name: {
-          required,
-        },
-      },
+    images() {
+      return this.$store.state.extranet.images;
     },
   },
+
+  validations() {
+    const validations = {
+      form: {
+        client: {
+          required,
+          name: {
+            required,
+          },
+        },
+        instance: {
+          required,
+          name: {
+            required,
+          },
+        },
+      },
+    };
+
+    if (!this.branch) {
+      validations.form.branch = {
+        required,
+        name: {
+          required,
+        },
+      };
+    }
+
+    return validations;
+  },
+
+  watch: {
+    images() {
+      [this.form.image] = this.images;
+    },
+  },
+
   methods: {
-    getClients() {
+    getData() {
       this.$store.dispatch('debiteur/getClients');
-    },
-    getInstances() {
+      this.$store.dispatch('debiteur/getBranches');
+      this.$store.dispatch('extranet/getImages');
       this.$store.dispatch('mmpi/getInstances');
     },
+
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
+
       this.showModal = true;
+
+      this.getData();
     },
+
     close() {
       this.showModal = false;
       this.$v.$reset();
     },
-    initForm() {
-      this.$M.FormSelect.init(this.$refs['java-version']);
-    },
+
     start() {
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
       }
 
-      this.build.started = true;
-      this.build.summary = 'Build will start shortly ...';
-
-      const payload = {
-        branch: this.branch,
+      this.$store.dispatch('debiteur/startBuild', {
+        branch: this.form.branch ? this.form.branch.name : this.branch,
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-      };
-
-      this.$store.dispatch('debiteur/startBuild', payload)
+        image: this.form.image,
+      })
         .then((response) => {
           this.build.status = 'running';
-
-          if (!this.$ws.isConnected()) {
-            return;
-          }
-
-          const subscribe = this.$ws.subscribe(
-            `/queue/${response.data.broadcast.queue}`,
-            (message) => {
-              const data = JSON.parse(message.body);
-
-              if (data.summary) {
-                this.build.summary = data.summary;
-              }
-              this.build.progress = data.progress || null;
-
-              if (data.log) {
-                this.build.log += data.log;
-                this.scrollLogContainer();
-              }
-
-              if (data.status === 'failed' || (data.action === 'deploy' && data.status !== 'running')) {
-                if (data.action === 'deploy' && data.status === 'success') {
-                  this.$store.dispatch('builds/getActive');
-                }
-
-                this.build.status = data.status;
-                this.$emit('created');
-                subscribe.unsubscribe();
-              }
-            },
-            response.data.broadcast,
-          );
+          this.build.summary = 'Build will start shortly ...';
+          this.build.broadcast = response.data.broadcast;
+          EventBus.$emit('build.created');
         })
         .catch((error) => {
           this.build.status = 'failed';
@@ -242,26 +255,9 @@ export default {
           } else {
             this.build.error = error;
           }
-        });
+        })
+        .finally(() => { this.build.started = true; });
     },
-    scrollLogContainer() {
-      setTimeout(() => {
-        const container = this.$el.querySelector('.log');
-        container.scrollTop = container.scrollHeight;
-      }, 100);
-    },
-  },
-  mounted() {
-    this.getClients();
-    this.getInstances();
   },
 };
 </script>
-
-<style lang="scss" >
-  .log {
-    height: 60vh;
-    overflow: auto;
-    white-space: pre;
-  }
-</style>

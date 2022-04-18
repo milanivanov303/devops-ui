@@ -1,4 +1,5 @@
 module.exports = {
+  publicPath: '/devops/',
   lintOnSave: false,
   chainWebpack: (config) => {
     config.output
@@ -6,16 +7,9 @@ module.exports = {
       .chunkFilename('js/[name].[hash:8].js');
   },
   devServer: {
-    disableHostCheck: true,
+    public: '0.0.0.0',
+    sockPath: '/devops/sockjs-node',
     port: 80,
-    proxy: {
-      '^/ssh': {
-        target: 'http://webssh2',
-        changeOrigin: true,
-        secure: false,
-        pathRewrite: { '^/ssh': '/ssh' },
-        logLevel: 'debug',
-      },
-    },
+    disableHostCheck: true,
   },
 };

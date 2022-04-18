@@ -8,10 +8,10 @@ module.exports = {
   auth_auto: {
     username: process.env.VUE_APP_AUTH_AUTO_USERNAME,
     password: process.env.VUE_APP_AUTH_AUTO_PASSWORD,
-    session_name: process.env.VUE_APP_AUTH_AUTO_SESSION_NAME,
   },
   um: {
-    url: process.env.VUE_APP_USER_MANAGEMENT_API_URL,
+    url: process.env.VUE_APP_USER_MANAGEMENT_URL,
+    api_url: process.env.VUE_APP_USER_MANAGEMENT_API_URL,
     code: process.env.VUE_APP_USER_MANAGEMENT_API_CODE,
   },
   cms: {
@@ -36,6 +36,15 @@ module.exports = {
     username: process.env.VUE_APP_WS_USERNAME,
     password: process.env.VUE_APP_WS_PASSWORD,
     vhost: process.env.VUE_APP_WS_VHOST,
+    username_es: process.env.VUE_APP_ES_USERNAME,
+    password_es: process.env.VUE_APP_ES_PASSWORD,
+    vhost_es: process.env.VUE_APP_ES_VHOST,
+  },
+  elastic: {
+    url: process.env.VUE_APP_ELASTIC_URL,
+    username: process.env.VUE_APP_ELASTIC_USERNAME,
+    pass: process.env.VUE_APP_ELASTIC_PASSWORD,
   },
   instance: process.env.VUE_APP_ENV,
+  ssh_port: process.env.VUE_APP_SSH_PORT,
 };

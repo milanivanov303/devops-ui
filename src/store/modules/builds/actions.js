@@ -14,7 +14,7 @@ export default {
         'details',
       ]),
       filters: JSON.stringify({
-        anyOf: [
+        allOf: [
           {
             status: {
               operator: 'in',
@@ -65,7 +65,7 @@ export default {
     const promise = api('devops').post(`builds/${id}/start`);
 
     promise
-      .then(response => commit('update', response.data.data))
+      .then((response) => commit('update', response.data.data))
       .catch(() => commit('error', 'Could not start build', { root: true }));
 
     return promise;
@@ -75,7 +75,7 @@ export default {
     const promise = api('devops').post(`builds/${id}/stop`);
 
     promise
-      .then(response => commit('update', response.data.data))
+      .then((response) => commit('update', response.data.data))
       .catch(() => commit('error', 'Could not stop build', { root: true }));
 
     return promise;
@@ -90,42 +90,66 @@ export default {
     return promise;
   },
 
+  remove({ commit }, id) {
+    const promise = api('devops').delete(`builds/${id}/remove`);
+
+    promise
+      .catch(() => commit('error', 'Could not remove build', { root: true }));
+
+    return promise;
+  },
+
   getBuildsByStatus({ commit }, {
-    branch, module, status, user, perPage, page, search
+    branch, module, status, createdBy, perPage, page, search,
   }) {
     const devopsApi = api('devops');
 
-    if (typeof cancelToken != 'undefined') {
+    if (typeof cancelToken !== 'undefined') {
       cancelToken.cancel();
     }
-    
+
     cancelToken = devopsApi.axios.CancelToken.source();
 
-    const promise = devopsApi.get('builds', {
-      filters: JSON.stringify({
-        allOf: [
-          {
-            status: {
-              operator: 'in',
-              value: status,
-            },
-          },
+    const filters = [
+      {
+        status: {
+          operator: 'in',
+          value: status,
+        },
+      },
+    ];
+
+    if (module) {
+      filters.push({ module });
+    }
+
+    if (branch) {
+      filters.push({ 'details->branch': branch });
+    }
+
+    if (createdBy) {
+      filters.push({ created_by: createdBy });
+    }
+
+    if (search) {
+      filters.push({
+        anyOf: [
           {
             name: {
               operator: 'like',
-              value: ''.concat('%', search, '%'),
+              value: `%${search}%`,
             },
           },
           {
-            module,
-          },
-          {
-            'details->branch': branch,
-          },
-          {
-            created_by: user,
+            created_by: search,
           },
         ],
+      });
+    }
+
+    const promise = devopsApi.get('builds', {
+      filters: JSON.stringify({
+        allOf: filters,
       }),
       orders: JSON.stringify({
         created_on: 'desc',
@@ -133,7 +157,7 @@ export default {
       per_page: perPage,
       page,
     }, {
-      cancelToken: cancelToken.token
+      cancelToken: cancelToken.token,
     });
 
     promise

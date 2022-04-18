@@ -1,4 +1,3 @@
-
 /**
  * Vue Router
  *
@@ -10,6 +9,8 @@
 // Lib imports
 import Vue from 'vue';
 import Router from 'vue-router';
+
+import config from '@/config';
 
 // Routes
 import paths from './routes';
@@ -34,12 +35,13 @@ const router = new Router({
 });
 // Route guard
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!auth.getUser()) {
-      return next(`/login?return_uri=${to.fullPath}`);
+      return window.location.replace(
+        `${config.um.url}/login-in-app?code=${config.auth.code}&redirect_url=${window.location.origin}/devops/login?return_uri=${to.fullPath}`,
+      );
     }
   }
-
   return next();
 });
 

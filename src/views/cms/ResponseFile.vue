@@ -224,7 +224,7 @@ export default {
     loadVariables() {
       const loader = this.$loading.show({ container: this.$el });
       const payload = {
-        instance_id: `in ${this.$store.state.cms.instances.map(a => a.id).join(',')}`,
+        instance_id: `in ${this.$store.state.cms.instances.map((a) => a.id).join(',')}`,
         with: JSON.stringify({
           default_variable: {},
         }),
@@ -317,7 +317,7 @@ export default {
     this.$store.subscribe((mutation) => {
       if (mutation.type === 'cms/updateVariable') {
         this.$store.state.cms.rspVariables
-          .filter(a => a.name === mutation.payload.name)
+          .filter((a) => a.name === mutation.payload.name)
           .map((a) => {
             a.default_variable = mutation.payload;
             return a.default_variable;

@@ -13,7 +13,7 @@
                 autocomplete="off"
                 type="text"
                 id="project"
-                v-model="project.name">
+                :value="project.name">
               <label :class="{active: project.name}" for="project">Project</label>
             </div>
           </div>

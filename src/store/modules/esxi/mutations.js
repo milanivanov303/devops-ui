@@ -1,0 +1,61 @@
+// https://vuex.vuejs.org/en/mutations.html
+import Vue from 'vue';
+
+export default {
+  error(state, error) {
+    state.error = error;
+  },
+
+  esxiHosts(state, esxiHosts) {
+    state.esxiHosts = esxiHosts;
+  },
+  allVirtualMachines(state, virtualMachines) {
+    state.allVirtualMachines = virtualMachines;
+  },
+  virtualMachines(state, virtualMachines) {
+    state.virtualMachines = virtualMachines;
+  },
+  instances(state, instances) {
+    state.instances = instances;
+  },
+
+  createHost(state, host) {
+    const { esxiHosts } = state;
+    esxiHosts.push(host);
+    Vue.set(state, 'esxiHosts', esxiHosts);
+  },
+  updateHost(state, host) {
+    state.esxiHosts.map((h) => {
+      if (h.id === host.id) {
+        Vue.set(state.esxiHosts, state.esxiHosts.indexOf(h), host);
+      }
+      return state.esxiHosts;
+    });
+  },
+
+  updateVirtualMachine(state, virtualMachine) {
+    state.virtualMachines.map((vm) => {
+      if (vm.id === virtualMachine.id) {
+        Vue.set(state.virtualMachines, state.virtualMachines.indexOf(vm), virtualMachine);
+      }
+      return state.virtualMachines;
+    });
+  },
+
+  imxComponents(state, imxComponents) {
+    state.imxComponents = imxComponents;
+  },
+  createImxComponent(state, imxComponent) {
+    const { imxComponents } = state;
+    imxComponents.push(imxComponent);
+    Vue.set(state, 'imxComponents', imxComponents);
+  },
+  updateImxComponent(state, component) {
+    if (!component.error) {
+      const { imxComponents } = state;
+      const index = imxComponents.findIndex((imxComponent) => imxComponent.id === component.id);
+      imxComponents.splice(index, 1, component);
+      Vue.set(state, 'imxComponents', imxComponents);
+    }
+  },
+};

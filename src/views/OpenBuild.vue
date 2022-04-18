@@ -99,11 +99,16 @@ export default {
     api.get('builds', { name: this.name })
       .then((response) => {
         loader.hide();
-        if (response.data.data.length === 0) {
+
+        [this.build] = response.data.data;
+
+        if (!this.build || this.build.status === 'failed') {
           document.getElementById('autostart_builds').classList.add('fail');
+
           this.icon = 'cancel';
           this.header = '- Sorry - ';
           this.message = 'There is no such build';
+
           return;
         }
 
