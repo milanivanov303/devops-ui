@@ -6,25 +6,31 @@
               label="Codix Team"
               icon="people"
               displayed="name"
-              v-model="codix_team"
+              v-model="codixTeam"
               :options="codixTeams"
             />
+      <div class="validator red-text" v-if="$v.codixTeam.$error">
+        <p v-if="!$v.codixTeam.required">Codix Team must not be empty.</p>
+      </div>
     </div>
      <div class="col s6 l6">
         <Select
               label="Codix Team from TTS"
               icon="people"
               displayed="name"
-              v-model="teamstts"
-              :options="codixTeamsTTS"
+              v-model="ttsTeam"
+              :options="teamsTTS"
             />
+       <div class="validator red-text" v-if="$v.ttsTeam.$error">
+         <p v-if="!$v.ttsTeam.required">Codix Team from TTS Team must not be empty.</p>
+       </div>
     </div>
     <div class="col s12 l12 ">
         <button
         class="btn waves-effect waves-light right"
         type="button"
-        name="action">
-        <!-- @click=""> -->
+        name="action"
+        @click="updateCodixTeams">
         Update Codix Teams
       </button>
     </div>
@@ -32,14 +38,23 @@
 </template>
 <script>
 
+import { required } from 'vuelidate/lib/validators';
+
 export default {
-  components: {},
-  mounted() {},
-  watch: {},
   data() {
-    return {};
+    return {
+      codixTeam: {},
+      ttsTeam: {},
+    };
   },
-  validations: {},
+  validations: {
+    codixTeam: {
+      required,
+    },
+    ttsTeam: {
+      required,
+    },
+  },
   computed: {
     codixTeams() {
       return this.$store.state.cms.codixTeams;
@@ -48,7 +63,25 @@ export default {
       return this.$store.state.cms.codixTeamsTTS;
     },
   },
-  methods: {},
+  methods: {
+    async updateCodixTeams() {
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        return;
+      }
+      console.log(this.codixTeam.id, this.ttsTeam.name)
+      const loader = this.$loading.show({ container: this.$el });
+      await this.$store.dispatch('cms/updateTeams', this.codixTeam.id)
+        .then(() => {
+          this.$M.toast({ html: 'Team has been updated!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          this.error = error;
+          return error;
+        });
+      loader.hide();
+    },
+  },
   created() {
     this.$store.dispatch('cms/getCodixTeams');
     this.$store.dispatch('cms/codixTeamsTTS');

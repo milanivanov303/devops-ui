@@ -20,7 +20,6 @@ export default {
     return promise;
   },
 
-
   getModules({ commit }) {
     const name = 'modules';
 
@@ -35,10 +34,9 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then((response) => commit('modules', response.data.data))
+      .then((response) => commit('modules', response.data.data));
     return promise;
   },
-
 
   getOneVariable({ commit }, variable) {
     const promise = api('cms').get(`default-variables/${variable}`);
@@ -95,15 +93,18 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then(response => commit('codixTeamsTTS', response.data.data))
+      .then((response) => commit('codixTeamsTTS', response.data.data));
     return promise;
   },
 
   updateTeams({ commit }, payload) {
-    const promise = api('cms').put(`codix-teams/${payload.id}`, payload);
+    const data = {
+      tts_group_name: payload.ttsTeam,
+    };
 
+    const promise = api('cms').put(`codix-teams/${payload.id}`, data);
     promise
-      .then(response => commit('updateTeams', response.data.data))
+      .then((response) => commit('updateTeams', response.data.data))
       .catch(() => commit('error', 'Could not update teams', { root: true }));
 
     return promise;
