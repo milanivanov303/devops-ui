@@ -142,6 +142,14 @@ export default {
     openModal() {
       this.currentHost = { ...this.esxiHost };
       this.showModal = true;
+
+      if (this.esxiHost.purchase_date) {
+        this.currentHost.purchase_date = this.$date(this.esxiHost.purchase_date).toISO();
+      }
+
+      if (this.esxiHost.expiration_date) {
+        this.currentHost.expiration_date = this.$date(this.esxiHost.expiration_date).toISO();
+      }
       // this.$router.push({
       //   path: `${encodeURIComponent('edit')}`,
       // });

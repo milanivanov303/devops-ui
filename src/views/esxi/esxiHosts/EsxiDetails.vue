@@ -39,7 +39,8 @@
           <li v-if="esxiHost.installation_date" class="collection-item">
             <b>Installation date: </b>{{ $date(esxiHost.installation_date).toHuman() }}
           </li>
-          <li v-if="esxiHost.expiration_date" class="collection-item">
+          <li v-if="esxiHost.expiration_date" class="collection-item"
+              :class="{'red-text': isDateExpired(esxiHost.expiration_date)}">
             <b>Expiration date: </b>{{ $date(esxiHost.expiration_date).toHuman() }}
           </li>
         </div>
@@ -106,6 +107,9 @@ export default {
         return null;
       }
       return this.$esxi(cpuDetails[0].core_speed).hertzToGigahertz();
+    },
+    isDateExpired(date) {
+      return date < Date.now() / 1000;
     },
   },
 
