@@ -22,6 +22,7 @@
         <Column show="val_instance"/>
         <Column show="delivery_chain"/>
         <Column show="prefix"/>
+        <Column show="app_version" :sortable="false" filter-type="dropdown"/>
         <Column show="servlet_container"/>
         <Column
           label="Additional info" name="additional_info"
