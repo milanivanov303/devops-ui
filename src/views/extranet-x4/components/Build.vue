@@ -32,6 +32,25 @@
               </div>
             </div>
             <div class="row">
+              <div class="col s12">
+                <Autocomplete
+                  label="Instance"
+                  icon="dynamic_feed"
+                  :items="instances"
+                  v-model="form.instance"
+                  :invalid="$v.form.instance.$error"
+                  @blur="$v.form.instance.$touch()"
+                />
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.instance.$error">
+                  <p v-if="!$v.form.instance.required">
+                    Instance field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
               <div class="col s12" >
                 <Select
                   :options="images"
@@ -73,6 +92,7 @@ function initialState() {
     showModal: false,
     form: {
       branch: null,
+      instance: null,
       image: null,
     },
     build: {
@@ -99,11 +119,11 @@ export default {
   },
 
   computed: {
-    instances() {
-      return this.$store.state.mmpi.instances;
-    },
     branches() {
       return this.$store.state['extranet-x4'].branches;
+    },
+    instances() {
+      return this.$store.state.mmpi.instances;
     },
     images() {
       return this.$store.state['extranet-x4'].images;
@@ -112,7 +132,14 @@ export default {
 
   validations() {
     const validations = {
-      form: {},
+      form: {
+        instance: {
+          required,
+          name: {
+            required,
+          },
+        },
+      },
     };
 
     if (!this.branch) {
@@ -136,6 +163,7 @@ export default {
   methods: {
     getData() {
       this.$store.dispatch('extranet-x4/getBranches');
+      this.$store.dispatch('mmpi/getInstances');
       this.$store.dispatch('extranet-x4/getImages');
     },
 
@@ -161,6 +189,7 @@ export default {
 
       this.$store.dispatch('extranet-x4/startBuild', {
         branch: this.form.branch ? this.form.branch.name : this.branch,
+        instance: this.form.instance,
         image: this.form.image,
       })
         .then((response) => {
