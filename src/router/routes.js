@@ -5,8 +5,8 @@ const Builds = () => import(/* webpackChunkName: "dashboard" */ '../views/Builds
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 
-const Configurations = () => import(/* webpackChunkName: "extranet" */ '../views/pas/configurations/Configurations');
-const SoaModification = () => import(/* webpackChunkName: "extranet" */ '../views/pas/SOAdeployment');
+const Configurations = () => import(/* webpackChunkName: "pas" */ '../views/pas/configurations/Configurations');
+const SoaModification = () => import(/* webpackChunkName: "pas" */ '../views/pas/SOAdeployment');
 
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
@@ -120,6 +120,52 @@ export default [
       module: 'extranet',
     },
   },
+
+  // Extranet X4 Tab
+  {
+    path: '/extranet-x4',
+    redirect: '/extranet-x4/dashboard',
+  },
+  {
+    path: '/extranet-x4/dashboard',
+    name: 'extranet-x4',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Extranet X4 Dashboard',
+      breadcrumb: 'Dashboard',
+    },
+    component: Dashboard,
+    props: {
+      module: 'extranet-x4',
+    },
+  },
+  {
+    path: '/extranet-x4/branches/:branch?',
+    name: 'extranet-x4-branches',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Extranet X4 Branches';
+
+        if (route.query.branch) {
+          title = `${route.query.branch} - ${title}`;
+        }
+
+        if (route.query.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Branches,
+    props: {
+      module: 'extranet-x4',
+    },
+  },
+
   {
     path: '/pas/configurations/:id?/:action?',
     name: 'configurations',
