@@ -26,8 +26,11 @@
               <li :class="{ active: isActive('pas/configurations') }">
                 <router-link to="/pas/configurations"> DevOps Matrix</router-link>
               </li>
-              <li :class="{ active: isActive('extranet') }">
+              <li :class="{ active: isActive('extranet/') }">
                 <router-link to="/extranet/dashboard"> Extranet</router-link>
+              </li>
+              <li :class="{ active: isActive('extranet-x4') }">
+                <router-link to="/extranet-x4/dashboard"> Extranet X4</router-link>
               </li>
               <li :class="{ active: isActive('debiteur') }">
                 <router-link to="/debiteur/dashboard"> Debiteur</router-link>
