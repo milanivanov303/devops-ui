@@ -69,9 +69,8 @@ export default {
       if (this.$v.$invalid) {
         return;
       }
-      console.log(this.codixTeam.id, this.ttsTeam.name)
       const loader = this.$loading.show({ container: this.$el });
-      await this.$store.dispatch('cms/updateTeams', this.codixTeam.id)
+      await this.$store.dispatch('cms/updateTeams', this.codixTeam, this.ttsTeam)
         .then(() => {
           this.$M.toast({ html: 'Team has been updated!', classes: 'toast-seccess' });
         })

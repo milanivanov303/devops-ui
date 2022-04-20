@@ -99,7 +99,7 @@ export default {
 
   updateTeams({ commit }, payload) {
     const data = {
-      tts_group_name: payload.ttsTeam,
+      tts_group_name: payload.name,
     };
 
     const promise = api('cms').put(`codix-teams/${payload.id}`, data);
