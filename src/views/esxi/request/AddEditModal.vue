@@ -33,6 +33,7 @@
                   v-model="selected.delivery_chain"
                   :invalid="$v.selected.delivery_chain.$error"
                   @blur="$v.selected.delivery_chain.$touch()"
+                  @change="delete selected.dc_role"
               />
               <div class="validator">
                 <div class="red-text" v-if="$v.selected.delivery_chain.$error">
@@ -175,17 +176,6 @@ export default {
     },
   },
   methods: {
-    loadData() {
-      const promise1 = this.$store.dispatch('mmpi/getProjects');
-      const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
-      const promise3 = this.$store.dispatch('mmpi/getInstanceTypes');
-      const promise4 = this.$store.dispatch('mmpi/getEnvironmentTypes');
-
-      Promise.all([promise1, promise2, promise3, promise4])
-        .then(() => {
-          if (this.action === 'update') this.setUpdateData();
-        });
-    },
     setUpdateData() {
       this.selected = { ...this.request };
 
@@ -216,7 +206,6 @@ export default {
     },
 
     getDefaultDeliveryChainRole() {
-      this.selected.dc_role = null;
       if (this.selected.delivery_chain && this.selected.delivery_chain.dc_role) {
         this.selected.dc_role = { value: this.selected.delivery_chain.dc_role.value };
       }
@@ -259,7 +248,9 @@ export default {
   },
 
   mounted() {
-    this.loadData();
+    if (this.action === 'update') {
+      this.setUpdateData();
+    }
   },
 };
 

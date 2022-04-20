@@ -93,10 +93,20 @@ export default {
     openAddEditModal(request, action) {
       this.selected = { ...request };
       this.action = action;
-      this.showAddEditModal = true;
-      this.$router.push({
-        path: `/inventory/request/${encodeURIComponent(this.selected.id || 'new')}`,
-      });
+
+      const promise1 = this.$store.dispatch('mmpi/getProjects');
+      const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
+      const promise3 = this.$store.dispatch('mmpi/getInstanceTypes');
+      const promise4 = this.$store.dispatch('mmpi/getEnvironmentTypes');
+
+      Promise.all([promise1, promise2, promise3, promise4])
+        .then(() => {
+          this.showAddEditModal = true;
+          this.$router.push({
+            path: `/inventory/request/${encodeURIComponent(this.selected.id || 'new')}`,
+          });
+        })
+        .catch((error) => this.$M.toast({ html: error, classes: 'toast-fail' }));
     },
     closeAddEditModal() {
       this.showAddEditModal = false;
