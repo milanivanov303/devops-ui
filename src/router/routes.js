@@ -36,6 +36,8 @@ const CmsActionsAdministration = () => import(/* webpackChunkName: "administrati
 
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
+const CmsModulesDetails = () => import(/* webpackChunkName: "cms-modules-details" */ '../views/administration/CmsModulesDetails.vue');
+
 export default [
   {
     path: '/login',
@@ -560,6 +562,20 @@ export default [
       requiresAuth: false,
     },
     component: OpenBuild,
+  },
+  {
+    path: '/administration/cms-modules-details',
+    meta: {
+      alias: '/administration/cms-modules-details',
+      name: 'cms-modules-details',
+      requiresAuth: true,
+      title: 'Cms Modules Details',
+    },
+    component: CmsModulesDetails,
+    beforeEnter: (to, from, next) => {
+      if (auth.can('can-manage-authorizations')) next();
+      else next('/dashbaord');
+    },
   },
   {
     path: '/:name(.*_\\d+)/:uri(.*)?',

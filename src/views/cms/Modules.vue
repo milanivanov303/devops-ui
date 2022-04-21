@@ -2,14 +2,14 @@
   <div class="row">
     <h1 class="center">Modules</h1>
      <div class="col s12 m4">
-            <Select
-              label="Modules"
-              icon="memory"
-              displayed="name"
-              v-model="abbrev.getModule"
-              :options="getModules"
-            />
-           </div>
+        <Select
+          label="Modules"
+          icon="memory"
+          displayed="name"
+          v-model="abbrev.getModule"
+          :options="getModules"
+        />
+     </div>
      <div class="col s12 l8">
       <table  class="highlight striped responsive-table">
         <thead>

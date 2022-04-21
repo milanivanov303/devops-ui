@@ -202,6 +202,16 @@
                 <li><div class="divider"></div></li>
               </ul>
             </div>
+            <div>
+              <ul>
+                <li
+                  v-if="$auth.can('can-manage-authorizations')"
+                  :class="{ active: isActive('administration/cms-modules-details') }">
+                  <router-link to="/administration/cms-modules-details">
+                    CMS Modules Details</router-link>
+                </li>
+              </ul>
+            </div>
           </div>
         </li>
       </ul>
