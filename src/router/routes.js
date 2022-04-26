@@ -36,7 +36,7 @@ const CmsActionsAdministration = () => import(/* webpackChunkName: "administrati
 
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
-const CmsModulesDetails = () => import(/* webpackChunkName: "cms-modules-details" */ '../views/administration/CmsModulesDetails.vue');
+const CmsModulesDetails = () => import(/* webpackChunkName: "cms-modules-details" */ '../views/administration/CmsModulesDetails');
 
 export default [
   {

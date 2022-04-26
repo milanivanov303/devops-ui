@@ -65,6 +65,21 @@ export default {
       .catch(() => commit('error', 'Could not get IMX Modules', { root: true }));
     return promise;
   },
+
+  createModule({ commit }, payload) {
+    const promise = api('cms').post('modules', payload);
+    promise
+      .catch(() => commit('error', 'Could not create module', { root: true }));
+    return promise;
+  },
+
+  createSubmodule({ commit }, payload) {
+    const promise = api('cms').post('modules/submodules', payload);
+    promise
+      .catch(() => commit('error', 'Could not create submodule', { root: true }));
+    return promise;
+  },
+
   getCodixTeams({ commit }) {
     const name = 'codix-teams';
 

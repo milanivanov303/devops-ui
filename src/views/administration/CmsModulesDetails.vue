@@ -1,42 +1,75 @@
 <template>
   <div>
-    <h1 class="center">Cms Modules Details</h1>
-    <form ref="form" @submit.prevent="onSubmit">
-      <Alert
-          v-if="error !== ''"
-          v-bind:msg="error"/>
+    <h3 class="center">Cms Modules Details</h3>
+    <form>
       <div class="row">
-        <div  class="input-field col l5 m6 s6">
+        <div class="input-field col l5 m6 s6">
           <i class="material-icons prefix">memory</i>
-          <label for="module" class="active">Module</label>
+          <label for="module" class="active">Module name</label>
           <input
               id="module"
               type="text"
-              v-model="module"
+              v-model="moduleName"
           />
-<!--          <div class="validator red-text" v-if="$v.form.project.$error">-->
-<!--            <span v-if="!$v.form.project.required">Module field must not be empty.</span>-->
-<!--          </div>-->
+          <div class="validator red-text" v-if="$v.moduleName.$error">
+            <span v-if="!$v.moduleName.required">Module name field must not be empty.</span>
+          </div>
         </div>
         <div class="input-field col s12 m4 l5">
-          <i class="material-icons prefix">description</i>
-          <label for="subModule" class="active">Sub Module</label>
+          <i class="material-icons prefix">fullscreen_exit</i>
+          <label for="moduleAbbrev" class="active">Module Abbreviation</label>
           <input
-              id="subModule"
+              id="moduleAbbrev"
               type="text"
-              v-model="subModule"
+              v-model="moduleAbbrev"
           />
-<!--          <div class="validator red-text" v-if="$v.form.details.$error">-->
-<!--            <span v-if="!$v.form.details.required">Details field must not be empty.</span>-->
-<!--          </div>-->
+          <div class="validator red-text" v-if="$v.moduleAbbrev.$error">
+            <span v-if="!$v.moduleAbbrev.required">
+              Module Abbreviation field must not be empty.</span>
+          </div>
         </div>
-        <div class="col s12 l12">
-          <button
-              class="btn waves-effect waves-light right"
-              type="button"
-              name="action">Add
-          </button>
+        <button
+            class="btn waves-effect waves-light"
+            type="button"
+            name="action"
+            @click="addModule()">Add Module
+        </button>
+      </div>
+    </form>
+
+    <form>
+      <div class="row">
+        <div class="input-field col l5 m6 s6">
+          <i class="material-icons prefix">developer_board</i>
+          <label for="submodule" class="active">Submodule name</label>
+          <input
+              id="submodule"
+              type="text"
+              v-model="submoduleName"
+          />
+          <div class="validator red-text" v-if="$v.submoduleName.$error">
+            <span v-if="!$v.submoduleName.required">Submodule name field must not be empty.</span>
+          </div>
         </div>
+        <div class="input-field col s12 m4 l5">
+          <i class="material-icons prefix">fullscreen_exit</i>
+          <label for="submoduleAbbrev" class="active">Submodule Abbreviation</label>
+          <input
+              id="submoduleAbbrev"
+              type="text"
+              v-model="submoduleAbbrev"
+          />
+          <div class="validator red-text" v-if="$v.submoduleAbbrev.$error">
+            <span v-if="!$v.submoduleAbbrev.required">
+              Submodule abbreviation field must not be empty.</span>
+          </div>
+        </div>
+        <button
+            class="btn waves-effect waves-light"
+            type="button"
+            name="action"
+            @click="addSubmodule()">Add Submodule
+        </button>
       </div>
     </form>
     <Table
@@ -71,8 +104,10 @@ export default {
 
   data() {
     return {
-      module: '',
-      subModule: '',
+      moduleName: '',
+      moduleAbbrev: '',
+      submoduleName: '',
+      submoduleAbbrev: '',
       error: '',
       form: {},
       project: '',
@@ -81,13 +116,70 @@ export default {
       selectedDetail: {},
     };
   },
-  validations: {},
+  validations: {
+    moduleName: {
+      required,
+    },
+    moduleAbbrev: {
+      required,
+    },
+    submoduleName: {
+      required,
+    },
+    submoduleAbbrev: {
+      required,
+    },
+  },
   computed: {
     modules() {
       return this.$store.getters['cms/modules'];
     },
   },
-  methods: {},
+  methods: {
+    async addModule() {
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        return;
+      }
+      const loader = this.$loading.show({ container: this.$el });
+      await this.$store.dispatch('cms/createModule', {
+        name: this.moduleName,
+        abbreviation: this.moduleAbbrev,
+      })
+        .then(() => {
+          this.$M.toast({ html: 'Module has been added!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          this.error = error;
+          return error;
+        });
+      this.moduleName = '';
+      this.moduleAbbrev = '';
+      loader.hide();
+    },
+
+    async addSubmodule() {
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        return;
+      }
+      const loader = this.$loading.show({ container: this.$el });
+      await this.$store.dispatch('cms/createSubmodule', {
+        name: this.submoduleName,
+        abbreviation: this.submoduleAbbrev,
+      })
+        .then(() => {
+          this.$M.toast({ html: 'Submodule has been added!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          this.error = error;
+          return error;
+        });
+      this.submoduleName = '';
+      this.submoduleAbbrev = '';
+      loader.hide();
+    },
+  },
   created() {
     this.$store.dispatch('cms/getModules');
   },
