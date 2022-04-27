@@ -114,4 +114,31 @@ export default {
     return promise;
   },
 
+  getRequestedInstances({ commit }) {
+    const promise = api('devops').get('inventory/requested-instances');
+
+    promise
+      .then((response) => {
+        commit('requestedInstances', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get servers\' list', { root: true }));
+    return promise;
+  },
+  createRequestedInstance({ commit }, payload) {
+    const promise = api('devops').post('inventory/requested-instances', payload);
+
+    promise
+      .then((response) => commit('requestInstance', response.data.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+  updateRequestedInstance({ commit }, payload) {
+    const promise = api('devops').put(`inventory/requested-instances/${payload.id}`, payload);
+
+    promise
+      .then((response) => commit('updateRequestedInstances', response.data.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+
 };
