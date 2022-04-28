@@ -1,82 +1,6 @@
 // https://vuex.vuejs.org/en/actions.html
 
 export default {
-  getInstances({ commit }) {
-    const name = 'instances';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
-    const promise = api('mmpi').get('instances', {
-      filters: JSON.stringify({
-        allOf: [
-          {
-            'environment_type.type': 'IMX',
-          },
-          {
-            instance_type_id: { operator: 'in', value: ['DEV', 'VAL', 'PATCH'] },
-          },
-          {
-            'owner.key': 'codix',
-          },
-          {
-            'status.key': 'active',
-          },
-        ],
-      }),
-      orders: JSON.stringify({
-        name: 'asc',
-      }),
-      with: JSON.stringify({
-        environment_type: [],
-      }),
-    });
-
-    commit('promise', { name, promise }, { root: true });
-
-    promise
-      .then((response) => commit('instances', response.data.data))
-      .catch(() => commit('error', 'Could not get instances list', { root: true }));
-
-    return promise;
-  },
-
-  getDeployInstances({ commit }) {
-    const name = 'deploy_instances';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
-    const promise = api('mmpi').get('instances', {
-      filters: JSON.stringify({
-        allOf: [
-          {
-            'environment_type.type': { operator: 'in', value: ['extranet', 'XNET_CFG'] },
-          },
-          {
-            'owner.key': 'codix',
-          },
-          {
-            'status.key': 'active',
-          },
-        ],
-      }),
-      orders: JSON.stringify({
-        name: 'asc',
-      }),
-    });
-
-    commit('promise', { name, promise }, { root: true });
-
-    promise
-      .then((response) => commit('deployInstances', response.data.data))
-      .catch(() => commit('error', 'Could not get instances list', { root: true }));
-
-    return promise;
-  },
-
   getProjects({ commit }) {
     const name = 'projects';
 
@@ -99,6 +23,7 @@ export default {
         delivery_chains: {
           instances: ['environment_type'],
           status: [],
+          dc_role: [],
         },
       }),
       orders: JSON.stringify({
@@ -115,6 +40,7 @@ export default {
     return promise;
   },
 
+  // delivery chains
   getDeliveryChains({ commit }) {
     const name = 'delivery-chains';
 
@@ -138,62 +64,22 @@ export default {
     return promise;
   },
 
-  async getDevInstances({ commit }) {
-    const name = 'devInstances';
+  getDeliveryChainRoles({ commit }) {
+    const name = 'delivery-chain-types';
 
     if (this.state.promises[name]) {
       return this.state.promises[name];
     }
 
-    const payload = {
-      limit: 5000,
-      orders: JSON.stringify({
-        name: 'asc',
-      }),
-      filters: JSON.stringify({
-        allOf: [
-          {
-            'owner.key': 'codix',
-          },
-          {
-            'status.key': 'active',
-          },
-        ],
-      }),
-      fields: JSON.stringify({
-        db_user: [],
-        environment_type: [],
-        host: [],
-        id: [],
-        instance_type_id: [],
-        name: [],
-        user: [],
-        timezone: [],
-        owner: [],
-        status: [],
-      }),
-      with: JSON.stringify({
-        environment_type: {},
-        owner: {},
-        status: {},
-      }),
-    };
-
-    const promise = api('mmpi').get('instances', payload);
+    const promise = api('mmpi').get('enum-values', {
+      type: 'delivery_chain_role',
+    });
 
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then((response) => {
-        const refbg2 = {
-          name: 'refbg2',
-          host: 'refbg2.codixfr.private',
-        };
-        response.data.data.unshift(refbg2);
-        commit('devInstances', response.data.data);
-      })
-      .catch(() => commit('error', 'Could not get instances list'));
-
+      .then((response) => commit('deliveryChainRoles', response.data.data))
+      .catch(() => commit('error', 'Could not get delivery chain roles list', { root: true }));
     return promise;
   },
 
@@ -256,13 +142,76 @@ export default {
     return promise;
   },
 
+  // instances
+  getInstances({ commit }) {
+    const name = 'instances';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('instances', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            'environment_type.type': 'IMX',
+          },
+          {
+            instance_type_id: { operator: 'in', value: ['DEV', 'VAL', 'PATCH'] },
+          },
+          {
+            'owner.key': 'codix',
+          },
+          {
+            'status.key': 'active',
+          },
+        ],
+      }),
+      orders: JSON.stringify({
+        name: 'asc',
+      }),
+      with: JSON.stringify({
+        environment_type: [],
+      }),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => commit('instances', response.data.data))
+      .catch(() => commit('error', 'Could not get instances list', { root: true }));
+
+    return promise;
+  },
+
+  getInstanceTypes({ commit }) {
+    const name = 'instanceTypes';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('delivery-chain-types');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((resp) => commit('instanceTypes', resp.data.data))
+      .catch(() => commit('error', 'Could not get instance types list'));
+    return promise;
+  },
+
   getInstanceStatus({ commit }) {
     const name = 'instanceStatus';
-    const payload = {
-      type: 'instance_status',
-    };
 
-    const promise = api('mmpi').get('enum-values', payload);
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('enum-values', {
+      type: 'instance_status',
+    });
+
     commit('promise', { name, promise }, { root: true });
 
     promise
@@ -270,24 +219,135 @@ export default {
         commit('instanceStatus', resp.data.data);
       })
       .catch(() => commit('error', 'Could not get instance status'));
+    return promise;
+  },
+
+  async getDevInstances({ commit }) {
+    const name = 'devInstances';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const payload = {
+      limit: 5000,
+      orders: JSON.stringify({
+        name: 'asc',
+      }),
+      filters: JSON.stringify({
+        allOf: [
+          {
+            'owner.key': 'codix',
+          },
+          {
+            'status.key': 'active',
+          },
+        ],
+      }),
+      fields: JSON.stringify({
+        db_user: [],
+        environment_type: [],
+        host: [],
+        id: [],
+        instance_type_id: [],
+        name: [],
+        user: [],
+        timezone: [],
+        owner: [],
+        status: [],
+      }),
+      with: JSON.stringify({
+        environment_type: {},
+        owner: {},
+        status: {},
+      }),
+    };
+
+    const promise = api('mmpi').get('instances', payload);
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => {
+        const refbg2 = {
+          name: 'refbg2',
+          host: 'refbg2.codixfr.private',
+        };
+        response.data.data.unshift(refbg2);
+        commit('devInstances', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get instances list'));
 
     return promise;
   },
 
-  getOperationTypes({ commit }) {
-    const name = 'operationType';
-    const payload = {
-      type: 'operation_types',
-    };
-    const promise = api('mmpi').get('enum-values', payload);
+  getDeployInstances({ commit }) {
+    const name = 'deploy_instances';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('instances', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            'environment_type.type': { operator: 'in', value: ['extranet', 'XNET_CFG'] },
+          },
+          {
+            'owner.key': 'codix',
+          },
+          {
+            'status.key': 'active',
+          },
+        ],
+      }),
+      orders: JSON.stringify({
+        name: 'asc',
+      }),
+    });
+
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then((resp) => {
-        commit('operationType', resp.data.data);
-      })
-      .catch(() => commit('error', 'Could not get SE Type'));
+      .then((response) => commit('deployInstances', response.data.data))
+      .catch(() => commit('error', 'Could not get instances list', { root: true }));
 
+    return promise;
+  },
+
+  getEnvironmentTypes({ commit }) {
+    const name = 'environmentTypes';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('instance-types');
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((resp) => commit('environmentTypes', resp.data.data))
+      .catch(() => commit('error', 'Could not get environment types list'));
+    return promise;
+  },
+
+  //
+  getOperationTypes({ commit }) {
+    const name = 'operationType';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('enum-values', {
+      type: 'operation_types',
+    });
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((resp) => commit('operationType', resp.data.data))
+      .catch(() => commit('error', 'Could not get SE Type'));
     return promise;
   },
 

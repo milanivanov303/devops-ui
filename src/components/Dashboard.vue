@@ -1,7 +1,7 @@
 <template>
   <div class="row">
       <div class="col s12 l8">
-        <MyBuilds :module="module"/>
+        <MyBuilds :module="module" :key="module"/>
         <BuildsByBranch :module="module" :loading="loading"/>
       </div>
       <div class="col s12 l4">
