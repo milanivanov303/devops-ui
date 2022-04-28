@@ -80,7 +80,22 @@
         <li v-if="vm.instances && vm.instances.length > 0">
           <div class="collapsible-header"><i class="material-icons">apps</i>Instances</div>
           <div class="collapsible-body ">
-            <Instances :instances="vm.instances" :hideActions="false"/>
+            <div class="data-table">
+              <Table
+                  :data="vm.instances"
+                  sort-by="name"
+                  sort-dir="asc"
+                  query-prefix="components_"
+                  :export-btn="false"
+                  :view-btn="false"
+                  :add-btn="false"
+                  :edit-btn="false"
+                  :delete-btn="false"
+              >
+                <Column show="name"/>
+                <Column show="home_path"/>
+              </Table>
+            </div>
           </div>
         </li>
         <li v-if="vm.components">
@@ -105,12 +120,10 @@
 </template>
 
 <script>
-import Instances from '../instances/Instances';
 import ComponentsTable from './ComponentsTable';
 
 export default {
   components: {
-    Instances,
     ComponentsTable,
   },
 
