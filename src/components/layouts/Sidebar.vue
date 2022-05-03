@@ -50,9 +50,23 @@
           </router-link>
         </li>
         <li :class="{ active: isActive('documentation') }">
-          <router-link to="/documentation">
+          <a class="collapsible-header">
             <i class="material-icons">library_books</i> Documentation
-          </router-link>
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li :class="{ active: isActive('documentation/Extranet') }">
+                <router-link to="/documentation/Extranet">Extranet</router-link>
+              </li>
+              <li :class="{ active: isActive('documentation/B2B') }">
+                <router-link to="/documentation/B2B">B2B</router-link>
+              </li>
+              <li :class="{ active: isActive('documentation/API_Platform') }">
+                <router-link to="/documentation/API_Platform">API Platform</router-link>
+              </li>
+            </ul>
+          </div>
         </li>
         <li :class="{ active: isActive('demos') }">
           <a class="collapsible-header">
@@ -248,6 +262,10 @@ li.active {
   .subheader {
     color: white;
     padding: 0 15px;
+  }
+
+  li > a > i.material-icons {
+    margin: 0 14px 0 0 ;
   }
 }
 </style>

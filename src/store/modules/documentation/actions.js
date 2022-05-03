@@ -1,48 +1,54 @@
-import Axios from 'axios';
-import config from '@/config';
-
-const gitlab = Axios.create({
-  baseURL: config.gitlab.url,
-});
+import { DateTime } from 'luxon';
 
 export default {
-  getFiles({ commit }) {
-    const promise = gitlab.get('api/v4/projects/495/repository/tree?path=API Catalog/Extranet&recursive=1&per_page=100');
-
-    promise
-      .catch(() => commit('error', 'Could not get documentation list', { root: true }));
-    return promise;
-  },
-
-  getRawFile({ commit }, file) {
-    const promise = gitlab.get(`api/v4/projects/495/repository/blobs/${file.id}/raw`);
-
-    promise
-      .catch(() => commit('error', 'Could not get raw file', { root: true }));
-    return promise;
-  },
-
-  getSpecs({ commit }, { branch, repo }) {
-    const promise = api('devops').get(`specs/?repo=${repo}&branch=${branch}`);
+  getSpecs({ commit }, parameters) {
+    const promise = api('devops').get('specs', parameters);
 
     promise
       .catch(() => commit('error', 'Could not get apiDocumentationList', { root: true }));
     return promise;
   },
 
-  getDetails({ commit }, { branch, repo }) {
-    const promise = api('devops').get(`specs/?repo=${repo}&branch=${branch}&file=data.json`);
+  getDetails({ commit }, parameters) {
+    parameters.file = 'data.json';
+    const promise = api('devops').get('specs', parameters);
 
     promise
       .catch(() => commit('error', 'Could not get documentation details', { root: true }));
     return promise;
   },
 
-  getRamlFile({ commit }, { branch, repo, file }) {
-    const promise = api('devops').get(`specs/?repo=${repo}&branch=${branch}&file=${file}`);
+  getRamlFile({ commit }, parameters) {
+    const promise = api('devops').get('specs', parameters);
 
     promise
       .catch(() => commit('error', 'Could not get RAML file', { root: true }));
+    return promise;
+  },
+
+  download({ commit }, parameters) {
+    const promise = api('devops').post(
+      'specs/download',
+      parameters,
+      {
+        responseType: 'blob',
+      },
+    );
+    promise
+      .then((response) => {
+        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        const fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute(
+          'download',
+          response.headers['content-disposition'].split('filename=')[1],
+        );
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      })
+      .catch(() => commit('error', 'Could not get apiDocumentationList', { root: true }));
     return promise;
   },
 };

@@ -8,10 +8,16 @@
         :edit-btn="false"
         :delete-btn="false"
       >
-        <Column label="Title" :show="getTitle" width="20%"/>
-        <Column label="Description" :show="getDescription" width="40%"/>
-        <Column show="path" width="25%"/>
+        <Column label="Title" :show="getTitle"/>
+        <Column label="Description" :show="getDescription"/>
+        <Column show="path"/>
         <Column show="paths" class="hidden"/>
+
+        <template v-slot:top-actions-after>
+          <button class="btn right" @click="downloadSelectedHtml()">
+            <i class="material-icons left">download</i> Download as HTML
+          </button>
+        </template>
 
         <template v-slot:actions-before="{ row }">
           <a class="btn btn-tiny" @click="showRawFile(row)">View</a>
@@ -19,9 +25,22 @@
         </template>
       </Table>
 
-      <Modal v-if="showRawFileModal" class="fullscreen" @close="showRawFileModal=false">
+      <Modal
+        v-if="showRawFileModal"
+        class="fullscreen"
+        @close="showRawFileModal=false"
+        @opened="initCodeMirror()"
+      >
         <template slot="header">{{ file.path }}</template>
-        <template slot="content"><pre>{{ file.content }}</pre></template>
+        <template slot="content">
+          <textarea ref="codemirror" hidden>{{ this.file.content }}</textarea>
+        </template>
+        <template slot="footer">
+          <button class="waves-effect btn" type="button" @click="downloadRaw(file)">
+            <i class="material-icons left">download</i>
+            Download
+          </button>
+        </template>
       </Modal>
 
       <Modal v-if="showRedocModal" class="fullscreen" @close="showRedocModal=false">
@@ -29,20 +48,30 @@
         <template slot="content">
           <redoc-wrapper :spec-or-spec-url="file.content" :options="redocOptions"></redoc-wrapper>
         </template>
+        <template slot="footer">
+          <button class="waves-effect btn" type="button" @click="downloadHtml([file.path])">
+            <i class="material-icons left">download</i>
+            Download
+          </button>
+        </template>
       </Modal>
     </div>
 </template>
 <script>
 
-import yaml from 'js-yaml';
 import RedocWrapper from '@hnluu8/vue-redoc-wrapper';
 import Modal from '@/components/Modal';
+import codemirrorMixin from '@/components/documentation/codemirrorMixin';
 
 export default {
   components: {
     Modal,
     RedocWrapper,
   },
+
+  mixins: [
+    codemirrorMixin,
+  ],
 
   data() {
     return {
@@ -56,36 +85,24 @@ export default {
     };
   },
 
+  computed: {
+    module() {
+      return this.$route.params.module;
+    },
+  },
+
   methods: {
     getFiles() {
       const loader = this.$loading.show({ container: this.$refs.demos });
 
-      this.$store.dispatch('documentation/getSpecs', { repo: 'specifications', branch: 'main' })
+      this.$store.dispatch('documentation/getSpecs', {
+        repo: 'specifications',
+        branch: 'main',
+        apis_dir: this.module,
+      })
         .then((response) => {
           this.files = response.data;
           loader.hide();
-        });
-      return;
-
-      this.$store.dispatch('documentation/getFiles')
-        .then((response) => {
-          const files = response.data.filter((spec) => spec.type === 'blob');
-
-          const promises = [];
-          files.forEach((file) => {
-            promises.push(
-              this.$store.dispatch('documentation/getRawFile', file)
-                .then((response) => {
-                  file.raw_content = response.data;
-                  file.content = yaml.load(response.data);
-                }),
-            );
-          });
-
-          Promise.all(promises).then(() => {
-            this.files = files;
-            loader.hide();
-          });
         });
     },
 
@@ -112,7 +129,38 @@ export default {
       this.file = file;
       this.showRedocModal = true;
     },
+
+    downloadRaw(file) {
+      const content = JSON.stringify(file.content, null, 2);
+
+      const element = document.createElement('a');
+      element.setAttribute('href', `data:text/plain;charset=utf-8, ${encodeURIComponent(content)}`);
+      element.setAttribute('download', file.path);
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    },
+
+    downloadHtml(files) {
+      this.$store.dispatch('documentation/download', {
+        repo: 'specifications',
+        branch: 'main',
+        apis_dir: this.module,
+        files,
+      });
+    },
+
+    downloadSelectedHtml() {
+      this.downloadHtml(this.files.map((file) => file.path));
+    },
   },
+
+  watch: {
+    module() {
+      this.getFiles();
+    },
+  },
+
   mounted() {
     this.getFiles();
   },
@@ -124,20 +172,30 @@ export default {
   h3 {
     font-size: 1rem !important;
   }
+  .search-input {
+    padding-left: 20px;
+    font-size: 14px;
+  }
   .search-icon {
-    display: none;
+    top: 15px;
+    left: 0;
   }
   .collapsible{
-    border: 0px;
+    border: 0;
   }
 }
 </style>
 
 <style lang="scss" scoped>
+.actions {
+  width: 200px;
+}
 table {
-  td {
-    .btn:first-child {
-      margin-right: 10px;
+  tr {
+    td {
+      .btn {
+        margin: 5px;
+      }
     }
   }
 }

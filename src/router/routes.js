@@ -259,12 +259,19 @@ export default [
 
   // Documentation
   {
-    path: '/documentation',
+    path: '/documentation/:module?',
     name: 'documentation',
     meta: {
       requiresAuth: true,
       transitionName: 'slide',
-      title: 'Documentation',
+      title: (route) => {
+        let title = 'Documentation';
+
+        if (route.query.module) {
+          title = `${route.query.module} - ${title}`;
+        }
+        return title;
+      },
     },
     component: Documentation,
   },
