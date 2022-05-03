@@ -3,6 +3,7 @@
     <template v-slot:header>
       <span v-if="action === 'create'">Create configuration </span>
       <span v-else-if="action === 'update'">Update configuration</span>
+      <span v-else>View configuration's details</span>
     </template>
 
     <template v-slot:content>
@@ -10,6 +11,7 @@
         <div class="row">
           <Autocomplete
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="Project"
               icon="list_alt"
               :items="projects"
@@ -29,6 +31,7 @@
         <div class="row">
           <Select
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="Project type"
               icon="title"
               displayed="name"
@@ -46,6 +49,7 @@
         <div class="row">
           <Autocomplete
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="Delivery chain"
               icon="refresh"
               valueKey="title"
@@ -74,6 +78,7 @@
         <div class="row">
           <Autocomplete
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="Dev Instance"
               icon="dynamic_feed"
               :items="dev_instances"
@@ -92,6 +97,7 @@
         <div class="row">
           <Autocomplete
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="Val Instance"
               icon="dynamic_feed"
               :items="val_instances"
@@ -101,6 +107,7 @@
         <div class="row">
           <Autocomplete
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="Deploy Dev Instance"
               icon="dynamic_feed"
               :items="deploy_instances"
@@ -110,6 +117,7 @@
         <div class="row">
           <Autocomplete
             class="col s12"
+            :class="{readonly: action === 'view'}"
             label="Deploy Val Instance"
             icon="dynamic_feed"
             :items="deploy_instances"
@@ -119,6 +127,7 @@
         <div class="row">
           <Select
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="App type"
               icon="title"
               displayed="name"
@@ -136,6 +145,7 @@
         <div class="row">
           <TextInput
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="App Version"
               icon="history"
               v-model="form.app_version"
@@ -153,6 +163,7 @@
         <div class="row">
           <Autocomplete
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="Branch"
               icon="merge_type"
               :items="branches"
@@ -169,6 +180,7 @@
         <div class="row">
         <Autocomplete
             class="col s12"
+            :class="{readonly: action === 'view'}"
             label="Prefix"
             icon="people"
             valueKey="package"
@@ -186,6 +198,7 @@
         <div class="row">
           <TextInput
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="Servlet container"
               icon="dns"
               v-model="form.servlet_container"
@@ -203,6 +216,7 @@
         <div class="row">
           <Autocomplete
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="JDK"
               icon="history"
               :items="[1.4, 1.5, 1.6, 1.7, 1.8]"
@@ -217,6 +231,7 @@
         <div class="row">
           <Autocomplete
               class="col s12"
+              :class="{readonly: action === 'view'}"
               label="JRE"
               icon="history"
               :items="[1.4, 1.5, 1.6, 1.7, 1.8]"
@@ -231,6 +246,7 @@
         <div class="row">
             <TextArea
                 class="col s12"
+                :class="{readonly: action === 'view'}"
                 label="Additional info"
                 icon="description"
                 v-model="form.additional_info"
@@ -240,6 +256,7 @@
     </template>
     <template v-slot:footer>
       <button
+          v-if="action !== 'view'"
           class="btn waves-effect waves-light"
           type="submit"
           name="action"
@@ -390,7 +407,7 @@ export default {
       promises.push(this.$store.dispatch('debiteur/getClients'));
       Promise.all(promises)
         .then(() => {
-          if (this.action === 'update') this.setUpdateData();
+          if (this.action !== 'create') this.setUpdateData();
         })
         .finally(() => loader.hide());
     },

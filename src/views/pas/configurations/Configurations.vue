@@ -7,12 +7,12 @@
         sort-by="project"
         sort-dir="asc"
         :export-btn="false"
-        :view-btn="false"
         :add-btn="$auth.can('pas.manage-configurations')"
         :edit-btn="$auth.can('pas.manage-configurations')"
         :delete-btn="$auth.can('pas.manage-configurations')"
         @add="openAddEditModal('create')"
         @edit="(row) => openAddEditModal('update', row)"
+        @view="(row) => openAddEditModal('view', row)"
         @delete="openDeleteModal"
       >
         <Column show="project" :sortable="false" filter-type="search"/>
@@ -22,15 +22,10 @@
         <Column show="val_instance"/>
         <Column show="delivery_chain"/>
         <Column show="prefix"/>
-        <Column show="deploy_dev_instance"/>
-        <Column show="deploy_val_instance"/>
-        <Column show="servlet_container"/>
-        <Column show="jdk"/>
-        <Column show="jre"/>
         <Column show="app_version" :sortable="false" filter-type="dropdown"/>
-        <Column show="project_type" :sortable="false" filter-type="dropdown"/>
+        <Column show="servlet_container"/>
         <Column
-          label="Additional info"
+          label="Additional info" name="additional_info"
           :show="(row) => getAdditionalInfoLink(row.additional_info)"
           />
         <template v-slot:actions-before="{ row }">
@@ -106,10 +101,10 @@ export default {
             (configuration) => configuration.id === parseInt(this.$route.params.id, 10),
           );
           if (configuration) {
-            if (this.$route.params.build === 'build') {
+            if (this.$route.params.action === 'build') {
               return this.openBuildModal('build', configuration);
             }
-            return this.openAddEditModal('update', configuration);
+            return this.openAddEditModal(this.$route.params.action, configuration);
           }
 
           this.$M.toast({
@@ -127,7 +122,8 @@ export default {
       this.configuration = { ...configuration };
       this.showAddEditModal = true;
       this.$router.history.replace({
-        path: `/pas/configurations/${encodeURIComponent(this.configuration.id || 'new')}`,
+        path: `/pas/configurations/${this.configuration.id
+          ? (`${encodeURIComponent(this.configuration.id)}/${action}`) : 'new'} `,
       });
     },
 

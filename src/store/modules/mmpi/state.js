@@ -1,14 +1,17 @@
 // https://vuex.vuejs.org/en/state.html
 
 export default {
-  instances: [],
-  deploy_instances: [],
+  error: '',
   projects: [],
   delivery_chains: [],
-  devInstances: [],
+  delivery_chain_roles: [],
   deliveryChains: [],
+  instances: [],
+  instanceTypes: [],
   instanceStatus: [],
+  devInstances: [],
+  deploy_instances: [],
+  environmentTypes: [],
   operationType: [],
-  error: '',
   binaryTypes: [],
 };
