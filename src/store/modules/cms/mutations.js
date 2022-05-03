@@ -105,4 +105,19 @@ export default {
       return state.teamValues;
     });
   },
+  modulesUpdate(state, request) {
+    state.modules.map((a) => {
+      if (a.id === request.id) {
+        Vue.set(state.modules, state.modules.indexOf(a), request);
+      }
+      return state.modules;
+    });
+  },
+  modulesRemove(state, id) {
+    state.modules.splice(
+      state.modules.findIndex((req) => req.id === id),
+      1,
+    );
+  },
+
 };

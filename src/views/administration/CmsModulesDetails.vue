@@ -31,47 +31,47 @@
         <button
             class="btn waves-effect waves-light"
             type="button"
-            name="action"
             @click="addModule()">Add Module
         </button>
       </div>
     </form>
 
-    <form>
-      <div class="row">
-        <div class="input-field col l5 m6 s6">
-          <i class="material-icons prefix">developer_board</i>
-          <label for="submodule" class="active">Submodule name</label>
-          <input
-              id="submodule"
-              type="text"
-              v-model="submoduleName"
-          />
-          <div class="validator red-text" v-if="$v.submoduleName.$error">
-            <span v-if="!$v.submoduleName.required">Submodule name field must not be empty.</span>
-          </div>
-        </div>
-        <div class="input-field col s12 m4 l5">
-          <i class="material-icons prefix">fullscreen_exit</i>
-          <label for="submoduleAbbrev" class="active">Submodule Abbreviation</label>
-          <input
-              id="submoduleAbbrev"
-              type="text"
-              v-model="submoduleAbbrev"
-          />
-          <div class="validator red-text" v-if="$v.submoduleAbbrev.$error">
-            <span v-if="!$v.submoduleAbbrev.required">
-              Submodule abbreviation field must not be empty.</span>
-          </div>
-        </div>
-        <button
-            class="btn waves-effect waves-light"
-            type="button"
-            name="action"
-            @click="addSubmodule()">Add Submodule
-        </button>
-      </div>
-    </form>
+<!--submodule form-->
+<!--    <form>-->
+<!--      <div class="row">-->
+<!--        <div class="input-field col l5 m6 s6">-->
+<!--          <i class="material-icons prefix">developer_board</i>-->
+<!--          <label for="submodule" class="active">Submodule name</label>-->
+<!--          <input-->
+<!--              id="submodule"-->
+<!--              type="text"-->
+<!--              v-model="submoduleName"-->
+<!--          />-->
+<!--          <div class="validator red-text" v-if="$v.submoduleName.$error">-->
+<!--            <span v-if="!$v.submoduleName.required">Submodule name field must not be empty.</span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="input-field col s12 m4 l5">-->
+<!--          <i class="material-icons prefix">fullscreen_exit</i>-->
+<!--          <label for="submoduleAbbrev" class="active">Submodule Abbreviation</label>-->
+<!--          <input-->
+<!--              id="submoduleAbbrev"-->
+<!--              type="text"-->
+<!--              v-model="submoduleAbbrev"-->
+<!--          />-->
+<!--          <div class="validator red-text" v-if="$v.submoduleAbbrev.$error">-->
+<!--            <span v-if="!$v.submoduleAbbrev.required">-->
+<!--              Submodule abbreviation field must not be empty.</span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <button-->
+<!--            class="btn waves-effect waves-light"-->
+<!--            type="button"-->
+<!--            @click="addSubmodule()">Add Submodule-->
+<!--        </button>-->
+<!--      </div>-->
+<!--    </form>-->
+
     <Table
         :data="modules"
         sort-by="name"
@@ -81,10 +81,11 @@
         :add-btn="false"
         :edit-btn="false"
         :delete-btn="true"
-        @delete="(row) => onDelete(row, 'delete')"
+        @delete="(row) => deleteModule(row, 'delete')"
         @update="(row) => openEditModal(row, 'update')">
       <Column show="name"/>
       <Column show="abbreviation"/>
+      <Column show="submodules"/>
       <template v-slot:actions-before="{ row }">
         <a
             @click="openEditModal(row, 'update')"
@@ -109,11 +110,6 @@ export default {
       submoduleName: '',
       submoduleAbbrev: '',
       error: '',
-      form: {},
-      project: '',
-      projects: [],
-      showEditModal: false,
-      selectedDetail: {},
     };
   },
   validations: {
@@ -134,6 +130,9 @@ export default {
     modules() {
       return this.$store.getters['cms/modules'];
     },
+    submodulesName() {
+
+    }
   },
   methods: {
     async addModule() {
@@ -155,6 +154,41 @@ export default {
         });
       this.moduleName = '';
       this.moduleAbbrev = '';
+      loader.hide();
+    },
+
+    async updateModule() {
+      // this.$v.$touch();
+      // if (this.$v.$invalid) {
+      //   return;
+      // }
+      // const loader = this.$loading.show({ container: this.$el });
+      // await this.$store.dispatch('cms/createModule', {
+      //   name: this.moduleName,
+      //   abbreviation: this.moduleAbbrev,
+      // })
+      //   .then(() => {
+      //     this.$M.toast({ html: 'Module has been updated!', classes: 'toast-seccess' });
+      //   })
+      //   .catch((error) => {
+      //     this.error = error;
+      //     return error;
+      //   });
+      // this.moduleName = '';
+      // this.moduleAbbrev = '';
+      // loader.hide();
+    },
+
+    deleteModule(data) {
+      const loader = this.$loading.show({ container: this.$el });
+      this.$store.dispatch('cms/deleteModule', data.id)
+        .then(() => {
+          this.$M.toast({ html: 'Module has been deleted!', classes: 'toast-seccess' });
+        })
+        .catch((error) => {
+          this.error = error;
+          return error;
+        });
       loader.hide();
     },
 

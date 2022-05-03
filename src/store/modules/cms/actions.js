@@ -38,6 +38,39 @@ export default {
     return promise;
   },
 
+  createModule({ commit }, payload) {
+    const promise = api('cms').post('modules', payload);
+    promise
+      .catch(() => commit('error', 'Could not create module', { root: true }));
+    return promise;
+  },
+
+  updateModule({ commit }, payload) {
+    const data = {
+      // name: payload.project.name,
+      // abbreviation: payload.hostname,
+      // submodules: payload.ipAddress
+    };
+
+    const promise = api('cms').put(`modules/${payload.id}`, data);
+    promise
+      .then((response) => {
+        commit('modulesUpdate', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not update module!'));
+    return promise;
+  },
+
+  deleteModule({ commit }, id) {
+    const promise = api('cms').delete(`modules/${id}`);
+    promise
+      .then(() => {
+        commit('modulesRemove', id);
+      })
+      .catch(() => commit('error', 'Could not delete module'));
+    return promise;
+  },
+
   getOneVariable({ commit }, variable) {
     const promise = api('cms').get(`default-variables/${variable}`);
 
@@ -66,19 +99,12 @@ export default {
     return promise;
   },
 
-  createModule({ commit }, payload) {
-    const promise = api('cms').post('modules', payload);
-    promise
-      .catch(() => commit('error', 'Could not create module', { root: true }));
-    return promise;
-  },
-
-  createSubmodule({ commit }, payload) {
-    const promise = api('cms').post('modules/submodules', payload);
-    promise
-      .catch(() => commit('error', 'Could not create submodule', { root: true }));
-    return promise;
-  },
+  // createSubmodule({ commit }, payload) {
+  //   const promise = api('cms').post('modules/submodules', payload);
+  //   promise
+  //     .catch(() => commit('error', 'Could not create submodule', { root: true }));
+  //   return promise;
+  // },
 
   getCodixTeams({ commit }) {
     const name = 'codix-teams';
