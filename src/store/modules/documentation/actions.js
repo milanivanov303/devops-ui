@@ -1,5 +1,3 @@
-import { DateTime } from 'luxon';
-
 export default {
   getSpecs({ commit }, parameters) {
     const promise = api('devops').get('specs', parameters);

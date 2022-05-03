@@ -13,9 +13,11 @@
         <Column show="path"/>
         <Column show="paths" class="hidden"/>
 
-        <template v-slot:top-actions-after>
-          <button class="btn right" @click="downloadSelectedHtml()">
-            <i class="material-icons left">download</i> Download as HTML
+        <template v-slot:top-actions-after="{ rows }">
+          <button class="btn right" @click="downloadAll(rows)" :disabled="downloading">
+            <i class="material-icons left">download</i>
+            <span v-if="downloading">Downloading ...</span>
+            <span v-else>Download</span>
           </button>
         </template>
 
@@ -27,7 +29,7 @@
 
       <Modal
         v-if="showRawFileModal"
-        class="fullscreen"
+        class="fullscreen codemirror-modal"
         @close="showRawFileModal=false"
         @opened="initCodeMirror()"
       >
@@ -49,9 +51,10 @@
           <redoc-wrapper :spec-or-spec-url="file.content" :options="redocOptions"></redoc-wrapper>
         </template>
         <template slot="footer">
-          <button class="waves-effect btn" type="button" @click="downloadHtml([file.path])">
+          <button class="btn" @click="downloadHtml([file.path])" :disabled="downloading">
             <i class="material-icons left">download</i>
-            Download
+            <span v-if="downloading">Downloading ...</span>
+            <span v-else>Download</span>
           </button>
         </template>
       </Modal>
@@ -82,6 +85,7 @@ export default {
       redocOptions: {
         showExtensions: true,
       },
+      downloading: false,
     };
   },
 
@@ -142,16 +146,18 @@ export default {
     },
 
     downloadHtml(files) {
+      this.downloading = true;
       this.$store.dispatch('documentation/download', {
         repo: 'specifications',
         branch: 'main',
         apis_dir: this.module,
         files,
-      });
+      })
+        .finally(() => { this.downloading = false; });
     },
 
-    downloadSelectedHtml() {
-      this.downloadHtml(this.files.map((file) => file.path));
+    downloadAll(files) {
+      this.downloadHtml(files.map((file) => file.path));
     },
   },
 
@@ -182,6 +188,11 @@ export default {
   }
   .collapsible{
     border: 0;
+  }
+}
+.codemirror-modal {
+  .modal-content {
+    padding: 0;
   }
 }
 </style>
