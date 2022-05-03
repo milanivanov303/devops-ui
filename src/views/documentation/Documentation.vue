@@ -35,10 +35,10 @@
       >
         <template slot="header">{{ file.path }}</template>
         <template slot="content">
-          <textarea ref="codemirror" hidden>{{ this.file.content }}</textarea>
+          <textarea ref="codemirror" hidden v-model="content"></textarea>
         </template>
         <template slot="footer">
-          <button class="waves-effect btn" type="button" @click="downloadRaw(file)">
+          <button class="waves-effect btn" type="button" @click="downloadRaw()">
             <i class="material-icons left">download</i>
             Download
           </button>
@@ -93,6 +93,9 @@ export default {
     module() {
       return this.$route.params.module;
     },
+    content() {
+      return JSON.stringify(this.file.content, null, 2);
+    },
   },
 
   methods: {
@@ -134,12 +137,10 @@ export default {
       this.showRedocModal = true;
     },
 
-    downloadRaw(file) {
-      const content = JSON.stringify(file.content, null, 2);
-
+    downloadRaw() {
       const element = document.createElement('a');
-      element.setAttribute('href', `data:text/plain;charset=utf-8, ${encodeURIComponent(content)}`);
-      element.setAttribute('download', file.path);
+      element.setAttribute('href', `data:text/plain;charset=utf-8, ${encodeURIComponent(this.content)}`);
+      element.setAttribute('download', this.file.path);
       document.body.appendChild(element);
       element.click();
       document.body.removeChild(element);
