@@ -1,26 +1,26 @@
 export default {
-  getSpecs({ commit }, parameters) {
-    const promise = api('devops').get('specs', parameters);
+  getSpecs({ commit }, payload) {
+    const promise = api('devops').get('specs', payload);
 
     promise
       .catch(() => commit('error', 'Could not get apiDocumentationList', { root: true }));
     return promise;
   },
 
-  getDetails({ commit }, parameters) {
-    parameters.file = 'data.json';
-    const promise = api('devops').get('specs', parameters);
+  getDetails({ commit }, payload) {
+    payload.file = 'data.json';
+    const promise = api('devops').get('specs', payload);
 
     promise
       .catch(() => commit('error', 'Could not get documentation details', { root: true }));
     return promise;
   },
 
-  getRamlFile({ commit }, parameters) {
-    const promise = api('devops').get('specs', parameters);
+  getBranches({ commit }, payload) {
+    const promise = api('devops').get('specs/branches', payload);
 
     promise
-      .catch(() => commit('error', 'Could not get RAML file', { root: true }));
+      .catch(() => commit('error', 'Could not get repository branches', { root: true }));
     return promise;
   },
 

@@ -14,7 +14,14 @@
         <Column show="paths" class="hidden"/>
 
         <template v-slot:top-actions-after="{ rows }">
-          <button class="btn right" @click="downloadAll(rows)" :disabled="downloading">
+          <Select
+            class="branches left"
+            :options="branches"
+            displayed="name"
+            :default-option="false"
+            v-model="branch"
+          />
+          <button class="btn btn-small right" @click="downloadAll(rows)" :disabled="downloading">
             <i class="material-icons left">download</i>
             <span v-if="downloading">Downloading ...</span>
             <span v-else>Download</span>
@@ -22,15 +29,15 @@
         </template>
 
         <template v-slot:actions-before="{ row }">
-          <a class="btn btn-tiny" @click="showRawFile(row)">View</a>
-          <a class="btn btn-tiny" @click="showReDocFile(row)">Re Doc</a>
+          <a class="btn btn-tiny" @click="openRawModal(row)">View</a>
+          <a class="btn btn-tiny" @click="openRedocModal(row)">Re Doc</a>
         </template>
       </Table>
 
       <Modal
-        v-if="showRawFileModal"
+        v-if="showRawModal"
         class="fullscreen codemirror-modal"
-        @close="showRawFileModal=false"
+        @close="closeRawModal()"
         @opened="initCodeMirror()"
       >
         <template slot="header">{{ file.path }}</template>
@@ -45,7 +52,11 @@
         </template>
       </Modal>
 
-      <Modal v-if="showRedocModal" class="fullscreen" @close="showRedocModal=false">
+      <Modal
+        v-if="showRedocModal"
+        class="fullscreen"
+        @close="closeRedocModal()"
+      >
         <template slot="header">{{ file.path }}</template>
         <template slot="content">
           <redoc-wrapper :spec-or-spec-url="file.content" :options="redocOptions"></redoc-wrapper>
@@ -78,9 +89,12 @@ export default {
 
   data() {
     return {
+      repo: 'specifications',
+      branches: [],
+      branch: this.$route.query.branch || 'main',
       files: [],
       file: {},
-      showRawFileModal: false,
+      showRawModal: false,
       showRedocModal: false,
       redocOptions: {
         showExtensions: true,
@@ -99,18 +113,44 @@ export default {
   },
 
   methods: {
+    getBranches() {
+      const loader = this.$loading.show({ container: this.$refs.files });
+
+      this.$store.dispatch('documentation/getBranches', {
+        repo: this.repo,
+      })
+        .then((response) => {
+          this.branches = response.data.map((branch) => branch.name);
+        })
+        .finally(() => { loader.hide(); });
+    },
+
     getFiles() {
-      const loader = this.$loading.show({ container: this.$refs.demos });
+      const loader = this.$loading.show({ container: this.$refs.files });
 
       this.$store.dispatch('documentation/getSpecs', {
-        repo: 'specifications',
-        branch: 'main',
+        repo: this.repo,
+        branch: this.branch,
         apis_dir: this.module,
       })
         .then((response) => {
           this.files = response.data;
-          loader.hide();
-        });
+
+          if (!this.$route.query.file) {
+            return;
+          }
+
+          const file = this.files.find((file) => file.path === this.$route.query.file);
+
+          if (file) {
+            if (this.$route.query.action === 'raw') {
+              this.openRawModal(file);
+              return;
+            }
+            this.openRedocModal(file);
+          }
+        })
+        .finally(() => { loader.hide(); });
     },
 
     getTitle(file) {
@@ -127,14 +167,66 @@ export default {
       return file.content.info.description;
     },
 
-    showRawFile(file) {
+    openRawModal(file) {
       this.file = file;
-      this.showRawFileModal = true;
+      this.showRawModal = true;
+
+      const query = {
+        branch: this.branch,
+        file: this.file.path,
+        action: 'raw',
+      };
+
+      this.$router.push({
+        path: `/documentation/${this.module}`,
+        query: { ...this.$route.query, ...query },
+      });
     },
 
-    showReDocFile(file) {
+    closeRawModal() {
+      this.file = {};
+      this.showRawModal = false;
+
+      const query = { ...this.$route.query };
+
+      delete query.file;
+      delete query.action;
+
+      this.$router.push({
+        path: `/documentation/${this.module}`,
+        query,
+      });
+    },
+
+    openRedocModal(file) {
       this.file = file;
       this.showRedocModal = true;
+
+      const query = {
+        branch: this.branch,
+        file: this.file.path,
+        action: 'redoc',
+      };
+
+      this.$router.push({
+        path: `/documentation/${this.module}`,
+        query: { ...this.$route.query, ...query },
+      });
+    },
+
+    closeRedocModal() {
+      this.file = {};
+      this.showRedocModal = false;
+
+      const query = { ...this.$route.query };
+
+      delete query.file;
+      delete query.action;
+
+      this.$router.push({
+        path: `/documentation/${this.module}`,
+        query,
+      });
     },
 
     downloadRaw() {
@@ -149,8 +241,8 @@ export default {
     downloadHtml(files) {
       this.downloading = true;
       this.$store.dispatch('documentation/download', {
-        repo: 'specifications',
-        branch: 'main',
+        repo: this.repo,
+        branch: this.branch,
         apis_dir: this.module,
         files,
       })
@@ -166,9 +258,18 @@ export default {
     module() {
       this.getFiles();
     },
+    branch() {
+      this.$router.push({
+        path: `/documentation/${this.module}`,
+        query: { branch: this.branch },
+      });
+
+      this.getFiles();
+    },
   },
 
   mounted() {
+    this.getBranches();
     this.getFiles();
   },
 };
