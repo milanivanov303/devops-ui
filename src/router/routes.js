@@ -610,21 +610,14 @@ export default [
 
   // Builds
   {
-    path: '/builds/:name(.*_\\d+)/:uri(.*)?',
+    path: '/builds/:name(.*[-_]{1}\\d{10})/:uri(.*)?',
     meta: {
       layout: 'basic',
       requiresAuth: false,
     },
     component: OpenBuild,
   },
-  {
-    path: '/:name(.*_\\d+)/:uri(.*)?',
-    meta: {
-      layout: 'basic',
-      requiresAuth: false,
-    },
-    redirect: (to) => `/builds${to.path}`,
-  },
+  
   {
     path: '*',
     meta: {
