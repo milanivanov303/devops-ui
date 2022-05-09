@@ -20,6 +20,7 @@ export default {
     return promise;
   },
 
+  // Modules
   getModules({ commit }) {
     const name = 'modules';
 
@@ -68,6 +69,23 @@ export default {
         commit('modulesRemove', id);
       })
       .catch(() => commit('error', 'Could not delete module'));
+    return promise;
+  },
+
+  // Submodules
+  getSubmodules({ commit }) {
+    const name = 'submodules';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('cms').get('submodules');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => commit('submodules', response.data.data));
     return promise;
   },
 

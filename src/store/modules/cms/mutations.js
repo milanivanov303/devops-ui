@@ -119,5 +119,7 @@ export default {
       1,
     );
   },
-
+  submodules(state, submodules) {
+    state.submodules = submodules;
+  },
 };

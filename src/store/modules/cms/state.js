@@ -4,6 +4,7 @@ export default {
   error: '',
   variables: [],
   modules: [],
+  submodules: [],
   rspVariables: [],
   selectedInstance: '',
   projects: [],
