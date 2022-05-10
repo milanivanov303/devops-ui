@@ -46,6 +46,17 @@ export default {
     return promise;
   },
 
+  getImages({ commit }) {
+    const promise = api('devops').get('extranet/images');
+
+    promise
+      .then((response) => {
+        commit('images', response.data);
+      })
+      .catch(() => commit('error', 'Could not get images', { root: true }));
+    return promise;
+  },
+
   startBuild({ commit }, payload) {
     const promise = api('devops').post('debiteur/build', payload);
     promise.catch((error) => commit('error', error, { root: true }));

@@ -4,4 +4,5 @@ export default {
   branches: [],
   clients: [],
   host: '',
+  images: [],
 };
