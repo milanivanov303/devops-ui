@@ -130,7 +130,7 @@ export default {
       this.error = '';
     },
     checkInTemplates(instance) {
-      console.log(instance)
+      console.log(instance);
       this.error = '';
       const loader = this.$loading.show({ container: this.$refs.interfaces });
       const payload = {
