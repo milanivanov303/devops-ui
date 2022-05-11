@@ -6,39 +6,7 @@
           class="col s12 readonly"
           label="Branch"
           icon="laptop_chromebook"
-          :value="build.details.branch.name || build.details.branch"
-        />
-      </div>
-      <div class="row">
-        <TextInput
-            class="col s12 readonly"
-            label="Client"
-            icon="people"
-            :value="build.details.client.name"
-        />
-      </div>
-      <div class="row">
-        <TextInput
-            class="col s12 readonly"
-            label="Java Version"
-            icon="history"
-            :value="build.details.java_version"
-        />
-      </div>
-      <div class="row">
-        <TextInput
-          class="col s12 readonly"
-          label="Instance"
-          icon="dynamic_feed"
-          :value="build.details.instance.name"
-        />
-      </div>
-      <div class="row">
-        <TextInput
-          class="col s12 readonly"
-          label="FE Branch"
-          icon="laptop_chromebook"
-          :value="build.details.fe_branch.name || build.details.fe_branch"
+          :value="build.details.branch"
         />
       </div>
       <div class="row" v-if="build.status === 'running'">
@@ -55,7 +23,7 @@
 
       </div>
 
-      <DeployOn :build="build" module="extranet"/>
+      <DeployOn :build="build" module="extranet-x4"/>
 
       <div class="row">
         <TextInput

@@ -8,12 +8,19 @@
               <span>{{ esxiHost.name }}</span>
             </div>
             <div class="col s12 m6 l3 esxi-icons">
+              <a :href="`https://${esxiHost.name}-idrac.codixfr.private/`"
+                 target="_blank"
+                 data-tooltip="Integrated Dell Remote Access Controller (iDRAC)"
+                 class="right">
+              <i class="material-icons">tv</i>
+            </a>
               <a :href="`https://${esxiHost.name}.codixfr.private/`"
                  target="_blank"
                  data-tooltip="ESXi for administration"
                  class="right">
                 <i class="material-icons">laptop_chromebook</i>
               </a>
+
               <a v-if="esxiHost.doc_url"
                  :href="esxiHost.doc_url"
                  target="_blank"
@@ -53,6 +60,18 @@
             <b>Free: </b> {{ $esxi(getHostFreeMemory(esxiHost)).bytesToSizeLabel() }}
             <div class="progress">
               <div class="determinate" :style="{width: getFreeMemoryInPerc(esxiHost) + '%'}"></div>
+            </div>
+          </div>
+        </div>
+        <div v-if="esxiHost.storage" class="row progress-bar">
+          <div class="col s12">
+            <b>Storage: </b>{{$esxi(esxiHost.storage.size).bytesToSizeLabel()}},
+            <b>Used: </b> {{$esxi(esxiHost.storage.used).bytesToSizeLabel()}}
+            <b>Free: </b> {{$esxi(esxiHost.storage.available).bytesToSizeLabel()}}
+            <div class="progress">
+              <div class="determinate"
+                   :style="{width: esxiHost.storage.used * 100 / esxiHost.storage.size + '%'}">
+              </div>
             </div>
           </div>
         </div>
@@ -135,6 +154,14 @@ export default {
     openModal() {
       this.currentHost = { ...this.esxiHost };
       this.showModal = true;
+
+      if (this.esxiHost.purchase_date) {
+        this.currentHost.purchase_date = this.$date(this.esxiHost.purchase_date).toISO();
+      }
+
+      if (this.esxiHost.expiration_date) {
+        this.currentHost.expiration_date = this.$date(this.esxiHost.expiration_date).toISO();
+      }
       // this.$router.push({
       //   path: `${encodeURIComponent('edit')}`,
       // });

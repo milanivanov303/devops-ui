@@ -33,6 +33,9 @@
             :value="build.details.java_version"
           />
         </div>
+
+        <DeployOn :build="build" module="debiteur"/>
+
         <div class="row">
           <TextInput
             class="col s12 m6 readonly"
@@ -74,7 +77,13 @@
 </template>
 
 <script>
+import DeployOn from '@/components/DeployOn';
+
 export default {
+  components: {
+    DeployOn,
+  },
+
   props: {
     build: {
       type: Object,

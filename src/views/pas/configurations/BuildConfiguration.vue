@@ -269,7 +269,7 @@ export default {
         });
     },
 
-    debounceCheckIssue: _.debounce(function () {
+    debounceCheckIssue: _.debounce(() => {
       this.checkIssue();
     }, 2000),
 

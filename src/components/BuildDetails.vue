@@ -7,12 +7,13 @@
           <ul ref="tabs" class="tabs">
             <li
               class="tab col s4"
-              v-on:click="currentTab = BuildInfo">
+              v-on:click="currentTab = buildInfo">
               <a class="active">Details</a>
             </li>
             <li
               class="tab col s4"
-              v-on:click="currentTab = 'BuildLogs'">
+              v-on:click="currentTab = 'BuildLogs'"
+              v-if="build.status!=='removed'">
               <a>Build logs</a>
             </li>
             <li
@@ -20,10 +21,6 @@
               v-on:click="currentTab = 'BuildServiceLogs'"
               v-if="build.status==='running'">
               <a >Docker logs</a>
-            </li>
-            <li
-              v-else class="tab col s4 disabled">
-              <a v-if="build.status!=='running'">Docker logs</a>
             </li>
           </ul>
         </div>
@@ -63,7 +60,7 @@ export default {
   },
 
   computed: {
-    BuildInfo() {
+    buildInfo() {
       // eslint-disable-next-line
       return () => import('@/views/' + this.build.module + '/components/BuildInfo');
     },
@@ -74,7 +71,7 @@ export default {
 
   mounted() {
     this.$M.Tabs.init(this.$refs.tabs);
-    this.currentTab = this.BuildInfo;
+    this.currentTab = this.buildInfo;
   },
 
 };

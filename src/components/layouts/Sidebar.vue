@@ -26,8 +26,11 @@
               <li :class="{ active: isActive('pas/configurations') }">
                 <router-link to="/pas/configurations"> DevOps Matrix</router-link>
               </li>
-              <li :class="{ active: isActive('extranet') }">
+              <li :class="{ active: isActive('extranet/') }">
                 <router-link to="/extranet/dashboard"> Extranet</router-link>
+              </li>
+              <li :class="{ active: isActive('extranet-x4') }">
+                <router-link to="/extranet-x4/dashboard"> Extranet X4</router-link>
               </li>
               <li :class="{ active: isActive('debiteur') }">
                 <router-link to="/debiteur/dashboard"> Debiteur</router-link>
@@ -48,6 +51,25 @@
           <router-link to="/imx_fe/dashboard">
             <i class="material-icons">devices</i> iMX FE
           </router-link>
+        </li>
+        <li :class="{ active: isActive('documentation') }">
+          <a class="collapsible-header">
+            <i class="material-icons">library_books</i> Documentation
+            <i class="material-icons right">arrow_drop_down</i>
+          </a>
+          <div class="collapsible-body">
+            <ul>
+              <li :class="{ active: isActive('documentation/Extranet') }">
+                <router-link to="/documentation/Extranet">Extranet</router-link>
+              </li>
+              <li :class="{ active: isActive('documentation/B2B') }">
+                <router-link to="/documentation/B2B">B2B</router-link>
+              </li>
+              <li :class="{ active: isActive('documentation/API_Platform') }">
+                <router-link to="/documentation/API_Platform">API Platform</router-link>
+              </li>
+            </ul>
+          </div>
         </li>
         <li :class="{ active: isActive('demos') }">
           <a class="collapsible-header">
@@ -148,6 +170,10 @@
               </li>
               <li :class="{ active: isActive('inventory/imxComponents') }">
                 <router-link to="/inventory/imxComponents"> iMX Components</router-link>
+              </li>
+              <li v-if="$auth.can('can-request-instances')"
+                  :class="{ active: isActive('inventory/request') }">
+                <router-link to="/inventory/request"> Instance Request</router-link>
               </li>
               <li><div class="divider"></div></li>
             </ul>
@@ -263,6 +289,10 @@ li.active {
   .subheader {
     color: white;
     padding: 0 15px;
+  }
+
+  li > a > i.material-icons {
+    margin: 0 14px 0 0 ;
   }
 }
 </style>

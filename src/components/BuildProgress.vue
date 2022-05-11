@@ -4,7 +4,7 @@
     <div class="row stages">
       <div class="col stage" v-for="stage in stages" :key="stage"
           :class="['s'.concat( 12 / stages.length ), getStageResult(stage)]">
-        <div v-if="currentStages.hasOwnProperty(stage)">
+        <div v-if="currentStages[stage] !== null">
           <Preloader v-if="currentStages[stage] === 'running'"/>
           <i v-else-if="currentStages[stage] === 'success'" class="material-icons">
             check_circle
@@ -56,8 +56,13 @@ export default {
     log: { default: '', String },
   },
   data() {
+    const currentStages = {};
+    this.stages.forEach((stage) => {
+      currentStages[stage] = null;
+    });
+
     return {
-      currentStages: {},
+      currentStages,
       currentStatus: this.status,
       currentSummary: this.summary,
       currentError: this.error,
@@ -89,6 +94,7 @@ export default {
 
       this.currentStages[action] = data.status;
     },
+
     getStageResult(stage) {
       if (Object.prototype.hasOwnProperty.call(this.currentStages, stage)) {
         if (this.currentStages[stage] === 'success') {

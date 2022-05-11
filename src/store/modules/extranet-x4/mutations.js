@@ -7,11 +7,14 @@ export default {
   host(state, host) {
     state.host = host;
   },
+  images(state, images) {
+    state.images = images;
+  },
   clients(state, clients) {
     state.clients = clients;
   },
-  images(state, images) {
-    state.images = images;
+  feBranches(state, branches) {
+    state.feBranches = branches;
   },
   removeBuild(state, id) {
     state.services.splice(

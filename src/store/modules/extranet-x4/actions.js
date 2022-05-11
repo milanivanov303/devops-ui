@@ -2,13 +2,13 @@
 
 export default {
   getClients({ commit }) {
-    const name = 'debiteur-clients';
+    const name = 'extranet-clients';
 
     if (this.state.promises[name]) {
       return this.state.promises[name];
     }
 
-    const promise = api('devops').get('debiteur/clients');
+    const promise = api('devops').get('extranet-x4/clients');
 
     commit('promise', { name, promise }, { root: true });
 
@@ -19,13 +19,13 @@ export default {
   },
 
   getBranches({ commit }) {
-    const name = 'debiteur-branches';
+    const name = 'extranet-branches';
 
     if (this.state.promises[name]) {
       return this.state.promises[name];
     }
 
-    const promise = api('devops').get('debiteur/branches');
+    const promise = api('devops').get('extranet-x4/branches');
 
     commit('promise', { name, promise }, { root: true });
 
@@ -36,7 +36,7 @@ export default {
   },
 
   getHost({ commit }) {
-    const promise = api('devops').get('debiteur/host');
+    const promise = api('devops').get('extranet-x4/host');
 
     promise
       .then((response) => {
@@ -47,7 +47,7 @@ export default {
   },
 
   getImages({ commit }) {
-    const promise = api('devops').get('extranet/images');
+    const promise = api('devops').get('extranet-x4/images');
 
     promise
       .then((response) => {
@@ -58,16 +58,8 @@ export default {
   },
 
   startBuild({ commit }, payload) {
-    const promise = api('devops').post('debiteur/build', payload);
+    const promise = api('devops').post('extranet-x4/build', payload);
     promise.catch((error) => commit('error', error, { root: true }));
-    return promise;
-  },
-
-  removeBuild({ commit }, id) {
-    const promise = api('devops').delete(`debiteur/build/${id}`);
-    promise
-      .then(() => commit('removeBuild', id))
-      .catch((error) => commit('error', error, { root: true }));
     return promise;
   },
 };

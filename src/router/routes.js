@@ -5,8 +5,10 @@ const Builds = () => import(/* webpackChunkName: "dashboard" */ '../views/Builds
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 
-const Configurations = () => import(/* webpackChunkName: "extranet" */ '../views/pas/configurations/Configurations');
-const SoaModification = () => import(/* webpackChunkName: "extranet" */ '../views/pas/SOAdeployment');
+const Configurations = () => import(/* webpackChunkName: "pas" */ '../views/pas/configurations/Configurations');
+const SoaModification = () => import(/* webpackChunkName: "pas" */ '../views/pas/SOAdeployment');
+
+const Documentation = () => import(/* webpackChunkName: "demos" */ '../views/documentation/Documentation');
 
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
@@ -23,7 +25,8 @@ const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
 const VirtualMachines = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/virtualMachines/VirtualMachines');
 const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
-const ImxComponents = () => import('../views/esxi/imxComponents/ImxComponents');
+const ImxComponents = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/imxComponents/ImxComponents');
+const InstanceRequest = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/request/InstanceRequest');
 
 const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
 const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
@@ -123,6 +126,52 @@ export default [
       module: 'extranet',
     },
   },
+
+  // Extranet X4 Tab
+  {
+    path: '/extranet-x4',
+    redirect: '/extranet-x4/dashboard',
+  },
+  {
+    path: '/extranet-x4/dashboard',
+    name: 'extranet-x4',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Extranet X4 Dashboard',
+      breadcrumb: 'Dashboard',
+    },
+    component: Dashboard,
+    props: {
+      module: 'extranet-x4',
+    },
+  },
+  {
+    path: '/extranet-x4/branches/:branch?',
+    name: 'extranet-x4-branches',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Extranet X4 Branches';
+
+        if (route.query.branch) {
+          title = `${route.query.branch} - ${title}`;
+        }
+
+        if (route.query.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Branches,
+    props: {
+      module: 'extranet-x4',
+    },
+  },
+
   {
     path: '/pas/configurations/:id?/:action?',
     name: 'configurations',
@@ -257,6 +306,25 @@ export default [
     props: {
       module: 'imx_fe',
     },
+  },
+
+  // Documentation
+  {
+    path: '/documentation/:module?',
+    name: 'documentation',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Documentation';
+
+        if (route.query.module) {
+          title = `${route.query.module} - ${title}`;
+        }
+        return title;
+      },
+    },
+    component: Documentation,
   },
 
   // Demos Tab
@@ -462,6 +530,16 @@ export default [
     },
     component: ImxComponents,
   },
+  {
+    path: '/inventory/request/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'instance-request',
+      transitionName: 'slide',
+      title: 'Instance request',
+    },
+    component: InstanceRequest,
+  },
   // Devops Administration Tab
   {
     path: '/expert-system/modification/:issue?',
@@ -556,7 +634,7 @@ export default [
 
   // Builds
   {
-    path: '/builds/:name(.*_\\d+)/:uri(.*)?',
+    path: '/builds/:name(.*[-_]{1}\\d{10})/:uri(.*)?',
     meta: {
       layout: 'basic',
       requiresAuth: false,
