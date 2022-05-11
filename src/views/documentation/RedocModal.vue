@@ -8,7 +8,7 @@
       <redoc-wrapper :spec-or-spec-url="file.content" :options="redocOptions"></redoc-wrapper>
     </template>
     <template slot="footer">
-      <button class="btn" @click="download()" :disabled="downloading">
+      <button class="btn" @click="$emit('download', [file])" :disabled="downloading">
         <i class="material-icons left">download</i>
         <span v-if="downloading">Downloading ...</span>
         <span v-else>Download</span>
@@ -33,30 +33,18 @@ export default {
       required: true,
       default: () => {},
     },
+    downloading: {
+      type: Boolean,
+      default: () => false,
+    },
   },
 
   data() {
     return {
-      downloading: false,
       redocOptions: {
         showExtensions: true,
       },
     };
-  },
-
-  methods: {
-    download() {
-      const files = [this.file.path];
-
-      this.downloading = true;
-      this.$store.dispatch('documentation/download', {
-        repo: this.repo,
-        branch: this.branch,
-        apis_dir: this.module,
-        files,
-      })
-        .finally(() => { this.downloading = false; });
-    },
   },
 };
 </script>

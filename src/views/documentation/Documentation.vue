@@ -34,8 +34,14 @@
         </template>
       </Table>
 
-      <RawModal v-if="showRawModal" :file="file" @close="closeRawModal"/>close
-      <RedocModal v-if="showRedocModal" :file="file" @close="closeRedocModal"/>close
+      <RawModal v-if="showRawModal" :file="file" @close="closeRawModal"/>
+      <RedocModal
+        v-if="showRedocModal"
+        :file="file"
+        :downloading="downloading"
+        @close="closeRedocModal"
+        @download="download"
+      />
     </div>
 </template>
 <script>
