@@ -7,6 +7,7 @@
         label="Deploy on"
         displayed="label"
         :default-option="false"
+        :disabled="build.status !== 'running' && build.status !== 'stopped'"
         v-model="image"
       />
     </div>
