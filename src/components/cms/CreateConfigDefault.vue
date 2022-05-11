@@ -143,6 +143,18 @@
             </p>
           </div>
         </div>
+        <div class="row">
+          <div class="col s12">
+            <label>
+              <input
+                class="filled-in"
+                type="checkbox"
+                v-model="variable.sensitive_data"
+                :disabled="action === 'edit'"/>
+              <span>Contains sensitive data</span>
+            </label>
+          </div>
+        </div>
         <div v-if="action === 'create'">
           <h6 class="center">COMMIT MESSAGE</h6>
           <div class="row">
@@ -370,6 +382,7 @@ export default {
       }
 
       this.variable.codix_team_id = this.codixTeam.id;
+      this.variable.sensitive_data = this.variable.sensitive_data ? 1 : 0;
 
       const payload = {
         variable: this.variable,
@@ -389,9 +402,11 @@ export default {
             html = 'The variable is created!';
           }
           this.$M.toast({ html, classes: 'toast-seccess' });
+          this.closeModal();
           return this.$emit('addedVariable', response.data);
         })
         .catch((error) => {
+          payload.variable.name = this.variable.name;
           if (error.response.status === 403) {
             this.error = 'Sorry, but you have no rights to create new variable!';
           }
@@ -402,7 +417,6 @@ export default {
         })
         .finally(() => {
           this.loading = false;
-          this.closeModal();
         });
     },
   },
