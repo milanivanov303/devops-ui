@@ -42,6 +42,9 @@ export default {
   createModule({ commit }, payload) {
     const promise = api('cms').post('modules', payload);
     promise
+      .then((response) => {
+        commit('modulesAdd', response.data.data);
+      })
       .catch(() => commit('error', 'Could not create module', { root: true }));
     return promise;
   },

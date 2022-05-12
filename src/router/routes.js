@@ -36,12 +36,9 @@ const DevopsLogsAdministration = () => import(/* webpackChunkName: "administrati
 const CmsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/cms/Users');
 const CmsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/cms/Roles');
 const CmsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/cms/Actions');
+const ModulesSubmodules = () => import(/* webpackChunkName: "modules-submodules" */ '../views/administration/cms/ModulesSubmodules');
 
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
-
-const CmsModulesDetails = () => import(/* webpackChunkName: "cms-modules-details" */ '../views/administration/cms/CmsModulesDetails');
-const CmsSubmodulesDetails = () => import(/* webpackChunkName: "cms-submodules-details" */ '../views/administration/cms/CmsSubmodulesDetails');
-const ModulesSubmodules = () => import(/* webpackChunkName: "modules-submodules" */ '../views/administration/cms/ModulesSubmodules');
 
 export default [
   {

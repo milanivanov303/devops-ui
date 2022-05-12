@@ -10,7 +10,7 @@
         :add-btn="true"
         :edit-btn="false"
         :delete-btn="true"
-        @delete="(row) => deleteSubmodule(row, 'delete')"
+        @delete="(row) => openDeleteModal(row, 'delete')"
         @add="() => openAddEditSubmoduleModal({}, 'add')"
         @update="(row) => openAddEditSubmoduleModal(row, 'update')">
       <Column show="name"/>
@@ -31,19 +31,28 @@
         :selectedSubmodule="selectedSubmodule"
         :action="action"
     />
+
+    <delete-submodule
+        v-if="showRemoveModal"
+        :selectedSubmodule="selectedSubmodule"
+        @close="closeDeleteModal()"
+    />
   </div>
 </template>
 
 <script>
 
 import CreateUpdateSubmodules from '@/components/cms/CreateUpdateSubmodules';
+import DeleteSubmodule from "../../../components/cms/DeleteSubmodule";
 
 export default {
   components: {
     CreateUpdateSubmodules,
+    DeleteSubmodule,
   },
   data() {
     return {
+      showRemoveModal: false,
       showAddEditSubmoduleModal: false,
       error: '',
       action: null,
@@ -61,17 +70,13 @@ export default {
       this.action = action;
       this.showAddEditSubmoduleModal = true;
     },
-    deleteSubmodule(data) {
-      const loader = this.$loading.show({ container: this.$el });
-      this.$store.dispatch('cms/deleteSubmodule', data.id)
-        .then(() => {
-          this.$M.toast({ html: 'Submodule has been deleted!', classes: 'toast-seccess' });
-        })
-        .catch((error) => {
-          this.error = error;
-          return error;
-        });
-      loader.hide();
+    openDeleteModal(selectedSubmodule) {
+      this.selectedSubmodule = selectedSubmodule;
+      this.showRemoveModal = true;
+    },
+    closeDeleteModal() {
+      this.selectedSubmodule = {};
+      this.showRemoveModal = false;
     },
   },
   created() {

@@ -24,6 +24,11 @@ export default {
   modules(state, modules) {
     state.modules = modules;
   },
+  modulesAdd(state, request) {
+    const { modules } = state;
+    modules.unshift(request);
+    Vue.set(state, 'modules', modules);
+  },
   modulesUpdate(state, request) {
     state.modules.map((a) => {
       if (a.id === request.id) {
@@ -121,6 +126,11 @@ export default {
   },
   submodules(state, submodules) {
     state.submodules = submodules;
+  },
+  submodulesAdd(state, request) {
+    const { submodules } = state;
+    submodules.unshift(request);
+    Vue.set(state, 'submodules', submodules);
   },
   submodulesUpdate(state, request) {
     state.submodules.map((a) => {
