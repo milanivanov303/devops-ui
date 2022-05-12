@@ -24,6 +24,20 @@ export default {
   modules(state, modules) {
     state.modules = modules;
   },
+  modulesUpdate(state, request) {
+    state.modules.map((a) => {
+      if (a.id === request.id) {
+        Vue.set(state.modules, state.modules.indexOf(a), request);
+      }
+      return state.modules;
+    });
+  },
+  modulesRemove(state, id) {
+    state.modules.splice(
+      state.modules.findIndex((req) => req.id === id),
+      1,
+    );
+  },
   rspVariables(state, rspVariables) {
     state.rspVariables = rspVariables;
   },
@@ -105,21 +119,21 @@ export default {
       return state.teamValues;
     });
   },
-  modulesUpdate(state, request) {
-    state.modules.map((a) => {
-      if (a.id === request.id) {
-        Vue.set(state.modules, state.modules.indexOf(a), request);
-      }
-      return state.modules;
-    });
-  },
-  modulesRemove(state, id) {
-    state.modules.splice(
-      state.modules.findIndex((req) => req.id === id),
-      1,
-    );
-  },
   submodules(state, submodules) {
     state.submodules = submodules;
+  },
+  submodulesUpdate(state, request) {
+    state.submodules.map((a) => {
+      if (a.id === request.id) {
+        Vue.set(state.submodules, state.submodules.indexOf(a), request);
+      }
+      return state.submodules;
+    });
+  },
+  submodulesRemove(state, id) {
+    state.submodules.splice(
+      state.submodules.findIndex((req) => req.id === id),
+      1,
+    );
   },
 };

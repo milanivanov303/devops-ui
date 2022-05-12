@@ -48,9 +48,9 @@ export default {
 
   updateModule({ commit }, payload) {
     const data = {
-      // name: payload.project.name,
-      // abbreviation: payload.hostname,
-      // submodules: payload.ipAddress
+      name: payload.moduleName,
+      abbreviation: payload.moduleAbbrev,
+      submodules: payload.submodulesSelected,
     };
 
     const promise = api('cms').put(`modules/${payload.id}`, data);
@@ -89,6 +89,41 @@ export default {
     return promise;
   },
 
+  createSubmodule({ commit }, payload) {
+    const promise = api('cms').post('submodules', payload);
+    promise
+      .then((response) => {
+        commit('submodulesAdd', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not create submodule', { root: true }));
+    return promise;
+  },
+
+  updateSubmodule({ commit }, payload) {
+    const data = {
+      name: payload.submoduleName,
+      abbreviation: payload.submoduleAbbrev,
+    };
+
+    const promise = api('cms').put(`submodules/${payload.id}`, data);
+    promise
+      .then((response) => {
+        commit('submodulesUpdate', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not update submodule!'));
+    return promise;
+  },
+
+  deleteSubmodule({ commit }, id) {
+    const promise = api('cms').delete(`submodules/${id}`);
+    promise
+      .then(() => {
+        commit('submodulesRemove', id);
+      })
+      .catch(() => commit('error', 'Could not delete submodule'));
+    return promise;
+  },
+
   getOneVariable({ commit }, variable) {
     const promise = api('cms').get(`default-variables/${variable}`);
 
@@ -116,13 +151,6 @@ export default {
       .catch(() => commit('error', 'Could not get IMX Modules', { root: true }));
     return promise;
   },
-
-  // createSubmodule({ commit }, payload) {
-  //   const promise = api('cms').post('modules/submodules', payload);
-  //   promise
-  //     .catch(() => commit('error', 'Could not create submodule', { root: true }));
-  //   return promise;
-  // },
 
   getCodixTeams({ commit }) {
     const name = 'codix-teams';

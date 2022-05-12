@@ -225,6 +225,12 @@
                 >
                   <router-link to="/administration/cms/actions"> Actions</router-link>
                 </li>
+                <li
+                    v-if="$auth.can('isAdmin', getApplicationCode('cms'))"
+                    :class="{ active: isActive('administration/cms/modules-submodules') }">
+                  <router-link to="/administration/cms/modules-submodules">
+                    Modules / Submodules</router-link>
+                </li>
                 <li><div class="divider"></div></li>
               </ul>
             </div>
@@ -235,6 +241,12 @@
                   :class="{ active: isActive('administration/cms-modules-details') }">
                   <router-link to="/administration/cms-modules-details">
                     CMS Modules Details</router-link>
+                </li>
+                <li
+                    v-if="$auth.can('can-manage-authorizations')"
+                    :class="{ active: isActive('administration/cms-submodules-details') }">
+                  <router-link to="/administration/cms-submodules-details">
+                    CMS Submodules Details</router-link>
                 </li>
               </ul>
             </div>

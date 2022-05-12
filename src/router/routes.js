@@ -39,7 +39,9 @@ const CmsActionsAdministration = () => import(/* webpackChunkName: "administrati
 
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
-const CmsModulesDetails = () => import(/* webpackChunkName: "cms-modules-details" */ '../views/administration/CmsModulesDetails');
+const CmsModulesDetails = () => import(/* webpackChunkName: "cms-modules-details" */ '../views/administration/cms/CmsModulesDetails');
+const CmsSubmodulesDetails = () => import(/* webpackChunkName: "cms-submodules-details" */ '../views/administration/cms/CmsSubmodulesDetails');
+const ModulesSubmodules = () => import(/* webpackChunkName: "modules-submodules" */ '../views/administration/cms/ModulesSubmodules');
 
 export default [
   {
@@ -631,6 +633,17 @@ export default [
     },
     component: CmsActionsAdministration,
   },
+  {
+    path: '/administration/cms/modules-submodules',
+    name: 'modules-submodules',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Modules Submodules',
+      breadcrumb: 'Modules Submodules',
+    },
+    component: ModulesSubmodules,
+  },
 
   // Builds
   {
@@ -650,6 +663,20 @@ export default [
       title: 'Cms Modules Details',
     },
     component: CmsModulesDetails,
+    beforeEnter: (to, from, next) => {
+      if (auth.can('can-manage-authorizations')) next();
+      else next('/dashbaord');
+    },
+  },
+  {
+    path: '/administration/cms-submodules-details',
+    meta: {
+      alias: '/administration/cms-submodules-details',
+      name: 'cms-submodules-details',
+      requiresAuth: true,
+      title: 'Cms Submodules Details',
+    },
+    component: CmsSubmodulesDetails,
     beforeEnter: (to, from, next) => {
       if (auth.can('can-manage-authorizations')) next();
       else next('/dashbaord');
