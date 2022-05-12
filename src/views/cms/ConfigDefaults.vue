@@ -18,8 +18,8 @@
           @edit="(row) => openAddEditVariableModal(row, 'edit')"
           :export-btn="false"
           :view-btn="false"
-          :add-btn="$auth.can('can-manage-config-defaults')"
-          :edit-btn="$auth.can('can-manage-config-defaults')"
+          :add-btn="$auth.can('can-manage-config-defaults', cmsCode)"
+          :edit-btn="$auth.can('can-manage-config-defaults', cmsCode)"
           :delete-btn="false">
           <Column show="id" />
           <Column show="name" />
@@ -83,6 +83,7 @@
 <script>
 import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
 import SwitchBox from '@/components/partials/SwitchBox';
+import config from '@/config';
 
 export default {
   components: {
@@ -99,6 +100,7 @@ export default {
       instance: {},
       templates: {},
       loading: false,
+      cmsCode: config.cms.code,
     };
   },
   computed: {
