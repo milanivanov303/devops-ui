@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3 class="center">Cms Modules Details</h3>
+    <h5 class="center">Modules</h5>
     <Table
         :data="modules"
         sort-by="name"

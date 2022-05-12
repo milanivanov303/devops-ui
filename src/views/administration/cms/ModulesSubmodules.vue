@@ -7,17 +7,17 @@
     <div class="col s12">
       <ul class="tabs row">
         <li class="tab col s6">
-          <a href="#esxi_details">MODULES DETAILS</a>
+          <a href="#modules">MODULES DETAILS</a>
         </li>
         <li class="tab col s6">
-          <a href="#memory_slots">SUBMODULES DETAILS</a>
+          <a href="#submodules">SUBMODULES DETAILS</a>
         </li>
       </ul>
-      <div id="esxi_details">
-        <EsxiDetails :esxiHost="esxiHost"/>
+      <div id="modules">
+        <CmsModulesDetails/>
       </div>
-      <div id="memory_slots">
-        <MemorySlots :esxiHost="esxiHost"/>
+      <div id="submodules">
+        <CmsSubmodulesDetails/>
       </div>
     </div>
   </div>
@@ -29,6 +29,13 @@ const CmsModulesDetails = () => import('./CmsModulesDetails');
 const CmsSubmodulesDetails = () => import('./CmsSubmodulesDetails');
 
 export default {
-
-}
+  components: {
+    CmsModulesDetails,
+    CmsSubmodulesDetails,
+  },
+  mounted() {
+    const elems = document.querySelectorAll('.tabs');
+    this.$M.Tabs.init(elems);
+  },
+};
 </script>

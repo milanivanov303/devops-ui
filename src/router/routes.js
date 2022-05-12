@@ -655,34 +655,6 @@ export default [
     component: OpenBuild,
   },
   {
-    path: '/administration/cms-modules-details',
-    meta: {
-      alias: '/administration/cms-modules-details',
-      name: 'cms-modules-details',
-      requiresAuth: true,
-      title: 'Cms Modules Details',
-    },
-    component: CmsModulesDetails,
-    beforeEnter: (to, from, next) => {
-      if (auth.can('can-manage-authorizations')) next();
-      else next('/dashbaord');
-    },
-  },
-  {
-    path: '/administration/cms-submodules-details',
-    meta: {
-      alias: '/administration/cms-submodules-details',
-      name: 'cms-submodules-details',
-      requiresAuth: true,
-      title: 'Cms Submodules Details',
-    },
-    component: CmsSubmodulesDetails,
-    beforeEnter: (to, from, next) => {
-      if (auth.can('can-manage-authorizations')) next();
-      else next('/dashbaord');
-    },
-  },
-  {
     path: '/:name(.*_\\d+)/:uri(.*)?',
     meta: {
       layout: 'basic',
