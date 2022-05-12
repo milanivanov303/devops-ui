@@ -63,6 +63,18 @@
             </div>
           </div>
         </div>
+        <div v-if="esxiHost.storage" class="row progress-bar">
+          <div class="col s12">
+            <b>Storage: </b>{{$esxi(esxiHost.storage.size).bytesToSizeLabel()}},
+            <b>Used: </b> {{$esxi(esxiHost.storage.used).bytesToSizeLabel()}}
+            <b>Free: </b> {{$esxi(esxiHost.storage.available).bytesToSizeLabel()}}
+            <div class="progress">
+              <div class="determinate"
+                   :style="{width: esxiHost.storage.used * 100 / esxiHost.storage.size + '%'}">
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="row">
           <div class="col s12">
             <ul class="tabs row">
