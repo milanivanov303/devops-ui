@@ -19,13 +19,21 @@
               v-model.trim="currentVariable.name"
               @change="resetCurrentVariable">
           </div>
-          <span class="helper-text">Check variable templates on: <b>{{devInstance.name}}</b></span>
+          <span class="helper-text">
+            Check variable templates on: <b>{{devInstance.name}}</b>
+            and config.defaults presence on <b>refbg2</b>
+          </span>
           <div class="validator">
             <div class="silver-text" v-if="currentVariable.status === 'PENDING'">
                 <p>Loading...</p>
             </div>
           <div class="validator red-text" v-if="$v.currentVariable.name.$error">
             <span v-if="!$v.currentVariable.name.required">Field is required!</span>
+          </div>
+          <div
+            class="validator red-text"
+            v-if="$v.currentVariable.$error && !currentVariable.status">
+            <span v-if="!$v.currentVariable.status.sameAs">Check variable first</span>
           </div>
             <div class="validator col s10">
               <div
@@ -110,7 +118,7 @@
         </table>
       </div>
     </template>
-    <template v-slot:footer v-if="currentVariable.status === 'OK'">
+    <template v-slot:footer>
       <button
         class="btn waves-effect waves-light"
         type="button"
@@ -154,6 +162,9 @@ export default {
   validations: {
     currentVariable: {
       name: {
+        required,
+      },
+      status: {
         required,
       },
     },
@@ -207,6 +218,40 @@ export default {
       this.$v.$reset();
       this.$emit('close');
     },
+    getDefaultValue(name) {
+      this.$store.dispatch('cms/getTemplates',
+        {
+          param: name,
+          instance_user: 'imx',
+          commands: ['get_variable_default'],
+        })
+        .then((resp) => {
+          const { data } = resp;
+          if (data.get_variable_default.length) {
+            this.currentVariable.defaultValue = data.get_variable_default;
+            if (this.currentVariable.value === '') {
+              this.currentVariable.value = data.get_variable_default;
+            }
+          }
+        });
+    },
+    getTemplate(name) {
+      this.$store.dispatch('cms/getTemplates',
+        {
+          instance: this.devInstance.name,
+          instance_user: this.devInstance.user,
+          param: name,
+          commands: [
+            'list_template',
+          ],
+        })
+        .then((resp) => {
+          const { data } = resp;
+          if (Object.values(data.list_template).length) {
+            this.templates = Object.values(data.list_template);
+          }
+        });
+    },
     async checkVariable() {
       // don't check if the field is empty
       if (this.currentVariable.name) {
@@ -222,27 +267,9 @@ export default {
           .catch((error) => {
             this.error = error;
           });
-        await this.$store.dispatch('cms/getTemplates',
-          {
-            instance: this.devInstance.name,
-            instance_user: this.devInstance.user,
-            param: variable,
-            commands: [
-              'list_template',
-              'get_variable_default',
-            ],
-          })
-          .then((resp) => {
-            const { data } = resp;
-            if (Object.values(data.list_template).length) {
-              this.templates = Object.values(data.list_template);
-            }
-            if (data.get_variable_default.length) {
-              this.currentVariable.defaultValue = data.get_variable_default;
-              if (this.currentVariable.value === '') {
-                this.currentVariable.value = data.get_variable_default;
-              }
-            }
+
+        Promise.all([this.getTemplate(variable), this.getDefaultValue(variable)])
+          .then(() => {
             this.currentVariable.status = 'OK';
           })
           .catch(() => {
