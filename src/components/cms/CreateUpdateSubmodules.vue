@@ -112,7 +112,10 @@ export default {
           this.$M.toast({ html: 'Submodule has been submitted!', classes: 'toast-seccess' });
         })
         .catch((error) => {
-          this.error = error;
+          if (error.response.status === 422) {
+            this.error = error;
+            this.$M.toast({ html: 'Submodule already exist!', classes: 'toast-fail' });
+          }
           return error;
         });
       this.form = {};

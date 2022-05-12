@@ -43,7 +43,7 @@
 <script>
 
 import CreateUpdateSubmodules from '@/components/cms/CreateUpdateSubmodules';
-import DeleteSubmodule from "../../../components/cms/DeleteSubmodule";
+import DeleteSubmodule from '../../../components/cms/DeleteSubmodule';
 
 export default {
   components: {
