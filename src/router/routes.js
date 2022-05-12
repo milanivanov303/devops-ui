@@ -617,7 +617,6 @@ export default [
     },
     component: OpenBuild,
   },
-
   {
     path: '*',
     meta: {
