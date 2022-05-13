@@ -2,15 +2,7 @@
 
 export default {
   getClients({ commit }) {
-    const name = 'extranet-clients';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
     const promise = api('devops').get('extranet/clients');
-
-    commit('promise', { name, promise }, { root: true });
 
     promise
       .then((response) => commit('clients', response.data))
@@ -19,15 +11,7 @@ export default {
   },
 
   getBranches({ commit }) {
-    const name = 'extranet-branches';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
     const promise = api('devops').get('extranet/branches');
-
-    commit('promise', { name, promise }, { root: true });
 
     promise
       .then((response) => commit('branches', response.data))

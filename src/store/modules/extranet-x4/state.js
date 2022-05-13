@@ -2,9 +2,6 @@
 
 export default {
   branches: [],
-  clients: [],
-  feBranches: [],
-  configurations: [],
   host: '',
   images: [],
 };
