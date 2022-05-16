@@ -15,7 +15,9 @@
         @update="(row) => openAddEditModuleModal(row, 'update')">
       <Column show="name"/>
       <Column show="abbreviation"/>
-      <Column show="submodules"/>
+      <Column
+          label="Submodules"
+          :show="(row) => showSubmodules(row)"/>
       <template v-slot:actions-before="{ row }">
         <a
             @click="openAddEditModuleModal(row, 'update')"
@@ -63,11 +65,11 @@ export default {
     modules() {
       return this.$store.getters['cms/modules'];
     },
-    submodules() {
-      return this.$store.getters['cms/submodules'];
-    },
   },
   methods: {
+    showSubmodules(value) {
+      return value.submodules.map((s) => s.name).toString();
+    },
     openAddEditModuleModal(moduleDetails, action) {
       this.selectedModule = { ...moduleDetails };
       this.action = action;
@@ -84,7 +86,6 @@ export default {
   },
   created() {
     this.$store.dispatch('cms/getModules');
-    this.$store.dispatch('cms/getSubmodules');
   },
 };
 </script>

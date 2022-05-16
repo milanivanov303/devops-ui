@@ -48,8 +48,8 @@
                 label="Submodules"
                 displayed="name"
                 icon="developer_board"
-                :options="submodules"
-                v-model="submodulesSelected"
+                :options="submoduless"
+                v-model="form.submodulesSelected"
             />
           </div>
         </div>
@@ -92,7 +92,7 @@ export default {
     modules() {
       return this.$store.getters['cms/modules'];
     },
-    submodules() {
+    submoduless() {
       return this.$store.getters['cms/submodules'];
     },
   },
@@ -117,7 +117,7 @@ export default {
         dispatch = this.$store.dispatch('cms/createModule', {
           name: this.form.moduleName,
           abbreviation: this.form.moduleAbbrev,
-          submodules: this.submodulesSelected,
+          submodules: this.form.submodulesSelected,
         });
       } else if (this.action === 'update') {
         dispatch = this.$store.dispatch('cms/updateModule', this.form);
@@ -144,7 +144,7 @@ export default {
         this.form.id = this.selectedModule.id;
         this.form.moduleName = this.selectedModule.name;
         this.form.moduleAbbrev = this.selectedModule.abbreviation;
-        this.submodulesSelected = this.selectedModule.submodules;
+        this.form.submodulesSelected = this.selectedModule.submodules;
       }
     },
     closeModal() {
