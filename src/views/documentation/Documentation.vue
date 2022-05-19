@@ -21,7 +21,7 @@
             :default-option="false"
             v-model="branch"
           />
-          <button class="btn btn-small right" @click="downloadAll(rows)" :disabled="downloading">
+          <button class="btn btn-small right" @click="download(rows)" :disabled="downloading">
             <i class="material-icons left">download</i>
             <span v-if="downloading">Downloading ...</span>
             <span v-else>Download</span>
@@ -34,58 +34,26 @@
         </template>
       </Table>
 
-      <Modal
-        v-if="showRawModal"
-        class="fullscreen codemirror-modal"
-        @close="closeRawModal()"
-        @opened="initCodeMirror()"
-      >
-        <template slot="header">{{ file.path }}</template>
-        <template slot="content">
-          <textarea ref="codemirror" hidden v-model="content"></textarea>
-        </template>
-        <template slot="footer">
-          <button class="waves-effect btn" type="button" @click="downloadRaw()">
-            <i class="material-icons left">download</i>
-            Download
-          </button>
-        </template>
-      </Modal>
-
-      <Modal
+      <RawModal v-if="showRawModal" :file="file" @close="closeRawModal"/>
+      <RedocModal
         v-if="showRedocModal"
-        class="fullscreen"
-        @close="closeRedocModal()"
-      >
-        <template slot="header">{{ file.path }}</template>
-        <template slot="content">
-          <redoc-wrapper :spec-or-spec-url="file.content" :options="redocOptions"></redoc-wrapper>
-        </template>
-        <template slot="footer">
-          <button class="btn" @click="downloadHtml([file.path])" :disabled="downloading">
-            <i class="material-icons left">download</i>
-            <span v-if="downloading">Downloading ...</span>
-            <span v-else>Download</span>
-          </button>
-        </template>
-      </Modal>
+        :file="file"
+        :downloading="downloading"
+        @close="closeRedocModal"
+        @download="download"
+      />
     </div>
 </template>
 <script>
 
-import RedocWrapper from '@hnluu8/vue-redoc-wrapper';
-import Modal from '@/components/Modal';
-import codemirrorMixin from '@/components/documentation/codemirrorMixin';
+import RawModal from '@/views/documentation/RawModal';
+import RedocModal from '@/views/documentation/RedocModal';
 
 export default {
   components: {
-    Modal,
-    RedocWrapper,
+    RawModal,
+    RedocModal,
   },
-
-  mixins: [
-    codemirrorMixin,
-  ],
 
   data() {
     return {
@@ -96,9 +64,6 @@ export default {
       file: {},
       showRawModal: false,
       showRedocModal: false,
-      redocOptions: {
-        showExtensions: true,
-      },
       downloading: false,
     };
   },
@@ -107,22 +72,16 @@ export default {
     module() {
       return this.$route.params.module;
     },
-    content() {
-      return JSON.stringify(this.file.content, null, 2);
-    },
   },
 
   methods: {
     getBranches() {
-      const loader = this.$loading.show({ container: this.$refs.files });
-
       this.$store.dispatch('documentation/getBranches', {
         repo: this.repo,
       })
         .then((response) => {
           this.branches = response.data.map((branch) => branch.name);
-        })
-        .finally(() => { loader.hide(); });
+        });
     },
 
     getFiles() {
@@ -229,16 +188,9 @@ export default {
       });
     },
 
-    downloadRaw() {
-      const element = document.createElement('a');
-      element.setAttribute('href', `data:text/plain;charset=utf-8, ${encodeURIComponent(this.content)}`);
-      element.setAttribute('download', this.file.path);
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-    },
+    download(rows) {
+      const files = rows.map((file) => file.path);
 
-    downloadHtml(files) {
       this.downloading = true;
       this.$store.dispatch('documentation/download', {
         repo: this.repo,
@@ -247,10 +199,6 @@ export default {
         files,
       })
         .finally(() => { this.downloading = false; });
-    },
-
-    downloadAll(files) {
-      this.downloadHtml(files.map((file) => file.path));
     },
   },
 
@@ -275,41 +223,18 @@ export default {
 };
 </script>
 
-<style lang="scss">
-#redoc-container {
-  h3 {
-    font-size: 1rem !important;
-  }
-  .search-input {
-    padding-left: 20px;
-    font-size: 14px;
-  }
-  .search-icon {
-    top: 15px;
-    left: 0;
-  }
-  .collapsible{
-    border: 0;
-  }
-}
-.codemirror-modal {
-  .modal-content {
-    padding: 0;
-  }
-}
-</style>
-
 <style lang="scss" scoped>
-.actions {
-  width: 200px;
-}
-table {
-  tr {
-    td {
-      .btn {
-        margin: 5px;
+  .actions {
+    width: 200px;
+  }
+
+  table {
+    tr {
+      td {
+        .btn {
+          margin: 5px;
+        }
       }
     }
   }
-}
 </style>
