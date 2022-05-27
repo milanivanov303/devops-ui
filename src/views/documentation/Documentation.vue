@@ -93,7 +93,7 @@ export default {
         apis_dir: this.module,
       })
         .then((response) => {
-          this.files = response.data;
+          this.files = response.data.filter((file) => file.path.endsWith('.yaml'));
 
           if (!this.$route.query.file) {
             return;
