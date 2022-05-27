@@ -113,14 +113,14 @@ export default {
     },
 
     getTitle(file) {
-      if (!file.content) {
+      if (!file.content || !file.content.info) {
         return '';
       }
       return file.content.info.title;
     },
 
     getDescription(file) {
-      if (!file.content) {
+      if (!file.content || !file.content.info) {
         return '';
       }
       return file.content.info.description;
