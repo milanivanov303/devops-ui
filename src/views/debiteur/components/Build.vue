@@ -166,7 +166,7 @@ export default {
       return this.$store.state.mmpi.instances;
     },
     images() {
-      return this.$store.state.extranet.images;
+      return this.$store.state.debiteur.images;
     },
   },
 
@@ -210,7 +210,7 @@ export default {
     getData() {
       this.$store.dispatch('debiteur/getClients');
       this.$store.dispatch('debiteur/getBranches');
-      this.$store.dispatch('extranet/getImages');
+      this.$store.dispatch('debiteur/getImages');
       this.$store.dispatch('mmpi/getInstances');
     },
 

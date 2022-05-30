@@ -12,7 +12,7 @@
               class="col s12"
               :class="{invalid: $v.selected.name.$error}"
               icon="title"
-              label="Name (if needed use snake case e.g. component_name)"
+              label="Name"
               v-model="selected.name"
               @blur="$v.selected.name.$touch()"
           />
@@ -104,9 +104,11 @@
         <div class="row">
           <TextInput
               class="col s12 l3"
+              :class="{invalid: !$v.newVersion.version.versionValidator}"
               icon="linear_scale"
               label="Version"
               v-model="newVersion.version"
+              @blur="$v.newVersion.version.$touch()"
           />
           <div class="input-field col s12 l4">
             <i class="material-icons prefix">date_range</i>
@@ -142,6 +144,15 @@
             </TooltipButton>
           </div>
         </div>
+        <div class="row">
+          <div class="validator col s12 offset-l1 offset-m1">
+            <div class="red-text" v-if="!$v.newVersion.version.versionValidator">
+              <p v-if="!$v.newVersion.version.versionValidator">
+                Invalid version format. Please fill only main versions.
+              </p>
+            </div>
+          </div>
+        </div>
       </form>
     </template>
     <template v-slot:footer>
@@ -162,7 +173,9 @@ import { DateTime } from 'luxon';
 import { Datetime } from 'vue-datetime';
 import 'vue-datetime/dist/vue-datetime.css';
 
-import { required } from 'vuelidate/lib/validators';
+import { required, helpers } from 'vuelidate/lib/validators';
+
+const versionValidator = helpers.regex('versionValidator', /^(\d)+(.\d+)?$/);
 
 const TooltipButton = () => import('@/components/partials/TooltipButton');
 
@@ -199,6 +212,11 @@ export default {
         required,
       },
     },
+    newVersion: {
+      version: {
+        versionValidator,
+      },
+    },
   },
 
   methods: {
@@ -219,6 +237,10 @@ export default {
     },
 
     addToVersions() {
+      if (!this.$v.newVersion.version.versionValidator) {
+        return;
+      }
+
       if (!this.selected.versions) {
         this.selected.versions = [];
       }

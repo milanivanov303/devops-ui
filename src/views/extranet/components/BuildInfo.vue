@@ -54,14 +54,9 @@
         </div>
 
       </div>
-      <div class="row" v-if="build.details.image">
-        <TextInput
-          class="col s12 readonly"
-          label="Docker image"
-          icon="adjust"
-          :value="build.details.image.label"
-        />
-      </div>
+
+      <DeployOn :build="build" module="extranet"/>
+
       <div class="row">
         <TextInput
             class="col s12 m6 readonly"
@@ -95,7 +90,14 @@
 </template>
 
 <script>
+
+import DeployOn from '@/components/DeployOn';
+
 export default {
+  components: {
+    DeployOn,
+  },
+
   props: {
     build: {
       type: Object,

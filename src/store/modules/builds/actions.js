@@ -99,6 +99,16 @@ export default {
     return promise;
   },
 
+  changeImage({ commit }, { id, image }) {
+    const promise = api('devops').post(`builds/${id}/change-image`, {
+      image,
+    });
+    promise
+      .then((response) => commit('update', response.data.data))
+      .catch((error) => commit('error', error, { root: true }));
+    return promise;
+  },
+
   getBuildsByStatus({ commit }, {
     branch, module, status, createdBy, perPage, page, search,
   }) {

@@ -5,10 +5,10 @@
         <div class="row">
           <h1 class="center-align col s12">Config Defaults</h1>
         </div>
+        <Alert v-if="error" :msg="error"/>
         <div v-if="loading || defaultVariables.length === 0" class="center" >
           <Preloader class="big"/>
         </div>
-        <Alert v-if="error" :msg="error"/>
         <Table
           v-else
           :data="defaultVariables"
@@ -18,14 +18,16 @@
           @edit="(row) => openAddEditVariableModal(row, 'edit')"
           :export-btn="false"
           :view-btn="false"
-          :add-btn="$auth.can('can-manage-config-defaults')"
-          :edit-btn="$auth.can('can-manage-config-defaults')"
-          :delete-btn="false"
-          :pagination="false"
-          :perPage="5000">
+          :add-btn="$auth.can('can-manage-config-defaults', cmsCode)"
+          :edit-btn="$auth.can('can-manage-config-defaults', cmsCode)"
+          :delete-btn="false">
           <Column show="id" />
           <Column show="name" />
           <Column show="value" />
+          <Column
+            label="Value"
+            :show="row => row.sensitive_data ? '*********' : row.value"
+          />
           <Column show="description" />
           <template v-slot:actions-before="{ row }">
             <a @click="openInterfacesModal(row)" class="right" title="Check Variable">
@@ -81,6 +83,7 @@
 <script>
 import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
 import SwitchBox from '@/components/partials/SwitchBox';
+import config from '@/config';
 
 export default {
   components: {
@@ -97,6 +100,7 @@ export default {
       instance: {},
       templates: {},
       loading: false,
+      cmsCode: config.cms.code,
     };
   },
   computed: {

@@ -19,15 +19,23 @@
               v-model.trim="currentVariable.name"
               @change="resetCurrentVariable">
           </div>
-          <span class="helper-text">Check variable templates on: <b>{{devInstance.name}}</b></span>
+          <span class="helper-text">
+            Check variable templates on: <b>{{devInstance.name}}</b>
+            and config.defaults presence on <b>refbg2</b>
+          </span>
           <div class="validator">
             <div class="silver-text" v-if="currentVariable.status === 'PENDING'">
                 <p>Loading...</p>
             </div>
-          <div class="validator red-text" v-if="$v.currentVariable.name.$error">
-            <span v-if="!$v.currentVariable.name.required">Field is required!</span>
-          </div>
-            <div class="validator col s10">
+            <div class="validator red-text" v-if="$v.currentVariable.name.$error">
+              <span v-if="!$v.currentVariable.name.required">Field is required!</span>
+            </div>
+            <div
+              class="validator red-text"
+              v-if="$v.currentVariable.$error && !currentVariable.status">
+              <span v-if="!$v.currentVariable.status.sameAs">Check variable first</span>
+            </div>
+            <div v-if="!loading" class="validator col s10">
               <div
                 class="red-text"
                 v-if="!currentVariable.defaultValue && currentVariable.status === 'OK'">
@@ -110,7 +118,7 @@
         </table>
       </div>
     </template>
-    <template v-slot:footer v-if="currentVariable.status === 'OK'">
+    <template v-slot:footer>
       <button
         class="btn waves-effect waves-light"
         type="button"
@@ -148,12 +156,16 @@ export default {
         defaultValue: '',
       },
       variableModif: [],
+      loading: false,
       error: '',
     };
   },
   validations: {
     currentVariable: {
       name: {
+        required,
+      },
+      status: {
         required,
       },
     },
@@ -209,48 +221,65 @@ export default {
     },
     async checkVariable() {
       // don't check if the field is empty
-      if (this.currentVariable.name) {
-        const variable = this.currentVariable.name
-          .replace(/[^\w\s]/gi, '')
-          .toUpperCase();
-        this.resetCurrentVariable();
-        this.currentVariable.status = 'PENDING';
-        await this.$store.dispatch('cms/getOneVariable', variable)
-          .then((resp) => {
-            this.currentVariable.currDbData = resp.data.data;
-          })
-          .catch((error) => {
-            this.error = error;
-          });
-        await this.$store.dispatch('cms/getTemplates',
-          {
-            instance: this.devInstance.name,
-            instance_user: this.devInstance.user,
-            param: variable,
-            commands: [
-              'list_template',
-              'get_variable_default',
-            ],
-          })
-          .then((resp) => {
-            const { data } = resp;
-            if (Object.values(data.list_template).length) {
-              this.templates = Object.values(data.list_template);
-            }
-            if (data.get_variable_default.length) {
-              this.currentVariable.defaultValue = data.get_variable_default;
-              if (this.currentVariable.value === '') {
-                this.currentVariable.value = data.get_variable_default;
-              }
-            }
-            this.currentVariable.status = 'OK';
-          })
-          .catch(() => {
-            this.currentVariable.status = 'ERROR';
-          });
-      } else {
-        this.$v.currentVariable.name.$touch();
+      if (!this.currentVariable.name) {
+        return this.$v.currentVariable.name.$touch();
       }
+      this.loading = true;
+      const variable = this.currentVariable.name
+        .replace(/[^\w\s]/gi, '')
+        .toUpperCase();
+      this.resetCurrentVariable();
+      this.currentVariable.status = 'PENDING';
+      await this.$store.dispatch('cms/getOneVariable', variable)
+        .then((resp) => {
+          this.currentVariable.currDbData = resp.data.data;
+        })
+        .catch((error) => {
+          this.error = error;
+        });
+
+      const promiseTemplate = this.$store.dispatch('cms/getTemplates',
+        {
+          instance: this.devInstance.name,
+          instance_user: this.devInstance.user,
+          param: variable,
+          commands: [
+            'list_template',
+          ],
+        })
+        .then((resp) => {
+          const { data } = resp;
+          if (Object.values(data.list_template).length) {
+            this.templates = Object.values(data.list_template);
+          }
+        });
+
+      const promiseVariable = this.$store.dispatch('cms/getTemplates',
+        {
+          param: variable,
+          instance_user: 'imx',
+          commands: ['get_variable_default'],
+        })
+        .then((resp) => {
+          const { data } = resp;
+          if (data.get_variable_default.length) {
+            this.currentVariable.defaultValue = data.get_variable_default;
+            if (this.currentVariable.value === '') {
+              this.currentVariable.value = data.get_variable_default;
+            }
+          }
+        });
+
+      return Promise.all([promiseTemplate, promiseVariable])
+        .then(() => {
+          this.currentVariable.status = 'OK';
+        })
+        .catch(() => {
+          this.currentVariable.status = 'ERROR';
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
     async addVariable() {
       this.$v.$touch();

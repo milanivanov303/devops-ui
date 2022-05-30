@@ -10,12 +10,6 @@ export default {
   images(state, images) {
     state.images = images;
   },
-  clients(state, clients) {
-    state.clients = clients;
-  },
-  feBranches(state, branches) {
-    state.feBranches = branches;
-  },
   removeBuild(state, id) {
     state.services.splice(
       state.services.findIndex((service) => service.ID === id),

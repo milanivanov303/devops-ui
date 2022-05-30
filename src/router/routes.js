@@ -8,6 +8,8 @@ const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/B
 const Configurations = () => import(/* webpackChunkName: "pas" */ '../views/pas/configurations/Configurations');
 const SoaModification = () => import(/* webpackChunkName: "pas" */ '../views/pas/SOAdeployment');
 
+const Documentation = () => import(/* webpackChunkName: "demos" */ '../views/documentation/Documentation');
+
 const DemosDashboard = () => import(/* webpackChunkName: "demos" */ '../views/demos/Dashboard');
 const DemosList = () => import(/* webpackChunkName: "demos" */ '../views/demos/Demos');
 
@@ -302,6 +304,25 @@ export default [
     },
   },
 
+  // Documentation
+  {
+    path: '/documentation/:module?',
+    name: 'documentation',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Documentation';
+
+        if (route.query.module) {
+          title = `${route.query.module} - ${title}`;
+        }
+        return title;
+      },
+    },
+    component: Documentation,
+  },
+
   // Demos Tab
   {
     path: '/demos',
@@ -589,20 +610,12 @@ export default [
 
   // Builds
   {
-    path: '/builds/:name(.*_\\d+)/:uri(.*)?',
+    path: '/builds/:name(.*[-_]{1}\\d{10})/:uri(.*)?',
     meta: {
       layout: 'basic',
       requiresAuth: false,
     },
     component: OpenBuild,
-  },
-  {
-    path: '/:name(.*_\\d+)/:uri(.*)?',
-    meta: {
-      layout: 'basic',
-      requiresAuth: false,
-    },
-    redirect: (to) => `/builds${to.path}`,
   },
   {
     path: '*',

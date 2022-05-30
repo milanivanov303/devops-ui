@@ -25,7 +25,7 @@ export default {
           readOnly: 'nocursor',
         },
       );
-      this.codeMirror.setSize('100%', '90%');
+      this.codeMirror.setSize('100%', '100%');
       this.codeMirror.setValue(raml);
     },
 
