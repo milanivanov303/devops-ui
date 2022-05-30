@@ -80,7 +80,7 @@
         <li v-if="vm.instances && vm.instances.length > 0">
           <div class="collapsible-header"><i class="material-icons">apps</i>Instances</div>
           <div class="collapsible-body">
-            <table class="data-table responsive-table">
+            <table class="responsive-table">
               <thead>
               <tr>
                 <th>Instance</th>
@@ -89,7 +89,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr v-for="instance in vm.instances">
+              <tr v-for="instance in vm.instances" :key="instance.id">
                 <td>
                   <a :href="'../instances?instances_search=' + instance.name" class="tbl-link">
                     {{instance.name}}
