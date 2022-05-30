@@ -7,4 +7,5 @@ export default {
   instances: [],
   imxComponents: [],
   requestedInstances: [],
+  expiringComponents: [],
 };
