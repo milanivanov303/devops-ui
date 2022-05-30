@@ -23,18 +23,14 @@
             </a>
           </div>
         </template>
-        <Column label="Instance" name="name"
-                :show="(instance) => hideActions ? instance.name : getInstanceLink(instance.name)"
-        />
+        <Column label="Instance" name="name" :show="(instance) => instance.name"/>
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
         <Column v-if="!instances" label="Virtual Machine" name="vm"
           :show="(instance) => getVMLink(instance.virtual_machine.name)"/>
-<!--        <Column v-if="!instances" label="Esxi Host" name="esxi"-->
-<!--          :show="(instance) => getHostLink(instance.virtual_machine.name)"/>-->
-        <Column show="version"/>
-        <Column show="pwd_hash_type"/>
+        <Column show="version" class="dont-break-out" width="20%"/>
+        <Column show="pwd_hash_type" width="10%"/>
         <Column label="Home path" name="home-path" :show="(instance) => instance.home_path"/>
         <Column show="patch_config_path"/>
         <template v-slot:actions-before="{ row }">
@@ -96,10 +92,6 @@ export default {
     instances: {
       type: [Array, String],
     },
-    hideActions: {
-      type: Boolean,
-      default: true,
-    },
   },
   data() {
     return {
@@ -158,10 +150,6 @@ export default {
     getVMLink(name) {
       return `<a href="virtualMachines/${name}" class="tbl-link">${name}</a>`;
     },
-    getInstanceLink(name) {
-      return `<a href="../instances?instances_search=${name}" class="tbl-link">${name}</a>`;
-    },
-
     getInstances() {
       const loader = this.$loading.show({ container: this.$refs.instances });
 
@@ -210,3 +198,24 @@ export default {
   },
 };
 </script>
+<style>
+.dont-break-out {
+
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+
+}
+</style>
