@@ -75,4 +75,7 @@ export default {
       return state.requestedInstances;
     });
   },
+  expiringComponents(state, expiringComponents) {
+    state.expiringComponents = expiringComponents;
+  },
 };

@@ -93,7 +93,7 @@ export default {
         apis_dir: this.module,
       })
         .then((response) => {
-          this.files = response.data;
+          this.files = response.data.filter((file) => file.path.endsWith('.yaml'));
 
           if (!this.$route.query.file) {
             return;
@@ -113,14 +113,14 @@ export default {
     },
 
     getTitle(file) {
-      if (!file.content) {
+      if (!file.content || !file.content.info) {
         return '';
       }
       return file.content.info.title;
     },
 
     getDescription(file) {
-      if (!file.content) {
+      if (!file.content || !file.content.info) {
         return '';
       }
       return file.content.info.description;

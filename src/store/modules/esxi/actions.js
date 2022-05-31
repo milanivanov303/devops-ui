@@ -1,4 +1,5 @@
 // https://vuex.vuejs.org/en/actions.html
+import { DateTime } from 'luxon';
 
 export default {
   updateSingleHost({ commit }, payload) {
@@ -137,6 +138,35 @@ export default {
 
     promise
       .then((response) => commit('updateRequestedInstances', response.data.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+
+  getExpiringComponents({ commit }) {
+    const promise = api('devops').get('inventory/imx-components/expiring');
+    promise
+      .then((response) => commit('expiringComponents', response.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+
+  getExpiringComponentsExport({ commit }, payload) {
+    const promise = api('devops').post(
+      'inventory/imx-components/expiring/export',
+      payload,
+      {
+        responseType: 'blob',
+      },
+    );
+    promise
+      .then((response) => {
+        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        const fileLink = document.createElement('a');
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', `${DateTime.local().toFormat('dd_MM_y')}_expiring_imx_components.xlsx`);
+        document.body.appendChild(fileLink);
+        fileLink.click();
+      })
       .catch((error) => commit('error', error));
     return promise;
   },
