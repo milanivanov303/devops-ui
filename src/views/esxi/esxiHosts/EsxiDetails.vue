@@ -43,6 +43,9 @@
               :class="{'red-text': isDateExpired(esxiHost.expiration_date)}">
             <b>Expiration date: </b>{{ $date(esxiHost.expiration_date).toHuman() }}
           </li>
+          <li v-if="esxiHost.purchase_date" class="collection-item">
+            <b>Server's age: </b>{{ getServersAge(esxiHost.purchase_date) }}
+          </li>
         </div>
       </div>
       <div class="row">
@@ -110,6 +113,14 @@ export default {
     },
     isDateExpired(date) {
       return date < Date.now() / 1000;
+    },
+    getServersAge(purchaseDate) {
+      const seconds = Math.floor(Date.now() / 1000) - purchaseDate;
+      const years = Math.floor(seconds / 31536000);
+      const months = Math.floor((seconds % 31536000) / 2628000);
+      const days = Math.floor(((seconds % 31536000) % 2628000) / 86400);
+
+      return `${years} years ${months} months ${days} days`;
     },
   },
 

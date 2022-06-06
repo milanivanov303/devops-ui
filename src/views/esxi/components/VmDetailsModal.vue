@@ -79,8 +79,27 @@
         </li>
         <li v-if="vm.instances && vm.instances.length > 0">
           <div class="collapsible-header"><i class="material-icons">apps</i>Instances</div>
-          <div class="collapsible-body ">
-            <Instances :instances="vm.instances" :hideActions="false"/>
+          <div class="collapsible-body">
+            <table class="responsive-table">
+              <thead>
+              <tr>
+                <th>Instance</th>
+                <th>Project</th>
+                <th>Delivery Chain</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="instance in vm.instances" :key="instance.id">
+                <td>
+                  <a :href="'../instances?instances_search=' + instance.name" class="tbl-link">
+                    {{instance.name}}
+                  </a>
+                </td>
+                <td>{{ getProjectName(instance.name) }}</td>
+                <td>{{ getDeliveryChain(instance.name) }}</td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </li>
         <li v-if="vm.components">
@@ -105,12 +124,10 @@
 </template>
 
 <script>
-import Instances from '../instances/Instances';
 import ComponentsTable from './ComponentsTable';
 
 export default {
   components: {
-    Instances,
     ComponentsTable,
   },
 
@@ -131,6 +148,9 @@ export default {
     status() {
       return this.vm.powered;
     },
+    projects() {
+      return this.$store.state.mmpi.projects;
+    },
   },
 
   methods: {
@@ -142,6 +162,32 @@ export default {
         return `${vm.name} <span class="new badge red" data-badge-caption="">Powered ${vm.powered}</span>`;
       }
       return vm.name;
+    },
+    getProjectName(instanceName) {
+      let project = null;
+      this.projects.forEach((p) => {
+        p.delivery_chains.forEach((d) => {
+          d.instances.forEach((i) => {
+            if (i.name === instanceName) {
+              project = p;
+            }
+          });
+        });
+      });
+      return project ? project.name : '-';
+    },
+    getDeliveryChain(instanceName) {
+      let deliveryChain = null;
+      this.projects.forEach((p) => {
+        p.delivery_chains.forEach((d) => {
+          d.instances.forEach((i) => {
+            if (i.name === instanceName) {
+              deliveryChain = d;
+            }
+          });
+        });
+      });
+      return deliveryChain ? deliveryChain.title : '-';
     },
     save() {
       this.$store.dispatch('esxi/updateVirtualMachine', {
@@ -161,6 +207,7 @@ export default {
   mounted() {
     const elems = document.querySelectorAll('.collapsible');
     this.$M.Collapsible.init(elems);
+    this.$store.dispatch('mmpi/getProjects');
   },
 
 };

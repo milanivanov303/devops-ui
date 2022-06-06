@@ -14,7 +14,23 @@
       </div>
     </div>
     <div class="col s12 l6">
-      <CPUcoresStatistics :esxiHosts="esxiHosts"/>
+      <div class="row">
+        <div class="col s12">
+          <CPUcoresStatistics :esxiHosts="esxiHosts"/>
+        </div>
+        <div class="col s12 l6">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">Average age of ESXi servers</span>
+              <div class="row">
+                <div class="col s12">
+                  {{ getAverageServersAge() }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -44,6 +60,24 @@ export default {
 
       this.$store.dispatch('esxi/getEsxiHosts')
         .finally(() => loader.hide());
+    },
+    getAverageServersAge() {
+      let count = 0;
+      let seconds = 0;
+
+      this.esxiHosts.forEach((e) => {
+        if (e.purchase_date) {
+          count += 1;
+          seconds += Math.floor(Date.now() / 1000) - e.purchase_date;
+        }
+      });
+      const average = Math.floor(seconds / count);
+
+      const years = Math.floor(average / 31536000);
+      const months = Math.floor((average % 31536000) / 2628000);
+      const days = Math.floor(((average % 31536000) % 2628000) / 86400);
+
+      return `${years ? `${years} years` : ''} ${months ? `${months} months` : ''} ${days ? `${days} days` : ''}`;
     },
   },
 
