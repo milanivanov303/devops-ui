@@ -119,6 +119,11 @@
                   Modification
                 </router-link>
               </li>
+               <li :class="{ active: isActive('cms/configurations') }">
+                <router-link to="/cms/configurations">
+                  Configurations
+                </router-link>
+              </li>
               <li><div class="divider"></div></li>
             </ul>
           </div>
@@ -214,6 +219,12 @@
                   :class="{ active: isActive('administration/cms/actions') }"
                 >
                   <router-link to="/administration/cms/actions"> Actions</router-link>
+                </li>
+                <li
+                    v-if="$auth.can('isAdmin', getApplicationCode('cms'))"
+                    :class="{ active: isActive('administration/cms/modules-submodules') }">
+                  <router-link to="/administration/cms/modules-submodules">
+                    Modules / Submodules</router-link>
                 </li>
                 <li><div class="divider"></div></li>
               </ul>

@@ -24,6 +24,25 @@ export default {
   modules(state, modules) {
     state.modules = modules;
   },
+  modulesAdd(state, request) {
+    const { modules } = state;
+    modules.unshift(request);
+    Vue.set(state, 'modules', modules);
+  },
+  modulesUpdate(state, request) {
+    state.modules.map((a) => {
+      if (a.id === request.id) {
+        Vue.set(state.modules, state.modules.indexOf(a), request);
+      }
+      return state.modules;
+    });
+  },
+  modulesRemove(state, id) {
+    state.modules.splice(
+      state.modules.findIndex((req) => req.id === id),
+      1,
+    );
+  },
   rspVariables(state, rspVariables) {
     state.rspVariables = rspVariables;
   },
@@ -47,6 +66,9 @@ export default {
   },
   codixTeams(state, codixTeams) {
     state.codixTeams = codixTeams;
+  },
+  codixTeamsTTS(state, codixTeamsTTS) {
+    state.codixTeamsTTS = codixTeamsTTS;
   },
   updateRspVariable(state, rspVariable) {
     state.rspVariables.map((v) => {
@@ -93,5 +115,35 @@ export default {
   // Change instanse status state in CMS/modification tab
   instanceStatus(state, instanceStatus) {
     state.instanceStatus = instanceStatus;
+  },
+  updateTeams(state, teamValue) {
+    state.teamValues.map((v) => {
+      if (v.id === teamValue.id) {
+        Vue.set(state.teamValues, state.teamValues.indexOf(v), teamValue);
+      }
+      return state.teamValues;
+    });
+  },
+  submodules(state, submodules) {
+    state.submodules = submodules;
+  },
+  submodulesAdd(state, request) {
+    const { submodules } = state;
+    submodules.unshift(request);
+    Vue.set(state, 'submodules', submodules);
+  },
+  submodulesUpdate(state, request) {
+    state.submodules.map((a) => {
+      if (a.id === request.id) {
+        Vue.set(state.submodules, state.submodules.indexOf(a), request);
+      }
+      return state.submodules;
+    });
+  },
+  submodulesRemove(state, id) {
+    state.submodules.splice(
+      state.submodules.findIndex((req) => req.id === id),
+      1,
+    );
   },
 };
