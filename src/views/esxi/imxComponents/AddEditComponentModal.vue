@@ -229,7 +229,7 @@ export default {
       this.$store.dispatch(`esxi/${this.action}ImxComponent`, this.selected)
         .then(() => {
           this.$emit('close');
-          this.$M.toast({ html: `The iMX component has been ${this.action}d!`, classes: 'toast-seccess' });
+          this.$M.toast({ html: `The iMX component has been ${this.action}d!`, classes: 'toast-success' });
         })
         .catch((error) => {
           this.error = error;

@@ -72,7 +72,7 @@ export default {
       const loader = this.$loading.show({ container: this.$el });
       await this.$store.dispatch('cms/updateTeams', this.codixTeam, this.ttsTeam)
         .then(() => {
-          this.$M.toast({ html: 'Team has been updated!', classes: 'toast-seccess' });
+          this.$M.toast({ html: 'Team has been updated!', classes: 'toast-success' });
         })
         .catch((error) => {
           this.error = error;

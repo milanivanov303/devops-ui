@@ -229,10 +229,10 @@ export default {
         .then(() => {
           this.$emit('close');
           if (this.action === 'create') {
-            this.$M.toast({ html: 'The instance has been requested', classes: 'toast-seccess' });
+            this.$M.toast({ html: 'The instance has been requested', classes: 'toast-success' });
             return;
           }
-          this.$M.toast({ html: 'The requested instance has been updated', classes: 'toast-seccess' });
+          this.$M.toast({ html: 'The requested instance has been updated', classes: 'toast-success' });
         })
         .catch((error) => {
           this.error = error;

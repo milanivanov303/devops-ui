@@ -477,10 +477,10 @@ export default {
         .then(() => {
           this.showAddEditDemoModal = false;
           if (this.action === 'create') {
-            this.$M.toast({ html: 'The demo has been created!', classes: 'toast-seccess' });
+            this.$M.toast({ html: 'The demo has been created!', classes: 'toast-success' });
             return;
           }
-          this.$M.toast({ html: `The demo has been ${payload.status}!`, classes: 'toast-seccess' });
+          this.$M.toast({ html: `The demo has been ${payload.status}!`, classes: 'toast-success' });
         })
         .catch((error) => {
           this.error = error;

@@ -109,7 +109,7 @@ export default {
       const loader = this.$loading.show({ container: this.$el });
       await dispatch
         .then(() => {
-          this.$M.toast({ html: 'Submodule has been submitted!', classes: 'toast-seccess' });
+          this.$M.toast({ html: 'Submodule has been submitted!', classes: 'toast-success' });
         })
         .catch((error) => {
           if (error.response.status === 422) {
