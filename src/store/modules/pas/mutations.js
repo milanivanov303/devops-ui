@@ -23,6 +23,26 @@ export default {
     const configurations = state.configurations.filter((d) => d.id !== id);
     Vue.set(state, 'configurations', configurations);
   },
+  clients(state, clients) {
+    state.clients = clients;
+  },
+  createClient(state, client) {
+    const { clients } = state;
+    clients.push(client);
+    Vue.set(state, 'clients', clients);
+  },
+  updateClient(state, client) {
+    state.clients.map((c) => {
+      if (c.id === client.id) {
+        Vue.set(state.clients, state.clients.indexOf(c), client);
+      }
+      return state.clients;
+    });
+  },
+  deleteClient(state, id) {
+    const clients = state.clients.filter((c) => c.id !== id);
+    Vue.set(state, 'clients', clients);
+  },
   hashes(state, hashes) {
     state.hashes = hashes;
   },
