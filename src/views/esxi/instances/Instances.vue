@@ -183,7 +183,7 @@ export default {
           }
           this.$M.toast({
             html: 'Updating all components in background. Please check in a few minutes.',
-            classes: 'toast-seccess',
+            classes: 'toast-success',
           });
         })
         .catch((error) => {

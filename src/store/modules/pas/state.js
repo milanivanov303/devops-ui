@@ -2,6 +2,7 @@
 
 export default {
   configurations: [],
+  clients: [],
   hashes: [],
   feHashes: [],
 };

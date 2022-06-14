@@ -118,7 +118,7 @@ export default {
       })
         .then(() => {
           this.$emit('close');
-          this.$M.toast({ html: `ESXi host has been ${this.action}d!`, classes: 'toast-seccess' });
+          this.$M.toast({ html: `ESXi host has been ${this.action}d!`, classes: 'toast-success' });
         })
         .catch((error) => {
           this.error = error;

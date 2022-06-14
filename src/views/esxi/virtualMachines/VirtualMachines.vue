@@ -150,7 +150,7 @@ export default {
           }
           this.$M.toast({
             html: 'Updating all hosts and virtual machines in background. Please check in a few minutes.',
-            classes: 'toast-seccess',
+            classes: 'toast-success',
           });
         })
         .catch((error) => {

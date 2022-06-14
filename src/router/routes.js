@@ -6,6 +6,7 @@ const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 
 const Configurations = () => import(/* webpackChunkName: "pas" */ '../views/pas/configurations/Configurations');
+const Clients = () => import(/* webpackChunkName: "pas" */ '../views/pas/clients/Clients');
 const SoaModification = () => import(/* webpackChunkName: "pas" */ '../views/pas/SOAdeployment');
 
 const Documentation = () => import(/* webpackChunkName: "demos" */ '../views/documentation/Documentation');
@@ -194,6 +195,17 @@ export default [
     props: {
       module: 'pas',
     },
+  },
+  {
+    path: '/pas/clients/:id?',
+    name: 'clients',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Clients',
+      breadcrumb: 'Clients',
+    },
+    component: Clients,
   },
 
   // Debiteur Tab

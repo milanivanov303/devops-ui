@@ -35,9 +35,12 @@
               <li :class="{ active: isActive('debiteur') }">
                 <router-link to="/debiteur/dashboard"> Debiteur</router-link>
               </li>
-
               <li :class="{ active: isActive('pas/soa-modification') }">
                 <router-link to="/pas/soa-modification"> SOA</router-link>
+              </li>
+              <li v-if="$auth.can('can-manage-authorizations', getApplicationCode('devops'))"
+                  :class="{ active: isActive('pas/clients') }">
+                <router-link to="/pas/clients"> Clients</router-link>
               </li>
             </ul>
           </div>
