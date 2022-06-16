@@ -29,7 +29,7 @@
 <script>
 export default {
   props: {
-    client: Object,
+    selected: Object,
   },
   data() {
     return {
@@ -41,7 +41,7 @@ export default {
   methods: {
     remove() {
       this.removing = true;
-      this.$store.dispatch('pas/deleteClient', this.client.id)
+      this.$store.dispatch('pas/deleteClient', this.selected.id)
         .then(() => {
           this.removed = true;
           this.$emit('close');
