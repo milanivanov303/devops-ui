@@ -88,4 +88,6 @@ export default {
 
     return Object.values(result.sort((a, b) => a.variable_name.localeCompare(b.variable_name)));
   },
+  modules: (state) => state.modules,
+  submodules: (state) => state.submodules,
 };

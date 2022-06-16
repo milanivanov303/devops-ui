@@ -35,9 +35,12 @@
               <li :class="{ active: isActive('debiteur') }">
                 <router-link to="/debiteur/dashboard"> Debiteur</router-link>
               </li>
-
               <li :class="{ active: isActive('pas/soa-modification') }">
                 <router-link to="/pas/soa-modification"> SOA</router-link>
+              </li>
+              <li v-if="$auth.can('can-manage-authorizations', getApplicationCode('devops'))"
+                  :class="{ active: isActive('pas/clients') }">
+                <router-link to="/pas/clients"> Clients</router-link>
               </li>
             </ul>
           </div>
@@ -117,6 +120,11 @@
               <li :class="{ active: isActive('cms/modification') }">
                 <router-link to="/cms/modification">
                   Modification
+                </router-link>
+              </li>
+               <li :class="{ active: isActive('cms/configurations') }">
+                <router-link to="/cms/configurations">
+                  Configurations
                 </router-link>
               </li>
               <li><div class="divider"></div></li>
@@ -214,6 +222,12 @@
                   :class="{ active: isActive('administration/cms/actions') }"
                 >
                   <router-link to="/administration/cms/actions"> Actions</router-link>
+                </li>
+                <li
+                    v-if="$auth.can('isAdmin', getApplicationCode('cms'))"
+                    :class="{ active: isActive('administration/cms/modules-submodules') }">
+                  <router-link to="/administration/cms/modules-submodules">
+                    Modules / Submodules</router-link>
                 </li>
                 <li><div class="divider"></div></li>
               </ul>

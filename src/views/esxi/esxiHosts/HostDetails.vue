@@ -178,7 +178,7 @@ export default {
           this.$M.toast({
             html: `Updating ESXi host ${this.esxiHost.name} details in background.
              Please check in a few minutes.`,
-            classes: 'toast-seccess',
+            classes: 'toast-success',
           });
         })
         .catch((error) => {

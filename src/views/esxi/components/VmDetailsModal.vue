@@ -196,7 +196,7 @@ export default {
       })
         .then(() => {
           this.$emit('close');
-          this.$M.toast({ html: 'Virtual Machine has been updated!', classes: 'toast-seccess' });
+          this.$M.toast({ html: 'Virtual Machine has been updated!', classes: 'toast-success' });
         })
         .catch((error) => {
           this.error = error;

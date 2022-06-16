@@ -19,6 +19,114 @@ export default {
       .catch(() => commit('error', 'Could not get config-defaults list', { root: true }));
     return promise;
   },
+
+  // Modules
+  getModules({ commit }) {
+    const name = 'modules';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('cms').get('modules', {
+      with: JSON.stringify(['submodules']),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => commit('modules', response.data.data));
+    return promise;
+  },
+
+  createModule({ commit }, payload) {
+    const promise = api('cms').post('modules', payload);
+    promise
+      .then((response) => {
+        commit('modulesAdd', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not create module', { root: true }));
+    return promise;
+  },
+
+  updateModule({ commit }, payload) {
+    const data = {
+      name: payload.moduleName,
+      abbreviation: payload.moduleAbbrev,
+      submodules: payload.submodulesSelected,
+    };
+
+    const promise = api('cms').put(`modules/${payload.id}`, data);
+    promise
+      .then((response) => {
+        commit('modulesUpdate', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not update module!'));
+    return promise;
+  },
+
+  deleteModule({ commit }, id) {
+    const promise = api('cms').delete(`modules/${id}`);
+    promise
+      .then(() => {
+        commit('modulesRemove', id);
+      })
+      .catch(() => commit('error', 'Could not delete module'));
+    return promise;
+  },
+
+  // Submodules
+  getSubmodules({ commit }) {
+    const name = 'submodules';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('cms').get('submodules');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => commit('submodules', response.data.data));
+    return promise;
+  },
+
+  createSubmodule({ commit }, payload) {
+    const promise = api('cms').post('submodules', payload);
+    promise
+      .then((response) => {
+        commit('submodulesAdd', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not create submodule', { root: true }));
+    return promise;
+  },
+
+  updateSubmodule({ commit }, payload) {
+    const data = {
+      name: payload.submoduleName,
+      abbreviation: payload.submoduleAbbrev,
+    };
+
+    const promise = api('cms').put(`submodules/${payload.id}`, data);
+    promise
+      .then((response) => {
+        commit('submodulesUpdate', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not update submodule!'));
+    return promise;
+  },
+
+  deleteSubmodule({ commit }, id) {
+    const promise = api('cms').delete(`submodules/${id}`);
+    promise
+      .then(() => {
+        commit('submodulesRemove', id);
+      })
+      .catch(() => commit('error', 'Could not delete submodule'));
+    return promise;
+  },
+
   getOneVariable({ commit }, variable) {
     const promise = api('cms').get(`default-variables/${variable}`);
 
@@ -27,6 +135,7 @@ export default {
       .catch(() => commit('error', 'Could not get config-defaults variable', { root: true }));
     return promise;
   },
+
   getImxModules({ commit }) {
     const name = 'imx-modules';
 
@@ -45,6 +154,7 @@ export default {
       .catch(() => commit('error', 'Could not get IMX Modules', { root: true }));
     return promise;
   },
+
   getCodixTeams({ commit }) {
     const name = 'codix-teams';
 
@@ -61,6 +171,35 @@ export default {
       .catch(() => commit('error', 'Could not get Codix Teams', { root: true }));
     return promise;
   },
+  codixTeamsTTS({ commit }) {
+    const name = 'teamstts';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('cms').get('codix-teams/tts-groups');
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => commit('codixTeamsTTS', response.data.data));
+    return promise;
+  },
+
+  updateTeams({ commit }, payload) {
+    const data = {
+      tts_group_name: payload.name,
+    };
+
+    const promise = api('cms').put(`codix-teams/${payload.id}`, data);
+    promise
+      .then((response) => commit('updateTeams', response.data.data))
+      .catch(() => commit('error', 'Could not update teams', { root: true }));
+
+    return promise;
+  },
+
   submitVariable({ commit }, payload) {
     let promise;
 
@@ -356,4 +495,5 @@ export default {
       return error;
     }
   },
+
 };

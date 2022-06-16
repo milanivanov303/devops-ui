@@ -401,7 +401,7 @@ export default {
           if (this.action === 'create') {
             html = 'The variable is created!';
           }
-          this.$M.toast({ html, classes: 'toast-seccess' });
+          this.$M.toast({ html, classes: 'toast-success' });
           this.closeModal();
           return this.$emit('addedVariable', response.data);
         })
