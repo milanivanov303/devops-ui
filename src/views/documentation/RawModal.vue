@@ -54,7 +54,7 @@ export default {
   methods: {
     download() {
       const element = document.createElement('a');
-      element.setAttribute('href', `data:text/plain;charset=utf-8, ${encodeURIComponent(this.content)}`);
+      element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(this.content)}`);
       element.setAttribute('download', this.file.path);
       document.body.appendChild(element);
       element.click();
