@@ -123,7 +123,7 @@ export default {
       this.projects.forEach((p) => {
         p.delivery_chains.forEach((d) => {
           d.instances.forEach((i) => {
-            if (i.name === instance) {
+            if (i.name.toLowerCase() === instance.toLowerCase()) {
               project = p;
             }
           });
@@ -136,7 +136,7 @@ export default {
       this.projects.forEach((p) => {
         p.delivery_chains.forEach((d) => {
           d.instances.forEach((i) => {
-            if (i.name === instance) {
+            if (i.name.toLowerCase() === instance.toLowerCase()) {
               deliveryChain = d;
             }
           });

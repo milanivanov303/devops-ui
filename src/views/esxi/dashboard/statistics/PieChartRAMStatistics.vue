@@ -43,9 +43,11 @@ export default {
         ],
       };
 
-      chartData.labels.push('Free RAM', 'Used RAM');
-      chartData.datasets[0].data.push(this.$esxi(this.getTotalFreeMemory()).bytesToSize(),
-        this.$esxi(this.getTotalUsedMemory()).bytesToSize());
+      chartData.labels.push(
+        `Free RAM (${Math.round((this.getTotalFreeMemory() / this.totalMemory) * 100)} %)`,
+        `Used RAM (${Math.round((this.getTotalUsedMemory() / this.totalMemory) * 100)} %)`,
+      );
+      chartData.datasets[0].data.push(this.getTotalFreeMemory(), this.getTotalUsedMemory());
       chartData.datasets[0].backgroundColor.push('#4caf50', '#c40147');
 
       return chartData;
