@@ -39,7 +39,7 @@ const DeleteModal = () => import('./DeleteModal');
 
 export default {
   props: {
-    items: Array ,
+    items: Array,
   },
   components: {
     AddUpdateModal,
@@ -84,7 +84,7 @@ export default {
     },
   },
   mounted() {
-  }
+  },
 };
 </script>
 

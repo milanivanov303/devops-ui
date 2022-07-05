@@ -2,7 +2,7 @@
 
 export default {
   configurations: [],
-  x4params : [],
+  x4params: [],
   hashes: [],
   feHashes: [],
 };

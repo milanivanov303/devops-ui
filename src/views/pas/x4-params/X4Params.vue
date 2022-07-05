@@ -30,7 +30,7 @@ export default {
   computed: {
     x4params() {
       return this.$store.state.pas.x4params;
-    }
+    },
   },
   methods: {
     setQueryParam(type) {
@@ -43,7 +43,7 @@ export default {
     },
 
     getData() {
-      const loader = this.$loading.show({container: this.$refs['x4-params']});
+      const loader = this.$loading.show({ container: this.$refs['x4-params'] });
       this.$store.dispatch('pas/getX4Params', this.$route.params.type)
         .then(() => {
           if (this.$route.params.id) {
@@ -52,7 +52,7 @@ export default {
             }
 
             const item = this.items.find(
-                (item) => item.id === parseInt(this.$route.params.id, 10),
+              (item) => item.id === parseInt(this.$route.params.id, 10),
             );
 
             if (item) {
@@ -66,14 +66,14 @@ export default {
           }
           return true;
         })
-        .catch((error) => this.$M.toast({html: error, classes: 'toast-fail'}))
+        .catch((error) => this.$M.toast({ html: error, classes: 'toast-fail' }))
         .finally(() => loader.hide());
     },
   },
   mounted() {
-  const elems = document.querySelectorAll('.tabs');
-  this.$M.Tabs.init(elems);
-  this.getData();
+    const elems = document.querySelectorAll('.tabs');
+    this.$M.Tabs.init(elems);
+    this.getData();
   },
 };
 </script>
