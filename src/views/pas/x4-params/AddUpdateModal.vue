@@ -1,8 +1,8 @@
 <template>
   <Modal class="right-sheet" @close="$emit('close')" >
     <template v-slot:header>
-      <span v-if="action === 'create'">Create client</span>
-      <span v-else>Update client</span>
+      <span v-if="action === 'create'">Create {{selected.type}} parameter</span>
+      <span v-else>Update {{selected.type}} parameter</span>
     </template>
 
     <template v-slot:content>
@@ -10,15 +10,15 @@
         <div class="row">
           <TextInput
               class="col s12"
-              label="Config"
-              v-model="client.config"
-              :invalid="$v.client.config.$error"
-              @blur="$v.client.config.$touch()"
+              label="Name"
+              v-model="param.name"
+              :invalid="$v.param.name.$error"
+              @blur="$v.param.name.$touch()"
           />
           <div class="validator col s12">
-            <div class="red-text" v-if="$v.client.config.$error">
-              <p v-if="!$v.client.config.required">
-                Config field must not be empty.
+            <div class="red-text" v-if="$v.param.name.$error">
+              <p v-if="!$v.param.name.required">
+                Name field must not be empty.
               </p>
             </div>
           </div>
@@ -27,7 +27,7 @@
           <TextInput
               class="col s12"
               label="Description"
-              v-model="client.description"
+              v-model="param.description"
           />
         </div>
       </form>
@@ -53,12 +53,12 @@ export default {
   data() {
     return {
       error: '',
-      client: { ...this.selected },
+      param: { ...this.selected },
     };
   },
   validations: {
-    client: {
-      config: {
+    param: {
+      name: {
         required,
       },
     },
@@ -70,10 +70,10 @@ export default {
         return;
       }
 
-      this.$store.dispatch(`pas/${this.action}Client`, { ...this.client })
+      this.$store.dispatch(`pas/${this.action}X4Param`, { ...this.param })
         .then(() => {
           this.$M.toast({
-            html: `The client has been ${this.action}d!`,
+            html: `The parameter has been ${this.action}d!`,
             classes: 'toast-success',
           });
           this.$emit('close');
@@ -81,7 +81,7 @@ export default {
         .catch((error) => {
           if (error.response.status === 403) {
             this.$M.toast({
-              html: `You do not have insufficient rights to ${this.action} this client`,
+              html: `You do not have insufficient rights to ${this.action} this parameter`,
               classes: 'toast-fail',
             });
             return;

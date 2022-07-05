@@ -2,7 +2,7 @@
 
 export default {
   configurations: [],
-  clients: [],
+  x4params : [],
   hashes: [],
   feHashes: [],
 };
