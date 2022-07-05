@@ -23,25 +23,25 @@ export default {
     const configurations = state.configurations.filter((d) => d.id !== id);
     Vue.set(state, 'configurations', configurations);
   },
-  clients(state, clients) {
-    state.clients = clients;
+  x4params(state, x4params) {
+    state.x4params = x4params;
   },
-  createClient(state, client) {
-    const { clients } = state;
-    clients.push(client);
-    Vue.set(state, 'clients', clients);
+  createX4Param(state, x4param) {
+    const { x4params } = state;
+    x4params.push(x4param);
+    Vue.set(state, 'x4params', x4params);
   },
-  updateClient(state, client) {
-    state.clients.map((c) => {
-      if (c.id === client.id) {
-        Vue.set(state.clients, state.clients.indexOf(c), client);
+  updateX4Param(state, x4param) {
+    state.x4params.map((x) => {
+      if (x.id === x4param.id) {
+        Vue.set(state.x4params, state.x4params.indexOf(x), x4param);
       }
-      return state.clients;
+      return state.x4params;
     });
   },
-  deleteClient(state, id) {
-    const clients = state.clients.filter((c) => c.id !== id);
-    Vue.set(state, 'clients', clients);
+  deleteX4Param(state, id) {
+    const x4params = state.x4params.filter((x) => x.id !== id);
+    Vue.set(state, 'x4params', x4params);
   },
   hashes(state, hashes) {
     state.hashes = hashes;
