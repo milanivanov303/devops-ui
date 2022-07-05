@@ -377,7 +377,7 @@ export default {
     }
 
     const promise = api('mmpi').get('enum-values', {
-      fields: JSON.stringify(['value', 'subtype']),
+      fields: JSON.stringify(['id', 'value', 'subtype']),
       filters: JSON.stringify({
         allOf: [
           {
