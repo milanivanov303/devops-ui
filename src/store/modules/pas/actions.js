@@ -54,18 +54,16 @@ export default {
     return promise;
   },
   getX4Params({ commit }, type) {
-    const promise = api('devops').get(`pas/x4-params`, {
+    const promise = api('devops').get('pas/x4-params', {
       filters: JSON.stringify({
         allOf: [
           {
-            'type': type,
+            type,
           },
         ],
       }),
 
     });
-
-    commit('promise', { name, promise }, { root: true });
 
     promise
       .then((response) => commit('x4params', response.data.data))
