@@ -114,7 +114,6 @@ export default {
     },
 
     openAddEditModal(item, action) {
-      debugger;
       this.selected = { ...item };
       this.action = action;
       this.showAddEditModal = true;
