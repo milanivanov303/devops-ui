@@ -6,7 +6,7 @@ const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 
 const Configurations = () => import(/* webpackChunkName: "pas" */ '../views/pas/configurations/Configurations');
-const Clients = () => import(/* webpackChunkName: "pas" */ '../views/pas/clients/Clients');
+const X4Params = () => import(/* webpackChunkName: "pas" */ '../views/pas/x4-params/X4Params');
 const SoaModification = () => import(/* webpackChunkName: "pas" */ '../views/pas/SOAdeployment');
 
 const Documentation = () => import(/* webpackChunkName: "demos" */ '../views/documentation/Documentation');
@@ -197,15 +197,19 @@ export default [
     },
   },
   {
-    path: '/pas/clients/:id?',
-    name: 'clients',
+    path: '/pas/x4-params',
+    redirect: '/pas/x4-params/config',
+  },
+  {
+    path: '/pas/x4-params/:type?/:id?',
+    name: 'x4-parameters',
     meta: {
       requiresAuth: true,
       transitionName: 'slide',
-      title: 'Clients',
-      breadcrumb: 'Clients',
+      title: 'X4 Parameters',
+      breadcrumb: 'X4 Parameters',
     },
-    component: Clients,
+    component: X4Params,
   },
 
   // Debiteur Tab
