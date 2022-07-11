@@ -2,6 +2,7 @@
   <div>
     <h5 class="center">Modules</h5>
     <Table
+        :key="componentKey"
         :data="modules"
         sort-by="name"
         sort-dir="asc"
@@ -33,6 +34,7 @@
         @close="showAddEditModuleModal = false"
         :selectedModule="selectedModule"
         :action="action"
+        @rerender="forceRerender"
     />
     <DeleteModule
         v-if="showRemoveModal"
@@ -59,6 +61,7 @@ export default {
       error: '',
       action: null,
       selectedModule: {},
+      componentKey: 0,
     };
   },
   computed: {
@@ -67,12 +70,20 @@ export default {
     },
   },
   methods: {
+    cancelAutoUpdate() {
+      clearInterval(this.timer);
+    },
+    forceRerender() {
+      this.componentKey += 1;
+      // this.timer = setInterval(this.$store.dispatch('cms/getModules'), 1800);
+    },
     showSubmodules(value) {
       return value.submodules.map((s) => s.name).toString();
     },
     openAddEditModuleModal(moduleDetails, action) {
       this.selectedModule = { ...moduleDetails };
       this.action = action;
+      // this.componentKey += 1;
       this.showAddEditModuleModal = true;
     },
     openDeleteModal(selectedModule) {
@@ -83,6 +94,9 @@ export default {
       this.selectedSubmodule = {};
       this.showRemoveModal = false;
     },
+  },
+  beforeDestroy() {
+    this.cancelAutoUpdate();
   },
   created() {
     this.$store.dispatch('cms/getModules');
