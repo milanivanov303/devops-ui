@@ -32,9 +32,9 @@
     <create-update-modules
         v-if="showAddEditModuleModal"
         @close="showAddEditModuleModal = false"
+        @rerender="forceRerender()"
         :selectedModule="selectedModule"
         :action="action"
-        @rerender="forceRerender"
     />
     <DeleteModule
         v-if="showRemoveModal"
@@ -47,7 +47,7 @@
 <script>
 
 import CreateUpdateModules from '@/components/cms/CreateUpdateModules';
-import DeleteModule from '../../../components/cms/DeleteModule';
+import DeleteModule from './DeleteModule';
 
 export default {
   components: {
@@ -62,28 +62,34 @@ export default {
       action: null,
       selectedModule: {},
       componentKey: 0,
+      modules: [],
+      loading: '',
     };
   },
-  computed: {
-    modules() {
-      return this.$store.getters['cms/modules'];
-    },
-  },
   methods: {
-    cancelAutoUpdate() {
-      clearInterval(this.timer);
+    async getModules() {
+      const loader = this.$loading.show({ container: this.$el });
+      await this.$store.dispatch('cms/getModules')
+        .then(() => { this.modules = this.$store.state.cms.modules; });
+      loader.hide();
     },
     forceRerender() {
       this.componentKey += 1;
-      // this.timer = setInterval(this.$store.dispatch('cms/getModules'), 1800);
+      if (this.componentKey === 1) {
+        this.$store.dispatch('cms/getModules')
+          .then(() => { this.modules = this.$store.state.cms.modules; });
+      }
+      this.componentKey = 0;
     },
     showSubmodules(value) {
-      return value.submodules.map((s) => s.name).toString();
+      if (value.submodules) {
+        return value.submodules.map((s) => s.name).toString();
+      }
+      return [];
     },
     openAddEditModuleModal(moduleDetails, action) {
       this.selectedModule = { ...moduleDetails };
       this.action = action;
-      // this.componentKey += 1;
       this.showAddEditModuleModal = true;
     },
     openDeleteModal(selectedModule) {
@@ -95,11 +101,8 @@ export default {
       this.showRemoveModal = false;
     },
   },
-  beforeDestroy() {
-    this.cancelAutoUpdate();
-  },
   created() {
-    this.$store.dispatch('cms/getModules');
+    this.getModules();
   },
 };
 </script>
