@@ -20,6 +20,7 @@ const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templ
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
 const CmsConfigurations = () => import(/* webpackChunkName: "cms" */ '../views/cms/Conf');
+const ModulesSubmodules = () => import(/* webpackChunkName: "modules-submodules" */ '../views/cms/ModulesSubmodules');
 
 const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
@@ -36,7 +37,6 @@ const DevopsLogsAdministration = () => import(/* webpackChunkName: "administrati
 const CmsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/cms/Users');
 const CmsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/cms/Roles');
 const CmsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/cms/Actions');
-const ModulesSubmodules = () => import(/* webpackChunkName: "modules-submodules" */ '../views/administration/cms/ModulesSubmodules');
 
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
@@ -443,7 +443,17 @@ export default [
     },
     component: CmsConfigurations,
   },
-
+  {
+    path: '/cms/modules-submodules',
+    name: 'modules-submodules',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Modules Submodules',
+      breadcrumb: 'Modules Submodules',
+    },
+    component: ModulesSubmodules,
+  },
   // Inventory Tab
   {
     path: '/inventory',
@@ -634,17 +644,6 @@ export default [
       breadcrumb: 'Actions',
     },
     component: CmsActionsAdministration,
-  },
-  {
-    path: '/administration/cms/modules-submodules',
-    name: 'modules-submodules',
-    meta: {
-      requiresAuth: true,
-      transitionName: 'slide',
-      title: 'Modules Submodules',
-      breadcrumb: 'Modules Submodules',
-    },
-    component: ModulesSubmodules,
   },
 
   // Builds

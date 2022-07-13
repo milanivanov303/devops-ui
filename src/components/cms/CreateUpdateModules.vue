@@ -19,10 +19,10 @@
             <input
                 id="module"
                 type="text"
-                v-model="form.moduleName"
+                v-model="form.name"
             />
-            <div class="validator red-text" v-if="$v.form.moduleName.$error">
-              <span v-if="!$v.form.moduleName.required">Module name field must not be empty.</span>
+            <div class="validator red-text" v-if="$v.form.name.$error">
+              <span v-if="!$v.form.name.required">Module name field must not be empty.</span>
             </div>
           </div>
         </div>
@@ -33,10 +33,10 @@
             <input
                 id="moduleAbbrev"
                 type="text"
-                v-model="form.moduleAbbrev"
+                v-model="form.abbreviation"
             />
-            <div class="validator red-text" v-if="$v.form.moduleAbbrev.$error">
-            <span v-if="!$v.form.moduleAbbrev.required">
+            <div class="validator red-text" v-if="$v.form.abbreviation.$error">
+            <span v-if="!$v.form.abbreviation.required">
               Module Abbreviation field must not be empty.</span>
             </div>
           </div>
@@ -48,8 +48,8 @@
                 label="Submodules"
                 displayed="name"
                 icon="developer_board"
-                :options="submoduless"
-                v-model="form.submodulesSelected"
+                v-model="form.submodules"
+                :options="submodulesOp"
             />
           </div>
         </div>
@@ -83,25 +83,18 @@ export default {
     return {
       error: '',
       form: {},
-      moduleName: '',
-      moduleAbbrev: '',
-      submodulesSelected: [],
+      name: '',
+      abbreviation: '',
+      submodules: [],
+      submodulesOp: [],
     };
-  },
-  computed: {
-    modules() {
-      return this.$store.getters['cms/modules'];
-    },
-    submoduless() {
-      return this.$store.getters['cms/submodules'];
-    },
   },
   validations: {
     form: {
-      moduleName: {
+      name: {
         required,
       },
-      moduleAbbrev: {
+      abbreviation: {
         required,
       },
     },
@@ -114,13 +107,9 @@ export default {
       }
       let dispatch = '';
       if (this.action === 'add') {
-        dispatch = this.$store.dispatch('cms/createModule', {
-          name: this.form.moduleName,
-          abbreviation: this.form.moduleAbbrev,
-          submodules: this.form.submodulesSelected,
-        });
+        dispatch = this.$store.dispatch('cms/addModules', this.form);
       } else if (this.action === 'update') {
-        dispatch = this.$store.dispatch('cms/updateModule', this.form);
+        dispatch = this.$store.dispatch('cms/updateModules', this.form);
       }
       const loader = this.$loading.show({ container: this.$el });
       await dispatch
@@ -136,15 +125,16 @@ export default {
         });
       this.form = {};
       loader.hide();
+      this.$emit('rerender');
       this.$emit('close');
     },
     setModalData() {
       this.form = {};
       if (this.action === 'update') {
         this.form.id = this.selectedModule.id;
-        this.form.moduleName = this.selectedModule.name;
-        this.form.moduleAbbrev = this.selectedModule.abbreviation;
-        this.form.submodulesSelected = this.selectedModule.submodules;
+        this.form.name = this.selectedModule.name;
+        this.form.abbreviation = this.selectedModule.abbreviation;
+        this.form.submodules = this.selectedModule.submodules;
       }
     },
     closeModal() {
@@ -152,6 +142,11 @@ export default {
       this.$v.$reset();
       this.$emit('close');
     },
+  },
+  created() {
+    this.$store.dispatch('cms/getSubmodules').then(() => {
+      this.submodulesOp = this.$store.state.cms.submodules;
+    });
   },
   mounted() {
     this.setModalData();

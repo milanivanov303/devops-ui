@@ -2,6 +2,7 @@
   <div>
     <h5 class="center">Modules</h5>
     <Table
+        :key="componentKey"
         :data="modules"
         sort-by="name"
         sort-dir="asc"
@@ -31,6 +32,7 @@
     <create-update-modules
         v-if="showAddEditModuleModal"
         @close="showAddEditModuleModal = false"
+        @rerender="forceRerender()"
         :selectedModule="selectedModule"
         :action="action"
     />
@@ -45,7 +47,7 @@
 <script>
 
 import CreateUpdateModules from '@/components/cms/CreateUpdateModules';
-import DeleteModule from '../../../components/cms/DeleteModule';
+import DeleteModule from './DeleteModule';
 
 export default {
   components: {
@@ -59,16 +61,31 @@ export default {
       error: '',
       action: null,
       selectedModule: {},
+      componentKey: 0,
+      modules: [],
+      loading: '',
     };
   },
-  computed: {
-    modules() {
-      return this.$store.getters['cms/modules'];
-    },
-  },
   methods: {
+    async getModules() {
+      const loader = this.$loading.show({ container: this.$el });
+      await this.$store.dispatch('cms/getModules')
+        .then(() => { this.modules = this.$store.state.cms.modules; });
+      loader.hide();
+    },
+    forceRerender() {
+      this.componentKey += 1;
+      if (this.componentKey === 1) {
+        this.$store.dispatch('cms/getModules')
+          .then(() => { this.modules = this.$store.state.cms.modules; });
+      }
+      this.componentKey = 0;
+    },
     showSubmodules(value) {
-      return value.submodules.map((s) => s.name).toString();
+      if (value.submodules) {
+        return value.submodules.map((s) => s.name).toString();
+      }
+      return [];
     },
     openAddEditModuleModal(moduleDetails, action) {
       this.selectedModule = { ...moduleDetails };
@@ -85,7 +102,7 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('cms/getModules');
+    this.getModules();
   },
 };
 </script>

@@ -25,8 +25,8 @@
 </template>
 
 <script>
-const CmsModulesDetails = () => import('./CmsModulesDetails');
-const CmsSubmodulesDetails = () => import('./CmsSubmodulesDetails');
+const CmsModulesDetails = () => import('../../components/cms/CmsModulesDetails');
+const CmsSubmodulesDetails = () => import('../../components/cms/CmsSubmodulesDetails');
 
 export default {
   components: {
