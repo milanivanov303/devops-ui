@@ -51,4 +51,20 @@ export default {
 
     return memoryByHosts;
   },
+
+  getAssignedCpusByHost: () => (host) => {
+    debugger;
+    if (!host.virtual_machines) {
+      return 0;
+    }
+
+    let assigned = 0;
+    host.virtual_machines.forEach((vm) => {
+      if (vm.powered === 'on') {
+        assigned += parseInt(vm.hardware.num_c_p_u, 10);
+      }
+    });
+
+    return assigned;
+  },
 };
