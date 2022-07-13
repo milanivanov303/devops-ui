@@ -53,7 +53,6 @@ export default {
   },
 
   getAssignedCpusByHost: () => (host) => {
-    debugger;
     if (!host.virtual_machines) {
       return 0;
     }
