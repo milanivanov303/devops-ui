@@ -10,43 +10,41 @@
     <template v-slot:content>
       <div class="row">
         <div class="col s5">
-          <div class="input-field">
-            <i class="material-icons prefix">label_outline</i>
-            <label for="name" class="active">Variable Name</label>
-            <input
-              id="name"
-              type="text"
-              v-model.trim="currentVariable.name"
-              @change="resetCurrentVariable">
-          </div>
+          <Autocomplete
+            label="Variable Name"
+            icon="label_outline"
+            :items="variables"
+            v-model.trim="currentVariable"
+            :invalid="$v.selectedVariable.name.$error"
+          />
           <span class="helper-text">
             Check variable templates on: <b>{{devInstance.name}}</b>
             and config.defaults presence on <b>refbg2</b>
           </span>
           <div class="validator">
-            <div class="silver-text" v-if="currentVariable.status === 'PENDING'">
-                <p>Loading...</p>
+            <div class="silver-text" v-if="selectedVariable.status === 'PENDING'">
+                <p class="red-text">Loading...</p>
             </div>
-            <div class="validator red-text" v-if="$v.currentVariable.name.$error">
-              <span v-if="!$v.currentVariable.name.required">Field is required!</span>
+            <div class="validator red-text" v-if="$v.selectedVariable.name.$error">
+              <span v-if="!$v.selectedVariable.name.required">Field is required!</span>
             </div>
             <div
               class="validator red-text"
-              v-if="$v.currentVariable.$error && !currentVariable.status">
-              <span v-if="!$v.currentVariable.status.sameAs">Check variable first</span>
+              v-if="$v.selectedVariable.$error && !selectedVariable.status">
+              <span v-if="!$v.selectedVariable.status.sameAs">Check variable first</span>
             </div>
             <div v-if="!loading" class="validator col s10">
               <div
                 class="red-text"
-                v-if="!currentVariable.defaultValue && currentVariable.status === 'OK'">
-                <span>Variable does not exist in config.defaults</span>
+                v-if="!selectedVariable.defaultValue && selectedVariable.status === 'OK'">
+                <span>Variable does not exist in config.defaults, will promt add in next step</span>
               </div>
               <div
                 class="red-text"
-                v-if="!templates.length && currentVariable.status === 'OK'">
+                v-if="!templates.length && selectedVariable.status === 'OK'">
                 <span>Variable does not exist in any template</span>
               </div>
-              <div class="red-text" v-if="currentVariable.status === 'ERROR'">
+              <div class="red-text" v-if="selectedVariable.status === 'ERROR'">
                 <span>Something went wrong</span>
               </div>
             </div>
@@ -62,14 +60,14 @@
             <i class="material-icons">cached</i>
           </a>
         </div>
-        <div class="col s6">
+        <div class="col s6" v-if="showVariableValueInput">
           <div class="input-field">
             <i class="material-icons prefix">label_outline</i>
             <label for="value" class="active">Variable Value</label>
             <input
               id="value"
               type="text"
-              v-model.trim="currentVariable.value">
+              v-model.trim="selectedVariable.value">
           </div>
         </div>
       </div>
@@ -94,7 +92,7 @@
             <input
               class="filled-in"
               type="checkbox"
-              v-model="currentVariable.cmsDeployCmd"/>
+              v-model="selectedVariable.cmsDeployCmd"/>
             <span>Add CMS deploy commands</span>
           </label>
         </div>
@@ -149,19 +147,21 @@ export default {
       instance: {},
       filteredInstances: '',
       templates: [],
-      currentVariable: {
+      currentVariable: null,
+      selectedVariable: {
         name: '',
         value: '',
         status: '',
         defaultValue: '',
       },
       variableModif: [],
+      showVariableValueInput: false,
       loading: false,
       error: '',
     };
   },
   validations: {
-    currentVariable: {
+    selectedVariable: {
       name: {
         required,
       },
@@ -176,6 +176,13 @@ export default {
   mounted() {
     this.$M.Tooltip.init(this.$refs.tooltip);
   },
+  watch: {
+    currentVariable(value) {
+      this.selectedVariable = { ...this.selectedVariable, ...value };
+      this.selectedVariable.currDbData = value;
+      this.selectedVariable.status = '';
+    },
+  },
   computed: {
     devInstance() {
       const [devInstance] = this.chain.instances
@@ -183,6 +190,9 @@ export default {
         .filter((instance) => instance.instance_type_id === 'DEV')
         .filter((instance) => instance.instance_to_delivery_chain.instance_previous_id === null);
       return devInstance || 'refbg2';
+    },
+    variables() {
+      return this.$store.state.cms.variables;
     },
   },
   methods: {
@@ -202,13 +212,13 @@ export default {
           break;
       }
     },
-    resetCurrentVariable() {
-      this.currentVariable.status = '';
-      this.currentVariable.defaultValue = '';
+    resetselectedVariable() {
+      this.selectedVariable.status = '';
+      this.selectedVariable.defaultValue = '';
       this.templates = [];
     },
     closeModal() {
-      this.currentVariable = {
+      this.selectedVariable = {
         name: '',
         value: '',
         status: '',
@@ -220,23 +230,15 @@ export default {
       this.$emit('close');
     },
     async checkVariable() {
-      // don't check if the field is empty
-      if (!this.currentVariable.name) {
-        return this.$v.currentVariable.name.$touch();
+      if (!this.selectedVariable.name) {
+        return this.$v.selectedVariable.name.$touch();
       }
       this.loading = true;
-      const variable = this.currentVariable.name
+      const variable = this.selectedVariable.name
         .replace(/[^\w\s]/gi, '')
         .toUpperCase();
-      this.resetCurrentVariable();
-      this.currentVariable.status = 'PENDING';
-      await this.$store.dispatch('cms/getOneVariable', variable)
-        .then((resp) => {
-          this.currentVariable.currDbData = resp.data.data;
-        })
-        .catch((error) => {
-          this.error = error;
-        });
+      this.resetselectedVariable();
+      this.selectedVariable.status = 'PENDING';
 
       const promiseTemplate = this.$store.dispatch('cms/getTemplates',
         {
@@ -263,19 +265,20 @@ export default {
         .then((resp) => {
           const { data } = resp;
           if (data.get_variable_default.length) {
-            this.currentVariable.defaultValue = data.get_variable_default;
-            if (this.currentVariable.value === '') {
-              this.currentVariable.value = data.get_variable_default;
+            this.selectedVariable.defaultValue = data.get_variable_default;
+            if (this.selectedVariable.value === '') {
+              this.selectedVariable.value = data.get_variable_default;
             }
           }
         });
 
       return Promise.all([promiseTemplate, promiseVariable])
         .then(() => {
-          this.currentVariable.status = 'OK';
+          this.selectedVariable.status = 'OK';
+          this.showVariableValueInput = true;
         })
         .catch(() => {
-          this.currentVariable.status = 'ERROR';
+          this.selectedVariable.status = 'ERROR';
         })
         .finally(() => {
           this.loading = false;
@@ -283,19 +286,26 @@ export default {
     },
     async addVariable() {
       this.$v.$touch();
-      if (this.$v.$invalid) {
+      if (this.$v.$invalid || this.loading) {
         return;
       }
       this.variableModif = {
-        name: `cms set_variable ${this.currentVariable.name.toUpperCase()}='${this.currentVariable.value}'`,
+        name: `cms set_variable ${this.selectedVariable.name.toUpperCase()}='${this.selectedVariable.value}'`,
         subtype: {
           key: 'cms_cmd',
         },
         contents: this.filteredInstances,
       };
-      this.$emit('addVariable', this.variableModif, this.currentVariable);
+      this.$emit('addVariable', this.variableModif, this.selectedVariable);
       this.closeModal();
     },
+  },
+  created() {
+    this.loading = true;
+    this.$store.dispatch('cms/getVariables')
+      .then(() => {
+        this.loading = false;
+      });
   },
 };
 </script>

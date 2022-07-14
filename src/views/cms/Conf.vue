@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div>
     <h1 class="center">Configurations</h1>
     <div class="col s6 l6">
         <Select
