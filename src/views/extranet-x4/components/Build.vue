@@ -58,14 +58,26 @@
                   :items="configs"
                   valueKey="name"
                   v-model="form.config"
+                  :invalid="$v.form.config.$error"
+                  @blur="$v.form.config.$touch()"
                 />
               </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.config.$error">
+                  <p v-if="!$v.form.config.required">
+                    Config field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
               <div class="col s12 m6">
                 <Autocomplete
-                  label="Project"
-                  :items="projects"
-                  valueKey="name"
-                  v-model="form.project"
+                    label="Project"
+                    icon="dynamic_feed"
+                    :items="projects"
+                    valueKey="name"
+                    v-model="form.project"
                 />
               </div>
             </div>
@@ -166,6 +178,12 @@ export default {
             required,
           },
         },
+        config: {
+          required,
+          name: {
+            required,
+          }
+        }
       },
     };
 
@@ -219,7 +237,8 @@ export default {
         branch: this.form.branch ? this.form.branch.name : this.branch,
         instance: this.form.instance,
         config: this.form.config.name,
-        project: this.form.project.name,
+        project:
+            this.form.project !== null && typeof this.form.project.name !== 'undefined' ? this.form.project.name : null,
         image: this.form.image,
       })
         .then((response) => {
