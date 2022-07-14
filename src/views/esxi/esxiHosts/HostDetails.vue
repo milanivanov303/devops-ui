@@ -37,9 +37,9 @@
               </a>
             </div>
             <div class="col s12 m6 l8">
-              <div v-if="esxiHost.notes" class="notes">
-                <b>Notes: </b>{{ esxiHost.notes }}
-              </div>
+              <b class="notes">
+                {{ esxiHost.cpu.num_cpu_threads }} physical CPUs, {{ assignedCpus }} assigned CPUs
+              </b>
             </div>
             <div class="col s12 m6 l4">
               <a class="right"
@@ -51,6 +51,13 @@
               <div v-if="esxiHost.updated_on" class="right updated-on">
                 Last updated on {{ $date(esxiHost.updated_on).toHuman() }}
               </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col s12">
+            <div v-if="esxiHost.notes" class="notes">
+              <b>Notes: </b>{{ esxiHost.notes }}
             </div>
           </div>
         </div>
@@ -147,6 +154,9 @@ export default {
       }
 
       return VMs;
+    },
+    assignedCpus() {
+      return this.$store.getters['esxi/getAssignedCpusByHost'](this.esxiHost);
     },
   },
 
