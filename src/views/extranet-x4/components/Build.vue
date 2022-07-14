@@ -182,8 +182,8 @@ export default {
           required,
           name: {
             required,
-          }
-        }
+          },
+        },
       },
     };
 
