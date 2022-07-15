@@ -178,6 +178,13 @@ export default {
   },
   watch: {
     currentVariable(value) {
+      if (typeof value === 'string') {
+        this.selectedVariable.name = value;
+        this.showVariableValueInput = false;
+        this.selectedVariable.value = '';
+        return;
+      }
+
       this.selectedVariable = { ...this.selectedVariable, ...value };
       this.selectedVariable.currDbData = value;
       this.selectedVariable.status = '';
