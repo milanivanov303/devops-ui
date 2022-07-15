@@ -37,7 +37,9 @@
               <div
                 class="red-text"
                 v-if="!selectedVariable.defaultValue && selectedVariable.status === 'OK'">
-                <span>Variable does not exist in config.defaults, will promt add in next step</span>
+                <span>
+                  Variable does not exist in config.defaults, add will be prompted in next step
+                </span>
               </div>
               <div
                 class="red-text"
@@ -178,6 +180,13 @@ export default {
   },
   watch: {
     currentVariable(value) {
+      if (typeof value === 'string') {
+        this.selectedVariable.name = value;
+        this.showVariableValueInput = false;
+        this.selectedVariable.value = '';
+        return;
+      }
+
       this.selectedVariable = { ...this.selectedVariable, ...value };
       this.selectedVariable.currDbData = value;
       this.selectedVariable.status = '';
