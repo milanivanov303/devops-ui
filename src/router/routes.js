@@ -6,7 +6,7 @@ const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 
 const Configurations = () => import(/* webpackChunkName: "pas" */ '../views/pas/configurations/Configurations');
-const Clients = () => import(/* webpackChunkName: "pas" */ '../views/pas/clients/Clients');
+const X4Params = () => import(/* webpackChunkName: "pas" */ '../views/pas/x4-params/X4Params');
 const SoaModification = () => import(/* webpackChunkName: "pas" */ '../views/pas/SOAdeployment');
 
 const Documentation = () => import(/* webpackChunkName: "demos" */ '../views/documentation/Documentation');
@@ -20,6 +20,7 @@ const Templates = () => import(/* webpackChunkName: "cms" */ '../views/cms/Templ
 const Inventory = () => import(/* webpackChunkName: "cms" */ '../views/cms/Inventory');
 const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Modification');
 const CmsConfigurations = () => import(/* webpackChunkName: "cms" */ '../views/cms/Conf');
+const ModulesSubmodules = () => import(/* webpackChunkName: "modules-submodules" */ '../views/cms/ModulesSubmodules');
 
 const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
@@ -36,7 +37,6 @@ const DevopsLogsAdministration = () => import(/* webpackChunkName: "administrati
 const CmsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/cms/Users');
 const CmsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/cms/Roles');
 const CmsActionsAdministration = () => import(/* webpackChunkName: "administration-actions" */ '../views/administration/cms/Actions');
-const ModulesSubmodules = () => import(/* webpackChunkName: "modules-submodules" */ '../views/administration/cms/ModulesSubmodules');
 
 const OpenBuild = () => import(/* webpackChunkName: "open-build" */ '../views/OpenBuild');
 
@@ -197,15 +197,19 @@ export default [
     },
   },
   {
-    path: '/pas/clients/:id?',
-    name: 'clients',
+    path: '/pas/x4-params',
+    redirect: '/pas/x4-params/config',
+  },
+  {
+    path: '/pas/x4-params/:type?/:id?',
+    name: 'x4-parameters',
     meta: {
       requiresAuth: true,
       transitionName: 'slide',
-      title: 'Clients',
-      breadcrumb: 'Clients',
+      title: 'X4 Parameters',
+      breadcrumb: 'X4 Parameters',
     },
-    component: Clients,
+    component: X4Params,
   },
 
   // Debiteur Tab
@@ -439,7 +443,17 @@ export default [
     },
     component: CmsConfigurations,
   },
-
+  {
+    path: '/cms/modules-submodules',
+    name: 'modules-submodules',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Modules Submodules',
+      breadcrumb: 'Modules Submodules',
+    },
+    component: ModulesSubmodules,
+  },
   // Inventory Tab
   {
     path: '/inventory',
@@ -630,17 +644,6 @@ export default [
       breadcrumb: 'Actions',
     },
     component: CmsActionsAdministration,
-  },
-  {
-    path: '/administration/cms/modules-submodules',
-    name: 'modules-submodules',
-    meta: {
-      requiresAuth: true,
-      transitionName: 'slide',
-      title: 'Modules Submodules',
-      breadcrumb: 'Modules Submodules',
-    },
-    component: ModulesSubmodules,
   },
 
   // Builds

@@ -13,6 +13,18 @@
                     />
                 </div>
             </div>
+            <span class="card-title">Total Assigned CPU cores</span>
+            <div class="row">
+                <div class="col s12 center">
+                    <number ref="counter"
+                        :to="getAssignedCoresCount()"
+                        :format="format"
+                        :duration="2"
+                        :delay="0.5"
+                        easing="Power1.easeOut"
+                    />
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -40,6 +52,13 @@ export default {
           return;
         }
         count += parseInt(host.cpu.num_cpu_cores, 10);
+      });
+      return count;
+    },
+    getAssignedCoresCount() {
+      let count = 0;
+      this.esxiHosts.forEach((host) => {
+        count += this.$store.getters['esxi/getAssignedCpusByHost'](host);
       });
       return count;
     },

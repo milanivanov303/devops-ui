@@ -53,46 +53,47 @@ export default {
 
     return promise;
   },
-  getClients({ commit }) {
-    const name = 'clients';
+  getX4Params({ commit }, type) {
+    const promise = api('devops').get('pas/x4-params', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            type,
+          },
+        ],
+      }),
 
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
-    const promise = api('devops').get('pas/clients');
-
-    commit('promise', { name, promise }, { root: true });
+    });
 
     promise
-      .then((response) => commit('clients', response.data.data))
-      .catch(() => commit('error', 'Could not get clients list', { root: true }));
+      .then((response) => commit('x4params', response.data.data))
+      .catch(() => commit('error', 'Could not get X4 parameters list', { root: true }));
     return promise;
   },
-  createClient({ commit }, payload) {
-    const promise = api('devops').post('pas/clients', payload);
+  createX4Param({ commit }, payload) {
+    const promise = api('devops').post('pas/x4-params', payload);
 
     promise
-      .then((response) => commit('createClient', response.data.data))
-      .catch(() => commit('error', 'Could not create client', { root: true }));
-
-    return promise;
-  },
-  updateClient({ commit }, payload) {
-    const promise = api('devops').put(`pas/clients/${payload.id}`, payload);
-
-    promise
-      .then((response) => commit('updateClient', response.data.data))
-      .catch(() => commit('error', 'Could not update client', { root: true }));
+      .then((response) => commit('createX4Param', response.data.data))
+      .catch(() => commit('error', 'Could not create X4 parameter', { root: true }));
 
     return promise;
   },
-  deleteClient({ commit }, id) {
-    const promise = api('devops').delete(`pas/clients/${id}`);
+  updateX4Param({ commit }, payload) {
+    const promise = api('devops').put(`pas/x4-params/${payload.id}`, payload);
 
     promise
-      .then(() => commit('deleteClient', id))
-      .catch(() => commit('error', 'Could not delete client', { root: true }));
+      .then((response) => commit('updateX4Param', response.data.data))
+      .catch(() => commit('error', 'Could not update X4 parameter', { root: true }));
+
+    return promise;
+  },
+  deleteX4Param({ commit }, id) {
+    const promise = api('devops').delete(`pas/x4-params/${id}`);
+
+    promise
+      .then(() => commit('deleteX4Param', id))
+      .catch(() => commit('error', 'Could not delete X4 parameter', { root: true }));
 
     return promise;
   },

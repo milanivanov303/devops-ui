@@ -66,6 +66,7 @@
         </div>
         <div class="row" v-if="build.status === 'running'">
           <TextInput
+            id="debiteur_deploy_url"
             class="col s12 readonly"
             label="Deploy URL"
             icon="link"

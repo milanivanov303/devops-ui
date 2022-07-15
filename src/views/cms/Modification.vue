@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div>
     <h1 class="center">CMS Modification</h1>
     <Alert v-if="error !== ''" :msg="error"/>
     <form>

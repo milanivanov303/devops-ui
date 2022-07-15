@@ -51,23 +51,34 @@
               </div>
             </div>
             <div class="row">
-              <div class="col s12">
+              <div class="col s12 m6">
                 <Autocomplete
-                    label="Config"
-                    icon="dynamic_feed"
-                    :items="clients"
-                    valueKey="config"
-                    v-model="form.client"
-                    :invalid="$v.form.client.$error"
-                    @blur="$v.form.client.$touch()"
+                  label="Config"
+                  icon="dynamic_feed"
+                  :items="configs"
+                  valueKey="name"
+                  v-model="form.config"
+                  :invalid="$v.form.config.$error"
+                  @blur="$v.form.config.$touch()"
                 />
               </div>
               <div class="validator col s11 offset-s1">
-                <div class="red-text" v-if="$v.form.client.$error">
-                  <p v-if="!$v.form.client.required">
+                <div class="red-text" v-if="$v.form.config.$error">
+                  <p v-if="!$v.form.config.required">
                     Config field must not be empty.
                   </p>
                 </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12 m6">
+                <Autocomplete
+                    label="Project"
+                    icon="dynamic_feed"
+                    :items="projects"
+                    valueKey="name"
+                    v-model="form.project"
+                />
               </div>
             </div>
             <div class="row">
@@ -113,7 +124,8 @@ function initialState() {
     form: {
       branch: null,
       instance: null,
-      client: null,
+      config: null,
+      project: null,
       image: null,
     },
     build: {
@@ -146,8 +158,11 @@ export default {
     instances() {
       return this.$store.state.mmpi.instances;
     },
-    clients() {
-      return this.$store.state.pas.clients;
+    configs() {
+      return this.$store.getters['pas/getX4ParamsByType']('config');
+    },
+    projects() {
+      return this.$store.getters['pas/getX4ParamsByType']('project');
     },
     images() {
       return this.$store.state['extranet-x4'].images;
@@ -163,8 +178,11 @@ export default {
             required,
           },
         },
-        client: {
+        config: {
           required,
+          name: {
+            required,
+          },
         },
       },
     };
@@ -192,7 +210,7 @@ export default {
       this.$store.dispatch('extranet-x4/getBranches');
       this.$store.dispatch('mmpi/getInstances');
       this.$store.dispatch('extranet-x4/getImages');
-      this.$store.dispatch('pas/getClients');
+      this.$store.dispatch('pas/getX4Params');
     },
 
     open() {
@@ -218,7 +236,9 @@ export default {
       this.$store.dispatch('extranet-x4/startBuild', {
         branch: this.form.branch ? this.form.branch.name : this.branch,
         instance: this.form.instance,
-        client: this.form.client.config,
+        config: this.form.config.name,
+        project:
+            this.form.project !== null && typeof this.form.project.name !== 'undefined' ? this.form.project.name : null,
         image: this.form.image,
       })
         .then((response) => {

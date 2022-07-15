@@ -116,12 +116,12 @@ export default {
   instanceStatus(state, instanceStatus) {
     state.instanceStatus = instanceStatus;
   },
-  updateTeams(state, teamValue) {
-    state.teamValues.map((v) => {
-      if (v.id === teamValue.id) {
-        Vue.set(state.teamValues, state.teamValues.indexOf(v), teamValue);
+  updateTeams(state, codixTeams) {
+    state.codixTeams.map((v) => {
+      if (v.id === codixTeams.id) {
+        Vue.set(state.codixTeams, state.codixTeams.indexOf(v), codixTeams);
       }
-      return state.teamValues;
+      return state.codixTeams;
     });
   },
   submodules(state, submodules) {

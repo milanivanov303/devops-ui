@@ -39,8 +39,8 @@
                 <router-link to="/pas/soa-modification"> SOA</router-link>
               </li>
               <li v-if="$auth.can('can-manage-authorizations', getApplicationCode('devops'))"
-                  :class="{ active: isActive('pas/clients') }">
-                <router-link to="/pas/clients"> Clients</router-link>
+                  :class="{ active: isActive('pas/x4-params') }">
+                <router-link to="/pas/x4-params"> X4 Parameters</router-link>
               </li>
             </ul>
           </div>
@@ -125,6 +125,12 @@
                <li :class="{ active: isActive('cms/configurations') }">
                 <router-link to="/cms/configurations">
                   Configurations
+                </router-link>
+              </li>
+              <li v-if="$auth.can('can-manage-modules', getApplicationCode('cms'))"
+                  :class="{ active: isActive('cms/modules-submodules') }">
+                <router-link to="/cms/modules-submodules">
+                  Modules / Submodules
                 </router-link>
               </li>
               <li><div class="divider"></div></li>
@@ -222,12 +228,6 @@
                   :class="{ active: isActive('administration/cms/actions') }"
                 >
                   <router-link to="/administration/cms/actions"> Actions</router-link>
-                </li>
-                <li
-                    v-if="$auth.can('isAdmin', getApplicationCode('cms'))"
-                    :class="{ active: isActive('administration/cms/modules-submodules') }">
-                  <router-link to="/administration/cms/modules-submodules">
-                    Modules / Submodules</router-link>
                 </li>
                 <li><div class="divider"></div></li>
               </ul>

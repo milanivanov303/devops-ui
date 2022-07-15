@@ -22,41 +22,29 @@ export default {
 
   // Modules
   getModules({ commit }) {
-    const name = 'modules';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
     const promise = api('cms').get('modules', {
-      with: JSON.stringify(['submodules']),
+      with: JSON.stringify({
+        submodules: [],
+      }),
     });
-
-    commit('promise', { name, promise }, { root: true });
-
     promise
-      .then((response) => commit('modules', response.data.data));
+      .then((response) => commit('modules', response.data.data))
+      .catch(() => commit('error', 'Could not get Modules list'));
     return promise;
   },
 
-  createModule({ commit }, payload) {
+  addModules({ commit }, payload) {
     const promise = api('cms').post('modules', payload);
     promise
       .then((response) => {
         commit('modulesAdd', response.data.data);
       })
-      .catch(() => commit('error', 'Could not create module', { root: true }));
+      .catch(() => commit('error', 'Could not create module'));
     return promise;
   },
 
-  updateModule({ commit }, payload) {
-    const data = {
-      name: payload.moduleName,
-      abbreviation: payload.moduleAbbrev,
-      submodules: payload.submodulesSelected,
-    };
-
-    const promise = api('cms').put(`modules/${payload.id}`, data);
+  updateModules({ commit }, payload) {
+    const promise = api('cms').put(`modules/${payload.id}`, payload);
     promise
       .then((response) => {
         commit('modulesUpdate', response.data.data);
@@ -189,10 +177,9 @@ export default {
 
   updateTeams({ commit }, payload) {
     const data = {
-      tts_group_name: payload.name,
+      tts_group_name: payload.ttsTeam.name,
     };
-
-    const promise = api('cms').put(`codix-teams/${payload.id}`, data);
+    const promise = api('cms').put(`codix-teams/${payload.codixTeam.id}`, data);
     promise
       .then((response) => commit('updateTeams', response.data.data))
       .catch(() => commit('error', 'Could not update teams', { root: true }));
