@@ -131,6 +131,7 @@ export default {
       this.templates = {};
       this.error = '';
     },
+    // eslint-disable-next-line func-names
     debounceInput: _.debounce(function (newVal) {
       this.checkInTemplates(newVal);
     }, 1300),
