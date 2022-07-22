@@ -53,14 +53,13 @@
           <template v-slot:content>
             <form class="col s12 l11" ref="interfaces">
               <div class="row">
-                <Select
+                <Autocomplete
                   class="col s12"
                   label="Instances"
                   icon="storage"
-                  displayed="name"
-                  :options="instances"
+                  :items="instances"
                   v-model="instance"
-                  @change="checkInTemplates"
+                  @input="debounceInput"
                 />
               </div>
               <SwitchBox
@@ -84,6 +83,7 @@
 import CreateConfigDefault from '@/components/cms/CreateConfigDefault';
 import SwitchBox from '@/components/partials/SwitchBox';
 import config from '@/config';
+import _ from 'lodash';
 
 export default {
   components: {
@@ -97,7 +97,7 @@ export default {
       selectedVariable: {},
       action: '',
       error: '',
-      instance: {},
+      instance: '',
       templates: {},
       loading: false,
       cmsCode: config.cms.code,
@@ -127,38 +127,44 @@ export default {
     },
     closeInterfacesModal() {
       this.showInterfacesModal = false;
-      this.instance = {};
+      this.instance = '';
       this.templates = {};
       this.error = '';
     },
+    // eslint-disable-next-line func-names
+    debounceInput: _.debounce(function (newVal) {
+      this.checkInTemplates(newVal);
+    }, 1300),
     checkInTemplates(instance) {
-      this.error = '';
-      const loader = this.$loading.show({ container: this.$refs.interfaces });
-      const payload = {
-        instance: instance.host,
-        instance_user: instance.user,
-        param: this.selectedVariable.name,
-        commands: [
-          'list_template',
-        ],
-      };
-      this.$store.dispatch('cms/checkVariableTemplates', payload)
-        .then((response) => {
-          loader.hide();
-          this.templates = {
-            header: `${this.selectedVariable.name} templates on ${instance.name}`,
-            options: response.list_template,
-          };
+      if (instance) {
+        this.error = '';
+        const loader = this.$loading.show({ container: this.$refs.interfaces });
+        const payload = {
+          instance: instance.host,
+          instance_user: instance.user,
+          param: this.selectedVariable.name,
+          commands: [
+            'list_template',
+          ],
+        };
+        this.$store.dispatch('cms/checkVariableTemplates', payload)
+          .then((response) => {
+            loader.hide();
+            this.templates = {
+              header: `${this.selectedVariable.name} templates on ${instance.name}`,
+              options: response.list_template,
+            };
 
-          if (response.list_template.length === 0) {
-            this.error = `The variable does not exist in any tamplates on ${instance.name}`;
-          }
-        })
-        .catch((error) => {
-          loader.hide();
-          this.templates = {};
-          this.error = `${error}: Could not connect to ${instance.name}`;
-        });
+            if (response.list_template.length === 0) {
+              this.error = `The variable does not exist in any templates on ${instance.name}`;
+            }
+          })
+          .catch((error) => {
+            loader.hide();
+            this.templates = {};
+            this.error = `${error}: Could not connect to ${instance.name}`;
+          });
+      }
     },
   },
 

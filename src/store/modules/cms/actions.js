@@ -187,6 +187,18 @@ export default {
     return promise;
   },
 
+  updateTeamsAbbrev({ commit }, payload) {
+    const data = {
+      abbreviation: payload.teamAbbrev,
+    };
+    const promise = api('cms').put(`codix-teams/${payload.id}`, data);
+    promise
+      .then((response) => commit('updateTeamsAbbrev', response.data.data))
+      .catch(() => commit('error', 'Could not update teams abbrev', { root: true }));
+
+    return promise;
+  },
+
   submitVariable({ commit }, payload) {
     let promise;
 

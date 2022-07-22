@@ -44,22 +44,42 @@
         :add-btn="false"
         :edit-btn="false"
         :delete-btn="false">
+      <Column show="abbreviation"/>
       <Column show="name"/>
       <Column show="tts_group_name"/>
+      <template v-slot:actions-before="{ row }">
+        <a
+            @click="openAddEditAbbrevModal(row, 'update')"
+            data-tooltip="Add abbreviation"
+            class="tooltipped">
+          <i class="material-icons">add_circle_outline</i>
+        </a>
+      </template>
     </Table>
+      <AddEditAbbrevModal
+          v-if="showAddEditAbbrevModal"
+          @close="showAddEditAbbrevModal = false"
+          :selectedTeam="selectedTeam"
+      />
     </div>
   </div>
 </template>
 <script>
 
 import { required } from 'vuelidate/lib/validators';
+import AddEditAbbrevModal from "../../components/cms/AddEditAbbrevModal";
 
 export default {
+  components: {
+    AddEditAbbrevModal,
+  },
   data() {
     return {
       form: {},
       codixTeam: {},
       ttsTeam: {},
+      showAddEditAbbrevModal: false,
+      selectedTeam: {},
     };
   },
   validations: {
@@ -81,6 +101,10 @@ export default {
     },
   },
   methods: {
+    openAddEditAbbrevModal(team) {
+      this.selectedTeam = { ...team };
+      this.showAddEditAbbrevModal = true;
+    },
     getCodixTeams() {
       this.$store.dispatch('cms/getCodixTeams');
     },

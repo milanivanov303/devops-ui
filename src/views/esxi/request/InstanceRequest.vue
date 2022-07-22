@@ -98,8 +98,9 @@ export default {
       const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
       const promise3 = this.$store.dispatch('mmpi/getInstanceTypes');
       const promise4 = this.$store.dispatch('mmpi/getEnvironmentTypes');
+      const promise5 = this.$store.dispatch('mmpi/getActiveProjects');
 
-      Promise.all([promise1, promise2, promise3, promise4])
+      Promise.all([promise1, promise2, promise3, promise4, promise5])
         .then(() => {
           this.showAddEditModal = true;
           this.$router.push({

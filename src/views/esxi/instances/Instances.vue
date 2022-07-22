@@ -29,7 +29,8 @@
           :show="(instance) => getDeliveryChain(instance.name)"/>
         <Column v-if="!instances" label="Virtual Machine" name="vm"
           :show="(instance) => getVMLink(instance.virtual_machine.name)"/>
-        <Column show="version" class="dont-break-out" width="20%"/>
+        <Column show="activity"/>
+        <Column show="version" class="dont-break-out" width="10%"/>
         <Column show="pwd_hash_type" width="10%"/>
         <Column label="Home path" name="home-path" :show="(instance) => instance.home_path"/>
         <Column show="patch_config_path"/>
