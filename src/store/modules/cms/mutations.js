@@ -124,6 +124,14 @@ export default {
       return state.codixTeams;
     });
   },
+  updateTeamsAbbrev(state, codixTeams) {
+    state.codixTeams.map((v) => {
+      if (v.id === codixTeams.id) {
+        Vue.set(state.codixTeams, state.codixTeams.indexOf(v), codixTeams);
+      }
+      return state.codixTeams;
+    });
+  },
   submodules(state, submodules) {
     state.submodules = submodules;
   },
