@@ -3,6 +3,7 @@
 export default {
   error: '',
   projects: [],
+  activeProjects: [],
   delivery_chains: [],
   delivery_chain_roles: [],
   deliveryChains: [],

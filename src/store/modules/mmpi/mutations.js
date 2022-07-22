@@ -8,6 +8,9 @@ export default {
   projects(state, projects) {
     state.projects = projects;
   },
+  activeProjects(state, activeProjects) {
+    state.activeProjects = activeProjects;
+  },
   updateProject(state, project) {
     state.projects.map((p) => {
       if (p.id === project.id) {
