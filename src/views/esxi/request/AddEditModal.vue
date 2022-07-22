@@ -155,7 +155,7 @@ export default {
   },
   computed: {
     projects() {
-      return this.$store.state.mmpi.projects || [];
+      return this.$store.state.mmpi.activeProjects || [];
     },
     projectDeliveryChains() {
       if (this.selected.project && this.selected.project.delivery_chains) {

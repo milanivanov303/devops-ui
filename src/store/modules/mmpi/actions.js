@@ -40,6 +40,42 @@ export default {
     return promise;
   },
 
+  getActiveProjects({ commit }) {
+    const name = 'activeProjects';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('projects', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            inactive: 0,
+          },
+        ],
+      }),
+      with: JSON.stringify({
+        delivery_chains: {
+          instances: ['environment_type'],
+          status: [],
+          dc_role: [],
+        },
+      }),
+      orders: JSON.stringify({
+        name: 'asc',
+      }),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((response) => commit('activeProjects', response.data.data))
+      .catch(() => commit('error', 'Could not get active projects list', { root: true }));
+
+    return promise;
+  },
+
   // delivery chains
   getDeliveryChains({ commit }) {
     const name = 'delivery-chains';
