@@ -67,7 +67,7 @@
 <script>
 
 import { required } from 'vuelidate/lib/validators';
-import AddEditAbbrevModal from "../../components/cms/AddEditAbbrevModal";
+import AddEditAbbrevModal from '../../components/cms/AddEditAbbrevModal';
 
 export default {
   components: {
