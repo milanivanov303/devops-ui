@@ -145,9 +145,8 @@ export default {
 
       this.$router.push({
         path: '/inventory/imxComponents',
-      }).catch((error) => {
-        this.$M.toast({ html: `${error}`, classes: 'toast-fail' });
-      });
+      })
+        .catch(() => {});
     },
   },
 
