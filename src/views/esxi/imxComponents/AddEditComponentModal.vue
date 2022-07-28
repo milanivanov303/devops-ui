@@ -31,6 +31,23 @@
           />
         </div>
         <div class="row">
+          <Select
+            id="type"
+            class="col s12"
+            :class="{invalid: $v.selected.type.$error || selected.type === 'undefined'}"
+            icon="list"
+            label="Types"
+            v-model="selected.type"
+            :options="typeOptions"
+            @blur="$v.selected.type.$touch()"
+          />
+          <div class="validator col s12 offset-l1 offset-m1">
+            <div class="red-text" v-if="$v.selected.type.$error || selected.type === 'undefined'">
+              <p>Type field must not be empty.</p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
           <TextInput
           class="col s12"
           icon="settings_ethernet"
@@ -202,6 +219,7 @@ export default {
       newVersion: {},
       dateNow: DateTime.local().toISO(),
       teamOptions: ['SA'],
+      typeOptions: ['OS', 'DB', 'SDK', 'Library'],
       error: null,
     };
   },
@@ -209,6 +227,9 @@ export default {
   validations: {
     selected: {
       name: {
+        required,
+      },
+      type: {
         required,
       },
     },
