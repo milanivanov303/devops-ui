@@ -219,7 +219,7 @@ export default {
       newVersion: {},
       dateNow: DateTime.local().toISO(),
       teamOptions: ['SA'],
-      typeOptions: ['OS', 'DB', 'SDK', 'Library'],
+      typeOptions: ['OS', 'DB', 'SDK', 'Library', 'Cross-platform software'],
       error: null,
     };
   },
