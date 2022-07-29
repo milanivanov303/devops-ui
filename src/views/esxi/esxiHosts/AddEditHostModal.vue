@@ -13,7 +13,13 @@
                 label="Hostname"
                 icon="laptop"
                 v-model="host.name"
+                @blur="$v.host.name.$touch()"
             />
+            <div class="validator col s12 offset-l1 offset-m1">
+              <div class="red-text" v-if="$v.host.name.$error">
+                <p>Name field must not be empty.</p>
+              </div>
+            </div>
           </div>
           <div class="row">
             <TextInput
@@ -51,7 +57,21 @@
               </label>
             </div>
           </div>
-
+          <div class="row">
+            <Select
+              class="col s12"
+              v-model="host.usage_type"
+              :options="['worker', 'training', 'spare']"
+              icon="cloud_upload"
+              label="Type of usage"
+              @blur="$v.host.usage_type.$touch()"
+            />
+            <div class="validator col s12 offset-l1 offset-m1">
+              <div class="red-text" v-if="$v.host.usage_type.$error">
+                <p>Usage type field must not be empty.</p>
+              </div>
+            </div>
+          </div>
           <div class="row">
             <TextInput
                 class="col s12"
@@ -99,6 +119,9 @@ export default {
       name: {
         required,
       },
+      usage_type: {
+        required,
+      },
     },
   },
   methods: {
@@ -114,6 +137,7 @@ export default {
         doc_url: this.host.doc_url,
         purchase_date: this.$date(this.host.purchase_date).toSeconds(),
         expiration_date: this.$date(this.host.expiration_date).toSeconds(),
+        usage_type: this.host.usage_type,
         notes: this.host.notes,
       })
         .then(() => {

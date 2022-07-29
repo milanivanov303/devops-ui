@@ -52,6 +52,9 @@
                 Last updated on {{ $date(esxiHost.updated_on).toHuman() }}
               </div>
             </div>
+            <div class="col s12">
+              <span class="new badge" data-badge-caption="">{{esxiHost.usage_type}} server</span>
+            </div>
           </div>
         </div>
         <div class="row">
@@ -204,6 +207,9 @@ export default {
     getHostFreeMemory(host) {
       return this.$store.getters['esxi/getHostFreeMemory'](host);
     },
+    getUsageTypeLabel(host) {
+      return `<span class="new badge" data-badge-caption="">${host.usage_type}</span>`;
+    }
   },
 
   watch: {
