@@ -9,6 +9,29 @@
           :value="build.details.branch"
         />
       </div>
+
+      <div class="row" v-if="build.details.config">
+        <div class="input-field col s12">
+          <i class="material-icons prefix">dynamic_feed</i>
+          <input id="config"
+                 class="readonly"
+                 type="text"
+                 :value="build.details.config">
+          <label :class="{active: build.details.config}" for="config">Config</label>
+        </div>
+      </div>
+
+      <div class="row" v-if="build.details.project">
+        <div class="input-field col s12">
+          <i class="material-icons prefix">dynamic_feed</i>
+          <input id="project"
+                 class="readonly"
+                 type="text"
+                 :value="build.details.project">
+          <label :class="{active: build.details.project}" for="config">Project</label>
+        </div>
+      </div>
+
       <div class="row" v-if="build.status === 'running'">
         <div class="input-field col s12">
           <i class="material-icons prefix">link</i>
@@ -20,7 +43,6 @@
           </a>
           <label :class="{active: build.details.url}" for="deploy-url">Deploy URL</label>
         </div>
-
       </div>
 
       <DeployOn :build="build" module="extranet-x4"/>
