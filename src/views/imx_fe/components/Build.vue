@@ -158,7 +158,7 @@ export default {
         return null;
       }
 
-      return this.form.build.details.url;
+      return this.form.build.details.url.replace(/\/+$/, '');
     },
     clients() {
       return this.$store.state.mmpi.projects.filter((pr) => pr.clnt_cvs_dir !== null);
@@ -194,7 +194,7 @@ export default {
 
   watch: {
     endpoint(value) {
-      this.form.endpoint = value;
+      this.form.endpoint = value.replace(/\/+$/, '');
     },
   },
 
