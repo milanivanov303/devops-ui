@@ -287,8 +287,8 @@ export default {
         }
       }
       this.instances = [
-        { name: 'All' },
-        { name: 'All except PROD' },
+        // { name: 'All' },
+        // { name: 'All except PROD' },
         ...this.instances,
       ];
     },

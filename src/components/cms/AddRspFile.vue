@@ -141,6 +141,7 @@ export default {
           // update instances
           this.$store.dispatch('cms/getInventoryInstances', this.deliveryChain.instances).then(() => {
             loader.hide();
+            this.$M.toast({ html: 'Instance rsp file has been added.', classes: 'toast-success' });
             this.cancel();
           });
         })
