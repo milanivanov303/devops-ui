@@ -31,11 +31,13 @@
                 </div>
               </div>
             </div>
-            <div class="row">
+            <div class="row" v-if="!client">
               <div class="col s12" >
-                <TextInput
+                <Autocomplete
                   label="Client"
                   icon="people"
+                  :items="clients"
+                  :valueKey="clientKeyColumn"
                   v-model="form.client"
                   :invalid="$v.form.client.$error"
                   @blur="$v.form.client.$touch()"
@@ -136,6 +138,7 @@ export default {
 
   props: {
     branch: String,
+    client: String,
   },
 
   data() {
@@ -155,7 +158,13 @@ export default {
         return null;
       }
 
-      return this.form.build.details.url;
+      return this.form.build.details.url.replace(/\/+$/, '');
+    },
+    clients() {
+      return this.$store.state.mmpi.projects.filter((pr) => pr.clnt_cvs_dir !== null);
+    },
+    clientKeyColumn() {
+      return 'clnt_cvs_dir';
     },
   },
 
@@ -185,7 +194,7 @@ export default {
 
   watch: {
     endpoint(value) {
-      this.form.endpoint = value;
+      this.form.endpoint = value.replace(/\/+$/, '');
     },
   },
 
@@ -193,6 +202,7 @@ export default {
     getData() {
       this.$store.dispatch('imx_fe/getBranches');
       this.$store.dispatch('builds/getActive');
+      this.$store.dispatch('mmpi/getProjects');
     },
 
     open() {
@@ -214,10 +224,9 @@ export default {
       if (this.$v.$invalid) {
         return;
       }
-
       this.$store.dispatch('imx_fe/startBuild', {
         branch: this.form.branch ? this.form.branch.name : this.branch,
-        client: this.form.client,
+        client: this.form.client[this.clientKeyColumn],
         build: this.form.build,
         endpoint: this.form.endpoint,
       })
