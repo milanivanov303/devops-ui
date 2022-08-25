@@ -291,7 +291,7 @@ export default {
         fe_branch: this.feHash ? this.feHash.commit : null,
         instance: this.instance,
         deploy_instance: this.deployInstance,
-        delivery_chain_id: this.build.delivery_chain.id,
+        delivery_chain_id: this.configuration.delivery_chain.id,
         client: this.client,
         mmpi: {
           binary_type: this.binaryType,
