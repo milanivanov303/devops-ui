@@ -297,8 +297,10 @@ export default {
         if (roles.includes(chain.dc_role.key)
           && chain.type.type === type) {
           chain.instances
-            .filter((instance) => instance.owner.key !== 'codix')
-            .map((instance) => acc.push(instance));
+            .map((instance) => {
+              if (instance.owner.key === 'codix' && instance.instance_type_id === 'DEV') return null;
+              return acc.push(instance);
+            });
         }
         return acc;
       }, []);
