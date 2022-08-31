@@ -287,7 +287,7 @@ export default {
         }
       }
       this.instances = [
-        // { name: 'All' },
+        { name: 'All' },
         // { name: 'All except PROD' },
         ...this.instances,
       ];
@@ -297,8 +297,7 @@ export default {
         if (roles.includes(chain.dc_role.key)
           && chain.type.type === type) {
           chain.instances
-            .filter((instance) => instance.instance_type_id !== 'DEV')
-            .filter((instance) => instance.instance_type_id !== 'codix')
+            .filter((instance) => instance.owner.key !== 'codix')
             .map((instance) => acc.push(instance));
         }
         return acc;
