@@ -207,12 +207,12 @@ export default {
   methods: {
     filterInstancesId(value) {
       switch (value.name) {
-        case 'All except PROD':
-          this.filteredInstances = this.chain.instances
-            .filter((instance) => instance.instance_type_id !== 'PROD')
-            .map((instance) => instance.id)
-            .join(', ');
-          break;
+        // case 'All except PROD':
+        //   this.filteredInstances = this.chain.instances
+        //     .filter((instance) => instance.instance_type_id !== 'PROD')
+        //     .map((instance) => instance.id)
+        //     .join(', ');
+        //   break;
         case 'All':
           this.filteredInstances = 'All';
           break;

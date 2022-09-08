@@ -7,7 +7,7 @@
           <div class="row">
             <div class="input-field col s12">
               <i class="material-icons prefix">label_outline</i>
-              <label for="icon_prefix2" class="active">TTS Key</label>
+              <label for="tts_key" class="active">TTS Key</label>
               <input id="tts_key"
                      type="text"
                      v-model="commitMsg.ttsKey"
@@ -25,7 +25,7 @@
           <div class="row">
             <div class="input-field col s6">
               <i class="material-icons prefix">label_outline</i>
-              <label for="icon_prefix2" class="active">Func Changes</label>
+              <label for="func_changes" class="active">Func Changes</label>
               <input id="func_changes"
                      type="text"
                      v-model="commitMsg.funcChanges"
@@ -38,7 +38,7 @@
             </div>
             <div class="input-field col s6">
               <i class="material-icons prefix">label_outline</i>
-              <label for="icon_prefix2" class="active">Tech Changes</label>
+              <label for="tech_changes" class="active">Tech Changes</label>
               <input id="tech_changes"
                      type="text"
                      v-model="commitMsg.techChanges"
