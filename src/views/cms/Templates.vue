@@ -74,8 +74,23 @@ export default {
                 && this.$store.getters.user.username !== 'eseimenova')
              || process.env.NODE_ENV !== 'production';
     },
-    contentTitle() {
-      return `${this.template.path_and_name} - ${this.revision.revision}`;
+    contentTitle(data) {
+      if (data.template.source_name === '') {
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        this.template.path_and_name = '';
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        this.revision.revision = '';
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        this.$store.state.cms.templateContent = '';
+      } else if (data.template.source_path === '') {
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        this.template.path_and_name = '';
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        this.revision.revision = '';
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        this.$store.state.cms.templateContent = '';
+      }
+      return `${this.template.path_and_name} ${this.revision.revision}`;
     },
     content() {
       return this.$store.state.cms.templateContent;
