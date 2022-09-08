@@ -334,12 +334,12 @@ export default {
           return this.modifications.push(value);
         }
         this.selectedVariable.value = variable.currDbData.value;
-        this.varMsg = 'Varible does not have description, please add it.';
+        this.varMsg = 'Variable does not have description, please add it.';
         this.varAction = 'edit';
       } else {
         this.selectedVariable.value = variable.value;
         this.varAction = 'create';
-        this.varMsg = 'Varible not found in config defaults, please add it.';
+        this.varMsg = 'Variable not found in config defaults, please add it.';
       }
       this.showAddEditVariableModal = true;
       return this.showAddEditVariableModal;
@@ -359,7 +359,7 @@ export default {
       });
     },
     addNewVariable(value) {
-      this.notAddedVariable.name = `cms set_variable ${value.data.name}='${this.notAddedVariableVal}'`;
+      this.notAddedVariable.name = `cms set_variable ${value.data.name}="${this.notAddedVariableVal}"`;
       this.modifications.push(this.notAddedVariable);
       this.notAddedVariable = '';
     },

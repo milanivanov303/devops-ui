@@ -299,7 +299,7 @@ export default {
         return;
       }
       this.variableModif = {
-        name: `cms set_variable ${this.selectedVariable.name.toUpperCase()}='${this.selectedVariable.value}'`,
+        name: `cms set_variable ${this.selectedVariable.name.toUpperCase()}="${this.selectedVariable.value}"`,
         subtype: {
           key: 'cms_cmd',
         },
