@@ -87,7 +87,19 @@
         </div>
       </div>
       <div v-if="modifications.length">
-        <inserts :modifications="modifications" @remove="key => modifications.splice(key, 1)"/>
+        <inserts
+            :modifications="modifications"
+            @remove="index => modifications.splice(index, 1)">
+        <template v-slot:actions-before="{ modification }">
+          <a
+              v-if="modification.name === 'cms deploy_config'"
+              @click="openCMSDeployModal(modification)"
+              data-tooltip="Check/Update data"
+              class="tooltipped">
+            <i class="material-icons update">edit</i>
+          </a>
+        </template>
+        </inserts>
         <div class="validator red-text" v-if="$v.modifications.$error">
           <p v-if="!$v.modifications.required">There are no added modifications!</p>
         </div>
@@ -139,6 +151,32 @@
         </button>
       </template>
     </Modal>
+
+    <Modal v-if="showEditDeployCmdModal" @close="closeCMSDeployModal()" class="confirm">
+      <template v-slot:header>
+        <h5>Add parameters to cms deploy_config</h5>
+      </template>
+      <template v-slot:content>
+        <div class="row">
+          <div class="input-field col s12">
+            <i class="material-icons prefix">label_outline</i>
+            <label for="cmd_params" class="active">Parameters</label>
+              <input
+                  id="cmd_params"
+                  type="text"
+                  v-model="cmdParams"
+              />
+          </div>
+        </div>
+      </template>
+      <template v-slot:footer>
+        <button
+            class="waves-effect btn"
+            @click="addCMSDeployCmdParameter()">Add
+        </button>
+      </template>
+    </Modal>
+
   </div>
 </template>
 <script>
@@ -171,6 +209,10 @@ export default {
   },
   data() {
     return {
+      selectedModification: {},
+      myObject: {},
+      cmdParams: '',
+      showEditDeployCmdModal: false,
       showConfirmModal: false,
       showAddEditVariableModal: false,
       showAddModifVariableModal: false,
@@ -236,6 +278,29 @@ export default {
     },
   },
   methods: {
+    openCMSDeployModal(modification) {
+      this.selectedModification = { ...modification };
+      this.showEditDeployCmdModal = true;
+    },
+    closeCMSDeployModal() {
+      this.showEditDeployCmdModal = false;
+      this.cmdParams = '';
+    },
+    addCMSDeployCmdParameter() {
+      const arr2 = [];
+      arr2.push({
+        id: this.myObject.id,
+        name: `cms deploy_config ${this.cmdParams}`,
+        subtype: {
+          key: 'cms_cmd',
+        },
+      });
+
+      this.modifications = this.modifications
+        .map((obj) => arr2.find((o) => o.id === obj.id) || obj);
+      this.cmdParams = '';
+      this.showEditDeployCmdModal = false;
+    },
     changeIssue() {
       this.issueStatus = '';
       this.deliveryChains = [];
@@ -261,7 +326,7 @@ export default {
     },
     async getInstances(deliveryChain) {
       this.instances = [];
-      if (deliveryChain.dc_role && deliveryChain.dc_role !== null) {
+      if (deliveryChain.dc_role !== null) {
         switch (deliveryChain.dc_role.key) {
           case 'dc_rel':
             this.instances = this.filterChains(
@@ -346,17 +411,20 @@ export default {
     },
     addCMSDeployCmd() {
       this.modifications.push({
+        id: Math.floor(Math.random() * 100),
         name: 'cms resolve_template', // ${template.template.source_name}`,
         subtype: {
           key: 'cms_cmd',
         },
       });
       this.modifications.push({
+        id: Math.floor(Math.random() * 100),
         name: 'cms deploy_config', // ${template.template.source_name}`,
         subtype: {
           key: 'cms_cmd',
         },
       });
+      this.myObject = this.modifications.find((m) => m.name === 'cms deploy_config');
     },
     addNewVariable(value) {
       this.notAddedVariable.name = `cms set_variable ${value.data.name}="${this.notAddedVariableVal}"`;
