@@ -360,13 +360,17 @@ export default {
     },
     filterChains(roles, type) {
       return this.deliveryChains.reduce((acc, chain) => {
-        if (roles.includes(chain.dc_role.key)
-          && chain.type.type === type) {
-          chain.instances
-            .map((instance) => {
-              if (instance.owner.key === 'codix' && instance.instance_type_id === 'DEV') return null;
-              return acc.push(instance);
-            });
+        if (chain.dc_role
+            && roles.includes(chain.dc_role.key)
+            && chain.type.type === type) {
+          if (roles.includes(chain.dc_role.key)
+              && chain.type.type === type) {
+            chain.instances
+              .map((instance) => {
+                if (instance.owner.key === 'codix' && instance.instance_type_id === 'DEV') return null;
+                return acc.push(instance);
+              });
+          }
         }
         return acc;
       }, []);
