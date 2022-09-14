@@ -92,7 +92,7 @@
             @remove="index => modifications.splice(index, 1)">
         <template v-slot:actions-before="{ modification }">
           <a
-              v-if="modification.name === 'cms deploy_config'"
+              v-if="modification.name.includes('cms deploy_config')"
               @click="openCMSDeployModal(modification)"
               data-tooltip="Check/Update data"
               class="tooltipped">
@@ -210,7 +210,6 @@ export default {
   data() {
     return {
       selectedModification: {},
-      myObject: {},
       cmdParams: '',
       showEditDeployCmdModal: false,
       showConfirmModal: false,
@@ -287,9 +286,11 @@ export default {
       this.cmdParams = '';
     },
     addCMSDeployCmdParameter() {
+      const objIndex = this.modifications
+        .findIndex((obj) => obj.id === this.selectedModification.id);
       const arr2 = [];
       arr2.push({
-        id: this.myObject.id,
+        id: this.modifications[objIndex].id,
         name: `cms deploy_config ${this.cmdParams}`,
         subtype: {
           key: 'cms_cmd',
@@ -359,13 +360,17 @@ export default {
     },
     filterChains(roles, type) {
       return this.deliveryChains.reduce((acc, chain) => {
-        if (roles.includes(chain.dc_role.key)
-          && chain.type.type === type) {
-          chain.instances
-            .map((instance) => {
-              if (instance.owner.key === 'codix' && instance.instance_type_id === 'DEV') return null;
-              return acc.push(instance);
-            });
+        if (chain.dc_role
+            && roles.includes(chain.dc_role.key)
+            && chain.type.type === type) {
+          if (roles.includes(chain.dc_role.key)
+              && chain.type.type === type) {
+            chain.instances
+              .map((instance) => {
+                if (instance.owner.key === 'codix' && instance.instance_type_id === 'DEV') return null;
+                return acc.push(instance);
+              });
+          }
         }
         return acc;
       }, []);
@@ -424,7 +429,6 @@ export default {
           key: 'cms_cmd',
         },
       });
-      this.myObject = this.modifications.find((m) => m.name === 'cms deploy_config');
     },
     addNewVariable(value) {
       this.notAddedVariable.name = `cms set_variable ${value.data.name}="${this.notAddedVariableVal}"`;
