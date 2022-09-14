@@ -23,7 +23,6 @@
           :delete-btn="false">
           <Column show="id" />
           <Column show="name" />
-          <Column show="value" />
           <Column
             label="Value"
             :show="row => row.sensitive_data ? '*********' : row.value"
