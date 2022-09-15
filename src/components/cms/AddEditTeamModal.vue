@@ -143,7 +143,7 @@ export default {
         }
         data = {
           id: this.form.id,
-          tts_group_name: this.form.tts_group_name,
+          tts_group_name: this.form.tts_group_name.name,
           abbreviation: null,
           manager: this.form.manager,
         }
