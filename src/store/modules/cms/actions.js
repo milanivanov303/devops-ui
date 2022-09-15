@@ -176,12 +176,7 @@ export default {
   },
 
   updateTeams({ commit }, payload) {
-    const data = {
-      tts_group_name: payload.TTSGroupName.name,
-      abbreviation: payload.teamAbbrev,
-      manager: payload.manager,
-    };
-    const promise = api('cms').put(`codix-teams/${payload.id}`, data);
+    const promise = api('cms').put(`codix-teams/${payload.id}`, payload);
     promise
       .then((response) => commit('updateTeams', response.data.data))
       .catch(() => commit('error', 'Could not update teams', { root: true }));

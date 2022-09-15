@@ -6,7 +6,6 @@
       Update {{ form.selectedTeamName }}
     </template>
     <template v-slot:content>
-
       <div class="row">
         <div class="input-field col s12">
           <i class="material-icons prefix">font_download</i>
@@ -19,7 +18,6 @@
           <label :class="{active: form.teamAbbrev}" for="abbrev">Abbreviation</label>
         </div>
       </div>
-
       <div class="row">
         <div class="input-field col s12">
           <i class="material-icons prefix">dehaze</i>
@@ -32,19 +30,17 @@
           <label :class="{active: form.selectedTeamName}" for="name">Name</label>
         </div>
       </div>
-
       <div class="row">
         <div class="col s12">
           <Select
             label="TTS Group Name"
             icon="group"
             displayed="name"
-            v-model="form.TTSGroupName"
-            :options="teamsTTS"
+            v-model="form.tts_group_name"
+            :options="getAllTtsGrNames"
           />
         </div>
       </div>
-
       <div class="row">
         <div class="input-field col s12">
           <i class="material-icons prefix">person</i>
@@ -88,23 +84,29 @@ export default {
       form: {},
       teamAbbrev: '',
       selectedTeamName: '',
-      TTSGroupName: '',
+      tts_group_name: {},
       manager: '',
     };
   },
   computed: {
-    teamsTTS() {
-      return this.$store.state.cms.codixTeamsTTS;
-    },
+    getAllTtsGrNames() {
+      return [
+        { name: 'N/A' },
+    ...this.$store.state.cms.codixTeamsTTS,
+    ];
+    }
   },
   methods: {
     setModalData() {
-      this.form = {};
+      this.form = { ...this.selectedTeam };
       if (this.action === 'update') {
         this.form.id = this.selectedTeam.id;
         this.form.teamAbbrev = this.selectedTeam.abbreviation;
         this.form.selectedTeamName = this.selectedTeam.name;
-        this.form.TTSGroupName = this.selectedTeam.tts_group_name;
+        if (this.selectedTeam.tts_group_name) {
+          this.form.tts_group_name = this.getAllTtsGrNames
+            .find((ttsgrname) => ttsgrname.name === this.selectedTeam.tts_group_name)
+        }
         this.form.manager = this.selectedTeam.manager;
       }
     },
@@ -112,10 +114,59 @@ export default {
       this.$store.dispatch('cms/getCodixTeams');
     },
     async updateCodixTeams() {
-      const loader = this.$loading.show({ container: this.$el });
-      await this.$store.dispatch('cms/updateTeams', this.form)
+      const loader = this.$loading.show({container: this.$el});
+      let data = {};
+      if (this.form.manager === '') {
+        if (this.form.tts_group_name.name === 'N/A') {
+          data = {
+            id: this.form.id,
+            tts_group_name: null,
+            abbreviation: this.form.teamAbbrev,
+            manager: null,
+          }
+        }
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name.name,
+          abbreviation: this.form.teamAbbrev,
+          manager: null,
+        }
+      }
+      else if (this.form.teamAbbrev === '') {
+        if (this.form.tts_group_name.name === 'N/A') {
+          data = {
+            id: this.form.id,
+            tts_group_name: null,
+            abbreviation: null,
+            manager: this.form.manager,
+          }
+        }
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name,
+          abbreviation: null,
+          manager: this.form.manager,
+        }
+      }
+      else if (this.form.tts_group_name.name === 'N/A') {
+        data = {
+          id: this.form.id,
+          tts_group_name: null,
+          abbreviation: this.form.teamAbbrev,
+          manager: this.form.manager,
+        }
+      }
+      else {
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name.name,
+          abbreviation: this.form.teamAbbrev,
+          manager: this.form.manager,
+        }
+      }
+      await this.$store.dispatch('cms/updateTeams', data)
         .then(() => {
-          this.$M.toast({ html: 'Team has been updated!', classes: 'toast-success' });
+          this.$M.toast({html: 'Team has been updated!', classes: 'toast-success'});
         })
         .catch((error) => {
           this.error = error;
