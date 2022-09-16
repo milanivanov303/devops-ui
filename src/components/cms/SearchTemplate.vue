@@ -173,7 +173,7 @@ export default {
           this.templateStatus = '';
           if (this.$store.state.cms.templates.length > 0) {
             this.templates.options = this.$store.getters['cms/getTemplates'];
-            this.showModal = true;
+            this.showModal = this.showModal !== true;
           } else {
             this.templateStatus = 'ERROR';
           }
@@ -184,6 +184,7 @@ export default {
       } else {
         this.$v.template.$touch();
       }
+      this.showModal = false;
     },
     async selectedTemplate(value) {
       if (value) {
