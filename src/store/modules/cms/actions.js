@@ -160,18 +160,10 @@ export default {
     return promise;
   },
   codixTeamsTTS({ commit }) {
-    const name = 'teamstts';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
     const promise = api('cms').get('codix-teams/tts-groups');
-
-    commit('promise', { name, promise }, { root: true });
-
     promise
-      .then((response) => commit('codixTeamsTTS', response.data.data));
+      .then((response) => commit('codixTeamsTTS', Object.values(response.data)))
+      .catch(() => commit('error', 'Could not get tts groups list'));
     return promise;
   },
 
