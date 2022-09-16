@@ -8,72 +8,60 @@
         <form @submit.prevent="submitted">
           <div class="row">
             <Select
-              class="col s6"
-              label="Projects"
-              icon="laptop_mac"
-              displayed="name"
-              :options="getProjects"
-              v-model="project"
-              @change="selectedProject"
+                class="col s6"
+                label="Projects"
+                icon="laptop_mac"
+                displayed="name"
+                :options="getProjects"
+                v-model="project"
+                @change="selectedProject"
             />
             <Select
-              class="col s6"
-              label="Delivery chains"
-              icon="linear_scale"
-              displayed="title"
-              :options="getDeliveryChains"
-              v-model="deliveryChain"
-              @change="selectedDeliveryChain"
+                class="col s6"
+                label="Delivery chains"
+                icon="linear_scale"
+                displayed="title"
+                :options="getDeliveryChains"
+                v-model="deliveryChain"
+                @change="selectedDeliveryChain"
             />
           </div>
         </form>
-        <div class="row">
-          <add-rsp-modal
-            :project="project"
-            v-if="openAddRspModal"
-            @return="openAddRspModal = false"/>
-          <a
-            v-if="project.name"
-            class="waves-effect waves-light btn right"
-            @click="openAddRspModal = true">
-            import rsp file
-          </a>
-        </div>
         <Table
-          v-if="$store.getters['cms/getRspVariables'].length"
-          :data="getVariables"
-          :pagination="true"
-          @add="isClicked = true"
-          sort-by="name"
-          sort-dir="asc"
-          :export-btn="false"
-          :view-btn="false"
-          :add-btn="false"
-          :edit-btn="true"
-          :delete-btn="false"
-          @edit="row => details(row, 'details')">
+            v-if="$store.getters['cms/getRspVariables'].length"
+            :data="getVariables"
+            :pagination="true"
+            @add="isClicked = true"
+            sort-by="name"
+            sort-dir="asc"
+            :export-btn="false"
+            :view-btn="false"
+            :add-btn="false"
+            :edit-btn="true"
+            :delete-btn="false"
+            @edit="row => details(row, 'details')">
           <Column show="id"/>
           <Column show="name"/>
           <Column
-            label="Default Variable"
-            :show="row => row.default_variable ? row.default_variable.value : ''"
+              label="Default Variable"
+              :show="row => row.default_variable ? row.default_variable.value : ''"
           />
           <Column
-            label="Last change"
-            :show="row => row.made_on"
+              label="Last change"
+              :show="row => row.made_on"
           />
           <Column class="custom-size" v-for="(instance, key) in this.$store.state.cms.instances"
-            v-bind:key="key"
-            :label="instance.name"
-            :show="row => getInstanceValue(row, instance)"
+                  v-bind:key="key"
+                  :label="instance.name"
+                  :show="row => getInstanceValue(row, instance)"
           />
         </Table>
 
         <Modal
-          ref="rsp-info"
-          v-if="modalIsOpen"
-          @close="cancel()"
-          class="right-sheet">
+            ref="rsp-info"
+            v-if="modalIsOpen"
+            @close="cancel()"
+            class="right-sheet">
           <template v-slot:header>
             <div>{{modalData.name}} information</div>
           </template>
@@ -83,41 +71,41 @@
                 <div class="input-field col s12">
                   <i class="material-icons prefix">label_outline</i>
                   <input class="read-only"
-                        id="variable_name"
-                        type="text"
-                        :value="modalData.name">
-                  <label for="icon_prefix2" class="active">Variable Name</label>
+                         id="variable_name"
+                         type="text"
+                         :value="modalData.name">
+                  <label for="variable_name" class="active">Variable Name</label>
                 </div>
               </div>
               <div class="row">
                 <Select
-                  class="col s12"
-                  label="Instances"
-                  icon="storage"
-                  displayed="name"
-                  v-model="instance"
-                  :options="getInstances"
-                  @change="selectedInstance"
+                    class="col s12"
+                    label="Instances"
+                    icon="storage"
+                    displayed="name"
+                    v-model="instance"
+                    :options="getInstances"
+                    @change="selectedInstance"
                 />
               </div>
               <div class="row">
                 <div class="input-field col s12">
                   <i class="material-icons prefix">label_outline</i>
-                  <label for="icon_prefix2" class="active">Variable Value</label>
+                  <label for="variable_value" class="active">Variable Value</label>
                   <input disabled
-                        id="variable_value"
-                        type="text"
-                        v-model="modalData.value">
+                         id="variable_value"
+                         type="text"
+                         v-model="modalData.value">
                 </div>
               </div>
               <div class="row">
                 <div class="input-field col s12">
                   <i class="material-icons prefix">label_outline</i>
-                  <label for="icon_prefix2" class="active">Default Value</label>
+                  <label for="default_value" class="active">Default Value</label>
                   <input disabled
-                        id="default_value"
-                        type="text"
-                        :value="modalData.default_variable.value">
+                         id="default_value"
+                         type="text"
+                         :value="modalData.default_variable.value">
                 </div>
               </div>
               <div class="row">
@@ -127,7 +115,7 @@
                             id="default_description"
                             class="materialize-textarea"
                             v-model="modalData.default_variable.description"></textarea>
-                  <label for="icon_prefix2" class="active">Default Description</label>
+                  <label for="default_description" class="active">Default Description</label>
                 </div>
               </div>
               <div class="row">
@@ -137,27 +125,27 @@
                             id="variable_description"
                             class="materialize-textarea"
                             v-model="modalData.description"></textarea>
-                  <label for="icon_prefix2" class="active">Description</label>
+                  <label for="variable_description" class="active">Description</label>
                 </div>
               </div>
               <div class="row">
                 <div class="input-field col s12">
                   <i class="material-icons prefix">label_outline</i>
-                  <label for="icon_prefix2" class="active">Codix Team</label>
+                  <label for="codix_team" class="active">Codix Team</label>
                   <input disabled
-                        id="default_value"
-                        type="text"
-                        :value="modalData.codix_team.name">
+                         id="codix_team"
+                         type="text"
+                         :value="modalData.codix_team.name">
                 </div>
               </div>
             </form>
           </template>
           <template v-slot:footer>
             <button
-              class="btn waves-effect waves-light"
-              type="submit"
-              name="action"
-              @click="onSubmit()"
+                class="btn waves-effect waves-light"
+                type="submit"
+                name="action"
+                @click="onSubmit()"
             >
               Save
             </button>
@@ -168,15 +156,10 @@
   </div>
 </template>
 <script>
-import AddRspFile from '@/components/cms/AddRspFile';
 
 export default {
-  components: {
-    'add-rsp-modal': AddRspFile,
-  },
   data() {
     return {
-      openAddRspModal: false,
       instance: {},
       project: {},
       deliveryChain: {},
@@ -330,7 +313,7 @@ export default {
 </script>
 
 <style lang="scss">
-  .custom-size{
-      word-break: break-word;
-  }
+.custom-size{
+  word-break: break-word;
+}
 </style>
