@@ -1,7 +1,7 @@
 <template>
   <Modal
-    @close="closeModal()"
-    class="right-sheet">
+      @close="closeModal()"
+      class="right-sheet">
     <template v-slot:header>
       Update {{ form.selectedTeamName }}
     </template>
@@ -10,10 +10,10 @@
         <div class="input-field col s12">
           <i class="material-icons prefix">font_download</i>
           <input
-            autocomplete="off"
-            type="text"
-            id="abbrev"
-            v-model="form.teamAbbrev"
+              autocomplete="off"
+              type="text"
+              id="abbrev"
+              v-model="form.teamAbbrev"
           />
           <label :class="{active: form.teamAbbrev}" for="abbrev">Abbreviation</label>
         </div>
@@ -22,22 +22,22 @@
         <div class="input-field col s12">
           <i class="material-icons prefix">dehaze</i>
           <input
-            :readonly="true"
-            autocomplete="off"
-            type="text"
-            id="name"
-            v-model="form.selectedTeamName">
+              :readonly="true"
+              autocomplete="off"
+              type="text"
+              id="name"
+              v-model="form.selectedTeamName">
           <label :class="{active: form.selectedTeamName}" for="name">Name</label>
         </div>
       </div>
       <div class="row">
         <div class="col s12">
           <Select
-            label="TTS Group Name"
-            icon="group"
-            displayed="name"
-            v-model="form.tts_group_name"
-            :options="getAllTtsGrNames"
+              label="TTS Group Name"
+              icon="group"
+              displayed="name"
+              v-model="form.tts_group_name"
+              :options="getAllTtsGrNames"
           />
         </div>
       </div>
@@ -45,20 +45,20 @@
         <div class="input-field col s12">
           <i class="material-icons prefix">person</i>
           <input
-            autocomplete="off"
-            type="text"
-            id="manager"
-            v-model="form.manager">
+              autocomplete="off"
+              type="text"
+              id="manager"
+              v-model="form.manager">
           <label :class="{active: form.manager}" for="manager">Manager</label>
         </div>
       </div>
     </template>
     <template v-slot:footer>
       <button
-        class="btn waves-effect waves-light"
-        type="submit"
-        name="action"
-        @click="updateCodixTeams()">
+          class="btn waves-effect waves-light"
+          type="submit"
+          name="action"
+          @click="updateCodixTeams()">
         Save
       </button>
     </template>
@@ -92,9 +92,9 @@ export default {
     getAllTtsGrNames() {
       return [
         { name: 'N/A' },
-    ...this.$store.state.cms.codixTeamsTTS,
-    ];
-    }
+        ...this.$store.state.cms.codixTeamsTTS,
+      ];
+    },
   },
   methods: {
     setModalData() {
@@ -105,7 +105,7 @@ export default {
         this.form.selectedTeamName = this.selectedTeam.name;
         if (this.selectedTeam.tts_group_name) {
           this.form.tts_group_name = this.getAllTtsGrNames
-            .find((ttsgrname) => ttsgrname.name === this.selectedTeam.tts_group_name)
+            .find((ttsgrname) => ttsgrname.name === this.selectedTeam.tts_group_name);
         }
         this.form.manager = this.selectedTeam.manager;
       }
@@ -114,7 +114,7 @@ export default {
       this.$store.dispatch('cms/getCodixTeams');
     },
     async updateCodixTeams() {
-      const loader = this.$loading.show({container: this.$el});
+      const loader = this.$loading.show({ container: this.$el });
       let data = {};
       if (this.form.manager === '') {
         if (this.form.tts_group_name.name === 'N/A') {
@@ -123,50 +123,47 @@ export default {
             tts_group_name: null,
             abbreviation: this.form.teamAbbrev,
             manager: null,
-          }
+          };
         }
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: this.form.teamAbbrev,
           manager: null,
-        }
-      }
-      else if (this.form.teamAbbrev === '') {
+        };
+      } else if (this.form.teamAbbrev === '') {
         if (this.form.tts_group_name.name === 'N/A') {
           data = {
             id: this.form.id,
             tts_group_name: null,
             abbreviation: null,
             manager: this.form.manager,
-          }
+          };
         }
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: null,
           manager: this.form.manager,
-        }
-      }
-      else if (this.form.tts_group_name.name === 'N/A') {
+        };
+      } else if (this.form.tts_group_name.name === 'N/A') {
         data = {
           id: this.form.id,
           tts_group_name: null,
           abbreviation: this.form.teamAbbrev,
           manager: this.form.manager,
-        }
-      }
-      else {
+        };
+      } else {
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: this.form.teamAbbrev,
           manager: this.form.manager,
-        }
+        };
       }
       await this.$store.dispatch('cms/updateTeams', data)
         .then(() => {
-          this.$M.toast({html: 'Team has been updated!', classes: 'toast-success'});
+          this.$M.toast({ html: 'Team has been updated!', classes: 'toast-success' });
         })
         .catch((error) => {
           this.error = error;

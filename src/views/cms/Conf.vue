@@ -53,7 +53,7 @@ export default {
   },
   methods: {
     openAddEditAbbrevModal(team, action) {
-      this.selectedTeam = {...team};
+      this.selectedTeam = { ...team };
       this.action = action;
       this.showAddEditTeamModal = true;
     },
