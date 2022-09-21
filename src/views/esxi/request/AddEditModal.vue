@@ -108,13 +108,13 @@
             <Select class="col s12 m6"
               label="Mail"
               displayed="Name"
-              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.mail"
             />
             <Select class="col s12 m6"
               label="Telephony"
               displayed="Name"
-              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.telephony"
             />
           </div>
@@ -122,13 +122,13 @@
             <Select class="col s12 m6"
               label="Fax"
               displayed="Name"
-              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.fax"
             />
             <Select class="col s12 m6"
               label="SMS"
               displayed="Name"
-              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.sms"
             />
           </div>
@@ -136,13 +136,13 @@
             <Select class="col s12 m6"
               label="Imagerie"
               displayed="Name"
-              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.imagerie"
             />
             <Select class="col s12 m6"
               label="Archivage"
               displayed="Name"
-              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]" 
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]" 
               v-model="selected.archivage"
             />
           </div>
@@ -248,32 +248,32 @@ export default {
 
       if (this.request.mail !== null) {
         this.selected.mail = this.request.mail === 1 ?
-          {Name: 'yes', value: 1} : {Name: 'no', value: 0};
+          {name: 'Yes', value: 1} : {name: 'No', value: 0};
       }
 
       if (this.request.telephony !== null) {
         this.selected.telephony = this.request.telephony === 1 ? 
-        {Name: 'yes', value: 1} : {Name: 'no', value: 0};
+        {name: 'Yes', value: 1} : {name: 'No', value: 0};
       }
 
       if (this.request.fax !== null) {
         this.selected.fax = this.request.fax === 1 ? 
-        {Name: 'yes', value: 1} : {Name: 'no', value: 0};
+        {name: 'Yes', value: 1} : {name: 'No', value: 0};
       }
 
       if (this.request.sms !== null) {
         this.selected.sms = this.request.sms === 1 ? 
-        {Name: 'yes', value: 1} : {Name: 'no', value: 0};
+        {Name: 'Yes', value: 1} : {name: 'No', value: 0};
       }
 
       if (this.request.imagerie !== null) {
         this.selected.imagerie = this.request.imagerie === 1 ? 
-        {Name: 'yes', value: 1} : {Name: 'no', value: 0};
+        {name: 'Yes', value: 1} : {name: 'No', value: 0};
       }
 
       if (this.request.archivage !== null) {
         this.selected.archivage = this.request.archivage === 1 ? 
-        {Name: 'yes', value: 1} : {Name: 'no', value: 0};
+        {name: 'Yes', value: 1} : {name: 'No', value: 0};
       }
     },
 
