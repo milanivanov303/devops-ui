@@ -105,94 +105,46 @@
             />
           </div>
           <div class="row">
-            <div class="col s12 m6">
-              <Select
-                label="Mail"
-                displayed="name"
-                :options="[{
-                  name:'yes',
-                  value:1
-                },{
-                  name:'no',
-                  value:0
-                }]"
-                v-model="selected.mail"
-              />
-            </div>
-            <div class="col s12 m6">
-              <Select
-                label="Telephony"
-                displayed="name"
-                :options="[{
-                  name:'yes',
-                  value:1
-                },{
-                  name:'no',
-                  value:0
-                }]"
-                v-model="selected.telephony"
-              />
-            </div>
+            <Select class="col s12 m6"
+              label="Mail"
+              displayed="Name"
+              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]"
+              v-model="selected.mail"
+            />
+            <Select class="col s12 m6"
+              label="Telephony"
+              displayed="Name"
+              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]"
+              v-model="selected.telephony"
+            />
           </div>
           <div class="row">
-            <div class="col s12 m6">
-              <Select
-                label="Fax"
-                displayed="name"
-                :options="[{
-                  name:'yes',
-                  value:1
-                },{
-                  name:'no',
-                  value:0
-                }]"
-                v-model="selected.fax"
-              />
-            </div>
-            <div class="col s12 m6">
-              <Select
-                label="SMS"
-                displayed="name"
-                :options="[{
-                  name:'yes',
-                  value:1
-                },{
-                  name:'no',
-                  value:0
-                }]"
-                v-model="selected.sms"
-              />
-            </div>
+            <Select class="col s12 m6"
+              label="Fax"
+              displayed="Name"
+              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]"
+              v-model="selected.fax"
+            />
+            <Select class="col s12 m6"
+              label="SMS"
+              displayed="Name"
+              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]"
+              v-model="selected.sms"
+            />
           </div>
           <div class="row">
-            <div class="col s12 m6">
-              <Select
-                label="Imagerie"
-                displayed="name"
-                :options="[{
-                  name:'yes',
-                  value:1
-                },{
-                  name:'no',
-                  value:0
-                }]"
-                v-model="selected.imagerie"
-              />
-            </div>
-            <div class="col s12 m6">
-              <Select
-                label="Archivage"
-                displayed="name"
-                :options="[{
-                  name:'yes',
-                  value:1
-                },{
-                  name:'no',
-                  value:0
-                }]"
-                v-model="selected.archivage"
-              />
-            </div>
+            <Select class="col s12 m6"
+              label="Imagerie"
+              displayed="Name"
+              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]"
+              v-model="selected.imagerie"
+            />
+            <Select class="col s12 m6"
+              label="Archivage"
+              displayed="Name"
+              :options="[{ Name:'yes', value:1 },{ Name:'no', value:0 }]" 
+              v-model="selected.archivage"
+            />
           </div>
         </form>
       </template>
@@ -294,46 +246,34 @@ export default {
           .find((environmentType) => environmentType.title === this.request.environment_type);
       }
 
-      if (this.request.mail) {
-        if (this.request.mail !== null) {
-          this.selected.mail = this.request.mail === 1 ?
-           {name: 'yes', value: 1} : {name: 'no', value: 0};
-        }
+      if (this.request.mail !== null) {
+        this.selected.mail = this.request.mail === 1 ?
+          {Name: 'yes', value: 1} : {Name: 'no', value: 0};
       }
 
-      if (this.request.telephony) {
-        if (this.request.telephony !== null) {
-          this.selected.telephony = this.request.telephony === 1 ? 
-          {name: 'yes', value: 1} : {name: 'no', value: 0};
-        }
+      if (this.request.telephony !== null) {
+        this.selected.telephony = this.request.telephony === 1 ? 
+        {Name: 'yes', value: 1} : {Name: 'no', value: 0};
       }
 
-      if (this.request.fax) {
-        if (this.request.fax !== null) {
-          this.selected.fax = this.request.fax === 1 ? 
-          {name: 'yes', value: 1} : {name: 'no', value: 0};
-        }
+      if (this.request.fax !== null) {
+        this.selected.fax = this.request.fax === 1 ? 
+        {Name: 'yes', value: 1} : {Name: 'no', value: 0};
       }
 
-      if (this.request.sms) {
-        if (this.request.sms !== null) {
-          this.selected.sms = this.request.sms === 1 ? 
-          {name: 'yes', value: 1} : {name: 'no', value: 0};
-        }
+      if (this.request.sms !== null) {
+        this.selected.sms = this.request.sms === 1 ? 
+        {Name: 'yes', value: 1} : {Name: 'no', value: 0};
       }
 
-      if (this.request.imagerie) {
-        if (this.request.imagerie !== null) {
-          this.selected.imagerie = this.request.imagerie === 1 ? 
-          {name: 'yes', value: 1} : {name: 'no', value: 0};
-        }
+      if (this.request.imagerie !== null) {
+        this.selected.imagerie = this.request.imagerie === 1 ? 
+        {Name: 'yes', value: 1} : {Name: 'no', value: 0};
       }
 
-      if (this.request.archivage) {
-        if (this.request.archivage !== null) {
-          this.selected.archivage = this.request.archivage === 1 ? 
-          {name: 'yes', value: 1} : {name: 'no', value: 0};
-        }
+      if (this.request.archivage !== null) {
+        this.selected.archivage = this.request.archivage === 1 ? 
+        {Name: 'yes', value: 1} : {Name: 'no', value: 0};
       }
     },
 
