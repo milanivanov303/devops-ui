@@ -160,41 +160,18 @@ export default {
     return promise;
   },
   codixTeamsTTS({ commit }) {
-    const name = 'teamstts';
-
-    if (this.state.promises[name]) {
-      return this.state.promises[name];
-    }
-
     const promise = api('cms').get('codix-teams/tts-groups');
-
-    commit('promise', { name, promise }, { root: true });
-
     promise
-      .then((response) => commit('codixTeamsTTS', response.data.data));
+      .then((response) => commit('codixTeamsTTS', Object.values(response.data)))
+      .catch(() => commit('error', 'Could not get tts groups list'));
     return promise;
   },
 
   updateTeams({ commit }, payload) {
-    const data = {
-      tts_group_name: payload.ttsTeam.name,
-    };
-    const promise = api('cms').put(`codix-teams/${payload.codixTeam.id}`, data);
+    const promise = api('cms').put(`codix-teams/${payload.id}`, payload);
     promise
       .then((response) => commit('updateTeams', response.data.data))
       .catch(() => commit('error', 'Could not update teams', { root: true }));
-
-    return promise;
-  },
-
-  updateTeamsAbbrev({ commit }, payload) {
-    const data = {
-      abbreviation: payload.teamAbbrev,
-    };
-    const promise = api('cms').put(`codix-teams/${payload.id}`, data);
-    promise
-      .then((response) => commit('updateTeamsAbbrev', response.data.data))
-      .catch(() => commit('error', 'Could not update teams abbrev', { root: true }));
 
     return promise;
   },

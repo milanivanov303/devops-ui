@@ -394,7 +394,7 @@ export default {
           payload.variable.name = this.abbrevName.concat(this.variable.name).toUpperCase();
         }
       }
-      this.loading = true;
+      this.loading = this.$loading.show({ container: this.$el });
       this.$store.dispatch('cms/submitVariable', payload)
         .then((response) => {
           let html = 'The variable has been updated!';
@@ -407,6 +407,9 @@ export default {
         })
         .catch((error) => {
           payload.variable.name = this.variable.name;
+          if (error.response.status === 423) {
+            this.error = 'Sorry, file is locked for edit!';
+          }
           if (error.response.status === 403) {
             this.error = 'Sorry, but you have no rights to create new variable!';
           }
@@ -416,7 +419,7 @@ export default {
           return this.$emit('error', error.message);
         })
         .finally(() => {
-          this.loading = false;
+          this.loading.hide();
         });
     },
   },
