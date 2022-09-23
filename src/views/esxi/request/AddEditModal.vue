@@ -104,6 +104,48 @@
                 v-model="selected.comments"
             />
           </div>
+          <div class="row">
+            <Select class="col s12 m6"
+              label="Mail"
+              displayed="Name"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
+              v-model="selected.mail"
+            />
+            <Select class="col s12 m6"
+              label="Telephony"
+              displayed="Name"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
+              v-model="selected.telephony"
+            />
+          </div>
+          <div class="row">
+            <Select class="col s12 m6"
+              label="Fax"
+              displayed="Name"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
+              v-model="selected.fax"
+            />
+            <Select class="col s12 m6"
+              label="SMS"
+              displayed="Name"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
+              v-model="selected.sms"
+            />
+          </div>
+          <div class="row">
+            <Select class="col s12 m6"
+              label="Imagerie"
+              displayed="Name"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
+              v-model="selected.imagerie"
+            />
+            <Select class="col s12 m6"
+              label="Archivage"
+              displayed="Name"
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]" 
+              v-model="selected.archivage"
+            />
+          </div>
         </form>
       </template>
       <template v-slot:footer>
@@ -203,6 +245,36 @@ export default {
         this.selected.environment_type = this.environmentTypes
           .find((environmentType) => environmentType.title === this.request.environment_type);
       }
+
+      if (this.request.mail !== null) {
+        this.selected.mail = this.request.mail === 1 ?
+          {name: 'Yes', value: 1} : {name: 'No', value: 0};
+      }
+
+      if (this.request.telephony !== null) {
+        this.selected.telephony = this.request.telephony === 1 ? 
+        {name: 'Yes', value: 1} : {name: 'No', value: 0};
+      }
+
+      if (this.request.fax !== null) {
+        this.selected.fax = this.request.fax === 1 ? 
+        {name: 'Yes', value: 1} : {name: 'No', value: 0};
+      }
+
+      if (this.request.sms !== null) {
+        this.selected.sms = this.request.sms === 1 ? 
+        {Name: 'Yes', value: 1} : {name: 'No', value: 0};
+      }
+
+      if (this.request.imagerie !== null) {
+        this.selected.imagerie = this.request.imagerie === 1 ? 
+        {name: 'Yes', value: 1} : {name: 'No', value: 0};
+      }
+
+      if (this.request.archivage !== null) {
+        this.selected.archivage = this.request.archivage === 1 ? 
+        {name: 'Yes', value: 1} : {name: 'No', value: 0};
+      }
     },
 
     getDefaultDeliveryChainRole() {
@@ -216,16 +288,41 @@ export default {
       if (this.$v.$invalid) {
         return;
       }
-
-      this.$store.dispatch(`esxi/${this.action}RequestedInstance`, {
-        id: this.selected.id,
+      var payload = {
+         id: this.selected.id,
         project: this.selected.project.name,
         delivery_chain: this.selected.delivery_chain.title,
         dc_role: this.selected.dc_role.value,
         instance_type: this.selected.instance_type.type,
         environment_type: this.selected.environment_type.title,
         comments: this.selected.comments,
-      })
+      };
+
+      if (this.selected.mail) { 
+        payload.mail = this.selected.mail.value;
+      }
+
+      if (this.selected.telephony) {
+        payload.telephony = this.selected.telephony.value;
+      }
+
+      if (this.selected.fax) {
+        payload.fax = this.selected.fax.value;
+      }
+
+      if (this.selected.sms) {
+        payload.sms = this.selected.sms.value;
+      }
+
+      if (this.selected.imagerie) {
+        payload.imagerie = this.selected.imagerie.value;
+      }
+
+      if (this.selected.archivage) {
+        payload.archivage = this.selected.archivage.value;
+      }
+
+      this.$store.dispatch(`esxi/${this.action}RequestedInstance`, payload)
         .then(() => {
           this.$emit('close');
           if (this.action === 'create') {
