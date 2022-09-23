@@ -107,13 +107,13 @@
           <div class="row">
             <Select class="col s12 m6"
               label="Mail"
-              displayed="Name"
+              displayed="name"
               :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.mail"
             />
             <Select class="col s12 m6"
               label="Telephony"
-              displayed="Name"
+              displayed="name"
               :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.telephony"
             />
@@ -121,13 +121,13 @@
           <div class="row">
             <Select class="col s12 m6"
               label="Fax"
-              displayed="Name"
+              displayed="name"
               :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.fax"
             />
             <Select class="col s12 m6"
               label="SMS"
-              displayed="Name"
+              displayed="name"
               :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.sms"
             />
@@ -135,13 +135,13 @@
           <div class="row">
             <Select class="col s12 m6"
               label="Imagerie"
-              displayed="Name"
+              displayed="name"
               :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.imagerie"
             />
             <Select class="col s12 m6"
               label="Archivage"
-              displayed="Name"
+              displayed="name"
               :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]" 
               v-model="selected.archivage"
             />
@@ -248,7 +248,7 @@ export default {
 
       if (this.request.mail !== null) {
         this.selected.mail = this.request.mail === 1 ?
-          {name: 'Yes', value: 1} : {name: 'No', value: 0};
+        {name: 'Yes', value: 1} : {name: 'No', value: 0};
       }
 
       if (this.request.telephony !== null) {
@@ -263,7 +263,7 @@ export default {
 
       if (this.request.sms !== null) {
         this.selected.sms = this.request.sms === 1 ? 
-        {Name: 'Yes', value: 1} : {name: 'No', value: 0};
+        {name: 'Yes', value: 1} : {name: 'No', value: 0};
       }
 
       if (this.request.imagerie !== null) {
