@@ -25,6 +25,27 @@
         <div class="row">
           <TextInput
             class="col s12"
+            :class="{invalid: $v.selected.name_key.keyValidator.$error}"
+            icon="title"
+            label="Name key"
+            v-model="selected.name_key"
+            @blur="$v.selected.name_key.$touch()"
+          />
+          <div class="validator col s12 offset-l1 offset-m1">
+            <div class="red-text" v-if="$v.selected.name_key.$error || selected.name_key === 'undefined'">
+               Name key field must not be empty.
+            </div>
+          </div>
+          <div class="validator col s12 offset-l1 offset-m1">
+            <div class="red-text" v-if="!$v.selected.name_key.keyValidator">
+              <p v-if="!$v.selected.name_key.keyValidator">
+                Name key field must contain maximum 30 characters.</p>
+            </div>
+        </div>
+        </div>
+        <div class="row">
+          <TextInput
+            class="col s12"
             icon="laptop"
             label="URL"
             v-model="selected.url"
@@ -55,6 +76,7 @@
           v-model="selected.intranet_command"
           />
         </div>
+
         <div class="row">
           <TextInput
             class="col s12"
@@ -193,7 +215,7 @@ import 'vue-datetime/dist/vue-datetime.css';
 import { required, helpers } from 'vuelidate/lib/validators';
 
 const versionValidator = helpers.regex('versionValidator', /^(\d)+(.\d+)?$/);
-
+const keyValidator = helpers.regex('keyValidator',/^(?=^[a-zA-Z]+(?:_[a-zA-Z]+)*)\w{1,30}?$/);
 const TooltipButton = () => import('@/components/partials/TooltipButton');
 
 export default {
@@ -217,10 +239,12 @@ export default {
     return {
       selected: this.component,
       newVersion: {},
+      name_key: {},
       dateNow: DateTime.local().toISO(),
       teamOptions: ['SA'],
       typeOptions: ['OS', 'DB', 'SDK', 'Library', 'Cross-platform software'],
       error: null,
+
     };
   },
 
@@ -229,6 +253,9 @@ export default {
       name: {
         required,
       },
+      name_key: {
+        keyValidator,required
+      },
       type: {
         required,
       },
@@ -236,10 +263,10 @@ export default {
     newVersion: {
       version: {
         versionValidator,
+
       },
     },
   },
-
   methods: {
     save() {
       this.$v.$touch();
