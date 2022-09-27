@@ -25,7 +25,7 @@
         <div class="row">
           <TextInput
             class="col s12"
-            :class="{invalid: $v.selected.name_key.keyValidator.$error}"
+            :class="{invalid: $v.selected.name_key.$error}"
             icon="title"
             label="Name key"
             v-model="selected.name_key"
@@ -33,15 +33,10 @@
           />
           <div class="validator col s12 offset-l1 offset-m1">
             <div class="red-text" v-if="$v.selected.name_key.$error || selected.name_key === 'undefined'">
-               Name key field must not be empty.
+              <p v-if="!$v.selected.name_key.required"> Name key field must not be empty.</p>
+              <p v-if="!$v.selected.name_key.keyValidator"> Name key must contain maximum 30 characters.</p>
             </div>
           </div>
-          <div class="validator col s12 offset-l1 offset-m1">
-            <div class="red-text" v-if="!$v.selected.name_key.keyValidator">
-              <p v-if="!$v.selected.name_key.keyValidator">
-                Name key field must contain maximum 30 characters.</p>
-            </div>
-        </div>
         </div>
         <div class="row">
           <TextInput
@@ -239,7 +234,6 @@ export default {
     return {
       selected: this.component,
       newVersion: {},
-      name_key: {},
       dateNow: DateTime.local().toISO(),
       teamOptions: ['SA'],
       typeOptions: ['OS', 'DB', 'SDK', 'Library', 'Cross-platform software'],
