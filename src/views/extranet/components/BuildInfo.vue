@@ -38,7 +38,9 @@
           class="col s12 readonly"
           label="FE Branch"
           icon="laptop_chromebook"
-          :value="build.details.fe_branch.name || build.details.fe_branch"
+          :value="build.details.fe_branch && build.details.fe_branch.name
+           ? build.details.fe_branch.name
+           : build.details.fe_branch"
         />
       </div>
       <div class="row" v-if="build.status === 'running'">
