@@ -35,6 +35,13 @@
                 @click="openAddEditModal(component, 'update')"
               />
             </div>
+            <p v-if="component.url">
+              <b>Url: </b><span>{{ component.url }}</span>
+
+            <p v-if="component.name_key">
+              <b>Name key: </b><span>{{ component.name_key }}</span>
+            </p>
+
             <p v-if="component.maintenance_team">
               <b>Maintenance team: </b><span>{{ component.maintenance_team }}</span>
             </p>
