@@ -32,9 +32,13 @@
             @blur="$v.selected.name_key.$touch()"
           />
           <div class="validator col s12 offset-l1 offset-m1">
-            <div class="red-text" v-if="$v.selected.name_key.$error || selected.name_key === 'undefined'">
-              <p v-if="!$v.selected.name_key.required"> Name key field must not be empty.</p>
-              <p v-if="!$v.selected.name_key.keyValidator"> Name key must contain maximum 30 characters.</p>
+            <div class="red-text" v-if="$v.selected.name_key.$error">
+              <p v-if="!$v.selected.name_key.required">
+                Name key field must not be empty.
+              </p>
+              <p v-if="!$v.selected.name_key.keyValidator">
+                Name key must contain maximum 30 characters.
+              </p>
             </div>
           </div>
         </div>
@@ -210,7 +214,7 @@ import 'vue-datetime/dist/vue-datetime.css';
 import { required, helpers } from 'vuelidate/lib/validators';
 
 const versionValidator = helpers.regex('versionValidator', /^(\d)+(.\d+)?$/);
-const keyValidator = helpers.regex('keyValidator',/^(?=^[a-zA-Z]+(?:_[a-zA-Z]+)*)\w{1,30}?$/);
+const keyValidator = helpers.regex('keyValidator', /^(?=^[a-zA-Z]+(?:_[a-zA-Z]+)*)\w{1,30}?$/);
 const TooltipButton = () => import('@/components/partials/TooltipButton');
 
 export default {
@@ -248,7 +252,7 @@ export default {
         required,
       },
       name_key: {
-        keyValidator,required
+        keyValidator, required,
       },
       type: {
         required,
