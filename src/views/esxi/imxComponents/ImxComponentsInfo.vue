@@ -13,8 +13,7 @@
           <h6>Components info</h6>
         </div>
       </div>
-
-      <ul id="imxComponents" class="collapsible expandable">
+        <ul id="imxComponents" class="collapsible expandable">
         <li v-for="component in imxComponents" :key="component.name">
           <div class="collapsible-header">
             <i class="material-icons">blur_on</i> {{ component.name }}
@@ -76,13 +75,17 @@
           </div>
         </li>
       </ul>
-
       <AddImxComponentModal
         v-if="showAddEditModal"
         :component="imxComponent"
         :action="action"
         @close="close()"
       />
+<!--      <DeleteComponent-->
+<!--        v-if="showDeleteComponent"-->
+<!--        :selectedImxComponent="selectedImxComponent"-->
+<!--        @close="closeDelete()"-->
+<!--      />-->
     </div>
   </div>
 </template>
@@ -90,17 +93,21 @@
 <script>
 const TooltipButton = () => import('@/components/partials/TooltipButton');
 const AddImxComponentModal = () => import('./AddEditComponentModal');
+// const DeleteComponent = () => import('./DeleteComponent');
 
 export default {
   components: {
     TooltipButton,
     AddImxComponentModal,
+    // DeleteComponent
   },
   data() {
     return {
       showAddEditModal: false,
       imxComponent: {},
       action: '',
+      // showDeleteComponent: false,
+      // selectedImxComponent: {}
     };
   },
   computed: {
@@ -110,8 +117,7 @@ export default {
   },
   methods: {
     getImxComponents() {
-      const loader = this.$loading.show({ container: this.$refs.imxComponents });
-
+      const loader = this.$loading.show({container: this.$refs.imxComponents});
       this.$store.dispatch('esxi/getImxComponents')
         .then(() => {
           if (this.$route.params.id) {
@@ -129,12 +135,12 @@ export default {
             if (component) {
               return this.openAddEditModal(component, 'update');
             }
-            this.$M.toast({ html: 'This component does not exist!', classes: 'toast-fail' });
+            this.$M.toast({html: 'This component does not exist!', classes: 'toast-fail'});
           }
           return false;
         })
         .catch((error) => {
-          this.$M.toast({ html: `${error}`, classes: 'toast-fail' });
+          this.$M.toast({html: `${error}`, classes: 'toast-fail'});
         })
         .finally(() => loader.hide());
     },
@@ -145,7 +151,7 @@ export default {
 
       this.$router.push({
         path: `/inventory/imxComponents/${encodeURIComponent(component.id || 'new')}`,
-      });
+      })
     },
     close() {
       this.showAddEditModal = false;
@@ -153,16 +159,23 @@ export default {
       this.$router.push({
         path: '/inventory/imxComponents',
       })
-        .catch(() => {});
+        .catch(() => {
+        });
+    },
+    // closeDelete() {
+    //   this.showDeleteComponent = false;
+    //   this.$router.push({
+    //     path: '/inventory/imxComponents',
+    //   })
+    //     .catch(() => {
+    //     });
+    // },
+    mounted() {
+      this.getImxComponents();
+      this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'), {
+        accordion: false,
+      });
     },
   },
-
-  mounted() {
-    this.getImxComponents();
-    this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'), {
-      accordion: false,
-    });
-  },
 };
-
 </script>
