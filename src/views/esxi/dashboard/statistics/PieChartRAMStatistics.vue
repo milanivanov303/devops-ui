@@ -57,7 +57,9 @@ export default {
     getTotalFreeMemory() {
       let freeMemory = 0;
       this.esxiHosts.forEach((host) => {
-        freeMemory += this.getHostFreeMemory(host);
+        if (host.usage_type === 'worker') {
+          freeMemory += this.getHostFreeMemory(host);
+        }
       });
       return freeMemory;
     },
@@ -69,9 +71,10 @@ export default {
     getTotalUsedMemory() {
       let usedMemory = 0;
       this.esxiHosts.forEach((host) => {
-        usedMemory += this.$store.getters['esxi/getVmsMemory'](host);
+        if (host.usage_type === 'worker') {
+          usedMemory += this.$store.getters['esxi/getVmsMemory'](host);
+        }
       });
-
       return usedMemory;
     },
   },
