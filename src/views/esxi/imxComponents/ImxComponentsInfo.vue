@@ -13,7 +13,7 @@
           <h6>Components info</h6>
         </div>
       </div>
-        <ul id="imxComponents" class="collapsible expandable">
+      <ul id="imxComponents" class="collapsible expandable">
         <li v-for="component in imxComponents" :key="component.name">
           <div class="collapsible-header">
             <i class="material-icons">blur_on</i> {{ component.name }}
@@ -32,6 +32,12 @@
                 icon="create"
                 tooltip="Edit component"
                 @click="openAddEditModal(component, 'update')"
+              />
+              <TooltipButton
+                v-if="$auth.can('imx-component.delete')"
+                icon="delete"
+                tooltip="Delete component"
+                @click="openDeleteModal(component, 'delete')"
               />
             </div>
             <p v-if="component.url">
@@ -81,33 +87,35 @@
         :action="action"
         @close="close()"
       />
-<!--      <DeleteComponent-->
-<!--        v-if="showDeleteComponent"-->
-<!--        :selectedImxComponent="selectedImxComponent"-->
-<!--        @close="closeDelete()"-->
-<!--      />-->
+
+      <DeleteImxComponentModal
+        v-if="showDeleteComponent"
+        :component="imxComponent"
+        :action="action"
+        @close="closeDelete()"
+      />
     </div>
   </div>
 </template>
-
 <script>
 const TooltipButton = () => import('@/components/partials/TooltipButton');
 const AddImxComponentModal = () => import('./AddEditComponentModal');
-// const DeleteComponent = () => import('./DeleteComponent');
+const DeleteImxComponentModal = () => import('./DeleteImxComponentModal');
 
 export default {
   components: {
     TooltipButton,
     AddImxComponentModal,
-    // DeleteComponent
+    DeleteImxComponentModal
   },
+
   data() {
     return {
       showAddEditModal: false,
       imxComponent: {},
-      action: '',
-      // showDeleteComponent: false,
-      // selectedImxComponent: {}
+      error: '',
+      action: null,
+      showDeleteComponent: false,
     };
   },
   computed: {
@@ -124,7 +132,6 @@ export default {
             if (this.$route.params.id === 'new') {
               return this.openAddEditModal({}, 'create');
             }
-
             const component = this.imxComponents.find((c) => {
               if (c.id === parseInt(this.$route.params.id, 10)) {
                 return true;
@@ -144,6 +151,7 @@ export default {
         })
         .finally(() => loader.hide());
     },
+
     openAddEditModal(component, action) {
       this.showAddEditModal = true;
       this.imxComponent = component;
@@ -151,31 +159,44 @@ export default {
 
       this.$router.push({
         path: `/inventory/imxComponents/${encodeURIComponent(component.id || 'new')}`,
+      });
+    },
+
+    openDeleteModal(component, action) {
+      this.showDeleteComponent = true;
+      this.imxComponent = component;
+      this.action = action;
+
+      this.$router.push({
+        path: `/inventory/imxComponents/${encodeURIComponent(component.id)}`,
       })
     },
-    close() {
-      this.showAddEditModal = false;
 
+    closeDelete() {
+      this.showDeleteComponent = false;
       this.$router.push({
         path: '/inventory/imxComponents',
       })
         .catch(() => {
         });
     },
-    // closeDelete() {
-    //   this.showDeleteComponent = false;
-    //   this.$router.push({
-    //     path: '/inventory/imxComponents',
-    //   })
-    //     .catch(() => {
-    //     });
-    // },
+
+    close() {
+      this.showAddEditModal = false;
+      this.$router.push({
+        path: '/inventory/imxComponents',
+      })
+        .catch(() => {
+        });
+    },
+  },
+
     mounted() {
       this.getImxComponents();
-      this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'), {
+      this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'),
+        {
         accordion: false,
       });
     },
-  },
 };
 </script>

@@ -114,15 +114,15 @@ export default {
       .catch((error) => commit('error', error));
     return promise;
   },
-  // deleteComponent({ commit }, id) {
-  //   const promise = api('devops').delete(`inventory/imx-components/${id}`);
-  //   promise
-  //     .then(() => {
-  //       commit('ComponentRemove', id);
-  //     })
-  //     .catch(() => commit('error', 'Could not delete component'));
-  //   return promise;
-  // },
+  deleteComponent({ commit }, payload) {
+    const promise = api('devops').delete(`inventory/imx-components/${payload.id}`);
+    promise
+      .then(() => {
+        commit('componentRemove', payload.id);
+      })
+      .catch(() => commit('error', 'Could not delete component'));
+    return promise;
+  },
 
   getRequestedInstances({ commit }) {
     const promise = api('devops').get('inventory/requested-instances');

@@ -58,12 +58,12 @@ export default {
       Vue.set(state, 'imxComponents', imxComponents);
     }
   },
-  // componentRemove(state, id) {
-  //   state.imxComponents.splice(
-  //     state.imxComponents.findIndex((req) => req.id === id),
-  //     1,
-  //   );
-  // },
+  componentRemove(state, id) {
+    state.imxComponents.splice(
+      state.imxComponents.findIndex((req) => req.id === id),
+      1,
+    );
+  },
 
   requestedInstances(state, instances) {
     state.requestedInstances = instances;
