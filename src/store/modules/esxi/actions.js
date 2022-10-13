@@ -114,13 +114,13 @@ export default {
       .catch((error) => commit('error', error));
     return promise;
   },
-  deleteComponent({ commit }, payload) {
+  removeImxComponent({ commit }, payload) {
     const promise = api('devops').delete(`inventory/imx-components/${payload.id}`);
     promise
       .then(() => {
-        commit('componentRemove', payload.id);
+        commit('removeImxComponent', payload.id);
       })
-      .catch(() => commit('error', 'Could not delete component'));
+      .catch(() => commit('error', 'Could not remove imx component'));
     return promise;
   },
 

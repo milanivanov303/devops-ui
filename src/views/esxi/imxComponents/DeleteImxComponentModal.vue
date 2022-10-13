@@ -49,7 +49,7 @@
     methods: {
     deleteImxComponent() {
       this.removing = true;
-      this.$store.dispatch('esxi/deleteComponent', this.selected)
+      this.$store.dispatch('esxi/removeImxComponent', this.selected)
         .then(() => {
           this.removed = true;
           this.$emit('close');
@@ -57,7 +57,7 @@
         })
         .catch((error) => {
           if (error.response.status === 403) {
-            this.error = 'You do not have insufficient rights to remove this component';
+            this.error = 'You do not have sufficient rights to remove this component';
           }
         })
         .finally(() => { this.removing = false; });
