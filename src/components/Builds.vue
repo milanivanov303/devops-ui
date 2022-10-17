@@ -270,9 +270,9 @@ export default {
     },
 
     getBuildUrl(build) {
-      const imxBeUrl = build && build.module === 'imx_be' ? 'healthcheck' : '';
-
-      return this.$router.resolve(`/builds/${build.name}/${imxBeUrl}`).href;
+      return build && build.module === 'imx_be'
+        ? `${build.details.url}healthcheck`
+        : this.$router.resolve(`/builds/${build.name}/`).href;
     },
 
     getWebssh2Url(build) {
