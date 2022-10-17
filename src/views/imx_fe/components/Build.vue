@@ -154,7 +154,7 @@ export default {
         .filter((build) => build.status !== 'building');
     },
     endpoint() {
-      if (!this.form.build) {
+      if (!this.form.build || !this.form.build.details) {
         return null;
       }
 
