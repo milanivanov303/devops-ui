@@ -18,7 +18,7 @@ export default {
           {
             status: {
               operator: 'in',
-              value: ['running', 'stopped', 'building'],
+              value: ['running', 'stopped', 'building', 'deployed'],
             },
           },
         ],
@@ -135,6 +135,13 @@ export default {
 
     if (branch) {
       filters.push({ 'details->branch': branch });
+      // If necessary to show builds with status deployed in branch from configuration{"branch"}
+      // filters.push({
+      //   anyOf: [
+      //     { 'details->branch': branch },
+      //     { 'details->configuration->branch': branch },
+      //   ],
+      // });
     }
 
     if (createdBy) {

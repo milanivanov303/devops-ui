@@ -114,6 +114,15 @@ export default {
       .catch((error) => commit('error', error));
     return promise;
   },
+  removeImxComponent({ commit }, payload) {
+    const promise = api('devops').delete(`inventory/imx-components/${payload.id}`);
+    promise
+      .then(() => {
+        commit('removeImxComponent', payload.id);
+      })
+      .catch(() => commit('error', 'Could not remove imx component'));
+    return promise;
+  },
 
   getRequestedInstances({ commit }) {
     const promise = api('devops').get('inventory/requested-instances');

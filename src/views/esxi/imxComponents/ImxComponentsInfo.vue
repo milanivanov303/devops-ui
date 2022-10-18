@@ -13,7 +13,6 @@
           <h6>Components info</h6>
         </div>
       </div>
-
       <ul id="imxComponents" class="collapsible expandable">
         <li v-for="component in imxComponents" :key="component.name">
           <div class="collapsible-header">
@@ -34,7 +33,20 @@
                 tooltip="Edit component"
                 @click="openAddEditModal(component, 'update')"
               />
+              <TooltipButton
+                v-if="$auth.can('imx-component.delete')"
+                icon="delete"
+                tooltip="Delete component"
+                @click="openDeleteModal(component, 'delete')"
+              />
             </div>
+            <p v-if="component.url">
+              <b>Url: </b><span>{{ component.url }}</span>
+
+            <p v-if="component.name_key">
+              <b>Name key: </b><span>{{ component.name_key }}</span>
+            </p>
+
             <p v-if="component.maintenance_team">
               <b>Maintenance team: </b><span>{{ component.maintenance_team }}</span>
             </p>
@@ -69,31 +81,41 @@
           </div>
         </li>
       </ul>
-
       <AddImxComponentModal
         v-if="showAddEditModal"
         :component="imxComponent"
         :action="action"
         @close="close()"
       />
+
+      <DeleteImxComponentModal
+        v-if="showDeleteComponent"
+        :component="imxComponent"
+        :action="action"
+        @close="closeDelete()"
+      />
     </div>
   </div>
 </template>
-
 <script>
 const TooltipButton = () => import('@/components/partials/TooltipButton');
 const AddImxComponentModal = () => import('./AddEditComponentModal');
+const DeleteImxComponentModal = () => import('./DeleteImxComponentModal');
 
 export default {
   components: {
     TooltipButton,
     AddImxComponentModal,
+    DeleteImxComponentModal
   },
+
   data() {
     return {
       showAddEditModal: false,
       imxComponent: {},
-      action: '',
+      error: '',
+      action: null,
+      showDeleteComponent: false,
     };
   },
   computed: {
@@ -103,15 +125,13 @@ export default {
   },
   methods: {
     getImxComponents() {
-      const loader = this.$loading.show({ container: this.$refs.imxComponents });
-
+      const loader = this.$loading.show({container: this.$refs.imxComponents});
       this.$store.dispatch('esxi/getImxComponents')
         .then(() => {
           if (this.$route.params.id) {
             if (this.$route.params.id === 'new') {
               return this.openAddEditModal({}, 'create');
             }
-
             const component = this.imxComponents.find((c) => {
               if (c.id === parseInt(this.$route.params.id, 10)) {
                 return true;
@@ -122,15 +142,16 @@ export default {
             if (component) {
               return this.openAddEditModal(component, 'update');
             }
-            this.$M.toast({ html: 'This component does not exist!', classes: 'toast-fail' });
+            this.$M.toast({html: 'This component does not exist!', classes: 'toast-fail'});
           }
           return false;
         })
         .catch((error) => {
-          this.$M.toast({ html: `${error}`, classes: 'toast-fail' });
+          this.$M.toast({html: `${error}`, classes: 'toast-fail'});
         })
         .finally(() => loader.hide());
     },
+
     openAddEditModal(component, action) {
       this.showAddEditModal = true;
       this.imxComponent = component;
@@ -140,22 +161,42 @@ export default {
         path: `/inventory/imxComponents/${encodeURIComponent(component.id || 'new')}`,
       });
     },
-    close() {
-      this.showAddEditModal = false;
 
+    openDeleteModal(component, action) {
+      this.showDeleteComponent = true;
+      this.imxComponent = component;
+      this.action = action;
+
+      this.$router.push({
+        path: `/inventory/imxComponents/${encodeURIComponent(component.id)}`,
+      })
+    },
+
+    closeDelete() {
+      this.showDeleteComponent = false;
       this.$router.push({
         path: '/inventory/imxComponents',
       })
-        .catch(() => {});
+        .catch(() => {
+        });
+    },
+
+    close() {
+      this.showAddEditModal = false;
+      this.$router.push({
+        path: '/inventory/imxComponents',
+      })
+        .catch(() => {
+        });
     },
   },
 
-  mounted() {
-    this.getImxComponents();
-    this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'), {
-      accordion: false,
-    });
-  },
+    mounted() {
+      this.getImxComponents();
+      this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'),
+        {
+        accordion: false,
+      });
+    },
 };
-
 </script>

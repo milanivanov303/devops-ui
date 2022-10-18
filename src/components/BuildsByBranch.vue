@@ -40,6 +40,11 @@
               class="new badge red"
               data-badge-caption="stopped">{{ build.builds.stopped }}
             </span>
+            <span
+                v-if="build.builds.deployed"
+                class="new badge blue-grey"
+                data-badge-caption="deployed">{{ build.builds.deployed }}
+            </span>
           </td>
         </tr>
         <tr v-if="builds.length === 0">

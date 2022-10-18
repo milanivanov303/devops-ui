@@ -23,7 +23,8 @@ export default {
       return sum;
     }, 0);
   },
-
+  
+  //Get total memory of workers only
   getTotalMemory: (state) => {
     if (!state.esxiHosts || state.esxiHosts.length === 0) {
       return 0;
@@ -31,7 +32,7 @@ export default {
 
     let total = 0;
     state.esxiHosts.forEach((esxiHost) => {
-      if (esxiHost.memory) {
+      if (esxiHost.memory && esxiHost.usage_type === 'worker') {
         total += esxiHost.memory.physical_memory;
       }
     });

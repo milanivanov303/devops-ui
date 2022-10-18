@@ -254,7 +254,7 @@ export default {
 
     getStatus() {
       if (this.status.indexOf('active') !== -1) {
-        return this.status.concat(['running', 'building', 'stopped']);
+        return this.status.concat(['running', 'building', 'stopped', 'deployed']);
       }
 
       return this.status;
@@ -270,9 +270,9 @@ export default {
     },
 
     getBuildUrl(build) {
-      const imxBeUrl = build && build.module === 'imx_be' ? 'healthcheck' : '';
-
-      return this.$router.resolve(`/builds/${build.name}/${imxBeUrl}`).href;
+      return build && build.module === 'imx_be'
+        ? `${build.details.url}healthcheck`
+        : this.$router.resolve(`/builds/${build.name}/`).href;
     },
 
     getWebssh2Url(build) {
@@ -289,6 +289,9 @@ export default {
 
       if (build.status === 'stopped' || build.status === 'failed') {
         return `<span class="new badge red" data-badge-caption="">${build.status}</span>`;
+      }
+      if (build.status === 'deployed') {
+        return `<span class="new badge blue-grey" data-badge-caption="">${build.status}</span>`;
       }
       return `<span class="new badge" data-badge-caption="">${build.status}</span>`;
     },

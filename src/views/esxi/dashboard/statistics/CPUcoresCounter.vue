@@ -51,14 +51,18 @@ export default {
         if (!host.cpu) {
           return;
         }
-        count += parseInt(host.cpu.num_cpu_cores, 10);
+        if (host.usage_type === 'worker') {
+          count += parseInt(host.cpu.num_cpu_cores, 10);
+        }           
       });
       return count;
     },
     getAssignedCoresCount() {
       let count = 0;
       this.esxiHosts.forEach((host) => {
-        count += this.$store.getters['esxi/getAssignedCpusByHost'](host);
+        if (host.usage_type === 'worker') {
+          count += this.$store.getters['esxi/getAssignedCpusByHost'](host);
+        }        
       });
       return count;
     },

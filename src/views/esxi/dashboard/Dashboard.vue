@@ -66,10 +66,12 @@ export default {
       let seconds = 0;
 
       this.esxiHosts.forEach((e) => {
-        if (e.purchase_date) {
-          count += 1;
-          seconds += Math.floor(Date.now() / 1000) - e.purchase_date;
-        }
+        if (e.usage_type === 'worker') {
+          if (e.purchase_date) {
+            count += 1;
+            seconds += Math.floor(Date.now() / 1000) - e.purchase_date;
+          }
+        }       
       });
       const average = Math.floor(seconds / count);
 
