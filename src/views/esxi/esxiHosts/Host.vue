@@ -18,6 +18,12 @@
           <b class="red-text">{{ esxiHost.error }}</b>
         </div>
         <div v-else>
+          <div v-if="esxiHost.version">
+            <b>Hypervisor: </b>{{ esxiHost.version.product }}, {{ esxiHost.version.version }}
+          </div>
+          <div v-if="esxiHost.platform" class="collection-item">
+            <b>Model: </b>{{esxiHost.platform.product_name}} {{ esxiHost.platform.vendor_name }}
+          </div>
           <div v-if="esxiHost.cpu">
             <b>CPU:</b>
             <span v-if="esxiHost.cpu.num_cpu_cores">
@@ -86,7 +92,7 @@ export default {
   }
 }
 .card-content {
-  height: 146.233px;
+  height: 180px;
 }
 
 </style>
