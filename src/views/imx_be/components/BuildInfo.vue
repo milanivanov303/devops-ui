@@ -46,12 +46,16 @@
         />
       </div>
       <div class="row" v-if="build.status === 'running'">
-        <TextInput
-          class="col s12 readonly"
-          label="Deploy URL"
-          icon="link"
-          :value="build.details.url"
-        />
+        <div class="input-field col s12">
+          <i class="material-icons prefix">link</i>
+          <a :href="build.details.url" target="_blank" rel="noopener noreferrer">
+            <input id="deploy-url"
+                   class="readonly"
+                   type="text"
+                   :value="build.details.url">
+          </a>
+          <label :class="{active: build.details.url}" for="deploy-url">Deploy URL</label>
+        </div>
       </div>
     </div>
   </div>
@@ -67,3 +71,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+#deploy-url {
+  margin-left: 3rem;
+}
+</style>

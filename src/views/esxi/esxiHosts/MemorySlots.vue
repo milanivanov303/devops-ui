@@ -11,7 +11,7 @@
             <li class="collection-item">
               <b>Location: </b>{{ empty.location }}
             </li>
-            <li class="collection-item">
+            <li v-if="empty.size" class="collection-item">
               <b>Size: </b>{{ empty.size }}
             </li>
             <li class="collection-item">
@@ -30,13 +30,13 @@
             <li class="collection-item">
               <b>Location: </b>{{ filled.location }}
             </li>
-            <li class="collection-item">
+            <li v-if="filled.size" class="collection-item">
               <b>Size: </b>{{ filled.size }}
             </li>
             <li class="collection-item">
               <b>Type: </b>{{ filled.type }}
             </li>
-            <li class="collection-item">
+            <li v-if="filled.speed" class="collection-item">
               <b>Speed: </b>{{ filled.speed }}
             </li>
           </div>
