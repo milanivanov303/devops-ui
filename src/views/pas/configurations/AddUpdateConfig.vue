@@ -143,11 +143,13 @@
           </div>
         </div>
         <div class="row">
-          <TextInput
+          <Autocomplete
               class="col s12"
               :class="{readonly: action === 'view'}"
               label="App Version"
               icon="history"
+              :items="app_versions"
+              valueKey="value"
               v-model="form.app_version"
               :invalid="$v.form.app_version.$error"
               @blur="$v.form.app_version.$touch()"
@@ -335,6 +337,9 @@ export default {
     deploy_instances() {
       return this.$store.state.mmpi.deploy_instances;
     },
+    app_versions() {
+      return this.$store.state.mmpi.app_versions;
+    },
     branches() {
       if (this.form.app_type && this.form.app_type.value === 'extranet') {
         return this.$store.state.extranet.branches;
@@ -401,6 +406,7 @@ export default {
       const promises = [];
       promises.push(this.$store.dispatch('mmpi/getProjects'));
       promises.push(this.$store.dispatch('mmpi/getDeployInstances'));
+      promises.push(this.$store.dispatch('mmpi/getAppVersions'));
       promises.push(this.$store.dispatch('extranet/getBranches'));
       promises.push(this.$store.dispatch('debiteur/getBranches'));
       promises.push(this.$store.dispatch('extranet/getClients'));
@@ -449,6 +455,11 @@ export default {
           .find((projectType) => projectType.value === this.configuration.project_type);
       }
 
+      if (this.configuration.app_version) {
+        this.form.app_version = this.app_versions
+            .find((version) => version.name === this.configuration.app_version);
+      }
+
       if (this.configuration.app_type) {
         this.form.app_type = this.appTypes
           .find((appType) => appType.value === this.configuration.app_type);
@@ -465,7 +476,7 @@ export default {
 
       payload.app_type = this.form.app_type.value;
       payload.project_type = this.form.project_type.value;
-      payload.app_version = this.form.app_version;
+      payload.app_version = this.form.app_version.name;
       payload.project = this.form.project.name;
       payload.delivery_chain = this.form.delivery_chain.title;
       payload.dev_instance = this.form.dev_instance.name;

@@ -7,6 +7,7 @@ export default {
   delivery_chains: [],
   delivery_chain_roles: [],
   deliveryChains: [],
+  app_versions: [],
   instances: [],
   instanceTypes: [],
   instanceStatus: [],

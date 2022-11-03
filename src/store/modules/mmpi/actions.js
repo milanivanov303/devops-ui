@@ -178,6 +178,35 @@ export default {
     return promise;
   },
 
+  getAppVersions({ commit }) {
+    const name = 'delivery-chains';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('enum-values', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            'type': 'delivery_chain_version',
+          },
+          {
+            'subtype': 'EXTRANET',
+          }
+        ],
+      }),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+        .then((response) => commit('appVersions', response.data.data))
+        .catch(() => commit('error', 'Could not get app version list', { root: true }));
+
+    return promise;
+  },
+
   // instances
   getInstances({ commit }) {
     const name = 'instances';
