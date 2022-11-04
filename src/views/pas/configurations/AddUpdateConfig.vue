@@ -457,7 +457,7 @@ export default {
 
       if (this.configuration.app_version) {
         this.form.app_version = this.app_versions
-            .find((version) => version.name === this.configuration.app_version);
+            .find((version) => version.value === this.configuration.app_version);
       }
 
       if (this.configuration.app_type) {
