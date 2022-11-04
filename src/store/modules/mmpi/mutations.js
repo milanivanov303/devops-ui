@@ -23,12 +23,17 @@ export default {
   deliveryChains(state, deliveryChains) {
     state.delivery_chains = deliveryChains;
   },
+
   deliveryChainRoles(state, deliveryChainRoles) {
     state.delivery_chain_roles = deliveryChainRoles;
   },
   // Delivery Chanins for CMS Inventory page
   deliveryChainsCMS(state, deliveryChains) {
     state.deliveryChains = deliveryChains;
+  },
+
+  appVersions(state, versions) {
+    state.app_versions = versions;
   },
 
   instances(state, instances) {
