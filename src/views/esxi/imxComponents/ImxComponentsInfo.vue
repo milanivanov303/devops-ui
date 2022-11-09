@@ -69,6 +69,8 @@
                 :edit-btn="false"
                 :delete-btn="false"
               >
+                <Column label="Approved by Codix"
+                        :sortable="true" show="approved"/>
                 <Column show="version" :sortable="false"/>
                 <Column label="End of support date (regular)" name="regular_eos_date"
                         :sortable="false" :show="(v) => v.regular_eos_date
