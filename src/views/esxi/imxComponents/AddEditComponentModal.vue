@@ -146,24 +146,22 @@
         </div>
         <div class="row">
           <Select
-            class="col 12 l3"
+            class="col 12 l2"
             :multiple="false"
             label="Approved by Codix"
-            icon="done"
             :options="chooseOptions"
             v-model="newVersion.approved"
             @blur="$v.newVersion.approved.$touch()"
           />
-          <div class="row">
           <TextInput
-            class="col s12 l3"
+            class="col s12 l2"
             :class="{invalid: !$v.newVersion.version.versionValidator}"
             icon="linear_scale"
             label="Version"
             v-model="newVersion.version"
             @blur="$v.newVersion.version.$touch()"
           />
-          <div class="input-field col s12 l2">
+          <div class="input-field col s12 l3">
             <i class="material-icons prefix">date_range</i>
             <datetime input-id="regular_eos_date"
                       input-class="datetime-input"
@@ -176,7 +174,7 @@
                    for="regular_eos_date">EOS date (regular)
             </label>
             </div>
-            <div class="input-field col s12 l2">
+            <div class="input-field col s12 l4">
             <i class="material-icons prefix">date_range</i>
             <datetime input-id="extended_eos_date"
                       input-class="datetime-input"
@@ -197,12 +195,11 @@
             </TooltipButton>
             </div>
             </div>
-          </div>
         <div class="row">
           <div class="validator col s12 offset-l1 offset-m1">
             <div class="red-text" v-if="!$v.newVersion.version.versionValidator">
               <p v-if="!$v.newVersion.version.versionValidator">
-                Invalid version format. Please fill only main versions.
+                Invalid version format!
               </p>
             </div>
           </div>
@@ -319,26 +316,14 @@ export default {
 
     },
     checkVersions() {
-      let [splitVersion] = [this.newVersion.version.split(".")];
+      let splitVersion = this.newVersion.version.split(".");
 
-      if (this.newVersion.approved === "Yes") {
-        if (!splitVersion[1]) {
-          this.newVersion.version = splitVersion[0];
-          return true;
+      if ((this.newVersion.approved === "Yes" || this.newVersion.approved === null)
+          && splitVersion.length > 2) {
+        this.$M.toast({html: `Please type main version!`, classes: 'toast-fail'});
+         return false;
         }
-          this.newVersion.version = splitVersion[0] + "." + splitVersion[1];
-          return true;
-      }
-      if (this.newVersion.approved === "No") {
-        if (!splitVersion[2]) {
-          this.$M.toast({html: `Please type the full version!`, classes: 'toast-fail'});
-          return false;
-        }
-
-         this.newVersion.version = splitVersion[0] + "." + splitVersion[1] + "." + splitVersion[2];
          return true;
-      }
-      return true;
     }
   },
 };
