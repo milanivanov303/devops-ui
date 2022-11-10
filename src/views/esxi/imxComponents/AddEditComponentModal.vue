@@ -319,7 +319,7 @@ export default {
 
     },
     checkVersions() {
-      let splitVersion = this.newVersion.version.split(".");
+      let [splitVersion] = [this.newVersion.version.split(".")];
 
       if (this.newVersion.approved === "Yes") {
         if (!splitVersion[1]) {
@@ -338,6 +338,7 @@ export default {
          this.newVersion.version = splitVersion[0] + "." + splitVersion[1] + "." + splitVersion[2];
          return true;
       }
+      return true;
     }
   },
 };
