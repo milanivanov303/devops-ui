@@ -130,7 +130,7 @@ export default {
       const loader = this.$loading.show({ container: this.$el });
       let data = {};
       if (this.form.manager === '') {
-        if (this.form.tts_group_name.name === 'N/A') {
+         if (this.form.tts_group_name.name === 'N/A') {
             data = {
               id: this.form.id,
               tts_group_name: null,
@@ -146,52 +146,56 @@ export default {
             manager: null,
             assistant: null
           };
-        }else
-          if (this.form.teamAbbrev === '') {
-            if (this.form.tts_group_name.name === 'N/A') {
-              data = {
-                id: this.form.id,
-                tts_group_name: null,
-                abbreviation: null,
-                manager: this.form.manager,
-                assistant: null
-              };
-            }
+        } else if (this.form.teamAbbrev === '') {
+          if (this.form.tts_group_name.name === 'N/A') {
             data = {
               id: this.form.id,
-              tts_group_name: this.form.tts_group_name.name,
+              tts_group_name: null,
               abbreviation: null,
               manager: this.form.manager,
               assistant: this.form.assistant
             };
-          } else if (this.form.tts_group_name.name === 'N/A') {
-            data = {
-              id: this.form.id,
-              tts_group_name: null,
-              abbreviation: this.form.teamAbbrev,
-              manager: this.form.manager,
-              assistant: this.form.assistant
-            };
-          } else {
-            data = {
-              id: this.form.id,
-              tts_group_name: this.form.tts_group_name.name,
-              abbreviation: this.form.teamAbbrev,
-              manager: this.form.manager,
-              assistant: this.form.assistant
-            };
-              if (this.form.manager === '') {
-              if (this.form.assistant === '') {
-                data = {
-                  id: this.form.id,
-                  tts_group_name: this.form.tts_group_name.name,
-                  abbreviation: this.form.teamAbbrev,
-                  manager: null,
-                  assistant: null
-                };
-              }
           }
-          await this.$store.dispatch('cms/updateTeams', data)
+          data = {
+            id: this.form.id,
+            tts_group_name: this.form.tts_group_name.name,
+            abbreviation: null,
+            manager: this.form.manager,
+            assistant: this.form.assistant
+          };
+        } else if (this.form.tts_group_name.name === 'N/A') {
+          data = {
+            id: this.form.id,
+            tts_group_name: null,
+            abbreviation: this.form.teamAbbrev,
+            manager: this.form.manager,
+            assistant: this.form.assistant
+          };
+        } else if (this.form.tts_group_name.name === 'N/A') {
+          data = {
+            id: this.form.id,
+            tts_group_name: this.form.tts_group_name,
+            abbreviation: this.form.teamAbbrev,
+            manager: null,
+            assistant: this.form.assistant
+          };
+      } else if (this.form.tts_group_name.name === 'N/A') {
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name,
+          abbreviation: this.form.teamAbbrev,
+          manager: this.form.manager,
+          assistant: null
+        };
+        } else {
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name.name,
+          abbreviation: this.form.teamAbbrev,
+          manager: this.form.manager,
+          assistant: this.form.assistant
+        };
+        await this.$store.dispatch('cms/updateTeams', data)
             .then(() => {
               this.$M.toast({html: 'Team has been updated!', classes: 'toast-success'});
             })
