@@ -14,6 +14,7 @@
       <Column show="abbreviation"/>
       <Column show="name"/>
       <Column show="tts_group_name"/>
+      <Column show="assistant"/>
       <Column show="manager"/>
       <template v-slot:actions-before="{ row }">
         <a

@@ -52,6 +52,17 @@
           <label :class="{active: form.manager}" for="manager">Manager</label>
         </div>
       </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <i class="material-icons prefix">person</i>
+          <input
+            autocomplete="off"
+            type="text"
+            id="assistant"
+            v-model="form.assistant">
+          <label :class="{active: form.assistant}" for="assistant">Assistant</label>
+        </div>
+      </div>
     </template>
     <template v-slot:footer>
       <button
@@ -86,6 +97,7 @@ export default {
       selectedTeamName: '',
       tts_group_name: {},
       manager: '',
+      assistant: ''
     };
   },
   computed: {
@@ -108,6 +120,7 @@ export default {
             .find((ttsgrname) => ttsgrname.name === this.selectedTeam.tts_group_name);
         }
         this.form.manager = this.selectedTeam.manager;
+        this.form.assistant = this.selectedTeam.assistant;
       }
     },
     getCodixTeams() {
@@ -118,59 +131,77 @@ export default {
       let data = {};
       if (this.form.manager === '') {
         if (this.form.tts_group_name.name === 'N/A') {
+            data = {
+              id: this.form.id,
+              tts_group_name: null,
+              abbreviation: this.form.teamAbbrev,
+              manager: null,
+              assistant: null
+            };
+          }
           data = {
             id: this.form.id,
-            tts_group_name: null,
+            tts_group_name: this.form.tts_group_name.name,
             abbreviation: this.form.teamAbbrev,
             manager: null,
+            assistant: null
           };
+        }else
+          if (this.form.teamAbbrev === '') {
+            if (this.form.tts_group_name.name === 'N/A') {
+              data = {
+                id: this.form.id,
+                tts_group_name: null,
+                abbreviation: null,
+                manager: this.form.manager,
+                assistant: null
+              };
+            }
+            data = {
+              id: this.form.id,
+              tts_group_name: this.form.tts_group_name.name,
+              abbreviation: null,
+              manager: this.form.manager,
+              assistant: this.form.assistant
+            };
+          } else if (this.form.tts_group_name.name === 'N/A') {
+            data = {
+              id: this.form.id,
+              tts_group_name: null,
+              abbreviation: this.form.teamAbbrev,
+              manager: this.form.manager,
+              assistant: this.form.assistant
+            };
+          } else {
+            data = {
+              id: this.form.id,
+              tts_group_name: this.form.tts_group_name.name,
+              abbreviation: this.form.teamAbbrev,
+              manager: this.form.manager,
+              assistant: this.form.assistant
+            };
+              if (this.form.manager === '') {
+              if (this.form.assistant === '') {
+                data = {
+                  id: this.form.id,
+                  tts_group_name: this.form.tts_group_name.name,
+                  abbreviation: this.form.teamAbbrev,
+                  manager: null,
+                  assistant: null
+                };
+              }
+          }
+          await this.$store.dispatch('cms/updateTeams', data)
+            .then(() => {
+              this.$M.toast({html: 'Team has been updated!', classes: 'toast-success'});
+            })
+            .catch((error) => {
+              this.error = error;
+              return error;
+            });
+          loader.hide();
+          this.closeModal();
         }
-        data = {
-          id: this.form.id,
-          tts_group_name: this.form.tts_group_name.name,
-          abbreviation: this.form.teamAbbrev,
-          manager: null,
-        };
-      } else if (this.form.teamAbbrev === '') {
-        if (this.form.tts_group_name.name === 'N/A') {
-          data = {
-            id: this.form.id,
-            tts_group_name: null,
-            abbreviation: null,
-            manager: this.form.manager,
-          };
-        }
-        data = {
-          id: this.form.id,
-          tts_group_name: this.form.tts_group_name.name,
-          abbreviation: null,
-          manager: this.form.manager,
-        };
-      } else if (this.form.tts_group_name.name === 'N/A') {
-        data = {
-          id: this.form.id,
-          tts_group_name: null,
-          abbreviation: this.form.teamAbbrev,
-          manager: this.form.manager,
-        };
-      } else {
-        data = {
-          id: this.form.id,
-          tts_group_name: this.form.tts_group_name.name,
-          abbreviation: this.form.teamAbbrev,
-          manager: this.form.manager,
-        };
-      }
-      await this.$store.dispatch('cms/updateTeams', data)
-        .then(() => {
-          this.$M.toast({ html: 'Team has been updated!', classes: 'toast-success' });
-        })
-        .catch((error) => {
-          this.error = error;
-          return error;
-        });
-      loader.hide();
-      this.closeModal();
     },
     closeModal() {
       this.error = '';
