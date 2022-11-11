@@ -171,23 +171,7 @@ export default {
             manager: this.form.manager,
             assistant: this.form.assistant
           };
-        } else if (this.form.tts_group_name.name === 'N/A') {
-          data = {
-            id: this.form.id,
-            tts_group_name: this.form.tts_group_name,
-            abbreviation: this.form.teamAbbrev,
-            manager: null,
-            assistant: this.form.assistant
-          };
-      } else if (this.form.tts_group_name.name === 'N/A') {
-        data = {
-          id: this.form.id,
-          tts_group_name: this.form.tts_group_name,
-          abbreviation: this.form.teamAbbrev,
-          manager: this.form.manager,
-          assistant: null
-        };
-        } else {
+      } else {
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
