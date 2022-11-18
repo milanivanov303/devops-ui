@@ -39,7 +39,7 @@
               <Column label="OS Version" name="os_version" :sortable="false" filter-type="dropdown"
                 :show="(vm) => vm.os && vm.os.version ? vm.os.version : 'n/a'"/>
               <Column label="Kernel" name="kernel" :sortable="false" filter-type="dropdown"
-                :show="(vm) => (vm.os && vm.os.kernel) ? vm.os.kernel : 'n/a'"/>
+                :show="(vm) => (vm.os && vm.os.kernel) ? formatVmKernel(vm.os.kernel) : 'n/a'"/>
               <Column label="Status" name="status" :sortable="false" filter-type="dropdown"
                 :show="(vm) => getVmStatus(vm.powered)"/>
               <template v-slot:actions-before="{ row }">
@@ -159,6 +159,12 @@ export default {
         .catch((error) => {
           this.$M.toast({ html: error });
         }).finally(() => loader.hide());
+    },
+
+    formatVmKernel(kernel) {
+      let formattedKernel = kernel.split('.');
+      formattedKernel = `${formattedKernel[0]}.${formattedKernel[1]}`;
+      return formattedKernel;
     },
   },
 
