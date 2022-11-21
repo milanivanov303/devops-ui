@@ -103,7 +103,7 @@ export default {
   computed: {
     getAllTtsGrNames() {
       return [
-        { name: 'N/A' },
+        { name: ''},
         ...this.$store.state.cms.codixTeamsTTS,
       ];
     },
@@ -130,63 +130,41 @@ export default {
       const loader = this.$loading.show({ container: this.$el });
       let data = {};
       if (this.form.manager === '') {
-        if (this.form.tts_group_name.name === 'N/A') {
+        if (this.form.tts_group_name.name === '') {
           data = {
             id: this.form.id,
-            tts_group_name: null,
+            tts_group_name: '',
             abbreviation: this.form.teamAbbrev,
-            manager: null,
-            assistant: this.form.assistant
+            manager: '',
           };
         }
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: this.form.teamAbbrev,
-          manager: null,
-          assistant: this.form.assistant
-        };
-      } else if (this.form.assistant === '') {
-        if (this.form.tts_group_name.name === 'N/A') {
-          data = {
-            id: this.form.id,
-            tts_group_name: null,
-            abbreviation: this.form.teamAbbrev,
-            manager: this.form.manager,
-            assistant: null,
-          };
-        }
-        data = {
-          id: this.form.id,
-          tts_group_name: this.form.tts_group_name.name,
-          abbreviation: this.form.teamAbbrev,
-          manager: this.form.manager,
-          assistant: null
+          manager: '',
         };
       } else if (this.form.teamAbbrev === '') {
-        if (this.form.tts_group_name.name === 'N/A') {
+        if (this.form.tts_group_name.name === '') {
           data = {
             id: this.form.id,
-            tts_group_name: null,
-            abbreviation: null,
+            tts_group_name: '',
+            abbreviation: '',
             manager: this.form.manager,
-            assistant: this.form.assistant
           };
         }
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
-          abbreviation: null,
+          abbreviation: '',
           manager: this.form.manager,
-          assistant: this.form.assistant
         };
-      } else if (this.form.tts_group_name.name === 'N/A') {
+      } else if (this.form.tts_group_name === '') {
         data = {
           id: this.form.id,
-          tts_group_name: null,
+          tts_group_name: '',
           abbreviation: this.form.teamAbbrev,
           manager: this.form.manager,
-          assistant: this.form.assistant
         };
       } else {
         data = {
@@ -194,7 +172,51 @@ export default {
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: this.form.teamAbbrev,
           manager: this.form.manager,
-          assistant: this.form.assistant
+        };
+      }
+      if (this.form.teamAbbrev === '') {
+        if (this.form.tts_group_name.name === '') {
+          data = {
+            id: this.form.id,
+            tts_group_name: '',
+            abbreviation: '' || null,
+            manager: this.form.manager,
+          };
+        }
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name.name,
+          abbreviation: '' || null,
+          manager: this.form.manager,
+        };
+      } else if (this.form.teamAbbrev === '') {
+        if (this.form.tts_group_name.name === '') {
+          data = {
+            id: this.form.id,
+            tts_group_name: '',
+            abbreviation: this.form.teamAbbrev,
+            manager: '',
+          };
+        }
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name.name,
+          abbreviation: this.form.teamAbbrev,
+          manager: '',
+        };
+      } else if (this.form.tts_group_name === '') {
+        data = {
+          id: this.form.id,
+          tts_group_name: '',
+          abbreviation: this.form.teamAbbrev,
+          manager: this.form.manager,
+        };
+      } else {
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name.name,
+          abbreviation: this.form.teamAbbrev,
+          manager: this.form.manager,
         };
       }
       await this.$store.dispatch('cms/updateTeams', data)
