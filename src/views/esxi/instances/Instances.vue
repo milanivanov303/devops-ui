@@ -14,7 +14,8 @@
         :delete-btn="false"
       >
         <template v-slot:top-actions-before>
-          <div class="table-btns right">
+          <div class="table-btns right" 
+          v-if="$auth.can('esxi.add') && $auth.can('imx-component.add')">
             <a @click="updateComponents()"
                class="btn-floating waves-effect waves-light right"
                data-tooltip="Refresh components"

@@ -98,6 +98,9 @@
           </a>
           <div class="collapsible-body">
             <ul>
+              <li>
+                <a :href="config.cms.cms_user_guide">User Guide</a>
+              </li>
               <li :class="{ active: isActive('cms/config-defaults') }">
                 <router-link to="/cms/config-defaults">
                   Config Defaults

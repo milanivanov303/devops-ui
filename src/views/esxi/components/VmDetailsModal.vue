@@ -36,6 +36,7 @@
                 </span>
               </p>
               <p v-if="vm.os.version "><b>OS Version:</b> {{ vm.os.version }}</p>
+              <p v-if="vm.os.kernel "><b>OS Kernel:</b> {{ vm.os.kernel }}</p>
             </div>
           </div>
         </li>

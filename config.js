@@ -17,6 +17,7 @@ module.exports = {
   cms: {
     url: process.env.VUE_APP_CMS_API_URL,
     code: process.env.VUE_APP_CMS_API_CODE,
+    cms_user_guide: process.env.VUE_APP_CMS_USER_GUIDE,
   },
   devops: {
     url: process.env.VUE_APP_DEVOPS_API_URL,
