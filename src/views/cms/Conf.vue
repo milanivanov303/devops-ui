@@ -15,6 +15,7 @@
       <Column show="name"/>
       <Column show="tts_group_name"/>
       <Column show="manager"/>
+      <Column show="assistant"/>
       <template v-slot:actions-before="{ row }">
         <a
           @click="openAddEditAbbrevModal(row, 'update')"
