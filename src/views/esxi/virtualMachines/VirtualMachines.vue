@@ -17,7 +17,8 @@
               :delete-btn="false"
             >
               <template v-slot:top-actions-before>
-                <div class="table-btns right">
+                <div class="table-btns right"
+                v-if="$auth.can('esxi.add') && $auth.can('imx-component.add')">
                   <a @click="updateInfo()"
                      class="btn-floating waves-effect waves-light right"
                      data-tooltip="Refresh details for all hosts"
@@ -37,6 +38,8 @@
                 :show="(vm) => (vm.os && vm.os.name) ? vm.os.name : 'n/a'"/>
               <Column label="OS Version" name="os_version" :sortable="false" filter-type="dropdown"
                 :show="(vm) => vm.os && vm.os.version ? vm.os.version : 'n/a'"/>
+              <Column label="Kernel" name="kernel" :sortable="false" filter-type="dropdown"
+                :show="(vm) => (vm.os && vm.os.kernel) ? formatVmKernel(vm.os.kernel) : 'n/a'"/>
               <Column label="Status" name="status" :sortable="false" filter-type="dropdown"
                 :show="(vm) => getVmStatus(vm.powered)"/>
               <template v-slot:actions-before="{ row }">
@@ -156,6 +159,12 @@ export default {
         .catch((error) => {
           this.$M.toast({ html: error });
         }).finally(() => loader.hide());
+    },
+
+    formatVmKernel(kernel) {
+      let formattedKernel = kernel.split('.');
+      formattedKernel = `${formattedKernel[0]}.${formattedKernel[1]}`;
+      return formattedKernel;
     },
   },
 
