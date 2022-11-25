@@ -53,7 +53,7 @@ export default {
         }
         if (host.usage_type === 'worker') {
           count += parseInt(host.cpu.num_cpu_cores, 10);
-        }           
+        }
       });
       return count;
     },
@@ -62,7 +62,7 @@ export default {
       this.esxiHosts.forEach((host) => {
         if (host.usage_type === 'worker') {
           count += this.$store.getters['esxi/getAssignedCpusByHost'](host);
-        }        
+        }
       });
       return count;
     },

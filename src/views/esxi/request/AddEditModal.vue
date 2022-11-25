@@ -142,7 +142,7 @@
             <Select class="col s12 m6"
               label="Archivage"
               displayed="name"
-              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]" 
+              :options="[{ name:'Yes', value:1 },{ name:'No', value:0 }]"
               v-model="selected.archivage"
             />
           </div>
@@ -247,33 +247,33 @@ export default {
       }
 
       if (this.request.mail !== null) {
-        this.selected.mail = this.request.mail === 1 ?
-        {name: 'Yes', value: 1} : {name: 'No', value: 0};
+        this.selected.mail = this.request.mail === 1
+          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
       }
 
       if (this.request.telephony !== null) {
-        this.selected.telephony = this.request.telephony === 1 ? 
-        {name: 'Yes', value: 1} : {name: 'No', value: 0};
+        this.selected.telephony = this.request.telephony === 1
+          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
       }
 
       if (this.request.fax !== null) {
-        this.selected.fax = this.request.fax === 1 ? 
-        {name: 'Yes', value: 1} : {name: 'No', value: 0};
+        this.selected.fax = this.request.fax === 1
+          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
       }
 
       if (this.request.sms !== null) {
-        this.selected.sms = this.request.sms === 1 ? 
-        {name: 'Yes', value: 1} : {name: 'No', value: 0};
+        this.selected.sms = this.request.sms === 1
+          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
       }
 
       if (this.request.imagerie !== null) {
-        this.selected.imagerie = this.request.imagerie === 1 ? 
-        {name: 'Yes', value: 1} : {name: 'No', value: 0};
+        this.selected.imagerie = this.request.imagerie === 1
+          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
       }
 
       if (this.request.archivage !== null) {
-        this.selected.archivage = this.request.archivage === 1 ? 
-        {name: 'Yes', value: 1} : {name: 'No', value: 0};
+        this.selected.archivage = this.request.archivage === 1
+          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
       }
     },
 
@@ -288,8 +288,8 @@ export default {
       if (this.$v.$invalid) {
         return;
       }
-      var payload = {
-         id: this.selected.id,
+      const payload = {
+        id: this.selected.id,
         project: this.selected.project.name,
         delivery_chain: this.selected.delivery_chain.title,
         dc_role: this.selected.dc_role.value,
@@ -298,7 +298,7 @@ export default {
         comments: this.selected.comments,
       };
 
-      if (this.selected.mail) { 
+      if (this.selected.mail) {
         payload.mail = this.selected.mail.value;
       }
 

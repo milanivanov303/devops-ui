@@ -14,7 +14,7 @@
         :delete-btn="false"
       >
         <template v-slot:top-actions-before>
-          <div class="table-btns right" 
+          <div class="table-btns right"
           v-if="$auth.can('esxi.add') && $auth.can('imx-component.add')">
             <a @click="updateComponents()"
                class="btn-floating waves-effect waves-light right"
@@ -25,16 +25,19 @@
           </div>
         </template>
         <Column label="Instance" name="name" :show="(instance) => instance.name"/>
+        <Column label="Last active on" name="last_activity" :show="(instance) =>
+          (instance.ssl && instance.ssl.lastActive) ?
+          $date(instance.ssl.lastActive / 1000 ).toHuman() : 'n/a'"/>
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
         <Column v-if="!instances" label="Virtual Machine" name="vm"
           :show="(instance) => getVMLink(instance.virtual_machine.name)"/>
+        <Column show="type" width="10%"/>
         <Column show="activity" width="10%"/>
         <Column show="version" class="dont-break-out" width="10%"/>
         <Column show="pwd_hash_type" width="10%"/>
-        <Column label="Home path" name="home-path" :show="(instance) => instance.home_path"/>
-        <Column show="patch_config_path"/>
+
         <template v-slot:actions-before="{ row }">
 <!--          <a target="_blank"-->
 <!--             data-tooltip="Extranet"-->
@@ -47,10 +50,10 @@
              class="tooltipped">
             <i class="material-icons red-text">error</i>
           </a>
-          <a v-if="row.filesystem && row.filesystem.files"
+          <a v-if="(row.filesystem && row.filesystem.files) || row.ssl"
              @click="openDetailsModal(row)"
              target="_blank"
-             data-tooltip="Filesystem"
+             data-tooltip="View Details"
              class="tooltipped">
             <i class="material-icons">view_list</i>
           </a>

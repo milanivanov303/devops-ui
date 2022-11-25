@@ -27,18 +27,18 @@
   </Modal>
 </template>
 <script>
-  export default {
-      props: {
-      component: {
-        type: Object,
-        required: true,
-      },
-      action: {
-        type: String,
-        required: true,
-      },
+export default {
+  props: {
+    component: {
+      type: Object,
+      required: true,
     },
-    data() {
+    action: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
     return {
       selected: this.component,
       removing: false,
@@ -46,7 +46,7 @@
       error: '',
     };
   },
-    methods: {
+  methods: {
     deleteImxComponent() {
       this.removing = true;
       this.$store.dispatch('esxi/removeImxComponent', this.selected)
