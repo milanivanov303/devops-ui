@@ -209,7 +209,7 @@ export default {
     },
     getUsageTypeLabel(host) {
       return `<span class="new badge" data-badge-caption="">${host.usage_type}</span>`;
-    }
+    },
   },
 
   watch: {

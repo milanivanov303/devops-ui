@@ -108,7 +108,7 @@ export default {
   components: {
     TooltipButton,
     AddImxComponentModal,
-    DeleteImxComponentModal
+    DeleteImxComponentModal,
   },
 
   data() {
@@ -127,7 +127,7 @@ export default {
   },
   methods: {
     getImxComponents() {
-      const loader = this.$loading.show({container: this.$refs.imxComponents});
+      const loader = this.$loading.show({ container: this.$refs.imxComponents });
       this.$store.dispatch('esxi/getImxComponents')
         .then(() => {
           if (this.$route.params.id) {
@@ -144,12 +144,12 @@ export default {
             if (component) {
               return this.openAddEditModal(component, 'update');
             }
-            this.$M.toast({html: 'This component does not exist!', classes: 'toast-fail'});
+            this.$M.toast({ html: 'This component does not exist!', classes: 'toast-fail' });
           }
           return false;
         })
         .catch((error) => {
-          this.$M.toast({html: `${error}`, classes: 'toast-fail'});
+          this.$M.toast({ html: `${error}`, classes: 'toast-fail' });
         })
         .finally(() => loader.hide());
     },
@@ -171,7 +171,7 @@ export default {
 
       this.$router.push({
         path: `/inventory/imxComponents/${encodeURIComponent(component.id)}`,
-      })
+      });
     },
 
     closeDelete() {
@@ -193,12 +193,12 @@ export default {
     },
   },
 
-    mounted() {
-      this.getImxComponents();
-      this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'),
-        {
+  mounted() {
+    this.getImxComponents();
+    this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'),
+      {
         accordion: false,
       });
-    },
+  },
 };
 </script>

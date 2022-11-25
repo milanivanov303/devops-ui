@@ -189,11 +189,11 @@ export default {
       filters: JSON.stringify({
         allOf: [
           {
-            'type': 'delivery_chain_version',
+            type: 'delivery_chain_version',
           },
           {
-            'subtype': 'EXTRANET',
-          }
+            subtype: 'EXTRANET',
+          },
         ],
       }),
     });
@@ -201,8 +201,8 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-        .then((response) => commit('appVersions', response.data.data))
-        .catch(() => commit('error', 'Could not get app version list', { root: true }));
+      .then((response) => commit('appVersions', response.data.data))
+      .catch(() => commit('error', 'Could not get app version list', { root: true }));
 
     return promise;
   },

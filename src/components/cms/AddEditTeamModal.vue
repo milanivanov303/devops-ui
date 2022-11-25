@@ -97,13 +97,13 @@ export default {
       selectedTeamName: '',
       tts_group_name: {},
       manager: '',
-      assistant: ''
+      assistant: '',
     };
   },
   computed: {
     getAllTtsGrNames() {
       return [
-        { name: ''},
+        { name: '' },
         ...this.$store.state.cms.codixTeamsTTS,
       ];
     },
@@ -136,7 +136,7 @@ export default {
             tts_group_name: '',
             abbreviation: this.form.teamAbbrev,
             manager: '',
-            assistant: this.form.assistant
+            assistant: this.form.assistant,
           };
         }
         data = {
@@ -144,7 +144,7 @@ export default {
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: this.form.teamAbbrev,
           manager: '',
-          assistant: this.form.assistant
+          assistant: this.form.assistant,
         };
       } else if (this.form.teamAbbrev === '') {
         if (this.form.tts_group_name.name === '') {
@@ -153,7 +153,7 @@ export default {
             tts_group_name: '',
             abbreviation: '',
             manager: this.form.manager,
-            assistant: ''
+            assistant: '',
           };
         }
         data = {
@@ -161,7 +161,7 @@ export default {
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: '',
           manager: this.form.manager,
-          assistant: ''
+          assistant: '',
         };
       } else if (this.form.tts_group_name === '') {
         data = {
@@ -169,7 +169,7 @@ export default {
           tts_group_name: '',
           abbreviation: this.form.teamAbbrev,
           manager: this.form.manager,
-          assistant: this.form.assistant
+          assistant: this.form.assistant,
         };
       } else {
         data = {
@@ -177,7 +177,7 @@ export default {
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: this.form.teamAbbrev,
           manager: this.form.manager,
-          assistant: this.form.assistant
+          assistant: this.form.assistant,
         };
       }
       if (this.form.teamAbbrev === '') {
@@ -187,7 +187,7 @@ export default {
             tts_group_name: '',
             abbreviation: '' || null,
             manager: this.form.manager,
-            assistant: this.form.assistant
+            assistant: this.form.assistant,
           };
         }
         data = {
@@ -195,7 +195,7 @@ export default {
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: '' || null,
           manager: this.form.manager,
-          assistant: this.form.assistant
+          assistant: this.form.assistant,
         };
       } else if (this.form.teamAbbrev === '') {
         if (this.form.tts_group_name.name === '') {
@@ -204,7 +204,7 @@ export default {
             tts_group_name: '',
             abbreviation: this.form.teamAbbrev,
             manager: '',
-            assistant: ''
+            assistant: '',
           };
         }
         data = {
@@ -212,7 +212,7 @@ export default {
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: this.form.teamAbbrev,
           manager: '',
-          assistant: ''
+          assistant: '',
         };
       } else if (this.form.tts_group_name === '') {
         data = {
@@ -220,7 +220,7 @@ export default {
           tts_group_name: '',
           abbreviation: this.form.teamAbbrev,
           manager: this.form.manager,
-          assistant: this.form.assistant
+          assistant: this.form.assistant,
         };
       } else {
         data = {
@@ -228,7 +228,7 @@ export default {
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: this.form.teamAbbrev,
           manager: this.form.manager,
-          assistant: this.form.assistant
+          assistant: this.form.assistant,
         };
       }
       await this.$store.dispatch('cms/updateTeams', data)

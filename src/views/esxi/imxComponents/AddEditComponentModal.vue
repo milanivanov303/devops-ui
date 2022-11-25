@@ -225,6 +225,7 @@ import { Datetime } from 'vue-datetime';
 import 'vue-datetime/dist/vue-datetime.css';
 
 import { required, helpers } from 'vuelidate/lib/validators';
+
 const versionValidator = helpers.regex('versionValidator', /^\d+(\.\d+)*$/);
 const keyValidator = helpers.regex('keyValidator', /^(?=^[a-zA-Z]+(?:_[a-zA-Z]+)*)\w{1,30}?$/);
 const TooltipButton = () => import('@/components/partials/TooltipButton');
@@ -273,7 +274,7 @@ export default {
     },
     newVersion: {
       version: {
-        versionValidator
+        versionValidator,
       },
     },
   },
@@ -313,18 +314,17 @@ export default {
     removeFromVersions(version) {
       const idx = this.selected.versions.findIndex((v) => v.version === version.version);
       this.selected.versions.splice(idx, 1);
-
     },
     checkVersions() {
-      let splitVersion = this.newVersion.version.split(".");
+      const splitVersion = this.newVersion.version.split('.');
 
-      if ((this.newVersion.approved === "Yes" || this.newVersion.approved === null)
+      if ((this.newVersion.approved === 'Yes' || this.newVersion.approved === null)
           && splitVersion.length > 2) {
-        this.$M.toast({html: `Please type main version!`, classes: 'toast-fail'});
-         return false;
-        }
-         return true;
-    }
+        this.$M.toast({ html: 'Please type main version!', classes: 'toast-fail' });
+        return false;
+      }
+      return true;
+    },
   },
 };
 
