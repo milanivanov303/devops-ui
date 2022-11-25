@@ -15,9 +15,21 @@
         <li v-if="instance.ssl">
           <div class="collapsible-header"><i class="material-icons">laptop</i>SSL</div>
           <div class="collapsible-body">
-            <p><b>BE: </b><a class="tbl-link" :href="instance.ssl.BE">{{ instance.ssl.BE }}</a></p>
-            <p><b>FE: </b><a class="tbl-link" :href="instance.ssl.FE">{{ instance.ssl.FE }}</a></p>
-            <p><b>Status: </b> {{ instance.ssl.status }}</p>
+            <p v-if="instance.ssl.BE">
+              <b>BE: </b><a class="tbl-link" :href="instance.ssl.BE">{{ instance.ssl.BE }}</a>
+            </p>
+            <p v-if="instance.ssl.FE">
+              <b>FE: </b><a class="tbl-link" :href="instance.ssl.FE">{{ instance.ssl.FE }}</a>
+            </p>
+            <p v-if="instance.ssl.status">
+              <b>Status: </b> {{ instance.ssl.status }}
+            </p>
+            <p v-if="instance.ssl.lastActive">
+              <b>Last active on: </b> {{ $date(instance.ssl.lastActive / 1000 ).toHuman() }}
+            </p>
+            <p v-if="instance.ssl.error">
+              <b class="red-text">{{ instance.ssl.error }}</b>
+            </p>
           </div>
         </li>
         <li v-if="instance.filesystem">

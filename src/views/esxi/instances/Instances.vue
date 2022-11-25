@@ -14,7 +14,7 @@
         :delete-btn="false"
       >
         <template v-slot:top-actions-before>
-          <div class="table-btns right" 
+          <div class="table-btns right"
           v-if="$auth.can('esxi.add') && $auth.can('imx-component.add')">
             <a @click="updateComponents()"
                class="btn-floating waves-effect waves-light right"
@@ -25,8 +25,9 @@
           </div>
         </template>
         <Column label="Instance" name="name" :show="(instance) => instance.name"/>
-        <Column label="Last active on" name="lst_activity" :show="(instance) =>
-          instance.ssl && instance.ssl.last_activity ? $date(instance.ssl.last_activity).toHuman() : 'n/a'"/>
+        <Column label="Last active on" name="last_activity" :show="(instance) =>
+          (instance.ssl && instance.ssl.lastActive) ?
+          $date(instance.ssl.lastActive / 1000 ).toHuman() : 'n/a'"/>
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
