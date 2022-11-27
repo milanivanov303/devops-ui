@@ -71,7 +71,7 @@ export default {
             count += 1;
             seconds += Math.floor(Date.now() / 1000) - e.purchase_date;
           }
-        }       
+        }
       });
       const average = Math.floor(seconds / count);
 

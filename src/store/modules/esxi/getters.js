@@ -23,8 +23,8 @@ export default {
       return sum;
     }, 0);
   },
-  
-  //Get total memory of workers only
+
+  // Get total memory of workers only
   getTotalMemory: (state) => {
     if (!state.esxiHosts || state.esxiHosts.length === 0) {
       return 0;

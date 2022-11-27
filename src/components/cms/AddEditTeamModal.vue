@@ -52,6 +52,17 @@
           <label :class="{active: form.manager}" for="manager">Manager</label>
         </div>
       </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <i class="material-icons prefix">person</i>
+          <input
+            autocomplete="off"
+            type="text"
+            id="assistant"
+            v-model="form.assistant">
+          <label :class="{active: form.assistant}" for="assistant">Assistant</label>
+        </div>
+      </div>
     </template>
     <template v-slot:footer>
       <button
@@ -86,12 +97,13 @@ export default {
       selectedTeamName: '',
       tts_group_name: {},
       manager: '',
+      assistant: '',
     };
   },
   computed: {
     getAllTtsGrNames() {
       return [
-        { name: 'N/A' },
+        { name: '' },
         ...this.$store.state.cms.codixTeamsTTS,
       ];
     },
@@ -108,6 +120,7 @@ export default {
             .find((ttsgrname) => ttsgrname.name === this.selectedTeam.tts_group_name);
         }
         this.form.manager = this.selectedTeam.manager;
+        this.form.assistant = this.selectedTeam.assistant;
       }
     },
     getCodixTeams() {
@@ -117,41 +130,46 @@ export default {
       const loader = this.$loading.show({ container: this.$el });
       let data = {};
       if (this.form.manager === '') {
-        if (this.form.tts_group_name.name === 'N/A') {
+        if (this.form.tts_group_name.name === '') {
           data = {
             id: this.form.id,
-            tts_group_name: null,
+            tts_group_name: '',
             abbreviation: this.form.teamAbbrev,
-            manager: null,
+            manager: '',
+            assistant: this.form.assistant,
           };
         }
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: this.form.teamAbbrev,
-          manager: null,
+          manager: '',
+          assistant: this.form.assistant,
         };
       } else if (this.form.teamAbbrev === '') {
-        if (this.form.tts_group_name.name === 'N/A') {
+        if (this.form.tts_group_name.name === '') {
           data = {
             id: this.form.id,
-            tts_group_name: null,
-            abbreviation: null,
+            tts_group_name: '',
+            abbreviation: '',
             manager: this.form.manager,
+            assistant: '',
           };
         }
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
-          abbreviation: null,
+          abbreviation: '',
           manager: this.form.manager,
+          assistant: '',
         };
-      } else if (this.form.tts_group_name.name === 'N/A') {
+      } else if (this.form.tts_group_name === '') {
         data = {
           id: this.form.id,
-          tts_group_name: null,
+          tts_group_name: '',
           abbreviation: this.form.teamAbbrev,
           manager: this.form.manager,
+          assistant: this.form.assistant,
         };
       } else {
         data = {
@@ -159,6 +177,58 @@ export default {
           tts_group_name: this.form.tts_group_name.name,
           abbreviation: this.form.teamAbbrev,
           manager: this.form.manager,
+          assistant: this.form.assistant,
+        };
+      }
+      if (this.form.teamAbbrev === '') {
+        if (this.form.tts_group_name.name === '') {
+          data = {
+            id: this.form.id,
+            tts_group_name: '',
+            abbreviation: '' || null,
+            manager: this.form.manager,
+            assistant: this.form.assistant,
+          };
+        }
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name.name,
+          abbreviation: '' || null,
+          manager: this.form.manager,
+          assistant: this.form.assistant,
+        };
+      } else if (this.form.teamAbbrev === '') {
+        if (this.form.tts_group_name.name === '') {
+          data = {
+            id: this.form.id,
+            tts_group_name: '',
+            abbreviation: this.form.teamAbbrev,
+            manager: '',
+            assistant: '',
+          };
+        }
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name.name,
+          abbreviation: this.form.teamAbbrev,
+          manager: '',
+          assistant: '',
+        };
+      } else if (this.form.tts_group_name === '') {
+        data = {
+          id: this.form.id,
+          tts_group_name: '',
+          abbreviation: this.form.teamAbbrev,
+          manager: this.form.manager,
+          assistant: this.form.assistant,
+        };
+      } else {
+        data = {
+          id: this.form.id,
+          tts_group_name: this.form.tts_group_name.name,
+          abbreviation: this.form.teamAbbrev,
+          manager: this.form.manager,
+          assistant: this.form.assistant,
         };
       }
       await this.$store.dispatch('cms/updateTeams', data)
@@ -172,6 +242,7 @@ export default {
       loader.hide();
       this.closeModal();
     },
+
     closeModal() {
       this.error = '';
       this.$emit('close');
