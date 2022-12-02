@@ -312,7 +312,6 @@ export default {
     },
 
     addToVersions() {
-      debugger;
       if (!this.$v.newVersion.version.versionValidator) {
         return;
       }
