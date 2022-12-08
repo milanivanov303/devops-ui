@@ -54,6 +54,50 @@
               </div>
             </div>
         </div>
+
+        <div
+            v-if="configuration.app_type === 'extranet' && configuration.app_version === 'X4'"
+            class="row">
+          <div class="col s12">
+            <Autocomplete
+                label="X4Config"
+                icon="dynamic_feed"
+                :items="x4configs"
+                valueKey="name"
+                v-model="x4config"
+                :invalid="$v.x4config.$error"
+                @blur="$v.x4config.$touch()"
+            />
+          </div>
+          <div class="validator col s11 offset-s1">
+            <div class="red-text" v-if="$v.x4config.$error">
+              <p v-if="!$v.x4config.required">
+                Config field must not be empty.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+            v-if="configuration.app_type === 'extranet' && configuration.app_version === 'X4'"
+            class="row">
+          <div class="col s12">
+            <Autocomplete
+                label="Project"
+                icon="dynamic_feed"
+                :items="projects"
+                valueKey="name"
+                v-model="project"
+            />
+          </div>
+          <div class="validator col s11 offset-s1">
+            <div class="red-text" v-if="$v.project.$error">
+              <p v-if="!$v.project.required">
+                Project field must not be empty.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div class="row">
           <text-area
               class="col s12"
@@ -65,7 +109,14 @@
           </text-area>
         </div>
         <div>
-          <h6 class="center">CHOOSE HASH</h6>
+          <h6 class="center">CHOOSE HASH/BRANCH
+            <span v-if="repository">
+              from repository <a :href="repositoryUrl">{{repository}}</a>
+            </span>
+            <span v-if="feRepository">
+              and FE repository <a :href="feRepositoryUrl">{{feRepository}}</a>
+            </span>
+          </h6>
           <div class="row">
             <Autocomplete
               class="col s12"
@@ -153,6 +204,12 @@ export default {
       comments: '',
       hash: null,
       feHash: null,
+      repository: null,
+      repositoryUrl: null,
+      feRepository: null,
+      feRepositoryUrl: null,
+      x4config: null,
+      project: null,
       build: {
         started: false,
         status: '',
@@ -170,25 +227,62 @@ export default {
       }
       this.debounceCheckIssue();
     },
+    hashes() {
+      if (this.hashes && this.hashes.length > 0) {
+        if (this.hashes[0].repository) {
+          this.repository = this.hashes[0].repository;
+        }
+
+        if (this.hashes[0].repositoryUrl) {
+          this.repositoryUrl = this.hashes[0].repositoryUrl;
+        }
+      }
+    },
+    feHashes() {
+      if (this.feHashes && this.feHashes.length > 0) {
+        if (this.feHashes[0].repository) {
+          this.feRepository = this.feHashes[0].repository;
+        }
+
+        if (this.feHashes[0].repositoryUrl) {
+          this.feRepositoryUrl = this.feHashes[0].repositoryUrl;
+        }
+      }
+    },
   },
 
   computed: {
+    x4configs() {
+      return this.$store.getters['pas/getX4ParamsByType']('config');
+    },
+
+    projects() {
+      return this.$store.getters['pas/getX4ParamsByType']('project');
+    },
+
     binaryTypes() {
       return this.$store.state.mmpi.binaryTypes;
     },
 
     hashes() {
-      return this.$store.state.pas.hashes.map((hash) => {
-        hash.summary = `${hash.commit} by ${hash.user} on ${this.$date(hash.date).toHuman()}`;
-        return hash;
-      });
+      return this.configuration.app_version === 'X4' && this.configuration.app_type === 'extranet'
+        ? this.$store.state['extranet-x4'].branches.map((hash) => {
+          hash.summary = hash.name;
+          return hash;
+        })
+        : this.$store.state.pas.hashes.map((hash) => {
+          hash.summary = `${hash.commit} by ${hash.user} on ${this.$date(hash.date).toHuman()}`;
+          return hash;
+        });
     },
 
     feHashes() {
-      return this.$store.state.pas.feHashes.map((hash) => {
-        hash.summary = `${hash.commit} by ${hash.user} on ${this.$date(hash.date).toHuman()}`;
-        return hash;
-      });
+      return this.configuration.app_version === 'X4' && this.configuration.app_type === 'extranet'
+        ? []
+        : this.$store.state.pas.feHashes.map((hash) => {
+          hash.summary = `${hash.commit} by ${hash.user} on ${this.$date(hash.date).toHuman()}`;
+          return hash;
+        });
     },
 
     client() {
@@ -251,6 +345,22 @@ export default {
       };
     }
 
+    if (this.configuration.app_type === 'extranet' && this.configuration.app_version === 'X4') {
+      rules.x4config = {
+        required,
+        name: {
+          required,
+        },
+      };
+
+      rules.project = {
+        required,
+        name: {
+          required,
+        },
+      };
+    }
+
     return rules;
   },
 
@@ -287,12 +397,14 @@ export default {
       this.build.summary = 'Build will start shortly ...';
 
       const payload = {
-        branch: this.hash.commit,
+        branch: this.configuration.app_type === 'extranet' && this.configuration.app_version === 'X4' ? this.hash.name : this.hash.commit,
         fe_branch: this.feHash ? this.feHash.commit : null,
         instance: this.instance,
         deploy_instance: this.deployInstance,
         delivery_chain: this.configuration.delivery_chain,
         client: this.client,
+        x4config: this.x4config ? this.x4config.name : null,
+        project: this.project ? this.project.name : null,
         mmpi: {
           binary_type: this.binaryType,
           config_name: this.configName,
@@ -336,6 +448,8 @@ export default {
     this.$store.dispatch('pas/getFeHashes', this.configuration.branch);
     this.$store.dispatch('extranet/getClients');
     this.$store.dispatch('debiteur/getClients');
+    this.$store.dispatch('extranet-x4/getBranches');
+    this.$store.dispatch('pas/getX4Params');
   },
 };
 </script>
