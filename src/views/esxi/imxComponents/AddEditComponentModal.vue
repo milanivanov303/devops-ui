@@ -109,12 +109,12 @@
                 </TooltipButton>
               </div>
               <TextInput
-                  class="col s12 l2 readonly"
+                  class="col s12 l2"
                   label="Version"
                   v-model="version.version"
               />
               <TextInput
-                  class="col s12 l2 readonly"
+                  class="col s12 l2"
                   label="Version Type"
                   v-model="version.version_type"
               />
@@ -124,7 +124,6 @@
                           input-class="datetime-input"
                           type="date"
                           v-model="version.regular_eos_date"
-                          :min-datetime="dateNow"
                           class="datetime-theme"
                           format="dd-MM-yyyy"
                           :week-start="1"/>
@@ -138,7 +137,6 @@
                           input-class="datetime-input"
                           type="date"
                           v-model="version.extended_eos_date"
-                          :min-datetime="version.regular_eos_date || dateNow"
                           class="datetime-theme"
                           format="dd-MM-yyyy"
                           :week-start="1"/>
@@ -146,12 +144,15 @@
                        :for="'extended_eos_date'.concat(version.version)">EOS date (extended)
                 </label>
               </div>
-              <TooltipButton
-                  v-if="version.approved"
-                  class="btn-floating btn-small"
-                  icon="check"
-                  tooltip="Approved by Codix">
-              </TooltipButton>
+              <p :title="(version.approved ? '' : 'Not ' ).concat('Approved by Codix')">
+                <label>
+                  <input class="with-gap"
+                         type="checkbox"
+                         v-model="version.approved"
+                  />
+                  <span></span>
+                </label>
+              </p>
             </div>
           </fieldset>
           <fieldset>
@@ -267,7 +268,7 @@ export default {
     return {
       selected: this.component,
       newVersion: {
-        approved: null,
+        approved: false,
       },
       dateNow: DateTime.local().toISO(),
       teamOptions: ['SA'],
