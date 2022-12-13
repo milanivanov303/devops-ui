@@ -37,6 +37,7 @@
               </p>
               <p v-if="vm.os.version "><b>OS Version:</b> {{ vm.os.version }}</p>
               <p v-if="vm.os.kernel "><b>OS Kernel:</b> {{ vm.os.kernel }}</p>
+              <p v-if="vm.os.install_date "><b>OS Install Date:</b> {{ vm.os.install_date }}</p>
             </div>
           </div>
         </li>
