@@ -30,7 +30,7 @@
           />
         <template v-slot:actions-before="{ row }">
           <a
-              v-if="row.app_version === 'X4'"
+              v-if="row.app_version === 'X4' && $auth.can('pas.manage-configurations')"
               @click="openBuildModal('build', row)"
               class="green-text"
               title="Start Build">
