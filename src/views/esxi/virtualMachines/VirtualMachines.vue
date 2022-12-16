@@ -1,6 +1,7 @@
 <template>
   <div class="row">
     <div class="col s12">
+      <div>Result: <b>{{virtualMachines.length}} records</b></div>
       <div ref="virtualMachines" class="row">
         <div class="col s12">
           <div class="data-table">

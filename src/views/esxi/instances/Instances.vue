@@ -1,5 +1,6 @@
 <template>
   <div ref="instances">
+    <div>Result: <b>{{currentInstances.length}} records</b></div>
     <div class="data-table">
       <Table
         :data="currentInstances"
