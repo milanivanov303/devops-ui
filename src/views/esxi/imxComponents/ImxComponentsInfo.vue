@@ -57,28 +57,37 @@
               <b>Extranet command: </b><span>{{ component.extranet_command }}</span>
             </p>
             <div class="data-table" v-if="component.versions">
-              <Table
-                :data="component.versions"
-                sort-by="version"
-                sort-dir="desc"
-                :perPage="5"
-                :searchField="false"
-                :export-btn="false"
-                :view-btn="false"
-                :add-btn="false"
-                :edit-btn="false"
-                :delete-btn="false"
-              >
-                <Column label="Approved by Codix"
-                        :sortable="true" show="approved"/>
-                <Column show="version" :sortable="false"/>
-                <Column label="End of support date (regular)" name="regular_eos_date"
-                        :sortable="false" :show="(v) => v.regular_eos_date
-                      ? $date(v.regular_eos_date).toHuman('dd-MM-yyyy') : ''"/>
-                <Column label="End of support date (extended)" name="extended_eos_date"
-                        :sortable="false" :show="(v) => v.extended_eos_date
-                      ? $date(v.extended_eos_date).toHuman('dd-MM-yyyy') : ''"/>
-              </Table>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Approved by Codix</th>
+                    <th>Version</th>
+                    <th>Version type</th>
+                    <th>End of support date (extended)</th>
+                    <th>End of support date (extended)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="v in component.versions" :key="v.id">
+                    <td>
+                      <span v-if="v.approved" class="new badge green" data-badge-caption="">
+                        Yes
+                      </span>
+                      <span v-else class="new badge red" data-badge-caption="">
+                        No
+                      </span>
+                    </td>
+                    <td>{{ v.version }}</td>
+                    <td>{{ v.version_type }}</td>
+                    <td>{{ v.regular_eos_date ?
+                        $date(v.regular_eos_date).toHuman('dd-MM-yyyy') : '' }}
+                    </td>
+                    <td>{{ v.extended_eos_date ?
+                        $date(v.extended_eos_date).toHuman('dd-MM-yyyy') : '' }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </li>
@@ -108,7 +117,7 @@ export default {
   components: {
     TooltipButton,
     AddImxComponentModal,
-    DeleteImxComponentModal
+    DeleteImxComponentModal,
   },
 
   data() {
@@ -127,7 +136,7 @@ export default {
   },
   methods: {
     getImxComponents() {
-      const loader = this.$loading.show({container: this.$refs.imxComponents});
+      const loader = this.$loading.show({ container: this.$refs.imxComponents });
       this.$store.dispatch('esxi/getImxComponents')
         .then(() => {
           if (this.$route.params.id) {
@@ -144,12 +153,12 @@ export default {
             if (component) {
               return this.openAddEditModal(component, 'update');
             }
-            this.$M.toast({html: 'This component does not exist!', classes: 'toast-fail'});
+            this.$M.toast({ html: 'This component does not exist!', classes: 'toast-fail' });
           }
           return false;
         })
         .catch((error) => {
-          this.$M.toast({html: `${error}`, classes: 'toast-fail'});
+          this.$M.toast({ html: `${error}`, classes: 'toast-fail' });
         })
         .finally(() => loader.hide());
     },
@@ -171,7 +180,7 @@ export default {
 
       this.$router.push({
         path: `/inventory/imxComponents/${encodeURIComponent(component.id)}`,
-      })
+      });
     },
 
     closeDelete() {
@@ -193,12 +202,12 @@ export default {
     },
   },
 
-    mounted() {
-      this.getImxComponents();
-      this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'),
-        {
+  mounted() {
+    this.getImxComponents();
+    this.$M.Collapsible.init(document.querySelector('.collapsible.expandable'),
+      {
         accordion: false,
       });
-    },
+  },
 };
 </script>

@@ -20,7 +20,7 @@ export default {
   },
 
   createHost(state, host) {
-    const {esxiHosts} = state;
+    const { esxiHosts } = state;
     esxiHosts.push(host);
     Vue.set(state, 'esxiHosts', esxiHosts);
   },
@@ -46,13 +46,13 @@ export default {
     state.imxComponents = imxComponents;
   },
   createImxComponent(state, imxComponent) {
-    const {imxComponents} = state;
+    const { imxComponents } = state;
     imxComponents.push(imxComponent);
     Vue.set(state, 'imxComponents', imxComponents);
   },
   updateImxComponent(state, component) {
     if (!component.error) {
-      const {imxComponents} = state;
+      const { imxComponents } = state;
       const index = imxComponents.findIndex((imxComponent) => imxComponent.id === component.id);
       imxComponents.splice(index, 1, component);
       Vue.set(state, 'imxComponents', imxComponents);

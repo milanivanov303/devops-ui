@@ -88,6 +88,16 @@
           </div>
         </div>
       </div>
+      <div v-if="instanceHost" class="row">
+        <div class="col s12">
+          <b>Hostname:</b> {{ instanceHost }}
+        </div>
+      </div>
+      <div v-if="instanceUser" class="row">
+        <div class="col s12">
+          <b>$IMX_LOGIN:</b> {{ instanceUser }}
+        </div>
+      </div>
       <div class="row">
         <div class="col s12">
           <label>
@@ -160,6 +170,8 @@ export default {
       showVariableValueInput: false,
       loading: false,
       error: '',
+      instanceHost: '',
+      instanceUser: '',
     };
   },
   validations: {
@@ -190,6 +202,10 @@ export default {
       this.selectedVariable = { ...this.selectedVariable, ...value };
       this.selectedVariable.currDbData = value;
       this.selectedVariable.status = '';
+    },
+    instance(value) {
+      this.instance = value;
+      this.checkInstance(value);
     },
   },
   computed: {
@@ -292,6 +308,10 @@ export default {
         .finally(() => {
           this.loading = false;
         });
+    },
+    checkInstance() {
+      this.instanceHost = this.instance.host;
+      this.instanceUser = this.instance.user;
     },
     async addVariable() {
       this.$v.$touch();

@@ -29,7 +29,11 @@
           :show="(row) => getAdditionalInfoLink(row.additional_info)"
           />
         <template v-slot:actions-before="{ row }">
-          <a @click="openBuildModal('build', row)" class="green-text" title="Start Build">
+          <a
+              v-if="row.app_version === 'X4' && $auth.can('pas.manage-configurations')"
+              @click="openBuildModal('build', row)"
+              class="green-text"
+              title="Start Build">
             <i class="material-icons">send</i>
           </a>
         </template>

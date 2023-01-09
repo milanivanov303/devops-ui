@@ -342,6 +342,9 @@ export default {
     },
     branches() {
       if (this.form.app_type && this.form.app_type.value === 'extranet') {
+        if (this.form.app_version && this.form.app_version.value === 'X4') {
+          return this.$store.state['extranet-x4'].branches;
+        }
         return this.$store.state.extranet.branches;
       }
 
@@ -409,6 +412,7 @@ export default {
       promises.push(this.$store.dispatch('mmpi/getAppVersions'));
       promises.push(this.$store.dispatch('extranet/getBranches'));
       promises.push(this.$store.dispatch('debiteur/getBranches'));
+      promises.push(this.$store.dispatch('extranet-x4/getBranches'));
       promises.push(this.$store.dispatch('extranet/getClients'));
       promises.push(this.$store.dispatch('debiteur/getClients'));
       Promise.all(promises)
@@ -457,7 +461,7 @@ export default {
 
       if (this.configuration.app_version) {
         this.form.app_version = this.app_versions
-            .find((version) => version.value === this.configuration.app_version);
+          .find((version) => version.value === this.configuration.app_version);
       }
 
       if (this.configuration.app_type) {

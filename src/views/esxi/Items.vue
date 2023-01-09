@@ -1,6 +1,8 @@
 <template>
   <div class="row">
     <div class="col s12">
+      <div>Result: <b>{{items.length}} records</b></div>
+
       <div class="row">
         <div class="col s12 m6">
           <TextInput label="Search..." icon="search" v-model="search"/>
