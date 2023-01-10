@@ -134,7 +134,7 @@ export default {
           data = {
             id: this.form.id,
             tts_group_name: '',
-            abbreviation: abbreviation,
+            abbreviation,
             manager: '',
             assistant: this.form.assistant,
           };
@@ -142,7 +142,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
-          abbreviation: abbreviation,
+          abbreviation,
           manager: '',
           assistant: this.form.assistant,
         };
@@ -167,7 +167,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: '',
-          abbreviation: abbreviation,
+          abbreviation,
           manager: this.form.manager,
           assistant: this.form.assistant,
         };
@@ -175,7 +175,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
-          abbreviation: abbreviation,
+          abbreviation,
           manager: this.form.manager,
           assistant: this.form.assistant,
         };
@@ -202,7 +202,7 @@ export default {
           data = {
             id: this.form.id,
             tts_group_name: '',
-            abbreviation: abbreviation,
+            abbreviation,
             manager: '',
             assistant: '',
           };
@@ -210,7 +210,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
-          abbreviation: abbreviation,
+          abbreviation,
           manager: '',
           assistant: '',
         };
@@ -218,7 +218,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: '',
-          abbreviation: abbreviation,
+          abbreviation,
           manager: this.form.manager,
           assistant: this.form.assistant,
         };
@@ -226,7 +226,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
-          abbreviation: abbreviation,
+          abbreviation,
           manager: this.form.manager,
           assistant: this.form.assistant,
         };
@@ -241,23 +241,28 @@ export default {
         })
         .then(() => {
           if (this.error) {
-            this.$M.toast({ html: 'Error. Abbrev should be unique. Team ' +
-                'not updated!', classes: 'toast-fail' });
+            this.$M.toast({
+              html: 'Error. Abbrev should be unique. Team '
+                + 'not updated!',
+              classes: 'toast-fail',
+            });
           }
-        })
+        });
       loader.hide();
       this.closeModal();
 
       if (!this.abbrevLength()) {
         return false;
       }
+      return false;
     },
     abbrevLength() {
-      let abbrevLength = this.form.teamAbbrev;
+      const abbrevLength = this.form.teamAbbrev;
       if (abbrevLength.length > 3) {
-        this.$M.toast({html: `Abbreviation should be up to 3 characters.`, classes: 'toast-fail'});
+        this.$M.toast({ html: 'Abbreviation should be up to 3 characters.', classes: 'toast-fail' });
         return false;
       }
+      return false;
     },
     closeModal() {
       this.error = '';
