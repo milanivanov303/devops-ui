@@ -88,6 +88,7 @@
                 <th>Instance</th>
                 <th>Project</th>
                 <th>Delivery Chain</th>
+                <th>Version</th>
               </tr>
               </thead>
               <tbody>
@@ -99,6 +100,7 @@
                 </td>
                 <td>{{ getProjectName(instance.name) }}</td>
                 <td>{{ getDeliveryChain(instance.name) }}</td>
+                <td>{{ instance.version }}</td>
               </tr>
               </tbody>
             </table>
