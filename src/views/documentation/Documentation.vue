@@ -26,6 +26,11 @@
             <span v-if="downloading">Downloading ...</span>
             <span v-else>Download</span>
           </button>
+          <button class="btn btn-small right" @click="excelExport()" :disabled="exporting">
+            <i class="material-icons left">assignment</i>
+            <span v-if="exporting">Exporting ...</span>
+            <span v-else>Excel Export</span>
+          </button>
         </template>
 
         <template v-slot:actions-before="{ row }">
@@ -65,6 +70,7 @@ export default {
       showRawModal: false,
       showRedocModal: false,
       downloading: false,
+      exporting: false,
     };
   },
 
@@ -199,6 +205,15 @@ export default {
         files,
       })
         .finally(() => { this.downloading = false; });
+    },
+    excelExport() {
+      this.exporting = true;
+      this.$store.dispatch('documentation/export', {
+        repo: this.repo,
+        branch: this.branch,
+        apis_dir: this.module,
+      })
+        .finally(() => { this.exporting = false; });
     },
   },
 

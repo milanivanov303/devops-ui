@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 export default {
   getSpecs({ commit }, payload) {
     const promise = api('devops').get('specs', payload);
@@ -47,6 +49,24 @@ export default {
         fileLink.click();
       })
       .catch(() => commit('error', 'Could not get apiDocumentationList', { root: true }));
+    return promise;
+  },
+  export({ commit }, payload) {
+    const promise = api('devops').post('specs/export',
+      payload,
+      { responseType: 'blob' });
+    promise
+      .then((response) => {
+        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        const fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', `${DateTime.local().toFormat('dd_MM_y')}_${payload.apis_dir}_documentation.xlsx`);
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      })
+      .catch((error) => commit('error', error));
     return promise;
   },
 };
