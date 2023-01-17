@@ -50,6 +50,28 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+            <TextInput
+              class="col s12"
+              label="TTS Key"
+              icon="dynamic_feed"
+              v-model="form.ttsKey"
+              :invalid="$v.form.ttsKey.$error"
+              @blur="$v.form.ttsKey.$touch()"
+            />
+            <div class="validator col s12"
+                 v-if="$v.form.ttsKey.$error || issueError">
+              <div class="red-text" v-if="!$v.form.ttsKey.required">
+                <p>Field is required</p>
+              </div>
+              <div class="red-text" v-if="!$v.form.ttsKey.validKey">
+                <p>Not a valid TTS key.</p>
+              </div>
+              <div class="red-text" v-if="issueError">
+                <p>{{ issueError }}</p>
+              </div>
+            </div>
+          </div>
           </div>
           <BuildProgress
             v-else
@@ -79,13 +101,16 @@
 import { required } from 'vuelidate/lib/validators';
 import BuildProgress from '@/components/BuildProgress';
 import EventBus from '@/event-bus';
+import _ from "lodash";
 
 function initialState() {
   return {
     showModal: false,
+    issueError: null,
     form: {
       branch: null,
       instance: null,
+      ttsKey: '',
     },
     build: {
       started: false,
@@ -129,6 +154,12 @@ export default {
             required,
           },
         },
+        ttsKey: {
+          required,
+          validKey(value) {
+            return /^[A-Z]+-[0-9]+$/.test(value);
+          },
+        },
       },
     };
 
@@ -140,11 +171,36 @@ export default {
         },
       };
     }
-
     return validations;
   },
-
+  watch: {
+    ttsKey() {
+      if (this.$v.form.ttsKey.$invalid) {
+        return;
+      }
+      this.debounceCheckIssue();
+    },
+  },
   methods: {
+    checkIssue() {
+      this.issueError = null;
+      this.$store.dispatch('mmpi/getIssue', this.form.ttsKey)
+        .then(() => {
+          this.issueError = false;
+          this.start();
+        })
+        .catch((error) => {
+          this.issueError = 'Could not validate issue key';
+          if (error.response.status === 404) {
+            this.issueError = 'Issue with this key does not exists';
+          }
+        });
+    },
+
+    debounceCheckIssue: _.debounce(() => {
+      this.checkIssue();
+    }, 2000),
+
     getData() {
       this.$store.dispatch('imx_be/getBranches');
       this.$store.dispatch('mmpi/getInstances');
@@ -165,14 +221,20 @@ export default {
     },
 
     start() {
+      if (this.issueError !== false) {
+        this.checkIssue();
+      }
+
       this.$v.$touch();
-      if (this.$v.$invalid) {
+      if (this.$v.$invalid || this.issueError !== false) {
+        this.issueError = null;
         return;
       }
 
       this.$store.dispatch('imx_be/startBuild', {
         branch: this.form.branch ? this.form.branch.name : this.branch,
         instance: this.form.instance,
+        ttsKey: this.form.ttsKey,
       })
         .then((response) => {
           this.build.status = 'running';
@@ -184,7 +246,7 @@ export default {
           this.build.status = 'failed';
           this.build.summary = 'Could not start build';
           if (error.response.status === 403) {
-            this.build.error = 'You do not have insufficient rights to create build';
+            this.build.error = 'You do not have sufficient rights to create a build';
           } else {
             this.build.error = error;
           }
