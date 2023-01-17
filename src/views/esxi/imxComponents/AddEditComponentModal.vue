@@ -271,7 +271,7 @@ export default {
         approved: false,
       },
       dateNow: DateTime.local().toISO(),
-      teamOptions: ['SA'],
+      teamOptions: ['SA','DevOps','IMX V9'],
       typeOptions: ['OS', 'DB', 'SDK', 'Library', 'Cross-platform software'],
       error: null,
       chooseOptions: ['Yes', 'No'],

@@ -480,7 +480,7 @@ export default {
 
       payload.app_type = this.form.app_type.value;
       payload.project_type = this.form.project_type.value;
-      payload.app_version = this.form.app_version.name;
+      payload.app_version = this.form.app_version.value;
       payload.project = this.form.project.name;
       payload.delivery_chain = this.form.delivery_chain.title;
       payload.dev_instance = this.form.dev_instance.name;
