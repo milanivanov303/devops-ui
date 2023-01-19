@@ -51,27 +51,24 @@
               </div>
             </div>
             <div class="row">
-            <TextInput
-              class="col s12"
-              label="TTS Key"
-              icon="dynamic_feed"
-              v-model="form.ttsKey"
-              :invalid="$v.form.ttsKey.$error"
-              @blur="$v.form.ttsKey.$touch()"
-            />
-            <div class="validator col s12"
-                 v-if="$v.form.ttsKey.$error || issueError">
-              <div class="red-text" v-if="!$v.form.ttsKey.required">
-                <p>Field is required</p>
-              </div>
-              <div class="red-text" v-if="!$v.form.ttsKey.validKey">
-                <p>Not a valid TTS key.</p>
-              </div>
-              <div class="red-text" v-if="issueError">
-                <p>{{ issueError }}</p>
+              <TextInput
+                class="col s12"
+                label="TTS Key"
+                icon="dynamic_feed"
+                v-model="form.ttsKey"
+                :invalid="$v.form.ttsKey.$error"
+                @blur="$v.form.ttsKey.$touch()"
+              />
+              <div class="validator col s12"
+                   v-if="$v.form.ttsKey.$error">
+                <div class="red-text" v-if="!$v.form.ttsKey.required">
+                  <p>Field is required</p>
+                </div>
+                <div class="red-text" v-if="!$v.form.ttsKey.validKey">
+                  <p>Not a valid TTS key.</p>
+                </div>
               </div>
             </div>
-          </div>
           </div>
           <BuildProgress
             v-else
@@ -101,12 +98,10 @@
 import { required } from 'vuelidate/lib/validators';
 import BuildProgress from '@/components/BuildProgress';
 import EventBus from '@/event-bus';
-import _ from "lodash";
 
 function initialState() {
   return {
     showModal: false,
-    issueError: null,
     form: {
       branch: null,
       instance: null,
@@ -173,33 +168,8 @@ export default {
     }
     return validations;
   },
-  watch: {
-    ttsKey() {
-      if (this.$v.form.ttsKey.$invalid) {
-        return;
-      }
-      this.debounceCheckIssue();
-    },
-  },
-  methods: {
-    checkIssue() {
-      this.issueError = null;
-      this.$store.dispatch('mmpi/getIssue', this.form.ttsKey)
-        .then(() => {
-          this.issueError = false;
-          this.start();
-        })
-        .catch((error) => {
-          this.issueError = 'Could not validate issue key';
-          if (error.response.status === 404) {
-            this.issueError = 'Issue with this key does not exists';
-          }
-        });
-    },
 
-    debounceCheckIssue: _.debounce(() => {
-      this.checkIssue();
-    }, 2000),
+  methods: {
 
     getData() {
       this.$store.dispatch('imx_be/getBranches');
@@ -221,13 +191,8 @@ export default {
     },
 
     start() {
-      if (this.issueError !== false) {
-        this.checkIssue();
-      }
-
       this.$v.$touch();
-      if (this.$v.$invalid || this.issueError !== false) {
-        this.issueError = null;
+      if (this.$v.$invalid) {
         return;
       }
 
@@ -237,10 +202,15 @@ export default {
         ttsKey: this.form.ttsKey,
       })
         .then((response) => {
-          this.build.status = 'running';
-          this.build.summary = 'Build will start shortly ...';
-          this.build.broadcast = response.data.broadcast;
-          EventBus.$emit('build.created');
+          if (response.data.broadcast) {
+            this.build.status = 'running';
+            this.build.summary = 'Build will start shortly ...';
+            this.build.broadcast = response.data.broadcast;
+            EventBus.$emit('build.created');
+          }
+
+          this.build.summary = response.data.summary;
+          this.build.status = 'failed';
         })
         .catch((error) => {
           this.build.status = 'failed';
