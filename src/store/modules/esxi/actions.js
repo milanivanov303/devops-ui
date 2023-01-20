@@ -180,4 +180,13 @@ export default {
     return promise;
   },
 
+  makeRequest({ commit }) {
+    const promise = api('devops').get('inventory/san');
+
+    promise
+      .then((response) => commit(console.log(response)))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+
 };
