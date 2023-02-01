@@ -87,16 +87,7 @@
                   icon="dynamic_feed"
                   :items="feBranches"
                   v-model="form.feBranch"
-                  :invalid="$v.form.feBranch.$error"
-                  @blur="$v.form.feBranch.$touch()"
                 />
-              </div>
-              <div class="validator col s11 offset-s1">
-                <div class="red-text" v-if="$v.form.feBranch.$error">
-                  <p v-if="!$v.form.feBranch.required">
-                    Fe branch field must not be empty.
-                  </p>
-                </div>
               </div>
             </div>
             <div class="row">
@@ -205,12 +196,6 @@ export default {
             required,
           },
         },
-        feBranch: {
-          required,
-          name: {
-            required,
-          },
-        },
       },
     };
 
@@ -280,7 +265,7 @@ export default {
         client: this.form.client,
         java_version: this.form.javaVersion,
         instance: this.form.instance,
-        fe_branch: this.form.feBranch.name,
+        fe_branch: this.form.feBranch ? this.form.feBranch.name : null,
         image: this.form.image,
       })
         .then((response) => {
