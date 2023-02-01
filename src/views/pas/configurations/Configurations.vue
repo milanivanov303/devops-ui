@@ -1,45 +1,43 @@
 <template>
   <div class="configurations">
-    <div class="data-table">
-
-      <Table
-        :data="configurations"
-        sort-by="project"
-        sort-dir="asc"
-        :export-btn="false"
-        :add-btn="$auth.can('pas.manage-configurations')"
-        :edit-btn="$auth.can('pas.manage-configurations')"
-        :delete-btn="$auth.can('pas.manage-configurations')"
-        @add="openAddEditModal('create')"
-        @edit="(row) => openAddEditModal('update', row)"
-        @view="(row) => openAddEditModal('view', row)"
-        @delete="openDeleteModal"
-      >
-        <Column show="project" :sortable="false" filter-type="search"/>
-        <Column show="app_type" :sortable="false" filter-type="dropdown"/>
-        <Column show="branch" :sortable="false" filter-type="search"/>
-        <Column show="dev_instance"/>
-        <Column show="val_instance"/>
-        <Column show="delivery_chain"/>
-        <Column show="prefix"/>
-        <Column show="app_version" :sortable="false" filter-type="dropdown"/>
-        <Column show="servlet_container"/>
-        <Column
-          label="Additional info" name="additional_info"
-          :show="(row) => getAdditionalInfoLink(row.additional_info)"
-          />
-        <template v-slot:actions-before="{ row }">
-          <a
-              v-if="row.app_version === 'X4' && $auth.can('pas.manage-configurations')"
-              @click="openBuildModal('build', row)"
-              class="green-text"
-              title="Start Build">
-            <i class="material-icons">send</i>
-          </a>
-        </template>
-      </Table>
-
-    </div>
+    <Table
+      :data="configurations"
+      :export-btn="false"
+      :add-btn="$auth.can('pas.manage-configurations')"
+      :edit-btn="$auth.can('pas.manage-configurations')"
+      :delete-btn="$auth.can('pas.manage-configurations')"
+      @add="openAddEditModal('create')"
+      @edit="(row) => openAddEditModal('update', row)"
+      @view="(row) => openAddEditModal('view', row)"
+      @delete="openDeleteModal"
+    >
+      <Column show="project" :sortable="false" filter-type="search"/>
+      <Column show="app_type" :sortable="false" filter-type="dropdown"/>
+      <Column show="branch" :sortable="false" filter-type="search"/>
+      <Column show="dev_instance"/>
+      <Column show="val_instance"/>
+      <Column show="delivery_chain"/>
+      <Column show="prefix"/>
+      <Column show="app_version" :sortable="false" filter-type="dropdown"/>
+      <Column show="servlet_container"/>
+      <Column
+        label="Additional info" name="additional_info"
+        :show="(row) => getAdditionalInfoLink(row.additional_info)"
+      />
+      <span class="new badge"></span>
+      <template v-slot:actions-after="{ row }">
+        <span v-if="isNew(row.created_on)" class="new badge"></span>
+      </template>
+      <template v-slot:actions-before="{ row }">
+        <a
+          v-if="canBeBuild(row)"
+          @click="openBuildModal('build', row)"
+          class="green-text"
+          title="Start Build">
+          <i class="material-icons">send</i>
+        </a>
+      </template>
+    </Table>
 
     <AddUpdateConfig
         v-if="showAddEditModal"
@@ -60,7 +58,6 @@
         :configuration="configuration"
         @close="closeDeleteModal()"
     />
-
   </div>
 </template>
 
@@ -87,7 +84,7 @@ export default {
   },
   computed: {
     configurations() {
-      return this.$store.state.pas.configurations;
+      return this.$store.getters['pas/getConfigurations'];
     },
   },
   methods: {
@@ -175,6 +172,20 @@ export default {
       }
       const dataToDisplay = `${data.substring(0, 15)}..`;
       return `<a href="${data}" target="_blank"> ${dataToDisplay} </a>`;
+    },
+
+    canBeBuild(build) {
+      if (build.app_version && build.project_type && build.branch && build.prefix
+          && build.app_version === 'X4'
+          && this.$auth.can('pas.manage-configurations')) {
+        return true;
+      }
+
+      return false;
+    },
+    isNew(date) {
+      // two days = 172800 seconds
+      return date > Date.now() / 1000 - 172800;
     },
   },
   mounted() {
