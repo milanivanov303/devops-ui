@@ -189,4 +189,21 @@ export default {
     return promise;
   },
 
+  makePoolRequest({ commit }) {
+    const promise = api('devops').get('inventory/pool');
+
+    promise
+      .then((response) => commit(console.log(response)))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+
+  makeMdiskRequest({ commit }) {
+    const promise = api('devops').get('inventory/mdisk');
+
+    promise
+      .then((response) => commit(console.log(response)))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
 };
