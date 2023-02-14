@@ -224,12 +224,18 @@ export default {
       varMsg: '',
       action: '',
       form: {
-        type_id: 'cms',
+        type_id: null,
         issue_id: '',
         visible: 1,
         active: 1,
         delivery_chain_id: '',
         instance_status: '',
+        path_id: null,
+        header_only: 0,
+        action_type: {
+          id: 87,
+        },
+        instance_id: 1,
       },
       deliveryChain: {},
       instanceStatuses: [],
@@ -241,6 +247,8 @@ export default {
       selectedTemplate: null,
       ttsKey: this.$route.params.issue,
       deliveryChains: [],
+      modifName: '',
+      sourcePaths: [],
     };
   },
   validations: {
@@ -295,6 +303,8 @@ export default {
         subtype: {
           key: 'cms_cmd',
         },
+        path_id: null,
+        type_id: 'cms',
       });
 
       this.modifications = this.modifications
@@ -378,11 +388,30 @@ export default {
     async loadData() {
       this.getInstanceStatus();
       this.$store.dispatch('cms/getVariables');
+      this.$store.dispatch('mmpi/getMiscellaneous');
     },
     addTemplate(template) {
       if (template) {
+        this.modifName = template.template.path_and_name;
+        this.sourcePaths = this.$store.state.mmpi.miscellaneous;
+        if (this.modifName.includes('imxclt')) {
+          this.modifName = this.modifName.replace('imxclt/', '');
+          const result = this.sourcePaths.find(({ description }) => description === '/app/cvs/repo/imxclt');
+          this.form.path_id = result.id;
+        }
+        if (this.modifName.includes('imxad/adclt')) {
+          this.modifName = this.modifName.replace('imxad/adclt/', '');
+          const result = this.sourcePaths.find(({ description }) => description === '/app/cvs/repo/imxad/adclt');
+          this.form.path_id = result.id;
+        }
+        if (this.modifName.includes('imxextranet/extclt')) {
+          this.modifName = this.modifName.replace('imxextranet/extclt/', '');
+          const result = this.sourcePaths.find(({ description }) => description === '/app/cvs/repo/imxextranet/extclt');
+          this.form.path_id = result.id;
+        }
+        this.form.type_id = 'source';
         this.modifications.push({
-          name: template.template.path_and_name,
+          name: this.modifName,
           version: template.revision.revision,
           revision_converted: template.revision.revision_converted,
           subtype: {
@@ -421,6 +450,8 @@ export default {
         subtype: {
           key: 'cms_cmd',
         },
+        path_id: null,
+        type_id: 'cms',
       });
       this.modifications.push({
         id: Math.floor(Math.random() * 100),
@@ -428,6 +459,8 @@ export default {
         subtype: {
           key: 'cms_cmd',
         },
+        path_id: null,
+        type_id: 'cms',
       });
     },
     addNewVariable(value) {

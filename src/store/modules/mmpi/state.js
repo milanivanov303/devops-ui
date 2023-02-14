@@ -16,4 +16,5 @@ export default {
   environmentTypes: [],
   operationType: [],
   binaryTypes: [],
+  miscellaneous: [],
 };

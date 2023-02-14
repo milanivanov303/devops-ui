@@ -471,4 +471,32 @@ export default {
 
     return promise;
   },
+
+  getMiscellaneous({ commit }) {
+    const name = 'miscellaneous';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('enum-values', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            type: 'source_paths',
+            key: { operator: 'in', value: ['source_path_imx_clt', 'source_path_ad_clt', 'source_path_ext'] },
+          },
+        ],
+      }),
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((resp) => {
+        commit('miscellaneous', resp.data.data);
+      })
+      .catch(() => commit('error', 'Could not get miscellaneous'));
+    return promise;
+  },
 };
