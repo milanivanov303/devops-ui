@@ -1,53 +1,61 @@
 <template>
-    <div class="data-table" ref="files">
-      <Table
-        :data="files"
-        :add-btn="false"
-        :export-btn="false"
-        :view-btn="false"
-        :edit-btn="false"
-        :delete-btn="false"
-      >
-        <Column label="Title" :show="getTitle"/>
-        <Column label="Description" :show="getDescription"/>
-        <Column show="path"/>
-        <Column show="paths" class="hidden"/>
+  <div ref="files">
+    <Table
+      :data="filteredFiles"
+      :add-btn="false"
+      :export-btn="false"
+      :view-btn="false"
+      :edit-btn="false"
+      :delete-btn="false"
+      :searchField="false"
+    >
 
-        <template v-slot:top-actions-after="{ rows }">
-          <Select
-            class="branches left"
-            :options="branches"
-            displayed="name"
-            :default-option="false"
-            v-model="branch"
-          />
-          <button class="btn btn-small right" @click="download(rows)" :disabled="downloading">
-            <i class="material-icons left">download</i>
-            <span v-if="downloading">Downloading ...</span>
-            <span v-else>Download</span>
-          </button>
-          <button class="btn btn-small right" @click="excelExport()" :disabled="exporting">
-            <i class="material-icons left">assignment</i>
-            <span v-if="exporting">Exporting ...</span>
-            <span v-else>Excel Export</span>
-          </button>
-        </template>
-
-        <template v-slot:actions-before="{ row }">
-          <a class="btn btn-tiny" @click="openRawModal(row)">View</a>
-          <a class="btn btn-tiny" @click="openRedocModal(row)">Re Doc</a>
-        </template>
-      </Table>
-
-      <RawModal v-if="showRawModal" :file="file" @close="closeRawModal"/>
-      <RedocModal
-        v-if="showRedocModal"
-        :file="file"
-        :downloading="downloading"
-        @close="closeRedocModal"
-        @download="download"
-      />
-    </div>
+      <Column label="Title" :show="getTitle"/>
+      <Column label="Description" :show="getDescription"/>
+      <Column show="path"/>
+      <Column show="paths" class="hidden"/>
+      <template v-slot:top-actions-after="{ rows }">
+        <div class="row center-row">
+        <TextInput
+        class="col s6"
+        label="Search"
+        v-model="search"
+        />
+        <Select
+          class="branches col s4"
+          :options="branches"
+          displayed="name"
+          :default-option="false"
+          v-model="branch"
+        />
+          <div class="col s8">
+            <button class="btn btn-small right" @click="download(rows)" :disabled="downloading">
+              <i class="material-icons left">download</i>
+              <span v-if="downloading">Downloading ...</span>
+              <span v-else>Download</span>
+            </button>
+            <button class="btn btn-small right" @click="excelExport()" :disabled="exporting">
+              <i class="material-icons left">assignment</i>
+              <span v-if="exporting">Exporting ...</span>
+              <span v-else>Excel Export</span>
+            </button>
+          </div>
+        </div>
+      </template>
+      <template v-slot:actions-before="{ row }">
+        <a class="btn btn-tiny" @click="openRawModal(row)">View</a>
+        <a class="btn btn-tiny" @click="openRedocModal(row)">Re Doc</a>
+      </template>
+    </Table>
+    <RawModal v-if="showRawModal" :file="file" @close="closeRawModal"/>
+    <RedocModal
+      v-if="showRedocModal"
+      :file="file"
+      :downloading="downloading"
+      @close="closeRedocModal"
+      @download="download"
+    />
+  </div>
 </template>
 <script>
 
@@ -65,6 +73,8 @@ export default {
       repo: 'specifications',
       branches: [],
       branch: this.$route.query.branch || 'main',
+      search: '',
+      filteredFiles: [],
       files: [],
       file: {},
       showRawModal: false,
@@ -74,7 +84,7 @@ export default {
     };
   },
 
-  computed: {
+  computed: { 
     module() {
       return this.$route.params.module;
     },
@@ -98,24 +108,34 @@ export default {
         branch: this.branch,
         apis_dir: this.module,
       })
-        .then((response) => {
-          this.files = response.data.filter((file) => file.path.endsWith('.yaml') || file.path.endsWith('.yml'));
+      .then((response) => {
+      this.files = response.data.filter((file) => file.path.endsWith('.yaml') || file.path.endsWith('.yml')); 
 
-          if (!this.$route.query.file) {
-            return;
-          }
+      if (!this.$route.query.file) {
+        this.filteredFiles = this.files;
+        return;
+      }
 
-          const file = this.files.find((file) => file.path === this.$route.query.file);
+      const file = this.files.find((file) => file.path === this.$route.query.file);
 
-          if (file) {
-            if (this.$route.query.action === 'raw') {
-              this.openRawModal(file);
-              return;
-            }
-            this.openRedocModal(file);
-          }
-        })
-        .finally(() => { loader.hide(); });
+      if (file) {
+        if (this.$route.query.action === 'raw') {
+          this.openRawModal(file);
+          return;
+        }
+        this.openRedocModal(file);
+      }
+
+      this.filteredFiles = this.files;
+    })
+    .finally(() => { loader.hide(); });
+  },
+
+
+    searchFiles(value) {
+      this.filteredFiles = this.files.filter((file) => {
+        return file.content.toLowerCase().includes(value.toLowerCase());
+      });
     },
 
     getTitle(file) {
@@ -229,6 +249,11 @@ export default {
 
       this.getFiles();
     },
+    search(value) {
+      this.filteredFiles = this.files.filter((file) => {
+        return JSON.stringify(file.content).toLowerCase().includes(value.toLowerCase());
+      })
+    },
   },
 
   mounted() {
@@ -252,4 +277,10 @@ export default {
       }
     }
   }
+
+.center-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>
