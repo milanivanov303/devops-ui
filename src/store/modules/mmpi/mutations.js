@@ -61,4 +61,7 @@ export default {
   binaryTypes(state, binaryTypes) {
     state.binaryTypes = binaryTypes;
   },
+  miscellaneous(state, miscellaneous) {
+    state.miscellaneous = miscellaneous;
+  },
 };

@@ -461,7 +461,9 @@ export default {
         uri = 'binaries';
       } else if (payload.type_id === 'cmd') {
         uri = 'commands';
-      } else if (payload.type_id === 'cms') {
+      } else if (payload.type_id === 'cms' && payload.subtype.key === 'cms_cmd') {
+        uri = 'cms';
+      } else if (payload.type_id === 'source' && payload.subtype.key === 'cms_source') {
         uri = 'cms';
       }
       const response = await api('mmpi').post(`modifications/${uri}`, payload);
