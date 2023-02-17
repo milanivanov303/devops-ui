@@ -38,13 +38,7 @@
         <Column show="activity" width="10%"/>
         <Column show="version" class="dont-break-out" width="10%"/>
         <Column show="pwd_hash_type" width="10%"/>
-
         <template v-slot:actions-before="{ row }">
-<!--          <a target="_blank"-->
-<!--             data-tooltip="Extranet"-->
-<!--             class="tooltipped">-->
-<!--            <i class="material-icons">laptop_chromebook</i>-->
-<!--          </a>-->
           <a v-if="row.error"
              target="_blank"
              :data-tooltip="row.error"
