@@ -89,7 +89,8 @@
       <div v-if="modifications.length">
         <inserts
             :modifications="modifications"
-            @remove="index => modifications.splice(index, 1)">
+            @remove="index => modifications.splice(index, 1)"
+            @add-deploy-config-cmd="addDeployConfigCmd()">
         <template v-slot:actions-before="{ modification }">
           <a
               v-if="modification.name.includes('cms deploy_config')"
@@ -442,6 +443,17 @@ export default {
       }
       this.showAddEditVariableModal = true;
       return this.showAddEditVariableModal;
+    },
+    addDeployConfigCmd() {
+      this.modifications.push({
+        id: Math.floor(Math.random() * 100),
+        name: 'cms deploy_config',
+        subtype: {
+          key: 'cms_cmd',
+        },
+        path_id: null,
+        type_id: 'cms',
+      });
     },
     addCMSDeployCmd() {
       this.modifications.push({
