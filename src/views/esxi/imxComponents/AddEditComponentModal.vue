@@ -390,7 +390,6 @@ export default {
     getMaintenanceTeam() {
       try {
         const objectData = JSON.parse(this.selected.maintenance_team);
-        debugger;
 
         this.selectedTeam = objectData.name || '';
         if (objectData.email_address) {
