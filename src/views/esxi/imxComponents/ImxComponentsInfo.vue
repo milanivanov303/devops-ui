@@ -124,7 +124,7 @@
 const TooltipButton = () => import('@/components/partials/TooltipButton');
 const AddImxComponentModal = () => import('./AddEditComponentModal');
 const DeleteImxComponentModal = () => import('./DeleteImxComponentModal');
-const SaveMails = () => import('./SaveEmails.vue');
+const SaveMails = () => import('./SaveEmailsModal');
 
 export default {
   components: {
