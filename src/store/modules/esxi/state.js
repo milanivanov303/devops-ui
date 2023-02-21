@@ -8,4 +8,5 @@ export default {
   imxComponents: [],
   requestedInstances: [],
   expiringComponents: [],
+  savedEmails: [],
 };
