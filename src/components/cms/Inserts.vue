@@ -28,6 +28,17 @@
             <slot name="actions-before" :modification="modification"></slot>
           </td>
         </tr>
+        <tr>
+          <td class="left-align"></td>
+          <td>
+            <button
+              class="btn-floating waves-effect waves-light left btn-small"
+              type="button"
+              @click="$emit('add-deploy-config-cmd')"
+              data-target="action"><i class="material-icons">add</i>
+            </button>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
