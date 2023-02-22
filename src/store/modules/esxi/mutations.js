@@ -84,4 +84,13 @@ export default {
   expiringComponents(state, expiringComponents) {
     state.expiringComponents = expiringComponents;
   },
+  setSystemData(state, systemData) {
+    state.systemData = systemData;
+  },
+  setPoolData(state, poolData) {
+    state.poolData = poolData;
+  },
+  setMdiskData(state, mdiskData) {
+    state.mdiskData = mdiskData;
+  },
 };

@@ -182,9 +182,11 @@ export default {
 
   makeRequest({ commit }) {
     const promise = api('devops').get('inventory/san');
-
+  
     promise
-      .then((response) => commit(console.log(response)))
+      .then((response) => {
+        commit('setSystemData', response.data);
+      })
       .catch((error) => commit('error', error));
     return promise;
   },
@@ -193,7 +195,9 @@ export default {
     const promise = api('devops').get('inventory/pool');
 
     promise
-      .then((response) => commit(console.log(response)))
+      .then((response) => {
+        commit('setPoolData', response.data);
+      })
       .catch((error) => commit('error', error));
     return promise;
   },
@@ -202,7 +206,9 @@ export default {
     const promise = api('devops').get('inventory/mdisk');
 
     promise
-      .then((response) => commit(console.log(response)))
+      .then((response) => {
+        commit('setMdiskData', response.data);
+      })
       .catch((error) => commit('error', error));
     return promise;
   },
