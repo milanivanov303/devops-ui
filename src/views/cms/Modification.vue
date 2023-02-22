@@ -236,7 +236,6 @@ export default {
         action_type: {
           id: 87,
         },
-        instance_id: 1,
       },
       deliveryChain: {},
       instanceStatuses: [],
@@ -418,6 +417,7 @@ export default {
           subtype: {
             key: 'cms_source',
           },
+          instance_id: 1,
         });
         this.addCMSDeployCmd();
       }
