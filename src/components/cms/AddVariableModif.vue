@@ -319,11 +319,13 @@ export default {
         return;
       }
       this.variableModif = {
-        name: `cms set_variable ${this.selectedVariable.name.toUpperCase()}="${this.selectedVariable.value}"`,
+        name: `cms set_variable ${this.selectedVariable.name.toUpperCase()}=${this.selectedVariable.value}`,
         subtype: {
           key: 'cms_cmd',
         },
         contents: this.filteredInstances,
+        path_id: null,
+        type_id: 'cms',
       };
       this.$emit('addVariable', this.variableModif, this.selectedVariable);
       this.closeModal();
