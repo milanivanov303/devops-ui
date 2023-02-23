@@ -1,5 +1,15 @@
 <template>
   <div ref="files">
+    <TextInput class="col s12 m8" label="Search" v-model="search"/>
+    <div class="col s12 m4">
+      <Select
+          class="branches"
+          :options="branches"
+          displayed="name"
+          :default-option="false"
+          v-model="branch"
+      />
+    </div>
     <Table
       :data="filteredFiles"
       :add-btn="false"
@@ -9,26 +19,13 @@
       :delete-btn="false"
       :searchField="false"
     >
-
       <Column label="Title" :show="getTitle"/>
       <Column label="Description" :show="getDescription"/>
       <Column show="path"/>
       <Column show="paths" class="hidden"/>
       <template v-slot:top-actions-after="{ rows }">
-        <div class="row center-row">
-        <TextInput
-        class="col s6"
-        label="Search"
-        v-model="search"
-        />
-        <Select
-          class="branches col s4"
-          :options="branches"
-          displayed="name"
-          :default-option="false"
-          v-model="branch"
-        />
-          <div class="col s8">
+        <div class="row">
+          <div class="col s12 m6">
             <button class="btn btn-small right" @click="download(rows)" :disabled="downloading">
               <i class="material-icons left">download</i>
               <span v-if="downloading">Downloading ...</span>
@@ -84,7 +81,7 @@ export default {
     };
   },
 
-  computed: { 
+  computed: {
     module() {
       return this.$route.params.module;
     },
@@ -108,34 +105,34 @@ export default {
         branch: this.branch,
         apis_dir: this.module,
       })
-      .then((response) => {
-      this.files = response.data.filter((file) => file.path.endsWith('.yaml') || file.path.endsWith('.yml')); 
+        .then((response) => {
+          this.files = response.data.filter((file) => {
+            if (file.path.endsWith('.yaml') || file.path.endsWith('.yml')) {
+              return true;
+            }
+            return false;
+          });
 
-      if (!this.$route.query.file) {
-        this.filteredFiles = this.files;
-        return;
-      }
+          if (!this.$route.query.file) {
+            this.filteredFiles = this.files;
+            return;
+          }
 
-      const file = this.files.find((file) => file.path === this.$route.query.file);
+          const file = this.files.find((file) => file.path === this.$route.query.file);
 
-      if (file) {
-        if (this.$route.query.action === 'raw') {
-          this.openRawModal(file);
-          return;
-        }
-        this.openRedocModal(file);
-      }
-
-      this.filteredFiles = this.files;
-    })
-    .finally(() => { loader.hide(); });
-  },
-
-
-    searchFiles(value) {
-      this.filteredFiles = this.files.filter((file) => {
-        return file.content.toLowerCase().includes(value.toLowerCase());
-      });
+          if (file) {
+            if (this.$route.query.action === 'raw') {
+              this.openRawModal(file);
+              return;
+            }
+            this.openRedocModal(file);
+          }
+          this.filteredFiles = this.files;
+        })
+        .catch((error) => {
+          this.$M.toast({ html: `Error: ${error.response.status} ${error.response.statusText}`, classes: 'toast-fail' });
+        })
+        .finally(() => { loader.hide(); });
     },
 
     getTitle(file) {
@@ -251,8 +248,11 @@ export default {
     },
     search(value) {
       this.filteredFiles = this.files.filter((file) => {
-        return JSON.stringify(file.content).toLowerCase().includes(value.toLowerCase());
-      })
+        if (JSON.stringify(file.content).toLowerCase().includes(value.toLowerCase())) {
+          return true;
+        }
+        return false;
+      });
     },
   },
 
@@ -278,9 +278,4 @@ export default {
     }
   }
 
-.center-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 </style>
