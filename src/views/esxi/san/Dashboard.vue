@@ -1,7 +1,7 @@
 <template>
-<div>
-    <div class="col s12 m3">
-      <div v-if="mdiskData">
+<div ref="san">
+    <div class="col s12 m3" v-if="mdiskData.length > 0">
+      <div >
         <div class="card grey lighten-5">
           <div class="card-content center-align">
             <span class="card-title">Mdisk Data</span>
@@ -25,8 +25,8 @@
         </div>
       </div>
     </div>
-    <div class="col s12 m6">
-      <div class="col s12" v-if="poolData.length > 0">
+    <div class="col s12 m6" v-if="poolData.length > 0">
+      <div class="col s12">
         <div class="card grey lighten-5">
           <div class="card-content center-align">
             <span class="card-title">Capacity by pools (in TB)</span>
@@ -35,8 +35,8 @@
         </div>
       </div>
     </div>
-        <div class="col s12 m3">
-      <div class="card grey lighten-5 system-data-card">
+    <div class="col s12 m3" v-if="systemData !== null">
+      <div class="card grey lighten-5 system-data-card" v-if="systemData">
         <div class="card-content center-align">
           <span class="card-title">System Data</span>
           <div v-if="systemData">
@@ -50,9 +50,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div>
-      <div ref="san" class="loader"></div>
     </div>
 </div>
 </template>
@@ -84,62 +81,43 @@ export default {
     Bar,
   },
 
-  data() {
-    return {
-      systemData: [],
-      poolData: [],
-      mdiskData: []
-    }
-  },
-
   computed: {
-    computedSystemData() {
-      return this.systemData;
+    systemData() {
+      return this.$store.state.esxi.systemData || null;
     },
-    computedPoolData() {
-      return this.poolData;
+    poolData() {
+      return this.$store.state.esxi.poolData || [];
     },
-    computedMdiskData() {
-      return this.mdiskData;
-    }
-  },
+    mdiskData() {
+      return this.$store.state.esxi.mdiskData || [];
+    },
+},
 
   mounted() {
-    const loader = this.$loading.show({ 
-      container: this.$refs['san'],
-      color: '#a3f7bf',
-      canCancel: false
-    });
-    this.$store.dispatch(`esxi/makeRequest`)
-      .then((response) => {
-        if(response){
-            this.systemData = response.data;
-            return this.$store.dispatch(`esxi/makePoolRequest`)
-        }
-      })
-      .then((response) => {
-        if(response){
-          this.poolData = response.data;
-          return this.$store.dispatch(`esxi/makeMdiskRequest`)
-        }
-      })
-      .then((response) => {
-        if(response){
-          this.mdiskData = response.data;
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        const message = error.response ? error.response.data.message : error.message;
-        const options = {
-          title: 'Error',
-          message: message,
-        };
-        chrome.notifications.create('', options);
-      })
-      .finally(() => {
+  const loader = this.$loading.show({ 
+    container: this.$refs['san'],
+    canCancel: false
+  });
+  this.$store.dispatch(`esxi/makeSystemDataRequest`)
+    .catch((error) => {
+      this.$M.toast({ html: 'Error fetching system data', classes: 'toast-fail' });
+    })
+    .then(() => {
+      return this.$store.dispatch(`esxi/makePoolRequest`)
+    })
+    .catch((error) => {
+      this.$M.toast({ html: 'Error fetching pool data', classes: 'toast-fail' });
+    })
+    .then(() => {
+      return this.$store.dispatch(`esxi/makeMdiskRequest`)
+    })
+    .catch((error) => {
+      this.$M.toast({ html: 'Error fetching system data', classes: 'toast-fail' });
+    })
+    .finally(() => {
       loader.hide();
-      });
-  },
+    });
+},
+
 }
 </script>

@@ -180,7 +180,7 @@ export default {
     return promise;
   },
 
-  makeRequest({ commit }) {
+  makeSystemDataRequest({ commit }) {
     const promise = api('devops').get('inventory/san');
   
     promise

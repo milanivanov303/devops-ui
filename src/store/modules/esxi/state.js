@@ -8,4 +8,7 @@ export default {
   imxComponents: [],
   requestedInstances: [],
   expiringComponents: [],
+  systemData: {},
+  poolData: [],
+  mdiskData: [],
 };
