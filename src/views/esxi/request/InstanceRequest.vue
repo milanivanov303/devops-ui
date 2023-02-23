@@ -94,13 +94,13 @@ export default {
       this.selected = { ...request };
       this.action = action;
 
-      const promise1 = this.$store.dispatch('mmpi/getProjects');
-      const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
-      const promise3 = this.$store.dispatch('mmpi/getInstanceTypes');
-      const promise4 = this.$store.dispatch('mmpi/getEnvironmentTypes');
-      const promise5 = this.$store.dispatch('mmpi/getActiveProjects');
+      // const promise1 = this.$store.dispatch('mmpi/getProjects');
+      // const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
+      // const promise3 = this.$store.dispatch('mmpi/getInstanceTypes');
+      // const promise4 = this.$store.dispatch('mmpi/getEnvironmentTypes');
+      const promise5 = this.$store.dispatch('mmpi/getProjectsForInstanceRequest');
 
-      Promise.all([promise1, promise2, promise3, promise4, promise5])
+      Promise.all([promise5])
         .then(() => {
           this.showAddEditModal = true;
           this.$router.push({

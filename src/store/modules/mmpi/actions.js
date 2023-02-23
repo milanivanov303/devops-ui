@@ -40,8 +40,8 @@ export default {
     return promise;
   },
 
-  getActiveProjects({ commit }) {
-    const name = 'activeProjects';
+  getProjectsForInstanceRequest({ commit }) {
+    const name = 'requestProjects';
 
     if (this.state.promises[name]) {
       return this.state.promises[name];
@@ -56,10 +56,11 @@ export default {
         ],
       }),
       with: JSON.stringify({
-        delivery_chains: {
-          instances: ['environment_type'],
-          status: [],
-          dc_role: [],
+        typeBusiness: {},
+        languages: {},
+        projectType: {},
+        project_specifics: {
+          projectSpecificFeature: {},
         },
       }),
       orders: JSON.stringify({
@@ -70,7 +71,7 @@ export default {
     commit('promise', { name, promise }, { root: true });
 
     promise
-      .then((response) => commit('activeProjects', response.data.data))
+      .then((response) => commit('requestProjects', response.data.data))
       .catch(() => commit('error', 'Could not get active projects list', { root: true }));
 
     return promise;

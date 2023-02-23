@@ -11,6 +11,9 @@ export default {
   activeProjects(state, activeProjects) {
     state.activeProjects = activeProjects;
   },
+  requestProjects(state, requestProjects) {
+    state.requestProjects = requestProjects;
+  },
   updateProject(state, project) {
     state.projects.map((p) => {
       if (p.id === project.id) {
