@@ -48,7 +48,7 @@
                 <TextInput
                   class="readonly"
                   label="iMX Business Activity"
-                  :value=getProjectBusinessActivity(selected.project)"
+                  :value="getProjectBusinessActivity(selected.project)"
                 />
               </div>
               <div class="col s12 m6">
