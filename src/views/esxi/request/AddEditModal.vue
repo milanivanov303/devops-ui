@@ -48,14 +48,14 @@
                 <TextInput
                   class="readonly"
                   label="iMX Business Activity"
-                  v-model="selected.project.type_business[0].value"
+                  :value=getProjectBusinessActivity(selected.project)"
                 />
               </div>
               <div class="col s12 m6">
                 <TextInput
                   class="readonly"
                   label="Business Activity Domain Template"
-                  v-model="selected.project.pnp_type"
+                  :value="selected.project.pnp_type"
                 />
               </div>
             </div>
@@ -64,14 +64,14 @@
                 <TextInput
                   class="readonly"
                   label="Client specific dir"
-                  v-model="selected.project.clnt_cvs_dir"
+                  :value="selected.project.clnt_cvs_dir"
                 />
               </div>
               <div class="col s12 m4">
                 <TextInput
                   class="readonly"
                   label="Client Code (s)"
-                  v-model="selected.project.clnt_code"
+                  :value="selected.project.clnt_code"
                 />
               </div>
               <div class="col s12 m4">
@@ -463,8 +463,18 @@ export default {
     },
 
     getProjectBusinessArea(project) {
-      return project.project_specifics.find((ps) => ps.project_specific_feature.subtype === 'business_type')
-        .project_specific_feature.value || '';
+      if (project.project_specifics.length > 0) {
+        return project.project_specifics.find((ps) => ps.project_specific_feature.subtype === 'business_type')
+            .project_specific_feature.value || '';
+      }
+      return '';
+    },
+
+    getProjectBusinessActivity(project) {
+      if (project.type_business.length > 0) {
+        return project.type_business[0].value || '';
+      }
+      return '';
     },
 
     getDefaultDeliveryChainRole() {
