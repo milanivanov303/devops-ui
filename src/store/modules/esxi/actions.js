@@ -179,5 +179,40 @@ export default {
       .catch((error) => commit('error', error));
     return promise;
   },
+  getSavedEmails({ commit }) {
+    const promise = api('devops').get('inventory/saved-emails');
+
+    promise
+      .then((response) => {
+        commit('savedEmails', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get saved emails', { root: true }));
+    return promise;
+  },
+  createSavedEmail({ commit }, payload) {
+    const promise = api('devops').post('inventory/saved-emails', payload);
+
+    promise
+      .then((response) => commit('createSavedEmail', response.data.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+  updateSavedEmail({ commit }, payload) {
+    const promise = api('devops').put(`inventory/saved-emails/${payload.id}`, payload);
+
+    promise
+      .then((response) => commit('updateSavedEmail', response.data.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+  removeSavedEmail({ commit }, payload) {
+    const promise = api('devops').delete(`inventory/saved-emails/${payload.id}`);
+    promise
+      .then(() => {
+        commit('removeSavedEmail', payload.id);
+      })
+      .catch(() => commit('error', 'Could not remove saved email'));
+    return promise;
+  },
 
 };
