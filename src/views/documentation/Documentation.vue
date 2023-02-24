@@ -1,14 +1,16 @@
 <template>
-  <div ref="files">
-    <TextInput class="col s12 m8" label="Search" v-model="search"/>
-    <div class="col s12 m4">
-      <Select
-          class="branches"
-          :options="branches"
-          displayed="name"
-          :default-option="false"
-          v-model="branch"
-      />
+  <div class="documentation" ref="files">
+    <div class="row">
+      <TextInput class="col s12 m8" label="Search" v-model="search"/>
+      <div class="col s12 m4">
+        <Select
+            class="branches"
+            :options="branches"
+            displayed="name"
+            :default-option="false"
+            v-model="branch"
+        />
+      </div>
     </div>
     <Table
       :data="filteredFiles"
