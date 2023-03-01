@@ -30,6 +30,7 @@
           (instance.ssl && instance.ssl.lastActive) ?
           $date(instance.ssl.lastActive / 1000 ).toHuman() : 'n/a'"/>
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
+        <Column show="client" width="10%"/>
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
         <Column v-if="!instances" label="Virtual Machine" name="vm"
