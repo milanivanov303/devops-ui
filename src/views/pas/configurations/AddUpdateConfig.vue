@@ -502,8 +502,8 @@ export default {
       if (this.form.deploy_val_instance) {
         payload.deploy_val_instance = this.form.deploy_val_instance.name;
       }
-      payload.branch = this.form.branch;
-      payload.prefix = this.form.prefix;
+      payload.branch = this.form.branch.name;
+      payload.prefix = this.form.prefix.package;
 
       delete payload.created_on;
       delete payload.created_by;
