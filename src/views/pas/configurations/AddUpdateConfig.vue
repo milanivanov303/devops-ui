@@ -505,6 +505,11 @@ export default {
       payload.branch = this.form.branch.name;
       payload.prefix = this.form.prefix.package;
 
+      delete payload.created_on;
+      delete payload.created_by;
+      delete payload.updated_on;
+      delete payload.updated_by;
+
       this.$store.dispatch(`pas/${this.action}Configuration`, payload)
         .then(() => {
           this.$M.toast({
