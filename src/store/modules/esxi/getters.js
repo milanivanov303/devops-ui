@@ -2,7 +2,6 @@
 
 export default {
   getError: (state) => state.error,
-  esxiHosts: (state) => state.esxiHosts,
 
   getHostFreeMemory: (state, getters) => (host) => {
     if (!host.memory) {
@@ -66,5 +65,33 @@ export default {
     });
 
     return assigned;
+  },
+
+  getLastCreated: (state) => (type) => {
+    state[type].sort((a, b) => {
+      if (a.created_on < b.created_on) {
+        return 1;
+      }
+      if (a.created_on > b.created_on) {
+        return -1;
+      }
+      return 0;
+    });
+
+    return state.virtualMachines.slice(0, 10);
+  },
+  getInstancesByType: (state) => {
+    const instances = {};
+    state.instances.forEach((instance) => {
+      if (instance.type === null) {
+        instance.type = 'unknown';
+      }
+      if (!instances[instance.type]) {
+        instances[instance.type] = 0;
+      }
+      instances[instance.type] += 1;
+    });
+
+    return instances;
   },
 };
