@@ -22,6 +22,12 @@ export default {
   },
 
   getEsxiHosts({ commit }) {
+    const name = 'esxiHosts';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
     const promise = api('devops').get('inventory/esxi-hosts', {
       with: JSON.stringify(['virtualMachines']),
     });
@@ -51,6 +57,12 @@ export default {
   },
 
   getVirtualMachines({ commit }) {
+    const name = 'virtualMachines';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
     const promise = api('devops').get('inventory/virtual-machines', {
       with: JSON.stringify(['esxiHost', 'instances']),
     });
@@ -72,6 +84,12 @@ export default {
   },
 
   getInstances({ commit }) {
+    const name = 'instances';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
     const promise = api('devops').get('inventory/instances', {
       with: JSON.stringify({
         virtualMachine: {
