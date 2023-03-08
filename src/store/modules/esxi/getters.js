@@ -78,7 +78,7 @@ export default {
       return 0;
     });
 
-    return state.virtualMachines.slice(0, 10);
+    return state[type].slice(0, 10);
   },
   getInstancesByType: (state) => {
     const instances = {};
