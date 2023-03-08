@@ -22,6 +22,12 @@ export default {
   },
 
   getEsxiHosts({ commit }) {
+    const name = 'esxiHosts';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
     const promise = api('devops').get('inventory/esxi-hosts', {
       with: JSON.stringify(['virtualMachines']),
     });
@@ -51,6 +57,12 @@ export default {
   },
 
   getVirtualMachines({ commit }) {
+    const name = 'virtualMachines';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
     const promise = api('devops').get('inventory/virtual-machines', {
       with: JSON.stringify(['esxiHost', 'instances']),
     });
@@ -72,6 +84,12 @@ export default {
   },
 
   getInstances({ commit }) {
+    const name = 'instances';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
     const promise = api('devops').get('inventory/instances', {
       with: JSON.stringify({
         virtualMachine: {
@@ -177,6 +195,41 @@ export default {
         fileLink.click();
       })
       .catch((error) => commit('error', error));
+    return promise;
+  },
+  getSavedEmails({ commit }) {
+    const promise = api('devops').get('inventory/saved-emails');
+
+    promise
+      .then((response) => {
+        commit('savedEmails', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get saved emails', { root: true }));
+    return promise;
+  },
+  createSavedEmail({ commit }, payload) {
+    const promise = api('devops').post('inventory/saved-emails', payload);
+
+    promise
+      .then((response) => commit('createSavedEmail', response.data.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+  updateSavedEmail({ commit }, payload) {
+    const promise = api('devops').put(`inventory/saved-emails/${payload.id}`, payload);
+
+    promise
+      .then((response) => commit('updateSavedEmail', response.data.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+  removeSavedEmail({ commit }, payload) {
+    const promise = api('devops').delete(`inventory/saved-emails/${payload.id}`);
+    promise
+      .then(() => {
+        commit('removeSavedEmail', payload.id);
+      })
+      .catch(() => commit('error', 'Could not remove saved email'));
     return promise;
   },
 

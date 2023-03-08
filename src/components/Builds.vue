@@ -351,7 +351,7 @@ export default {
     },
 
     canRemove(build) {
-      if (build.status !== 'running' && build.status !== 'stopped') {
+      if (build.status !== 'running' && build.status !== 'stopped' && build.status !== 'deployed') {
         return false;
       }
 
