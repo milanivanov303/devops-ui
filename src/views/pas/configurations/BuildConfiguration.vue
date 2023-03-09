@@ -403,12 +403,9 @@ export default {
       }
 
       this.$v.$touch();
-      if (this.$v.$invalid || this.issueError !== false) {
+      if (this.$v.$invalid || this.issueError) {
         return;
       }
-
-      this.build.started = true;
-      this.build.summary = 'Build will start shortly ...';
 
       const payload = {
         branch: this.configuration.app_type === 'extranet' && this.configuration.app_version === 'X4' ? this.hash.name : this.hash.commit,
