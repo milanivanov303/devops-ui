@@ -379,9 +379,9 @@ export default {
   },
 
   methods: {
-    checkIssue() {
+    async checkIssue() {
       this.issueError = null;
-      this.$store.dispatch('mmpi/getIssue', this.ttsKey)
+      await this.$store.dispatch('mmpi/getIssue', this.ttsKey)
         .then(() => {
           this.issueError = false;
         })
@@ -397,13 +397,13 @@ export default {
       this.checkIssue();
     }, 2000),
 
-    start() {
-      if (this.issueError === null) {
-        this.checkIssue();
-      }
+    async start() {
+      const loader = this.$loading.show({ });
+      await this.checkIssue();
 
       this.$v.$touch();
       if (this.$v.$invalid || this.issueError) {
+        loader.hide();
         return;
       }
 
@@ -435,6 +435,7 @@ export default {
           EventBus.$emit('build.created');
         })
         .catch((error) => {
+          loader.hide();
           this.build.status = 'failed';
           this.build.summary = 'Could not start build';
           if (error.response.status === 403) {
@@ -443,7 +444,10 @@ export default {
             this.build.error = error;
           }
         })
-        .finally(() => { this.build.started = true; });
+        .finally(() => {
+          this.build.started = true;
+          loader.hide();
+        });
     },
   },
 
