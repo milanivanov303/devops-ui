@@ -31,14 +31,20 @@
           <PoweredVmCounter />
           <div class="card">
             <div class="card-content">
+              <div class="center-align">
               <span class="card-title">Last created VMs</span>
+                <a class="waves-effect waves-light btn-small" @click="showAll = !showAll">
+                  {{ showAll ? "Show Less" : "Show More" }}
+                </a>
+              </div>
               <div class="row">
                 <table>
                   <tbody>
-                  <tr v-for="vm in virtualMachines" :key="vm.id">
-                    <td> {{ vm.name }} </td>
-                    <td> {{ $date(vm.created_on).toHuman() }} </td>
-                  </tr>
+                    <tr v-for="vm in virtualMachines" :key="vm.id">
+                      <td>{{ vm.name }}</td>
+                      <td v-if="vm.os && vm.os.install_date">{{ vm.os.install_date }}</td>
+                      <td v-else>-</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -85,12 +91,39 @@ export default {
     InstancesByType,
     PoweredVmCounter,
   },
+  data() {
+  return {
+      showAll: false,
+    };
+  },
   computed: {
     esxiHosts() {
       return this.$store.state.esxi.esxiHosts;
     },
     virtualMachines() {
-      return this.$store.getters['esxi/getLastCreated']('virtualMachines');
+      const uniqueVMs = new Set();
+      const sortedVMs = this.$store.state.esxi.virtualMachines
+        .filter(
+          (vm) =>
+            vm.os &&
+            vm.os.install_date &&
+            !vm.os.install_date.includes("is not installed")
+        )
+        .sort(
+          (vm1, vm2) =>
+            new Date(vm2.os.install_date) - new Date(vm1.os.install_date)
+        );
+      const latestVMs = [];
+      for (const vm of sortedVMs) {
+        if (uniqueVMs.size >= (this.showAll ? sortedVMs.length : 10)) {
+          break;
+        }
+        if (!uniqueVMs.has(vm.name)) {
+          uniqueVMs.add(vm.name);
+          latestVMs.push(vm);
+        }
+      }
+      return latestVMs;
     },
     instances() {
       return this.$store.getters['esxi/getLastCreated']('instances');
@@ -128,7 +161,6 @@ export default {
       return ` - ${years ? `${years} years` : ''} ${months ? `${months} months` : ''} ${days ? `${days} days` : ''}`;
     },
   },
-
   created() {
     this.getEsxiHosts();
   },
