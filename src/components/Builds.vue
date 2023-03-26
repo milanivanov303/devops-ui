@@ -501,7 +501,7 @@ export default {
 
     closeBuildDetailsModal() {
       this.build = {};
-
+      this.getBuilds();
       this.showBuildDetailsModal = false;
     },
 
