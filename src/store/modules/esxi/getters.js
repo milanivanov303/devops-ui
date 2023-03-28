@@ -94,4 +94,51 @@ export default {
 
     return instances;
   },
+  getLatestvirtualMachines: (state) => {
+    const uniqueVMs = new Set();
+    const sortedVMs = state.virtualMachines
+      .filter(
+        (vm) =>
+          vm.os &&
+          vm.os.install_date &&
+          !vm.os.install_date.includes("is not installed")
+      )
+      .sort(
+        (vm1, vm2) =>
+          new Date(vm2.os.install_date) - new Date(vm1.os.install_date)
+      );
+    const latestVMs = [];
+    for (const vm of sortedVMs) {
+      if (uniqueVMs.size >= 10) {
+        break;
+      }
+      if (!uniqueVMs.has(vm.name)) {
+        uniqueVMs.add(vm.name);
+        latestVMs.push(vm);
+      }
+    }
+    return latestVMs;
+  },
+  getAllVirtualMachines: (state) => {
+    const uniqueVMs = new Set();
+    const sortedVMs = state.virtualMachines
+      .filter(
+        (vm) =>
+          vm.os &&
+          vm.os.install_date &&
+          !vm.os.install_date.includes("is not installed")
+      )
+      .sort(
+        (vm1, vm2) =>
+          new Date(vm2.os.install_date) - new Date(vm1.os.install_date)
+      );
+    const allVMs = [];
+    for (const vm of sortedVMs) {
+      if (!uniqueVMs.has(vm.name)) {
+        uniqueVMs.add(vm.name);
+        allVMs.push(vm);
+      }
+    }
+    return allVMs;
+  },
 };

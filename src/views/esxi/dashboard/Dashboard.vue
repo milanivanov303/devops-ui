@@ -31,11 +31,13 @@
           <PoweredVmCounter />
           <div class="card">
             <div class="card-content">
-              <div class="center-align">
-              <span class="card-title">Last created VMs</span>
-                <a class="waves-effect waves-light btn-small" @click="showAll = !showAll">
-                  {{ showAll ? "Show Less" : "Show More" }}
-                </a>
+            <span class="card-title">Last created VMs</span>
+              <div>
+                <button
+                  class="btn waves-effect waves-light"
+                  @click="showModal = true">
+                  <span>Show all VMs</span>
+                </button>
               </div>
               <div class="row">
                 <table>
@@ -71,6 +73,28 @@
         </div>
       </div>
     </div>
+
+    <Modal v-if="showModal" @close="showModal=false">
+      <template v-slot:header></template>
+      <template v-slot:content>
+        <h2>All Virtual Machines</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Installation Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="vm in allVirtualMachines" :key="vm.id">
+              <td>{{ vm.name }}</td>
+              <td>{{ vm.os.install_date }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </template>
+    </Modal>
+
   </div>
 </template>
 
@@ -92,8 +116,8 @@ export default {
     PoweredVmCounter,
   },
   data() {
-  return {
-      showAll: false,
+    return {
+      showModal: false,
     };
   },
   computed: {
@@ -101,32 +125,13 @@ export default {
       return this.$store.state.esxi.esxiHosts;
     },
     virtualMachines() {
-      const uniqueVMs = new Set();
-      const sortedVMs = this.$store.state.esxi.virtualMachines
-        .filter(
-          (vm) =>
-            vm.os &&
-            vm.os.install_date &&
-            !vm.os.install_date.includes("is not installed")
-        )
-        .sort(
-          (vm1, vm2) =>
-            new Date(vm2.os.install_date) - new Date(vm1.os.install_date)
-        );
-      const latestVMs = [];
-      for (const vm of sortedVMs) {
-        if (uniqueVMs.size >= (this.showAll ? sortedVMs.length : 10)) {
-          break;
-        }
-        if (!uniqueVMs.has(vm.name)) {
-          uniqueVMs.add(vm.name);
-          latestVMs.push(vm);
-        }
-      }
-      return latestVMs;
+      return this.$store.getters['esxi/getLatestvirtualMachines'];
     },
     instances() {
       return this.$store.getters['esxi/getLastCreated']('instances');
+    },
+    allVirtualMachines() {
+      return this.$store.getters['esxi/getAllVirtualMachines'];
     },
   },
   methods: {
@@ -159,6 +164,9 @@ export default {
       const days = Math.floor(((average % 31536000) % 2628000) / 86400);
 
       return ` - ${years ? `${years} years` : ''} ${months ? `${months} months` : ''} ${days ? `${days} days` : ''}`;
+    },
+    openModal() {
+      this.$refs.modal.show();
     },
   },
   created() {
