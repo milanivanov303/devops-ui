@@ -97,48 +97,31 @@ export default {
   getLatestvirtualMachines: (state) => {
     const uniqueVMs = new Set();
     const sortedVMs = state.virtualMachines
-      .filter(
-        (vm) =>
-          vm.os &&
-          vm.os.install_date &&
-          !vm.os.install_date.includes("is not installed")
-      )
-      .sort(
-        (vm1, vm2) =>
-          new Date(vm2.os.install_date) - new Date(vm1.os.install_date)
-      );
-    const latestVMs = [];
-    for (const vm of sortedVMs) {
-      if (uniqueVMs.size >= 10) {
-        break;
-      }
-      if (!uniqueVMs.has(vm.name)) {
-        uniqueVMs.add(vm.name);
-        latestVMs.push(vm);
-      }
-    }
+      .filter((vm) => vm.os && vm.os.install_date && !vm.os.install_date.includes('is not installed'))
+      .sort((vm1, vm2) => new Date(vm2.os.install_date) - new Date(vm1.os.install_date));
+
+    const latestVMs = sortedVMs.filter((vm) => !uniqueVMs.has(vm.name)).slice(0, 10);
+    latestVMs.forEach((vm) => uniqueVMs.add(vm.name));
     return latestVMs;
   },
   getAllVirtualMachines: (state) => {
     const uniqueVMs = new Set();
     const sortedVMs = state.virtualMachines
       .filter(
-        (vm) =>
-          vm.os &&
-          vm.os.install_date &&
-          !vm.os.install_date.includes("is not installed")
+        (vm) => vm.os
+          && vm.os.install_date
+          && !vm.os.install_date.includes('is not installed'),
       )
       .sort(
-        (vm1, vm2) =>
-          new Date(vm2.os.install_date) - new Date(vm1.os.install_date)
+        (vm1, vm2) => new Date(vm2.os.install_date) - new Date(vm1.os.install_date),
       );
-    const allVMs = [];
-    for (const vm of sortedVMs) {
+
+    return sortedVMs.reduce((acc, vm) => {
       if (!uniqueVMs.has(vm.name)) {
         uniqueVMs.add(vm.name);
-        allVMs.push(vm);
+        acc.push(vm);
       }
-    }
-    return allVMs;
+      return acc;
+    }, []);
   },
 };
