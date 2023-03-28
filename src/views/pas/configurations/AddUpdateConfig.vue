@@ -349,7 +349,7 @@ export default {
     dev_instances() {
       if (this.form.delivery_chain) {
         return this.form.delivery_chain.instances
-          .filter((instance) => instance.instance_type_id === 'DEV') || [];
+          .filter((instance) => instance.instance_type_id === 'DEV' || instance.instance_type_id === 'OTH') || [];
       }
       return [];
     },
