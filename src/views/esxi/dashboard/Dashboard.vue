@@ -31,14 +31,22 @@
           <PoweredVmCounter />
           <div class="card">
             <div class="card-content">
-              <span class="card-title">Last created VMs</span>
+            <span class="card-title">Last installed VMs</span>
+              <div>
+                <button
+                  class="btn waves-effect waves-light"
+                  @click="showModal = true">
+                  <span>Show all VMs</span>
+                </button>
+              </div>
               <div class="row">
                 <table>
                   <tbody>
-                  <tr v-for="vm in virtualMachines" :key="vm.id">
-                    <td> {{ vm.name }} </td>
-                    <td> {{ $date(vm.created_on).toHuman() }} </td>
-                  </tr>
+                    <tr v-for="vm in virtualMachines" :key="vm.id">
+                      <td>{{ vm.name }}</td>
+                      <td v-if="vm.os && vm.os.install_date">{{ vm.os.install_date }}</td>
+                      <td v-else>-</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -65,6 +73,28 @@
         </div>
       </div>
     </div>
+
+    <Modal v-if="showModal" @close="showModal=false">
+      <template v-slot:header></template>
+      <template v-slot:content>
+        <h2>All Virtual Machines</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Installation Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="vm in allVirtualMachines" :key="vm.id">
+              <td>{{ vm.name }}</td>
+              <td>{{ vm.os.install_date }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </template>
+    </Modal>
+
   </div>
 </template>
 
@@ -85,15 +115,23 @@ export default {
     InstancesByType,
     PoweredVmCounter,
   },
+  data() {
+    return {
+      showModal: false,
+    };
+  },
   computed: {
     esxiHosts() {
       return this.$store.state.esxi.esxiHosts;
     },
     virtualMachines() {
-      return this.$store.getters['esxi/getLastCreated']('virtualMachines');
+      return this.$store.getters['esxi/getLatestvirtualMachines'];
     },
     instances() {
       return this.$store.getters['esxi/getLastCreated']('instances');
+    },
+    allVirtualMachines() {
+      return this.$store.getters['esxi/getAllVirtualMachines'];
     },
   },
   methods: {
@@ -127,8 +165,10 @@ export default {
 
       return ` - ${years ? `${years} years` : ''} ${months ? `${months} months` : ''} ${days ? `${days} days` : ''}`;
     },
+    openModal() {
+      this.$refs.modal.show();
+    },
   },
-
   created() {
     this.getEsxiHosts();
   },
