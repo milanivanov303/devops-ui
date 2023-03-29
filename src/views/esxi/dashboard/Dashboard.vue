@@ -31,7 +31,7 @@
           <PoweredVmCounter />
           <div class="card">
             <div class="card-content">
-            <span class="card-title">Last created VMs</span>
+            <span class="card-title">Last installed VMs</span>
               <div>
                 <button
                   class="btn waves-effect waves-light"
