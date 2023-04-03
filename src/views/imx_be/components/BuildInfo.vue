@@ -18,11 +18,11 @@
         />
       </div>
       <div class="row">
-        <TextInput v-if="build.details['tts_key']"
+        <TextInput v-if="build.details.tts_key"
           class="col s12 readonly"
           label="TTS Key"
           icon="dynamic_feed"
-          :value="build.details['tts_key']"
+          :value="build.details.tts_key"
         />
       </div>
       <div class="row">
