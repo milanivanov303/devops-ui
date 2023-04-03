@@ -18,6 +18,14 @@
         />
       </div>
       <div class="row">
+        <TextInput v-if="build.details.tts_key"
+          class="col s12 readonly"
+          label="TTS Key"
+          icon="dynamic_feed"
+          :value="build.details.tts_key"
+        />
+      </div>
+      <div class="row">
         <TextInput
           class="col s12 m6 readonly"
           label="Created on"
