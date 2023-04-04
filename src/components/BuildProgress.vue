@@ -37,7 +37,7 @@
 
     <div class="row">
       <div class="col s12">
-        <div ref="log" class="log">{{ currentLog }}</div>
+        <div ref="log" class="log" id="log">{{ currentLog }}</div>
       </div>
     </div>
   </div>
@@ -75,6 +75,9 @@ export default {
   methods: {
     scrollLogContainer() {
       setTimeout(() => {
+        const logElement = document.getElementById('log');
+        logElement.innerHTML = logElement.innerHTML.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+
         const container = this.$refs.log;
         container.scrollTop = container.scrollHeight;
       }, 100);
