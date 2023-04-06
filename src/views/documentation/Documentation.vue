@@ -250,7 +250,12 @@ export default {
     },
     search(value) {
       this.filteredFiles = this.files.filter((file) => {
-        if (JSON.stringify(file.content).toLowerCase().includes(value.toLowerCase())) {
+        if (
+          JSON.stringify(file.content)
+            .toLowerCase()
+            .includes(value.toLowerCase()) ||
+          file.path.toLowerCase().includes(value.toLowerCase())
+        ) {
           return true;
         }
         return false;
