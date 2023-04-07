@@ -18,14 +18,6 @@ export default {
     return promise;
   },
 
-  getBranches({ commit }, payload) {
-    const promise = api('devops').get('specs/branches', payload);
-
-    promise
-      .catch(() => commit('error', 'Could not get repository branches', { root: true }));
-    return promise;
-  },
-
   download({ commit }, parameters) {
     const promise = api('devops').post(
       'specs/download',

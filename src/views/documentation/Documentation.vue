@@ -1,14 +1,13 @@
 <template>
   <div class="documentation" ref="files">
     <div class="row">
-      <TextInput class="col s12 m8" label="Search" v-model="search"/>
+      <TextInput class="col s12 m8" label="Search in yaml file content" v-model="search"/>
       <div class="col s12 m4">
-        <Select
-            class="branches"
-            :options="branches"
-            displayed="name"
-            :default-option="false"
-            v-model="branch"
+        <Autocomplete
+            class="x-tags"
+            :items="xTags"
+            label="Search by x-tag"
+            v-model="xTag"
         />
       </div>
     </div>
@@ -70,9 +69,8 @@ export default {
   data() {
     return {
       repo: 'specifications',
-      branches: [],
-      branch: this.$route.query.branch || 'main',
       search: '',
+      xTag: '',
       filteredFiles: [],
       files: [],
       file: {},
@@ -87,24 +85,24 @@ export default {
     module() {
       return this.$route.params.module;
     },
+    xTags() {
+      const options = [];
+      this.files.forEach((file) => {
+        if (file.content.info['x-tag']) {
+          options.push(...file.content.info['x-tag'].split(','));
+        }
+      });
+      return options.filter((key, idx) => options.indexOf(key) === idx)
+        .map((option) => ({ name: option }));
+    },
   },
 
   methods: {
-    getBranches() {
-      this.$store.dispatch('documentation/getBranches', {
-        repo: this.repo,
-      })
-        .then((response) => {
-          this.branches = response.data.map((branch) => branch.name);
-        });
-    },
-
     getFiles() {
       const loader = this.$loading.show({ container: this.$refs.files });
 
       this.$store.dispatch('documentation/getSpecs', {
         repo: this.repo,
-        branch: this.branch,
         apis_dir: this.module,
       })
         .then((response) => {
@@ -156,7 +154,6 @@ export default {
       this.showRawModal = true;
 
       const query = {
-        branch: this.branch,
         file: this.file.path,
         action: 'raw',
       };
@@ -187,7 +184,6 @@ export default {
       this.showRedocModal = true;
 
       const query = {
-        branch: this.branch,
         file: this.file.path,
         action: 'redoc',
       };
@@ -219,7 +215,6 @@ export default {
       this.downloading = true;
       this.$store.dispatch('documentation/download', {
         repo: this.repo,
-        branch: this.branch,
         apis_dir: this.module,
         files,
       })
@@ -229,7 +224,6 @@ export default {
       this.exporting = true;
       this.$store.dispatch('documentation/export', {
         repo: this.repo,
-        branch: this.branch,
         apis_dir: this.module,
       })
         .finally(() => { this.exporting = false; });
@@ -240,31 +234,17 @@ export default {
     module() {
       this.getFiles();
     },
-    branch() {
-      this.$router.push({
-        path: `/documentation/${this.module}`,
-        query: { branch: this.branch },
-      });
-
-      this.getFiles();
-    },
     search(value) {
-      this.filteredFiles = this.files.filter((file) => {
-        if (
-          JSON.stringify(file.content)
-            .toLowerCase()
-            .includes(value.toLowerCase()) ||
-          file.path.toLowerCase().includes(value.toLowerCase())
-        ) {
-          return true;
-        }
-        return false;
-      });
+      this.filteredFiles = this.files.filter((file) => JSON.stringify(file.content).toLowerCase()
+        .includes(value.toLowerCase()) || file.path.toLowerCase().includes(value.toLowerCase()));
+    },
+    xTag(value) {
+      this.filteredFiles = this.files.filter((file) => file.content.info['x-tag']
+        && file.content.info['x-tag'].includes(value.name));
     },
   },
 
   mounted() {
-    this.getBranches();
     this.getFiles();
   },
 };
