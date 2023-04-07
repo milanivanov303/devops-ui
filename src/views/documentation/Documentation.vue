@@ -2,7 +2,7 @@
   <div class="documentation" ref="files">
     <div class="row">
       <TextInput class="col s12 m8" label="Search in yaml file content" v-model="search"/>
-      <div class="col s12 m4">
+      <div class="col s12 m4" v-if="xTags.length">
         <Autocomplete
             class="x-tags"
             :items="xTags"
@@ -12,7 +12,7 @@
       </div>
     </div>
     <Table
-      :data="filteredFiles"
+      :data="files"
       :add-btn="false"
       :export-btn="false"
       :view-btn="false"
@@ -71,8 +71,6 @@ export default {
       repo: 'specifications',
       search: '',
       xTag: '',
-      filteredFiles: [],
-      files: [],
       file: {},
       showRawModal: false,
       showRedocModal: false,
@@ -85,10 +83,22 @@ export default {
     module() {
       return this.$route.params.module;
     },
+    files() {
+      const files = this.$store.getters['documentation/getYamlFiles'];
+
+      if (this.search !== '') {
+        return files.filter((file) => file.path.toLowerCase().includes(this.search.toLowerCase())
+          || JSON.stringify(file.content).toLowerCase().includes(this.search.toLowerCase()));
+      }
+      if (this.xTag.name) {
+        return files.filter((file) => file.content.info['x-tag'] && file.content.info['x-tag'].includes(this.xTag.name));
+      }
+      return files;
+    },
     xTags() {
       const options = [];
       this.files.forEach((file) => {
-        if (file.content.info['x-tag']) {
+        if (file.content && file.content.info['x-tag']) {
           options.push(...file.content.info['x-tag'].split(','));
         }
       });
@@ -105,21 +115,8 @@ export default {
         repo: this.repo,
         apis_dir: this.module,
       })
-        .then((response) => {
-          this.files = response.data.filter((file) => {
-            if (file.path.endsWith('.yaml') || file.path.endsWith('.yml')) {
-              return true;
-            }
-            return false;
-          });
-
-          if (!this.$route.query.file) {
-            this.filteredFiles = this.files;
-            return;
-          }
-
+        .then(() => {
           const file = this.files.find((file) => file.path === this.$route.query.file);
-
           if (file) {
             if (this.$route.query.action === 'raw') {
               this.openRawModal(file);
@@ -127,7 +124,6 @@ export default {
             }
             this.openRedocModal(file);
           }
-          this.filteredFiles = this.files;
         })
         .catch((error) => {
           this.$M.toast({ html: `Error: ${error.response.status} ${error.response.statusText}`, classes: 'toast-fail' });
@@ -141,7 +137,6 @@ export default {
       }
       return file.content.info.title;
     },
-
     getDescription(file) {
       if (!file.content || !file.content.info) {
         return '';
@@ -163,7 +158,6 @@ export default {
         query: { ...this.$route.query, ...query },
       });
     },
-
     closeRawModal() {
       this.file = {};
       this.showRawModal = false;
@@ -178,7 +172,6 @@ export default {
         query,
       });
     },
-
     openRedocModal(file) {
       this.file = file;
       this.showRedocModal = true;
@@ -193,7 +186,6 @@ export default {
         query: { ...this.$route.query, ...query },
       });
     },
-
     closeRedocModal() {
       this.file = {};
       this.showRedocModal = false;
@@ -233,14 +225,6 @@ export default {
   watch: {
     module() {
       this.getFiles();
-    },
-    search(value) {
-      this.filteredFiles = this.files.filter((file) => JSON.stringify(file.content).toLowerCase()
-        .includes(value.toLowerCase()) || file.path.toLowerCase().includes(value.toLowerCase()));
-    },
-    xTag(value) {
-      this.filteredFiles = this.files.filter((file) => file.content.info['x-tag']
-        && file.content.info['x-tag'].includes(value.name));
     },
   },
 
