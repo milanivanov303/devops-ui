@@ -5,6 +5,7 @@ export default {
     const promise = api('devops').get('specs', payload);
 
     promise
+      .then((response) => commit('specs', response.data))
       .catch(() => commit('error', 'Could not get apiDocumentationList', { root: true }));
     return promise;
   },
