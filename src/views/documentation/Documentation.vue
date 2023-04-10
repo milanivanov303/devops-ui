@@ -3,10 +3,11 @@
     <div class="row">
       <TextInput class="col s12 m8" label="Search in yaml file content" v-model="search"/>
       <div class="col s12 m4" v-if="xTags.length">
-        <Autocomplete
+        <Select
             class="x-tags"
-            :items="xTags"
-            label="Search by x-tag"
+            :options="xTags"
+            defaultOptionText="Search by x-tag"
+            :multiple="true"
             v-model="xTag"
         />
       </div>
@@ -70,7 +71,7 @@ export default {
     return {
       repo: 'specifications',
       search: '',
-      xTag: '',
+      xTag: [],
       file: {},
       showRawModal: false,
       showRedocModal: false,
@@ -84,26 +85,25 @@ export default {
       return this.$route.params.module;
     },
     files() {
-      const files = this.$store.getters['documentation/getYamlFiles'];
+      let files = this.$store.getters['documentation/getYamlFiles'];
 
       if (this.search !== '') {
-        return files.filter((file) => file.path.toLowerCase().includes(this.search.toLowerCase())
+        files = files.filter((file) => file.path.toLowerCase().includes(this.search.toLowerCase())
           || JSON.stringify(file.content).toLowerCase().includes(this.search.toLowerCase()));
       }
-      if (this.xTag.name) {
-        return files.filter((file) => file.content.info['x-tag'] && file.content.info['x-tag'].includes(this.xTag.name));
+      if (this.xTag.length) {
+        files = files.filter((file) => file.content.info['x-tag'] && this.xTag.some((tag) => file.content.info['x-tag'].includes(tag)));
       }
       return files;
     },
     xTags() {
       const options = [];
-      this.files.forEach((file) => {
+      this.$store.getters['documentation/getYamlFiles'].forEach((file) => {
         if (file.content && file.content.info['x-tag']) {
-          options.push(...file.content.info['x-tag'].split(','));
+          options.push(...file.content.info['x-tag'].split(',').map((option) => option.trim()));
         }
       });
-      return options.filter((key, idx) => options.indexOf(key) === idx)
-        .map((option) => ({ name: option }));
+      return options.filter((key, idx) => options.indexOf(key) === idx);
     },
   },
 
