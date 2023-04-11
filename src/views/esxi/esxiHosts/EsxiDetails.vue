@@ -81,6 +81,9 @@
             <b>{{ key }} </b>- {{ value }}
           </li>
         </div>
+        <!-- <li v-if="powerStatus" class="collection-item">
+            <b>Power Status: </b>{{ powerStatus }}
+        </li> -->
       </div>
     </ul>
     <span v-else class="col s12">Sorry! There is no data. Please update and try again.</span>
@@ -96,6 +99,22 @@ export default {
       required: true,
     },
   },
+
+  computed: {
+    powerStatus() {
+      return this.$store.state.esxi.powerStatus || [];
+    },
+  },
+
+  mounted() {
+  this.$store.dispatch(`esxi/makePowerStatusRequest`)
+    .then(() => {
+      console.log(this.$store.state.esxi.powerStatus);
+    })
+    .catch((error) => {
+      this.$M.toast({ html: 'Error fetching power status', classes: 'toast-fail' });
+    });
+},
 
   methods: {
     getCpuBrand(cpuDetails) {
