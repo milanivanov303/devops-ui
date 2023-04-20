@@ -9,5 +9,4 @@ export default {
   requestedInstances: [],
   expiringComponents: [],
   savedEmails: [],
-  powerStatus: []
 };

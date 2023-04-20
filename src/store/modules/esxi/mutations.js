@@ -107,7 +107,4 @@ export default {
       1,
     );
   },
-  setPowerStatus(state, powerStatus) {
-    state.powerStatus = powerStatus;
-  },
 };

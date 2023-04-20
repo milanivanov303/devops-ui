@@ -232,14 +232,4 @@ export default {
       .catch(() => commit('error', 'Could not remove saved email'));
     return promise;
   },
-  makePowerStatusRequest({ commit }) {
-    const promise = api('devops').get('inventory/power');
-  
-    promise
-      .then((response) => {
-        commit('setPowerStatus', response.data);
-      })
-      .catch((error) => commit('error', error));
-    return promise;
-  },
 };

@@ -81,9 +81,36 @@
             <b>{{ key }} </b>- {{ value }}
           </li>
         </div>
-        <!-- <li v-if="powerStatus" class="collection-item">
-            <b>Power Status: </b>{{ powerStatus }}
-        </li> -->
+      </div>
+      <div class="row">
+        <div class="col s12 l6" v-if="esxiHost.power_details">
+          <li class="collection-header">
+            <span class="collection-section">POWER DETAILS</span>
+          </li>
+          <li class="collection-item"><b>Power allocated watts:</b> 
+            {{ JSON.parse(esxiHost.power_details).power_allocated_watts }}
+          </li>
+          <li class="collection-item"><b>Average consumed watts:</b>
+            {{ JSON.parse(esxiHost.power_details).average_consumed_watts }}
+          </li>
+          <li class="collection-item"><b>Max consumed watts:</b> 
+            {{ JSON.parse(esxiHost.power_details).max_consumed_watts }}
+          </li>
+          <li class="collection-item"><b>Member ID slot one:</b> 
+            {{ JSON.parse(esxiHost.power_details).member_id_slot_one }}
+          </li>
+          <li class="collection-item"><b>Status one: </b>
+            <b>State:</b> {{ JSON.parse(esxiHost.power_details).status_one.State }},
+            <b>Health:</b> {{ JSON.parse(esxiHost.power_details).status_one.Health }}
+          </li>
+          <li class="collection-item"><b>Member ID slot two:</b> 
+            {{ JSON.parse(esxiHost.power_details).member_id_slot_two }}
+          </li>
+          <li class="collection-item"><b>Status two: </b>
+            <b>State:</b> {{ JSON.parse(esxiHost.power_details).status_two.State }},
+            <b>Health:</b> {{ JSON.parse(esxiHost.power_details).status_two.Health }}
+          </li>
+        </div>
       </div>
     </ul>
     <span v-else class="col s12">Sorry! There is no data. Please update and try again.</span>
@@ -99,22 +126,6 @@ export default {
       required: true,
     },
   },
-
-  computed: {
-    powerStatus() {
-      return this.$store.state.esxi.powerStatus || [];
-    },
-  },
-
-  mounted() {
-  this.$store.dispatch(`esxi/makePowerStatusRequest`)
-    .then(() => {
-      console.log(this.$store.state.esxi.powerStatus);
-    })
-    .catch((error) => {
-      this.$M.toast({ html: 'Error fetching power status', classes: 'toast-fail' });
-    });
-},
 
   methods: {
     getCpuBrand(cpuDetails) {
