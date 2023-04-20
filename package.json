@@ -14,7 +14,7 @@
     "@api-components/api-navigation": "^4.2.8",
     "@enterpriseapps/ea-js-sdk": "^1.0.5",
     "@enterpriseapps/vue-administration": "^1.4.0",
-    "@enterpriseapps/vue-components": "^4.0.4",
+    "@enterpriseapps/vue-components": "^4.0.7",
     "@hnluu8/vue-redoc-wrapper": "^0.1.15",
     "amf-client-js": "4.7.1",
     "api-console": "^6.4.10",

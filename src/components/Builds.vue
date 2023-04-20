@@ -109,6 +109,17 @@
                   <i class="material-icons">wysiwyg</i>
                 </a>
                 <a
+                  v-if="
+                  build.status !== 'building' &&
+                  build.module === 'imx_be' &&
+                  canManageBeBuilds()"
+                  @click="openRebuildModal(build)"
+                  data-tooltip="Rebuild"
+                  class="deep-orange-text tooltipped"
+                >
+                  <i class="material-icons">settings_backup_restore</i>
+                </a>
+                <a
                   v-if="canRemove(build)"
                   @click="openRemoveModal(build)"
                   data-tooltip="Remove"
@@ -174,10 +185,44 @@
       </template>
     </Modal>
 
+    <Modal v-if="showRebuildModal" @close="showRebuildModal = false" class="confirm">
+      <template v-slot:content>
+        <div v-if="error" class="center">
+          <i class="material-icons large red-text">error_outline</i>
+          <p>{{ error }}</p>
+        </div>
+        <div v-else>
+          Are you sure you what to rebuild <b>{{ build.name }}</b>?
+        </div>
+      </template>
+      <template v-slot:footer>
+        <button
+          class="waves-effect btn deep-orange"
+          @click="rebuild(build)"
+        >
+          <i class="material-icons left">settings_backup_restore</i> Rebuild
+        </button>
+      </template>
+    </Modal>
+
     <Modal v-if="showProgressModal" @close="showProgressModal = false" class="right-sheet">
       <template v-slot:header>{{ build.name }}</template>
       <template v-slot:content>
         <BuildProgress :broadcast="build.details.broadcast"></BuildProgress>
+      </template>
+    </Modal>
+    <Modal
+      v-if="showProgressModal && rebuildStarted"
+      @close="(showProgressModal = false) && (rebuildStarted = false)"
+      class="right-sheet">
+      <template v-slot:header>{{ build.name }}</template>
+      <template v-slot:content>
+        <BuildProgress
+          :broadcast="build.broadcast"
+          :status="build.status"
+          :summary="build.summary"
+          :error="build.error"
+        ></BuildProgress>
       </template>
     </Modal>
   </div>
@@ -186,6 +231,7 @@
 <script>
 import EventBus from '@/event-bus';
 import config from '@/config';
+import Modal from '@/components/Modal';
 
 const Paginate = () => import('@/components/partials/Paginate');
 const BuildProgress = () => import('@/components/BuildProgress');
@@ -193,6 +239,7 @@ const BuildDetails = () => import('@/components/BuildDetails');
 
 export default {
   components: {
+    Modal,
     Paginate,
     BuildProgress,
     BuildDetails,
@@ -216,8 +263,10 @@ export default {
       status: ['active'],
 
       showRemoveModal: false,
+      showRebuildModal: false,
       showProgressModal: false,
       showBuildDetailsModal: false,
+      rebuildStarted: false,
 
       updating: false,
       removing: false,
@@ -319,6 +368,10 @@ export default {
       return this.$auth.getUser().username === build.created_by;
     },
 
+    canManageBeBuilds() {
+      return !!(this.$auth.can('imx_be.remove-builds') && this.$auth.can('imx_be.create-builds'));
+    },
+
     openRemoveModal(build) {
       this.build = build;
       this.removing = false;
@@ -326,6 +379,13 @@ export default {
       this.error = null;
 
       this.showRemoveModal = true;
+    },
+
+    openRebuildModal(build) {
+      this.build = build;
+      this.error = null;
+
+      this.showRebuildModal = true;
     },
 
     initTooltips() {
@@ -370,7 +430,7 @@ export default {
         })
         .catch((error) => {
           if (error.response.status === 403) {
-            this.error = 'You do not have insufficient rights to remove this build';
+            this.error = 'You do not have sufficient rights to remove this build';
             return;
           }
 
@@ -386,6 +446,37 @@ export default {
           this.error = error;
         })
         .finally(() => { this.removing = false; });
+    },
+
+    rebuild(build) {
+      this.showRebuildModal = false;
+      this.rebuildStarted = true;
+      this.$store.dispatch('imx_be/startBuild', {
+        branch: build.details.branch,
+        instance: build.details.instance,
+        ttsKey: build.details.tts_key,
+      })
+        .then((response) => {
+          this.build.status = 'running';
+          this.build.summary = 'Build will start shortly ...';
+          this.build.broadcast = response.data.broadcast;
+          EventBus.$emit('build.created');
+        })
+        .catch((error) => {
+          this.build.status = 'failed';
+          this.build.summary = 'Could not start build';
+          if (error.response.status === 403) {
+            this.build.error = 'You do not have sufficient rights to create build';
+          } else {
+            this.build.error = error;
+          }
+        })
+        .finally(() => {
+          this.showProgressModal = true;
+          this.rebuildStarted = true;
+          this.getBuilds();
+        });
+      this.getBuilds();
     },
 
     openBuildDetailsModal(build) {
@@ -410,7 +501,7 @@ export default {
 
     closeBuildDetailsModal() {
       this.build = {};
-
+      this.getBuilds();
       this.showBuildDetailsModal = false;
     },
 

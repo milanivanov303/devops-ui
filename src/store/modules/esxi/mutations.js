@@ -93,4 +93,26 @@ export default {
   setMdiskData(state, mdiskData) {
     state.mdiskData = mdiskData;
   },
+  savedEmails(state, savedEmails) {
+    state.savedEmails = savedEmails;
+  },
+  createSavedEmail(state, savedEmail) {
+    const { savedEmails } = state;
+    savedEmails.push(savedEmail);
+    Vue.set(state, 'savedEmails', savedEmails);
+  },
+  updateSavedEmail(state, email) {
+    if (!email.error) {
+      const { savedEmails } = state;
+      const index = savedEmails.findIndex((savedEmail) => savedEmail.id === email.id);
+      savedEmails.splice(index, 1, email);
+      Vue.set(state, 'savedEmails', savedEmails);
+    }
+  },
+  removeSavedEmail(state, id) {
+    state.savedEmails.splice(
+      state.savedEmails.findIndex((req) => req.id === id),
+      1,
+    );
+  },
 };

@@ -30,30 +30,6 @@
             </div>
           </div>
         </div>
-        <div class="row">
-          <Select
-              class="col s12"
-              label="Define Binary Type"
-              icon="transform"
-              displayed="value"
-              v-model="binaryType"
-              :options="binaryTypes"
-          />
-        </div>
-        <div class="row">
-            <TextInput
-              class="col s12"
-              v-if="binaryType.value === 'Manual'"
-              v-model="configName"
-              icon="more_vert"
-              label="Config Name"
-            />
-            <div class="validator col s12">
-              <div class="red-text" v-if="$v.configName.$error">
-                <p>Config name field must not be empty.</p>
-              </div>
-            </div>
-        </div>
 
         <div
             v-if="configuration.app_type === 'extranet' && configuration.app_version === 'X4'"
@@ -94,6 +70,31 @@
               <p v-if="!$v.project.required">
                 Project field must not be empty.
               </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <Select
+              class="col s12"
+              label="Define Binary Type"
+              icon="transform"
+              displayed="value"
+              v-model="binaryType"
+              :options="binaryTypes"
+          />
+        </div>
+        <div class="row">
+          <TextInput
+              class="col s12"
+              v-if="binaryType.value === 'Manual'"
+              v-model="configName"
+              icon="more_vert"
+              label="Config Name"
+          />
+          <div class="validator col s12">
+            <div class="red-text" v-if="$v.configName.$error">
+              <p>Config name field must not be empty.</p>
             </div>
           </div>
         </div>
@@ -249,6 +250,19 @@ export default {
         }
       }
     },
+    project() {
+      if (this.project && this.project.name === 'xnet') {
+        const found = this.binaryTypes.filter((obj) => Object.keys(obj).some(() => obj.subtype === 'xnet'));
+        const xnetBinaryType = found[0];
+        this.binaryType = xnetBinaryType;
+      }
+
+      if (this.project && this.project.name === 'xnet-admin') {
+        const found = this.binaryTypes.filter((obj) => Object.keys(obj).some(() => obj.subtype === 'xnet-admin'));
+        const adminBinaryType = found[0];
+        this.binaryType = adminBinaryType;
+      }
+    },
   },
 
   computed: {
@@ -365,9 +379,9 @@ export default {
   },
 
   methods: {
-    checkIssue() {
+    async checkIssue() {
       this.issueError = null;
-      this.$store.dispatch('mmpi/getIssue', this.ttsKey)
+      await this.$store.dispatch('mmpi/getIssue', this.ttsKey)
         .then(() => {
           this.issueError = false;
         })
@@ -383,18 +397,15 @@ export default {
       this.checkIssue();
     }, 2000),
 
-    start() {
-      if (this.issueError === null) {
-        this.checkIssue();
-      }
+    async start() {
+      const loader = this.$loading.show({ });
+      await this.checkIssue();
 
       this.$v.$touch();
-      if (this.$v.$invalid || this.issueError !== false) {
+      if (this.$v.$invalid || this.issueError) {
+        loader.hide();
         return;
       }
-
-      this.build.started = true;
-      this.build.summary = 'Build will start shortly ...';
 
       const payload = {
         branch: this.configuration.app_type === 'extranet' && this.configuration.app_version === 'X4' ? this.hash.name : this.hash.commit,
@@ -424,6 +435,7 @@ export default {
           EventBus.$emit('build.created');
         })
         .catch((error) => {
+          loader.hide();
           this.build.status = 'failed';
           this.build.summary = 'Could not start build';
           if (error.response.status === 403) {
@@ -432,7 +444,10 @@ export default {
             this.build.error = error;
           }
         })
-        .finally(() => { this.build.started = true; });
+        .finally(() => {
+          this.build.started = true;
+          loader.hide();
+        });
     },
   },
 

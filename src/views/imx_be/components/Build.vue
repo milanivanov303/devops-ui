@@ -50,6 +50,25 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <TextInput
+                class="col s12"
+                label="TTS Key"
+                icon="dynamic_feed"
+                v-model="form.ttsKey"
+                :invalid="$v.form.ttsKey.$error"
+                @blur="$v.form.ttsKey.$touch()"
+              />
+              <div class="validator col s12"
+                   v-if="$v.form.ttsKey.$error">
+                <div class="red-text" v-if="!$v.form.ttsKey.required">
+                  <p>Field is required</p>
+                </div>
+                <div class="red-text" v-if="!$v.form.ttsKey.validKey">
+                  <p>Not a valid TTS key.</p>
+                </div>
+              </div>
+            </div>
           </div>
           <BuildProgress
             v-else
@@ -86,6 +105,7 @@ function initialState() {
     form: {
       branch: null,
       instance: null,
+      ttsKey: '',
     },
     build: {
       started: false,
@@ -129,6 +149,12 @@ export default {
             required,
           },
         },
+        ttsKey: {
+          required,
+          validKey(value) {
+            return /^(?:[A-Z]|[0-9])+-[0-9]+$/.test(value);
+          },
+        },
       },
     };
 
@@ -140,11 +166,11 @@ export default {
         },
       };
     }
-
     return validations;
   },
 
   methods: {
+
     getData() {
       this.$store.dispatch('imx_be/getBranches');
       this.$store.dispatch('mmpi/getInstances');
@@ -173,18 +199,24 @@ export default {
       this.$store.dispatch('imx_be/startBuild', {
         branch: this.form.branch ? this.form.branch.name : this.branch,
         instance: this.form.instance,
+        ttsKey: this.form.ttsKey,
       })
         .then((response) => {
-          this.build.status = 'running';
-          this.build.summary = 'Build will start shortly ...';
-          this.build.broadcast = response.data.broadcast;
-          EventBus.$emit('build.created');
+          if (response.data.broadcast) {
+            this.build.status = 'running';
+            this.build.summary = 'Build will start shortly ...';
+            this.build.broadcast = response.data.broadcast;
+            EventBus.$emit('build.created');
+          }
+
+          this.build.summary = response.data.summary;
+          this.build.status = 'failed';
         })
         .catch((error) => {
           this.build.status = 'failed';
           this.build.summary = 'Could not start build';
           if (error.response.status === 403) {
-            this.build.error = 'You do not have insufficient rights to create build';
+            this.build.error = 'You do not have sufficient rights to create a build';
           } else {
             this.build.error = error;
           }

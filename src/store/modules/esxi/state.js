@@ -11,4 +11,5 @@ export default {
   systemData: {},
   poolData: [],
   mdiskData: [],
+  savedEmails: [],
 };

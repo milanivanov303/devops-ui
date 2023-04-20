@@ -13,11 +13,11 @@
               autocomplete="off"
               type="text"
               id="abbrev"
-              v-model="form.teamAbbrev"
+              v-model.trim="form.teamAbbrev"
           />
           <label :class="{active: form.teamAbbrev}" for="abbrev">Abbreviation</label>
         </div>
-      </div>
+        </div>
       <div class="row">
         <div class="input-field col s12">
           <i class="material-icons prefix">dehaze</i>
@@ -75,7 +75,6 @@
     </template>
   </Modal>
 </template>
-
 <script>
 export default {
   props: {
@@ -127,6 +126,7 @@ export default {
       this.$store.dispatch('cms/getCodixTeams');
     },
     async updateCodixTeams() {
+      const abbreviation = this.form.teamAbbrev.toUpperCase();
       const loader = this.$loading.show({ container: this.$el });
       let data = {};
       if (this.form.manager === '') {
@@ -134,7 +134,7 @@ export default {
           data = {
             id: this.form.id,
             tts_group_name: '',
-            abbreviation: this.form.teamAbbrev,
+            abbreviation,
             manager: '',
             assistant: this.form.assistant,
           };
@@ -142,7 +142,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
-          abbreviation: this.form.teamAbbrev,
+          abbreviation,
           manager: '',
           assistant: this.form.assistant,
         };
@@ -167,7 +167,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: '',
-          abbreviation: this.form.teamAbbrev,
+          abbreviation,
           manager: this.form.manager,
           assistant: this.form.assistant,
         };
@@ -175,7 +175,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
-          abbreviation: this.form.teamAbbrev,
+          abbreviation,
           manager: this.form.manager,
           assistant: this.form.assistant,
         };
@@ -202,7 +202,7 @@ export default {
           data = {
             id: this.form.id,
             tts_group_name: '',
-            abbreviation: this.form.teamAbbrev,
+            abbreviation,
             manager: '',
             assistant: '',
           };
@@ -210,7 +210,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
-          abbreviation: this.form.teamAbbrev,
+          abbreviation,
           manager: '',
           assistant: '',
         };
@@ -218,7 +218,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: '',
-          abbreviation: this.form.teamAbbrev,
+          abbreviation,
           manager: this.form.manager,
           assistant: this.form.assistant,
         };
@@ -226,7 +226,7 @@ export default {
         data = {
           id: this.form.id,
           tts_group_name: this.form.tts_group_name.name,
-          abbreviation: this.form.teamAbbrev,
+          abbreviation,
           manager: this.form.manager,
           assistant: this.form.assistant,
         };
@@ -238,11 +238,32 @@ export default {
         .catch((error) => {
           this.error = error;
           return error;
+        })
+        .then(() => {
+          if (this.error) {
+            this.$M.toast({
+              html: 'Error. Abbrev should be unique. Team '
+                + 'not updated!',
+              classes: 'toast-fail',
+            });
+          }
         });
       loader.hide();
       this.closeModal();
-    },
 
+      if (!this.abbrevLength()) {
+        return false;
+      }
+      return false;
+    },
+    abbrevLength() {
+      const abbrevLength = this.form.teamAbbrev;
+      if (abbrevLength.length > 3) {
+        this.$M.toast({ html: 'Abbreviation should be up to 3 characters.', classes: 'toast-fail' });
+        return false;
+      }
+      return false;
+    },
     closeModal() {
       this.error = '';
       this.$emit('close');
