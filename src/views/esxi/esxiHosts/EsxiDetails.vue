@@ -60,16 +60,16 @@
             <b>Processor Type: </b>{{ esxiHost.cpu.cpu_model }}
           </li>
           <li v-if="esxiHost.cpu" class="collection-item">
-            <b>Packages: </b>{{ esxiHost.cpu.num_cpu_pkgs }}
+            <b>Packages: </b>{{ esxiHost.cpu.cpu_pkgs }}
           </li>
           <li v-if="esxiHost.cpu" class="collection-item">
-            <b>Cores: </b>{{ esxiHost.cpu.num_cpu_cores }}
+            <b>Cores: </b>{{ esxiHost.cpu.cpu_cores }}
             <span v-if="esxiHost.cpu_details">
             x {{ getCpuCoreSpeed(esxiHost.cpu_details) }}
           </span>
           </li>
           <li v-if="esxiHost.cpu" class="collection-item">
-            <b>Threads: </b>{{ esxiHost.cpu.num_cpu_threads }}
+            <b>Threads: </b>{{ esxiHost.cpu.cpu_threads }}
           </li>
         </div>
         <div class="col s12 l6" v-if="esxiHost.account_list" >
