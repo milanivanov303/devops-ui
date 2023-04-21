@@ -50,13 +50,13 @@
       </div>
       <div class="row">
         <div class="col s12 l6">
-          <li v-if="esxiHost.cpu" class="collection-header">
+          <li v-if="esxiHost.cpu || esxiHost.cpu_details" class="collection-header">
             <span class="collection-section">CPU DETAILS</span>
           </li>
           <li v-if="esxiHost.cpu_details" class="collection-item">
             <b>Brand: </b>{{ getCpuBrand(esxiHost.cpu_details) }}
           </li>
-          <li v-if="esxiHost.cpu_details" class="collection-item">
+          <li v-if="esxiHost.cpu" class="collection-item">
             <b>Processor Type: </b>{{ esxiHost.cpu.cpu_model }}
           </li>
           <li v-if="esxiHost.cpu" class="collection-item">
