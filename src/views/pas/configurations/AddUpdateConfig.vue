@@ -238,13 +238,19 @@
           </div>
         </div>
         <div class="row">
-            <TextArea
-                class="col s12"
-                :class="{readonly: action === 'view'}"
-                label="Additional info"
-                icon="description"
+          <div class="col s12">
+            <label for="additional-info">Additional info</label>
+            <div class="input-field">
+              <i class="material-icons prefix">description</i>
+              <textarea
+                id="additional-info"
+                class="materialize-textarea"
                 v-model="form.additional_info"
-            />
+                :style="{'min-height': '70px',
+                'overflow-y': action === 'view' ? 'scroll' : 'auto'}"
+              />
+            </div>
+          </div>
         </div>
         <div class="row" v-if="form.created_on">
           <TextInput
