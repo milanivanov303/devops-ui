@@ -82,33 +82,22 @@
           </li>
         </div>
       </div>
-      <div class="row">
-        <div class="col s12 l6" v-if="esxiHost.power_details">
+      <div class="row" v-if="esxiHost.power_details">
+        <div class="col s12 l6">
           <li class="collection-header">
             <span class="collection-section">POWER DETAILS</span>
           </li>
-          <li class="collection-item"><b>Power allocated watts:</b> 
-            {{ JSON.parse(esxiHost.power_details).power_allocated_watts }}
+          <li class="collection-item"><b>Power allocated watts:</b>
+            {{ esxiHost.power_details.power_allocated_watts }}
           </li>
           <li class="collection-item"><b>Average consumed watts:</b>
-            {{ JSON.parse(esxiHost.power_details).average_consumed_watts }}
+            {{ esxiHost.power_details.average_consumed_watts }}
           </li>
-          <li class="collection-item"><b>Max consumed watts:</b> 
-            {{ JSON.parse(esxiHost.power_details).max_consumed_watts }}
+          <li class="collection-item"><b>Max consumed watts:</b>
+            {{ esxiHost.power_details.max_consumed_watts }}
           </li>
-          <li class="collection-item"><b>Member ID slot one:</b> 
-            {{ JSON.parse(esxiHost.power_details).member_id_slot_one }}
-          </li>
-          <li class="collection-item"><b>Status one: </b>
-            <b>State:</b> {{ JSON.parse(esxiHost.power_details).status_one.State }},
-            <b>Health:</b> {{ JSON.parse(esxiHost.power_details).status_one.Health }}
-          </li>
-          <li class="collection-item"><b>Member ID slot two:</b> 
-            {{ JSON.parse(esxiHost.power_details).member_id_slot_two }}
-          </li>
-          <li class="collection-item"><b>Status two: </b>
-            <b>State:</b> {{ JSON.parse(esxiHost.power_details).status_two.State }},
-            <b>Health:</b> {{ JSON.parse(esxiHost.power_details).status_two.Health }}
+          <li class="collection-item" v-for="slot in esxiHost.power_details.slots" :key="slot.id">
+            <b>{{ slot.name }}:</b> State: {{ slot.status.State }}, Health: {{ slot.status.Health }}
           </li>
         </div>
       </div>
