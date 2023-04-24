@@ -8,7 +8,7 @@
           </li>
           <li v-if="esxiHost.board_info" class="collection-item">
             <b>Motherboard: </b>{{ esxiHost.board_info.product }},
-            {{ esxiHost.board_info.version }},
+            <span v-if="esxiHost.board_info.version">{{ esxiHost.board_info.version }} ,</span>
             {{ esxiHost.board_info.manufacturer }}
           </li>
           <li v-if="esxiHost.version" class="collection-item">
