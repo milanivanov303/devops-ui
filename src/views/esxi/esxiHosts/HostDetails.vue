@@ -37,8 +37,8 @@
               </a>
             </div>
             <div class="col s12 m6 l8">
-              <b class="notes">
-                {{ esxiHost.cpu.num_cpu_threads }} physical CPUs, {{ assignedCpus }} assigned CPUs
+              <b class="notes" v-if="esxiHost.cpu">
+                {{ esxiHost.cpu.cpu_threads }} physical CPUs, {{ assignedCpus }} assigned CPUs
               </b>
             </div>
             <div class="col s12 m6 l4">
