@@ -39,10 +39,10 @@ export default {
   },
   methods: {
     getCPUcoresByHost(host) {
-      if (!host.cpu) {
-        return 0;
+      if (host.cpu) {
+        return host.cpu.cpu_cores;
       }
-      return parseInt(host.cpu.num_cpu_cores, 10);
+      return 0;
     },
   },
 };

@@ -1,19 +1,19 @@
 <template>
   <div class="documentation" ref="files">
     <div class="row">
-      <TextInput class="col s12 m8" label="Search" v-model="search"/>
-      <div class="col s12 m4">
+      <TextInput class="col s12 m8" label="Search in yaml file content" v-model="search"/>
+      <div class="col s12 m4" v-if="xTags.length">
         <Select
-            class="branches"
-            :options="branches"
-            displayed="name"
-            :default-option="false"
-            v-model="branch"
+            class="x-tags"
+            :options="xTags"
+            defaultOptionText="Search by x-tag"
+            :multiple="true"
+            v-model="xTag"
         />
       </div>
     </div>
     <Table
-      :data="filteredFiles"
+      :data="files"
       :add-btn="false"
       :export-btn="false"
       :view-btn="false"
@@ -70,11 +70,8 @@ export default {
   data() {
     return {
       repo: 'specifications',
-      branches: [],
-      branch: this.$route.query.branch || 'main',
       search: '',
-      filteredFiles: [],
-      files: [],
+      xTag: [],
       file: {},
       showRawModal: false,
       showRedocModal: false,
@@ -87,41 +84,39 @@ export default {
     module() {
       return this.$route.params.module;
     },
+    files() {
+      let files = this.$store.getters['documentation/getYamlFiles'];
+
+      if (this.search !== '') {
+        files = files.filter((file) => file.path.toLowerCase().includes(this.search.toLowerCase())
+          || JSON.stringify(file.content).toLowerCase().includes(this.search.toLowerCase()));
+      }
+      if (this.xTag.length) {
+        files = files.filter((file) => file.content.info['x-tag'] && this.xTag.some((tag) => file.content.info['x-tag'].includes(tag)));
+      }
+      return files;
+    },
+    xTags() {
+      const options = [];
+      this.$store.getters['documentation/getYamlFiles'].forEach((file) => {
+        if (file.content && file.content.info['x-tag']) {
+          options.push(...file.content.info['x-tag'].split(',').map((option) => option.trim()));
+        }
+      });
+      return options.filter((key, idx) => options.indexOf(key) === idx);
+    },
   },
 
   methods: {
-    getBranches() {
-      this.$store.dispatch('documentation/getBranches', {
-        repo: this.repo,
-      })
-        .then((response) => {
-          this.branches = response.data.map((branch) => branch.name);
-        });
-    },
-
     getFiles() {
       const loader = this.$loading.show({ container: this.$refs.files });
 
       this.$store.dispatch('documentation/getSpecs', {
         repo: this.repo,
-        branch: this.branch,
         apis_dir: this.module,
       })
-        .then((response) => {
-          this.files = response.data.filter((file) => {
-            if (file.path.endsWith('.yaml') || file.path.endsWith('.yml')) {
-              return true;
-            }
-            return false;
-          });
-
-          if (!this.$route.query.file) {
-            this.filteredFiles = this.files;
-            return;
-          }
-
+        .then(() => {
           const file = this.files.find((file) => file.path === this.$route.query.file);
-
           if (file) {
             if (this.$route.query.action === 'raw') {
               this.openRawModal(file);
@@ -129,7 +124,6 @@ export default {
             }
             this.openRedocModal(file);
           }
-          this.filteredFiles = this.files;
         })
         .catch((error) => {
           this.$M.toast({ html: `Error: ${error.response.status} ${error.response.statusText}`, classes: 'toast-fail' });
@@ -143,7 +137,6 @@ export default {
       }
       return file.content.info.title;
     },
-
     getDescription(file) {
       if (!file.content || !file.content.info) {
         return '';
@@ -156,7 +149,6 @@ export default {
       this.showRawModal = true;
 
       const query = {
-        branch: this.branch,
         file: this.file.path,
         action: 'raw',
       };
@@ -166,7 +158,6 @@ export default {
         query: { ...this.$route.query, ...query },
       });
     },
-
     closeRawModal() {
       this.file = {};
       this.showRawModal = false;
@@ -181,13 +172,11 @@ export default {
         query,
       });
     },
-
     openRedocModal(file) {
       this.file = file;
       this.showRedocModal = true;
 
       const query = {
-        branch: this.branch,
         file: this.file.path,
         action: 'redoc',
       };
@@ -197,7 +186,6 @@ export default {
         query: { ...this.$route.query, ...query },
       });
     },
-
     closeRedocModal() {
       this.file = {};
       this.showRedocModal = false;
@@ -219,7 +207,6 @@ export default {
       this.downloading = true;
       this.$store.dispatch('documentation/download', {
         repo: this.repo,
-        branch: this.branch,
         apis_dir: this.module,
         files,
       })
@@ -229,7 +216,6 @@ export default {
       this.exporting = true;
       this.$store.dispatch('documentation/export', {
         repo: this.repo,
-        branch: this.branch,
         apis_dir: this.module,
       })
         .finally(() => { this.exporting = false; });
@@ -240,26 +226,9 @@ export default {
     module() {
       this.getFiles();
     },
-    branch() {
-      this.$router.push({
-        path: `/documentation/${this.module}`,
-        query: { branch: this.branch },
-      });
-
-      this.getFiles();
-    },
-    search(value) {
-      this.filteredFiles = this.files.filter((file) => {
-        if (JSON.stringify(file.content).toLowerCase().includes(value.toLowerCase())) {
-          return true;
-        }
-        return false;
-      });
-    },
   },
 
   mounted() {
-    this.getBranches();
     this.getFiles();
   },
 };

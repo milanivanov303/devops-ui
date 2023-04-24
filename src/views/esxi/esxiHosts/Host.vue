@@ -26,8 +26,8 @@
           </div>
           <div v-if="esxiHost.cpu">
             <b>CPU:</b>
-            <span v-if="esxiHost.cpu.num_cpu_cores">
-              {{ esxiHost.cpu.num_cpu_cores }} cores
+            <span v-if="esxiHost.cpu.cpu_cores">
+              {{ esxiHost.cpu.cpu_cores }} cores
             </span>
               <span v-if="esxiHost.cpu_details">
               x {{ getCpuCoreSpeed(esxiHost.cpu_details) }}
