@@ -232,5 +232,4 @@ export default {
       .catch(() => commit('error', 'Could not remove saved email'));
     return promise;
   },
-
 };
