@@ -82,6 +82,25 @@
           </li>
         </div>
       </div>
+      <div class="row" v-if="esxiHost.power_details">
+        <div class="col s12 l6">
+          <li class="collection-header">
+            <span class="collection-section">POWER DETAILS</span>
+          </li>
+          <li class="collection-item"><b>Power allocated watts:</b>
+            {{ esxiHost.power_details.power_allocated_watts }}
+          </li>
+          <li class="collection-item"><b>Average consumed watts:</b>
+            {{ esxiHost.power_details.average_consumed_watts }}
+          </li>
+          <li class="collection-item"><b>Max consumed watts:</b>
+            {{ esxiHost.power_details.max_consumed_watts }}
+          </li>
+          <li class="collection-item" v-for="slot in esxiHost.power_details.slots" :key="slot.id">
+            <b>{{ slot.name }}:</b> State: {{ slot.status.State }}, Health: {{ slot.status.Health }}
+          </li>
+        </div>
+      </div>
     </ul>
     <span v-else class="col s12">Sorry! There is no data. Please update and try again.</span>
   </div>
