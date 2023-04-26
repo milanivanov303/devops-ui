@@ -8,7 +8,7 @@
           </li>
           <li v-if="esxiHost.board_info" class="collection-item">
             <b>Motherboard: </b>{{ esxiHost.board_info.product }},
-            {{ esxiHost.board_info.version }},
+            <span v-if="esxiHost.board_info.version">{{ esxiHost.board_info.version }} ,</span>
             {{ esxiHost.board_info.manufacturer }}
           </li>
           <li v-if="esxiHost.version" class="collection-item">
@@ -50,26 +50,26 @@
       </div>
       <div class="row">
         <div class="col s12 l6">
-          <li v-if="esxiHost.cpu" class="collection-header">
+          <li v-if="esxiHost.cpu || esxiHost.cpu_details" class="collection-header">
             <span class="collection-section">CPU DETAILS</span>
           </li>
           <li v-if="esxiHost.cpu_details" class="collection-item">
             <b>Brand: </b>{{ getCpuBrand(esxiHost.cpu_details) }}
           </li>
-          <li v-if="esxiHost.cpu_details" class="collection-item">
+          <li v-if="esxiHost.cpu" class="collection-item">
             <b>Processor Type: </b>{{ esxiHost.cpu.cpu_model }}
           </li>
           <li v-if="esxiHost.cpu" class="collection-item">
-            <b>Packages: </b>{{ esxiHost.cpu.num_cpu_pkgs }}
+            <b>Packages: </b>{{ esxiHost.cpu.cpu_pkgs }}
           </li>
           <li v-if="esxiHost.cpu" class="collection-item">
-            <b>Cores: </b>{{ esxiHost.cpu.num_cpu_cores }}
+            <b>Cores: </b>{{ esxiHost.cpu.cpu_cores }}
             <span v-if="esxiHost.cpu_details">
             x {{ getCpuCoreSpeed(esxiHost.cpu_details) }}
           </span>
           </li>
           <li v-if="esxiHost.cpu" class="collection-item">
-            <b>Threads: </b>{{ esxiHost.cpu.num_cpu_threads }}
+            <b>Threads: </b>{{ esxiHost.cpu.cpu_threads }}
           </li>
         </div>
         <div class="col s12 l6" v-if="esxiHost.account_list" >
@@ -79,6 +79,25 @@
           <li class="collection-item"
               v-for="[key, value] in Object.entries(esxiHost.account_list)" :key="key.id">
             <b>{{ key }} </b>- {{ value }}
+          </li>
+        </div>
+      </div>
+      <div class="row" v-if="esxiHost.power_details">
+        <div class="col s12 l6">
+          <li class="collection-header">
+            <span class="collection-section">POWER DETAILS</span>
+          </li>
+          <li class="collection-item"><b>Power allocated watts:</b>
+            {{ esxiHost.power_details.power_allocated_watts }}
+          </li>
+          <li class="collection-item"><b>Average consumed watts:</b>
+            {{ esxiHost.power_details.average_consumed_watts }}
+          </li>
+          <li class="collection-item"><b>Max consumed watts:</b>
+            {{ esxiHost.power_details.max_consumed_watts }}
+          </li>
+          <li class="collection-item" v-for="slot in esxiHost.power_details.slots" :key="slot.id">
+            <b>{{ slot.name }}:</b> State: {{ slot.status.State }}, Health: {{ slot.status.Health }}
           </li>
         </div>
       </div>

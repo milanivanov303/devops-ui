@@ -238,13 +238,19 @@
           </div>
         </div>
         <div class="row">
-            <TextArea
-                class="col s12"
-                :class="{readonly: action === 'view'}"
-                label="Additional info"
-                icon="description"
+          <div class="col s12">
+            <label for="additional-info">Additional info</label>
+            <div class="input-field">
+              <i class="material-icons prefix">description</i>
+              <textarea
+                id="additional-info"
+                class="materialize-textarea"
                 v-model="form.additional_info"
-            />
+                :style="{'min-height': '70px',
+                'overflow-y': action === 'view' ? 'scroll' : 'auto'}"
+              />
+            </div>
+          </div>
         </div>
         <div class="row" v-if="form.created_on">
           <TextInput
@@ -289,12 +295,8 @@
 </template>
 <script>
 import { required } from 'vuelidate/lib/validators';
-import TextArea from '@/components/TextArea';
 
 export default {
-  components: {
-    TextArea,
-  },
   props: {
     action: String,
     configuration: Object,
@@ -504,6 +506,11 @@ export default {
       }
       payload.branch = this.form.branch.name;
       payload.prefix = this.form.prefix.package;
+
+      delete payload.created_on;
+      delete payload.created_by;
+      delete payload.updated_on;
+      delete payload.updated_by;
 
       this.$store.dispatch(`pas/${this.action}Configuration`, payload)
         .then(() => {

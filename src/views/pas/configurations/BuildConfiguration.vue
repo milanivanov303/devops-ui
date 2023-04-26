@@ -1,5 +1,5 @@
 <template>
-  <Modal class="right-sheet" @close="$emit('close')">
+  <Modal class="right-sheet" @close="close()">
     <template v-slot:header>
       <span v-if="action === 'build'">Build configuration</span>
     </template>
@@ -170,7 +170,12 @@
       />
     </template>
     <template v-slot:footer>
-      <button v-if="!build.started" class="waves-effect btn" @click="start()">
+      <button
+        v-if="!build.started"
+        class="waves-effect btn"
+        :disabled="isButtonDisabled"
+        @click="start()"
+      >
         <i class="material-icons left">play_arrow</i> Start
       </button>
     </template>
@@ -198,6 +203,7 @@ export default {
 
   data() {
     return {
+      isButtonDisabled: false,
       ttsKey: this.$route.params.issue,
       issueError: null,
       binaryType: {},
@@ -379,9 +385,9 @@ export default {
   },
 
   methods: {
-    checkIssue() {
+    async checkIssue() {
       this.issueError = null;
-      this.$store.dispatch('mmpi/getIssue', this.ttsKey)
+      await this.$store.dispatch('mmpi/getIssue', this.ttsKey)
         .then(() => {
           this.issueError = false;
         })
@@ -397,19 +403,17 @@ export default {
       this.checkIssue();
     }, 2000),
 
-    start() {
-      if (this.issueError === null) {
-        this.checkIssue();
-      }
+    async start() {
+      const loader = this.$loading.show({ });
+      await this.checkIssue();
 
       this.$v.$touch();
-      if (this.$v.$invalid || this.issueError !== false) {
+      if (this.$v.$invalid || this.issueError) {
+        loader.hide();
         return;
       }
 
-      this.build.started = true;
-      this.build.summary = 'Build will start shortly ...';
-
+      this.isButtonDisabled = true;
       const payload = {
         branch: this.configuration.app_type === 'extranet' && this.configuration.app_version === 'X4' ? this.hash.name : this.hash.commit,
         fe_branch: this.feHash ? this.feHash.commit : null,
@@ -438,6 +442,7 @@ export default {
           EventBus.$emit('build.created');
         })
         .catch((error) => {
+          loader.hide();
           this.build.status = 'failed';
           this.build.summary = 'Could not start build';
           if (error.response.status === 403) {
@@ -446,7 +451,14 @@ export default {
             this.build.error = error;
           }
         })
-        .finally(() => { this.build.started = true; });
+        .finally(() => {
+          this.build.started = true;
+          loader.hide();
+        });
+    },
+    close() {
+      this.isButtonDisabled = false;
+      this.$emit('close');
     },
   },
 

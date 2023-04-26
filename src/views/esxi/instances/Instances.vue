@@ -30,6 +30,7 @@
           (instance.ssl && instance.ssl.lastActive) ?
           $date(instance.ssl.lastActive / 1000 ).toHuman() : 'n/a'"/>
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
+        <Column show="client" width="10%"/>
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
         <Column v-if="!instances" label="Virtual Machine" name="vm"
@@ -38,13 +39,8 @@
         <Column show="activity" width="10%"/>
         <Column show="version" class="dont-break-out" width="10%"/>
         <Column show="pwd_hash_type" width="10%"/>
-
+        <Column show="creation_date" width="10%"/>
         <template v-slot:actions-before="{ row }">
-<!--          <a target="_blank"-->
-<!--             data-tooltip="Extranet"-->
-<!--             class="tooltipped">-->
-<!--            <i class="material-icons">laptop_chromebook</i>-->
-<!--          </a>-->
           <a v-if="row.error"
              target="_blank"
              :data-tooltip="row.error"

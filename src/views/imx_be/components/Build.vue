@@ -83,7 +83,9 @@
             id="start-btn"
             v-if="!build.started"
             class="waves-effect btn"
-            @click="start()">
+            :disabled="isButtonDisabled"
+            @click="start()"
+          >
             <i class="material-icons left">play_arrow</i> Start
           </button>
         </template>
@@ -101,6 +103,7 @@ import EventBus from '@/event-bus';
 
 function initialState() {
   return {
+    isButtonDisabled: false,
     showModal: false,
     form: {
       branch: null,
@@ -152,7 +155,7 @@ export default {
         ttsKey: {
           required,
           validKey(value) {
-            return /^[A-Z]+-[0-9]+$/.test(value);
+            return /^(?:[A-Z]|[0-9])+-[0-9]+$/.test(value);
           },
         },
       },
@@ -188,6 +191,7 @@ export default {
     close() {
       this.$v.$reset();
       this.showModal = false;
+      this.isButtonDisabled = false;
     },
 
     start() {
@@ -196,6 +200,7 @@ export default {
         return;
       }
 
+      this.isButtonDisabled = true;
       this.$store.dispatch('imx_be/startBuild', {
         branch: this.form.branch ? this.form.branch.name : this.branch,
         instance: this.form.instance,

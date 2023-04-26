@@ -106,7 +106,9 @@
             id="start-btn"
             v-if="!build.started"
             class="waves-effect btn"
-            @click="start()">
+            :disabled="isButtonDisabled"
+            @click="start()"
+          >
             <i class="material-icons left">play_arrow</i> Start
           </button>
         </template>
@@ -123,6 +125,7 @@ import EventBus from '@/event-bus';
 
 function initialState() {
   return {
+    isButtonDisabled: false,
     showModal: false,
     form: {
       branch: null,
@@ -225,6 +228,7 @@ export default {
 
     close() {
       this.showModal = false;
+      this.isButtonDisabled = false;
       this.$v.$reset();
     },
 
@@ -234,6 +238,7 @@ export default {
         return;
       }
 
+      this.isButtonDisabled = true;
       this.$store.dispatch('debiteur/startBuild', {
         branch: this.form.branch ? this.form.branch.name : this.branch,
         client: this.form.client,

@@ -5,6 +5,7 @@ export default {
     const promise = api('devops').get('specs', payload);
 
     promise
+      .then((response) => commit('specs', response.data))
       .catch(() => commit('error', 'Could not get apiDocumentationList', { root: true }));
     return promise;
   },
@@ -15,14 +16,6 @@ export default {
 
     promise
       .catch(() => commit('error', 'Could not get documentation details', { root: true }));
-    return promise;
-  },
-
-  getBranches({ commit }, payload) {
-    const promise = api('devops').get('specs/branches', payload);
-
-    promise
-      .catch(() => commit('error', 'Could not get repository branches', { root: true }));
     return promise;
   },
 
