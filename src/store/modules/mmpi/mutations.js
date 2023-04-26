@@ -4,67 +4,51 @@ export default {
   error(state, error) {
     state.error = error;
   },
-
   projects(state, projects) {
     state.projects = projects;
   },
-  activeProjects(state, activeProjects) {
-    state.activeProjects = activeProjects;
-  },
-  requestProjects(state, requestProjects) {
-    state.requestProjects = requestProjects;
-  },
-  updateProject(state, project) {
-    state.projects.map((p) => {
-      if (p.id === project.id) {
-        Object.assign(p, project);
-      }
-      return state.projects;
-    });
-  },
-
-  deliveryChains(state, deliveryChains) {
-    state.delivery_chains = deliveryChains;
-  },
-
-  deliveryChainRoles(state, deliveryChainRoles) {
-    state.delivery_chain_roles = deliveryChainRoles;
-  },
-  // Delivery Chanins for CMS Inventory page
-  deliveryChainsCMS(state, deliveryChains) {
-    state.deliveryChains = deliveryChains;
-  },
-
-  appVersions(state, versions) {
-    state.app_versions = versions;
-  },
-
   instances(state, instances) {
     state.instances = instances;
   },
-  instanceTypes(state, instanceTypes) {
-    state.instanceTypes = instanceTypes;
-  },
-  instanceStatus(state, instanceStatus) {
-    state.instanceStatus = instanceStatus;
-  },
-  devInstances(state, devInstances) {
-    state.devInstances = devInstances;
+
+  // DevOps Matrix
+  appVersions(state, versions) {
+    state.app_versions = versions;
   },
   deployInstances(state, deployInstances) {
     state.deploy_instances = deployInstances;
   },
-  environmentTypes(state, environmentTypes) {
-    state.environmentTypes = environmentTypes;
-  },
-
-  operationType(state, operationType) {
-    state.operationType = operationType;
-  },
   binaryTypes(state, binaryTypes) {
     state.binaryTypes = binaryTypes;
   },
+
+  // Delivery Chanins for CMS Inventory page
+  deliveryChainsCMS(state, deliveryChains) {
+    state.deliveryChains = deliveryChains;
+  },
+  devInstances(state, devInstances) {
+    state.devInstances = devInstances;
+  },
+
+  // Modifications Tab
+  operationType(state, operationType) {
+    state.operationType = operationType;
+  },
   miscellaneous(state, miscellaneous) {
     state.miscellaneous = miscellaneous;
+  },
+  instanceStatus(state, instanceStatus) {
+    state.instanceStatus = instanceStatus;
+  },
+
+  // Request instance tab
+  requestProjects(state, requestProjects) {
+    state.requestProjects = requestProjects;
+  },
+  deliveryChainRoles(state, deliveryChainRoles) {
+    state.delivery_chain_roles = deliveryChainRoles;
+  },
+  environmentTypes(state, environmentTypes) {
+    state.environmentTypes = environmentTypes;
   },
 };
