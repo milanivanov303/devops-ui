@@ -141,6 +141,25 @@ export default {
       .catch(() => commit('error', 'Could not remove imx component'));
     return promise;
   },
+  // OS for request instance form
+  getOsComponents({ commit }) {
+    const promise = api('devops').get('inventory/imx-components', {
+      filters: JSON.stringify({
+        allOf: [
+          {
+            type: 'OS',
+          },
+        ],
+      }),
+    });
+
+    promise
+      .then((response) => {
+        commit('osPlatforms', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get iMX OS components', { root: true }));
+    return promise;
+  },
 
   getRequestedInstances({ commit }) {
     const promise = api('devops').get('inventory/requested-instances');
@@ -176,7 +195,6 @@ export default {
       .catch((error) => commit('error', error));
     return promise;
   },
-
   getExpiringComponentsExport({ commit }, payload) {
     const promise = api('devops').post(
       'inventory/imx-components/expiring/export',
@@ -197,6 +215,7 @@ export default {
       .catch((error) => commit('error', error));
     return promise;
   },
+
   getSavedEmails({ commit }) {
     const promise = api('devops').get('inventory/saved-emails');
 

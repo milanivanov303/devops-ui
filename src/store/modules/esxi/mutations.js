@@ -9,16 +9,6 @@ export default {
   esxiHosts(state, esxiHosts) {
     state.esxiHosts = esxiHosts;
   },
-  allVirtualMachines(state, virtualMachines) {
-    state.allVirtualMachines = virtualMachines;
-  },
-  virtualMachines(state, virtualMachines) {
-    state.virtualMachines = virtualMachines;
-  },
-  instances(state, instances) {
-    state.instances = instances;
-  },
-
   createHost(state, host) {
     const { esxiHosts } = state;
     esxiHosts.push(host);
@@ -33,6 +23,12 @@ export default {
     });
   },
 
+  allVirtualMachines(state, virtualMachines) {
+    state.allVirtualMachines = virtualMachines;
+  },
+  virtualMachines(state, virtualMachines) {
+    state.virtualMachines = virtualMachines;
+  },
   updateVirtualMachine(state, virtualMachine) {
     state.virtualMachines.map((vm) => {
       if (vm.id === virtualMachine.id) {
@@ -40,6 +36,10 @@ export default {
       }
       return state.virtualMachines;
     });
+  },
+
+  instances(state, instances) {
+    state.instances = instances;
   },
 
   imxComponents(state, imxComponents) {
@@ -64,6 +64,9 @@ export default {
       1,
     );
   },
+  osPlatforms(state, osPlatforms) {
+    state.osPlatforms = osPlatforms;
+  },
 
   requestedInstances(state, instances) {
     state.requestedInstances = instances;
@@ -81,6 +84,7 @@ export default {
       return state.requestedInstances;
     });
   },
+
   expiringComponents(state, expiringComponents) {
     state.expiringComponents = expiringComponents;
   },

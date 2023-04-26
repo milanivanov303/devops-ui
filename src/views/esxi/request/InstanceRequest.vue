@@ -54,15 +54,6 @@ export default {
     },
   },
   methods: {
-    // getStatus(status) {
-    //   if (status === 'on') {
-    //     return `<span class="new badge green" data-badge-caption="">${status}</span>`;
-    //   }
-    //   if (status === 'off') {
-    //     return `<span class="new badge red" data-badge-caption="">${status}</span>`;
-    //   }
-    //   return `<span class="new badge" data-badge-caption="">${status}</span>`;
-    // },
     getRequested() {
       const loader = this.$loading.show({ container: this.$refs.requested });
       this.$store.dispatch('esxi/getRequestedInstances')
@@ -94,13 +85,12 @@ export default {
       this.selected = { ...request };
       this.action = action;
 
-      // const promise1 = this.$store.dispatch('mmpi/getProjects');
-      // const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
-      // const promise3 = this.$store.dispatch('mmpi/getInstanceTypes');
-      // const promise4 = this.$store.dispatch('mmpi/getEnvironmentTypes');
-      const promise5 = this.$store.dispatch('mmpi/getProjectsForInstanceRequest');
+      const promise1 = this.$store.dispatch('mmpi/getProjectsForInstanceRequest');
+      const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
+      const promise3 = this.$store.dispatch('mmpi/getEnvironmentTypes');
+      const promise4 = this.$store.dispatch('esxi/getOsComponents');
 
-      Promise.all([promise5])
+      Promise.all([promise1, promise2, promise3, promise4])
         .then(() => {
           this.showAddEditModal = true;
           this.$router.push({

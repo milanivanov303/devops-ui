@@ -85,6 +85,45 @@
           </div>
         </fieldset>
         <fieldset v-if="selected.project">
+          <legend>Main requirements</legend>
+          <div class="row">
+            <div class="col s12 m6">
+              <Autocomplete
+                  label="Delivery chain"
+                  valueKey="title"
+                  :items="projectDeliveryChains"
+                  v-model="selected.delivery_chain"
+                  @change="delete selected.dc_role"
+              />
+            </div>
+            <div class="col s12 m6">
+              <Autocomplete
+                  label="Delivery chain role"
+                  :items="deliveryChainRoles"
+                  valueKey="value"
+                  v-model="selected.dc_role"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s12 m6">
+              <Autocomplete
+                  label="Instance type"
+                  :items="instanceTypes"
+                  v-model="selected.instance_type"
+              />
+            </div>
+            <div class="col s12 m6">
+              <Autocomplete
+                  label="Purpose (Environment type)"
+                  :items="environmentTypes"
+                  valueKey="title"
+                  v-model="selected.environment_type"
+              />
+            </div>
+          </div>
+        </fieldset>
+        <fieldset v-if="selected.project">
           <legend>Additional requirements</legend>
           <div class="row">
             <div class="col s12 m6">
@@ -113,23 +152,22 @@
             <div class="col s12 m4">
               <Autocomplete
                 label="OS Platform (Hardware)"
-                :items="[{ name: 'Linux' },
-                         { name: 'Aix'},
-                         { name: 'Other'},
-                         { name: 'N/A'}]"
+                :items="osPlatforms"
                 v-model="selected.os"
               />
             </div>
             <div class="col s12 m4">
               <TextInput
                 label="Oracle Fusion Middleware version"
-                v-model="selected.project.oracle_middleware"
+                v-model="selected.oracle_middleware"
               />
             </div>
             <div class="col s12 m4">
-              <TextInput
-                label="Oracle DB version"
-                v-model="selected.project.oracle_version"
+              <Autocomplete
+                  label="Oracle DB version"
+                  :items="dbVersions"
+                  valueKey="version"
+                  v-model="selected.oracle_version"
               />
             </div>
           </div>
@@ -285,49 +323,6 @@
               v-model="selected.comments"
             />
           </div>
-          <div class="row">
-            <div class="col s12 m6">
-              <Autocomplete
-                  label="Purpose/Environment type"
-                  :items="environmentTypes"
-                  valueKey="title"
-                  v-model="selected.environment_type"
-              />
-              <div class="validator">
-                <div class="red-text" v-if="$v.selected.environment_type.$error">
-                  <p v-if="!$v.selected.environment_type.required">
-                    Environment type field must not be empty.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="col s12 m6">
-              <Autocomplete
-                  label="Instance type"
-                  :items="instanceTypes"
-                  valueKey="type"
-                  v-model="selected.instance_type"
-                  :invalid="$v.selected.instance_type.$error"
-                  @blur="$v.selected.instance_type.$touch()"
-              />
-              <div class="validator">
-                <div class="red-text" v-if="$v.selected.instance_type.$error">
-                  <p v-if="!$v.selected.instance_type.required">
-                    Instance type field must not be empty.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s12 m6">
-              <TextInput
-                  label="Delivery chain role"
-                  value="value"
-                  v-model="selected.dc_role"
-              />
-            </div>
-          </div>
         </fieldset>
       </form>
     </template>
@@ -366,18 +361,6 @@ export default {
       project: {
         required,
       },
-      delivery_chain: {
-        required,
-      },
-      dc_role: {
-        required,
-      },
-      instance_type: {
-        required,
-      },
-      environment_type: {
-        required,
-      },
     },
   },
   computed: {
@@ -396,10 +379,23 @@ export default {
       return this.$store.state.mmpi.delivery_chain_roles || [];
     },
     instanceTypes() {
-      return this.$store.state.mmpi.instanceTypes || [];
+      return [
+        { name: 'Intranet' },
+        { name: 'Extranet' },
+        { name: 'AD' },
+      ];
     },
     environmentTypes() {
       return this.$store.state.mmpi.environmentTypes || [];
+    },
+    osPlatforms() {
+      return this.$store.state.esxi.osPlatforms;
+    },
+    dbVersions() {
+      if (this.selected.os) {
+        return this.selected.os.versions.filter((version) => version.approved) || [];
+      }
+      return [];
     },
   },
   methods: {
@@ -430,53 +426,21 @@ export default {
         this.selected.environment_type = this.environmentTypes
           .find((environmentType) => environmentType.title === this.request.environment_type);
       }
-
-      if (this.request.mail !== null) {
-        this.selected.mail = this.request.mail === 1
-          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
-      }
-
-      if (this.request.telephony !== null) {
-        this.selected.telephony = this.request.telephony === 1
-          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
-      }
-
-      if (this.request.fax !== null) {
-        this.selected.fax = this.request.fax === 1
-          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
-      }
-
-      if (this.request.sms !== null) {
-        this.selected.sms = this.request.sms === 1
-          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
-      }
-
-      if (this.request.imagerie !== null) {
-        this.selected.imagerie = this.request.imagerie === 1
-          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
-      }
-
-      if (this.request.archivage !== null) {
-        this.selected.archivage = this.request.archivage === 1
-          ? { name: 'Yes', value: 1 } : { name: 'No', value: 0 };
-      }
     },
 
     getProjectBusinessArea(project) {
       if (project.project_specifics.length > 0) {
         return project.project_specifics.find((ps) => ps.project_specific_feature.subtype === 'business_type')
-            .project_specific_feature.value || '';
+          .project_specific_feature.value || '';
       }
       return '';
     },
-
     getProjectBusinessActivity(project) {
       if (project.type_business.length > 0) {
         return project.type_business[0].value || '';
       }
       return '';
     },
-
     getDefaultDeliveryChainRole() {
       if (this.selected.delivery_chain && this.selected.delivery_chain.dc_role) {
         this.selected.dc_role = { value: this.selected.delivery_chain.dc_role.value };
