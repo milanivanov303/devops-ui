@@ -51,4 +51,7 @@ export default {
   environmentTypes(state, environmentTypes) {
     state.environmentTypes = environmentTypes;
   },
+  instanceTypesVersions(state, versions) {
+    state.instanceTypesVersions = versions;
+  },
 };

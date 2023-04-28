@@ -456,4 +456,23 @@ export default {
       .catch(() => commit('error', 'Could not get environment types list'));
     return promise;
   },
+  getInstanceTypesVersions({ commit }) {
+    const name = 'instanceTypesVersions';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('mmpi').get('enum-values', {
+      type: 'delivery_chain_version',
+    });
+
+    commit('promise', { name, promise }, { root: true });
+
+    promise
+      .then((resp) => commit('instanceTypesVersions', resp.data.data))
+      .catch(() => commit('error', 'Could not get instance type\'s versions list'));
+    return promise;
+  },
+
 };

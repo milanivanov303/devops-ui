@@ -19,4 +19,5 @@ export default {
   requestProjects: [],
   delivery_chain_roles: [],
   environmentTypes: [],
+  instanceTypesVersions: [],
 };

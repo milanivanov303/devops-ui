@@ -85,19 +85,22 @@ export default {
       this.selected = { ...request };
       this.action = action;
 
+      const loader = this.$loading.show({ container: this.$refs.requested });
       const promise1 = this.$store.dispatch('mmpi/getProjectsForInstanceRequest');
       const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
       const promise3 = this.$store.dispatch('mmpi/getEnvironmentTypes');
-      const promise4 = this.$store.dispatch('esxi/getOsComponents');
+      const promise4 = this.$store.dispatch('mmpi/getInstanceTypesVersions');
+      const promise5 = this.$store.dispatch('esxi/getOsComponents');
 
-      Promise.all([promise1, promise2, promise3, promise4])
+      Promise.all([promise1, promise2, promise3, promise4, promise5])
         .then(() => {
           this.showAddEditModal = true;
           this.$router.push({
             path: `/inventory/request/${encodeURIComponent(this.selected.id || 'new')}`,
           });
         })
-        .catch((error) => this.$M.toast({ html: error, classes: 'toast-fail' }));
+        .catch((error) => this.$M.toast({ html: error, classes: 'toast-fail' }))
+        .finally(() => loader.hide());
     },
     closeAddEditModal() {
       this.showAddEditModal = false;

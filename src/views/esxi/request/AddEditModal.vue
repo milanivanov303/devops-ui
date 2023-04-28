@@ -106,14 +106,24 @@
             </div>
           </div>
           <div class="row">
-            <div class="col s12 m6">
+            <div class="col s12" :class="{m4: selected.instance_type, m8: !selected.instance_type}">
               <Autocomplete
                   label="Instance type"
                   :items="instanceTypes"
                   v-model="selected.instance_type"
               />
             </div>
-            <div class="col s12 m6">
+            <div class="col s12 m4">
+              <Autocomplete
+                  v-if="selected.instance_type"
+                  label="Instance version"
+                  :items="getVersions(selected.instance_type.name === 'Intranet' ?
+                  'imx' : selected.instance_type.name )"
+                  valueKey="key"
+                  v-model="selected.instance_version"
+              />
+            </div>
+            <div class="col s12 m4">
               <Autocomplete
                   label="Purpose (Environment type)"
                   :items="environmentTypes"
@@ -149,20 +159,14 @@
             </div>
           </div>
           <div class="row">
-            <div class="col s12 m4">
+            <div class="col s12 m6">
               <Autocomplete
                 label="OS Platform (Hardware)"
                 :items="osPlatforms"
                 v-model="selected.os"
               />
             </div>
-            <div class="col s12 m4">
-              <TextInput
-                label="Oracle Fusion Middleware version"
-                v-model="selected.oracle_middleware"
-              />
-            </div>
-            <div class="col s12 m4">
+            <div class="col s12 m6">
               <Autocomplete
                   label="Oracle DB version"
                   :items="dbVersions"
@@ -172,66 +176,11 @@
             </div>
           </div>
           <div class="row">
-            <div class="col s12 m4">
-              <span>Intranet Application version</span>
-              <p>
-                <label>
-                  <input
-                    class="with-gap" name="intranet" type="radio"
-                    v-model="selected.intranet_version"/>
-                  <span>iMX v8</span>
-                </label>
-              </p>
-              <p>
-                <label>
-                  <input
-                    class="with-gap" name="intranet" type="radio"
-                    v-model="selected.intranet_version"/>
-                  <span>iMX v9</span>
-                </label>
-              </p>
-              <p>
-                <label>
-                  <input
-                    class="with-gap" name="intranet" type="radio"
-                    v-model="selected.intranet_version"/>
-                  <span>iMX v10</span>
-                </label>
-              </p>
-            </div>
-            <div class="col s12 m4">
-              <span>Extranet build version</span>
-              <p>
-                <label>
-                  <input
-                    class="with-gap" name="extranet" type="radio"
-                    v-model="selected.extranet_version"/>
-                  <span>XNET2</span>
-                </label>
-              </p>
-              <p>
-                <label>
-                  <input
-                    class="with-gap" name="extranet" type="radio"
-                    v-model="selected.extranet_version"/>
-                  <span>XNET3</span>
-                </label>
-              </p>
-            </div>
-            <div class="col s12 m4">
-              <span>AD version</span>
-              <p>
-                <label>
-                  <input class="with-gap" name="ad" type="radio" v-model="selected.ad_version"/>
-                  <span>v1</span>
-                </label>
-              </p>
-              <p>
-                <label>
-                  <input class="with-gap" name="ad" type="radio" v-model="selected.ad_version"/>
-                  <span>v2</span>
-                </label>
-              </p>
+            <div class="col s12">
+              <TextInput
+                  label="Oracle Fusion Middleware version"
+                  v-model="selected.oracle_middleware"
+              />
             </div>
           </div>
           <div class="row">
@@ -397,6 +346,9 @@ export default {
       }
       return [];
     },
+    instanceTypesVersions() {
+      return this.$store.state.mmpi.instanceTypesVersions || [];
+    },
   },
   methods: {
     setUpdateData() {
@@ -445,6 +397,12 @@ export default {
       if (this.selected.delivery_chain && this.selected.delivery_chain.dc_role) {
         this.selected.dc_role = { value: this.selected.delivery_chain.dc_role.value };
       }
+    },
+    getVersions(type) {
+      // Intranet Application version
+      // Extranet build version
+      // AD version
+      return this.instanceTypesVersions.filter((version) => version.subtype === type.toUpperCase());
     },
 
     save() {
