@@ -233,35 +233,11 @@ export default {
     return promise;
   },
 
-  makeSystemDataRequest({ commit }) {
+  getSanData({ commit }) {
     const promise = api('devops').get('inventory/san');
 
     promise
-      .then((response) => {
-        commit('setSystemData', response.data);
-      })
-      .catch((error) => commit('error', error));
-    return promise;
-  },
-
-  makePoolRequest({ commit }) {
-    const promise = api('devops').get('inventory/pool');
-
-    promise
-      .then((response) => {
-        commit('setPoolData', response.data);
-      })
-      .catch((error) => commit('error', error));
-    return promise;
-  },
-
-  makeMdiskRequest({ commit }) {
-    const promise = api('devops').get('inventory/mdisk');
-
-    promise
-      .then((response) => {
-        commit('setMdiskData', response.data);
-      })
+      .then((response) => commit('san', response.data))
       .catch((error) => commit('error', error));
     return promise;
   },

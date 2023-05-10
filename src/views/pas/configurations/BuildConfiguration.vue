@@ -1,5 +1,5 @@
 <template>
-  <Modal class="right-sheet" @close="$emit('close')">
+  <Modal class="right-sheet" @close="close()">
     <template v-slot:header>
       <span v-if="action === 'build'">Build configuration</span>
     </template>
@@ -170,7 +170,12 @@
       />
     </template>
     <template v-slot:footer>
-      <button v-if="!build.started" class="waves-effect btn" @click="start()">
+      <button
+        v-if="!build.started"
+        class="waves-effect btn"
+        :disabled="isButtonDisabled"
+        @click="start()"
+      >
         <i class="material-icons left">play_arrow</i> Start
       </button>
     </template>
@@ -198,6 +203,7 @@ export default {
 
   data() {
     return {
+      isButtonDisabled: false,
       ttsKey: this.$route.params.issue,
       issueError: null,
       binaryType: {},
@@ -407,6 +413,7 @@ export default {
         return;
       }
 
+      this.isButtonDisabled = true;
       const payload = {
         branch: this.configuration.app_type === 'extranet' && this.configuration.app_version === 'X4' ? this.hash.name : this.hash.commit,
         fe_branch: this.feHash ? this.feHash.commit : null,
@@ -448,6 +455,10 @@ export default {
           this.build.started = true;
           loader.hide();
         });
+    },
+    close() {
+      this.isButtonDisabled = false;
+      this.$emit('close');
     },
   },
 

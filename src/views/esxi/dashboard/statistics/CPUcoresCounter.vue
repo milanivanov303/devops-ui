@@ -48,11 +48,8 @@ export default {
     getCoresCount() {
       let count = 0;
       this.esxiHosts.forEach((host) => {
-        if (!host.cpu) {
-          return;
-        }
-        if (host.usage_type === 'worker') {
-          count += parseInt(host.cpu.num_cpu_cores, 10);
+        if (host.usage_type === 'worker' && host.cpu) {
+          count += host.cpu.cpu_cores;
         }
       });
       return count;
