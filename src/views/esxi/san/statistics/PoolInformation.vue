@@ -6,14 +6,14 @@ export default {
   props: {
     poolData: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     chartData() {
-      const labels = this.poolData.map(pool => pool.name);
-      const capacities = this.poolData.map(pool => parseFloat(pool.capacity.replace(/[^\d\.]/g, '')));
-      const usedCapacities = this.poolData.map(pool => parseFloat(pool.used_capacity.replace(/[^\d\.]/g, '')));
+      const labels = this.poolData.map((pool) => pool.name);
+      const capacities = this.poolData.map((pool) => parseFloat(pool.capacity.replace(/[^\d\.]/g, '')));
+      const usedCapacities = this.poolData.map((pool) => parseFloat(pool.used_capacity.replace(/[^\d\.]/g, '')));
 
       return {
         labels,
@@ -30,7 +30,7 @@ export default {
             borderWidth: 1,
             data: usedCapacities,
           },
-        ]
+        ],
       };
     },
     chartOptions() {
@@ -40,15 +40,15 @@ export default {
         scales: {
           yAxes: [{
             ticks: {
-              beginAtZero: true
-            }
-          }]
-        }
+              beginAtZero: true,
+            },
+          }],
+        },
       };
-    }
+    },
   },
   mounted() {
     this.renderChart(this.chartData, this.chartOptions);
-  }
+  },
 };
 </script>

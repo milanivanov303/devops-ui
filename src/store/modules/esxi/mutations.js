@@ -84,15 +84,7 @@ export default {
   expiringComponents(state, expiringComponents) {
     state.expiringComponents = expiringComponents;
   },
-  setSystemData(state, systemData) {
-    state.systemData = systemData;
-  },
-  setPoolData(state, poolData) {
-    state.poolData = poolData;
-  },
-  setMdiskData(state, mdiskData) {
-    state.mdiskData = mdiskData;
-  },
+
   savedEmails(state, savedEmails) {
     state.savedEmails = savedEmails;
   },
@@ -114,5 +106,9 @@ export default {
       state.savedEmails.findIndex((req) => req.id === id),
       1,
     );
+  },
+
+  san(state, sanData) {
+    state.san = sanData;
   },
 };
