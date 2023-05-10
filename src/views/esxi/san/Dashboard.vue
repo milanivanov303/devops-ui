@@ -50,8 +50,12 @@
             <p><b>Total Free Space: </b><span>{{ san.system.total_free_space }}</span></p>
             <p><b>Console IP: </b><span>{{ san.system.console_IP }}</span></p>
             <p><b>Code Level: </b><span>{{ san.system.code_level }}</span></p>
-            <p><b>Cluster NTP IP Address: </b><span>{{ san.system.cluster_ntp_IP_address }}</span></p>
-            <p><b>Total Drive Raw Capacity: </b><span>{{ san.system.total_drive_raw_capacity }}</span></p>
+            <p><b>Cluster NTP IP Address: </b>
+              <span>{{ san.system.cluster_ntp_IP_address }}</span>
+            </p>
+            <p><b>Total Drive Raw Capacity: </b>
+              <span>{{ san.system.total_drive_raw_capacity }}</span>
+            </p>
           </div>
         </div>
       </div>
@@ -60,8 +64,7 @@
 </template>
 
 <script>
-// import { Bar } from 'vue-chartjs';
-import PoolInformation from './statistics/PoolInformation.vue';
+import PoolInformation from './statistics/PoolInformation';
 
 export default {
   components: {
