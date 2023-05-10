@@ -182,6 +182,9 @@
                   :class="{ active: isActive('inventory/request') }">
                 <router-link to="/inventory/request"> Instance Request</router-link>
               </li>
+              <li :class="{ active: isActive('inventory/sanDashboard') }">
+                <router-link to="/inventory/sanDashboard"> SAN</router-link>
+              </li>
               <li><div class="divider"></div></li>
             </ul>
           </div>
