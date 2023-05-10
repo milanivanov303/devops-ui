@@ -3,18 +3,21 @@
     <div class="col s12">
       <div class="card">
         <div class="card-content" >
-          <span class="card-title center">{{ san.system.name.toUpperCase() }}</span>
+          <span class="card-title center">
+            {{ san.system ? san.system.name.toUpperCase() : 'IBMSAN' }}
+          </span>
           <p class="center">IBM Storage Area Network</p>
+          <Alert v-if="san.error" :msg="san.error"/>
         </div>
       </div>
     </div>
     <div class="col s12 l3">
-      <div class="card">
+      <div class="card" v-if="san.mdisk && san.mdisk.length > 0">
         <div class="card-content">
                 <span class="card-title">
                   Mdisk Data
                 </span>
-          <table v-if="san.mdisk.length > 0">
+          <table>
             <thead>
             <tr>
               <th class="center-align">Name</th>
@@ -34,7 +37,7 @@
       </div>
     </div>
     <div class="col s12 l3">
-      <div class="card">
+      <div class="card" v-if="san.mdiskgrp">
         <div class="card-content">
           <span class="card-title">Capacity by pools (in TB)</span>
           <pool-information :poolData="san.mdiskgrp"/>
@@ -42,10 +45,10 @@
       </div>
     </div>
     <div class="col s12 l3">
-      <div class="card">
+      <div class="card" v-if="san.system">
         <div class="card-content">
           <span class="card-title">System Data</span>
-          <div v-if="san.system">
+          <div>
             <p><b>Total Mdisk Capacity: </b><span>{{ san.system.total_mdisk_capacity }}</span></p>
             <p><b>Total Free Space: </b><span>{{ san.system.total_free_space }}</span></p>
             <p><b>Console IP: </b><span>{{ san.system.console_IP }}</span></p>
@@ -69,7 +72,6 @@ import PoolInformation from './statistics/PoolInformation';
 export default {
   components: {
     PoolInformation,
-    // Bar,
   },
 
   computed: {
