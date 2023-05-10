@@ -12,8 +12,8 @@ export default {
   computed: {
     chartData() {
       const labels = this.poolData.map((pool) => pool.name);
-      const capacities = this.poolData.map((pool) => parseFloat(pool.capacity.replace(/[^\d\.]/g, '')));
-      const usedCapacities = this.poolData.map((pool) => parseFloat(pool.used_capacity.replace(/[^\d\.]/g, '')));
+      const capacities = this.poolData.map((pool) => parseFloat(pool.capacity.replace(/[^\d.]/g, '')));
+      const usedCapacities = this.poolData.map((pool) => parseFloat(pool.used_capacity.replace(/[^\d.]/g, '')));
 
       return {
         labels,
