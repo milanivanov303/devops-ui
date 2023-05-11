@@ -232,4 +232,13 @@ export default {
       .catch(() => commit('error', 'Could not remove saved email'));
     return promise;
   },
+
+  getSanData({ commit }) {
+    const promise = api('devops').get('inventory/san');
+
+    promise
+      .then((response) => commit('san', response.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
 };

@@ -23,6 +23,7 @@ const CmsConfigurations = () => import(/* webpackChunkName: "cms" */ '../views/c
 const ModulesSubmodules = () => import(/* webpackChunkName: "modules-submodules" */ '../views/cms/ModulesSubmodules');
 
 const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
+const San = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/san/Dashboard');
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
 const VirtualMachines = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/virtualMachines/VirtualMachines');
 const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
@@ -468,6 +469,16 @@ export default [
       title: 'ESXI Dashboard',
     },
     component: EsxiDashboard,
+  },
+  {
+    path: '/inventory/sanDashboard',
+    name: 'san',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'SAN Dashboard',
+    },
+    component: San,
   },
   {
     path: '/inventory/esxiHosts/:name?',
