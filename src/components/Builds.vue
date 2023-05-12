@@ -112,7 +112,7 @@
                   v-if="
                   build.status !== 'building' &&
                   (build.module === 'imx_be' || build.module === 'imx_fe') &&
-                  canManageBeBuilds()"
+                  (canManageBeBuilds() || canManageFeBuilds())"
                   @click="openRebuildModal(build)"
                   data-tooltip="Rebuild"
                   class="deep-orange-text tooltipped"
