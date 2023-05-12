@@ -111,7 +111,7 @@
                 <a
                   v-if="
                   build.status !== 'building' &&
-                  build.module === 'imx_be' &&
+                  (build.module === 'imx_be' || build.module === 'imx_fe') &&
                   canManageBeBuilds()"
                   @click="openRebuildModal(build)"
                   data-tooltip="Rebuild"
@@ -451,11 +451,26 @@ export default {
     rebuild(build) {
       this.showRebuildModal = false;
       this.rebuildStarted = true;
-      this.$store.dispatch('imx_be/startBuild', {
-        branch: build.details.branch,
-        instance: build.details.instance,
-        ttsKey: build.details.tts_key,
-      })
+      let payload = {};
+      
+      if (this.module === 'imx_be') {
+        payload = {
+          branch: build.details.branch,
+          instance: build.details.instance,
+          ttsKey: build.details.tts_key,
+        };
+      }
+
+      if (this.module === 'imx_fe') {
+        payload = {
+          branch: build.details.branch,
+          build: build.details.build || null,
+          client: build.details.client,
+          endpoint: build.details.endpoint
+        };
+      }
+
+      this.$store.dispatch(this.module + '/startBuild', payload)
         .then((response) => {
           this.build.status = 'running';
           this.build.summary = 'Build will start shortly ...';
