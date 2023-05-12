@@ -7,7 +7,8 @@ export default {
     }
     return state.x4params.filter((x) => x.type === type);
   },
-  getConfigurations: (state) => state.configurations.sort((a, b) => {
+  // slice() used to create shallow copy to avoid re-rendering
+  getConfigurations: (state) => state.configurations.slice().sort((a, b) => {
     if (a.created_on < b.created_on) {
       return 1;
     }
