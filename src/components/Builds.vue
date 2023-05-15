@@ -111,10 +111,19 @@
                 <a
                   v-if="
                   build.status !== 'building' &&
-                  (build.module === 'imx_be' || build.module === 'imx_fe') &&
-                  (canManageBeBuilds() || canManageFeBuilds())"
+                  build.module === 'imx_be' && canManageBeBuilds()"
                   @click="openRebuildModal(build)"
                   data-tooltip="Rebuild"
+                  class="deep-orange-text tooltipped"
+                >
+                  <i class="material-icons">settings_backup_restore</i>
+                </a>
+                <a 
+                  v-if="
+                  build.status !== 'building' &&
+                  build.module === 'imx_fe' && canManageFeBuilds()"
+                  @click="openRebuildModal(build)"
+                  data-tooltip="Rebuild" 
                   class="deep-orange-text tooltipped"
                 >
                   <i class="material-icons">settings_backup_restore</i>
@@ -370,6 +379,10 @@ export default {
 
     canManageBeBuilds() {
       return !!(this.$auth.can('imx_be.remove-builds') && this.$auth.can('imx_be.create-builds'));
+    },
+
+    canManageFeBuilds() {
+      return !!(this.$auth.can('imx_fe.remove-builds') && this.$auth.can('imx_fe.create-builds'));
     },
 
     openRemoveModal(build) {
