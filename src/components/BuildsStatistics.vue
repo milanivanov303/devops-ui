@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-content">
       <span class="card-title">Builds by {{ aggregateBy }}</span>
-        <ul class="collection center-align green-border">
+        <ul class="collection center-align green-border" v-if="aggregateBy === 'user'">
           <li v-if="champion" class="collection-item">
             Congratulations {{ champion }}
             <i class="material-icons">sentiment_very_satisfied</i> !! <br>
@@ -28,7 +28,8 @@
     <div class="card-content" v-if="aggregateBy === 'user'">
       <span class="card-title">Top Builders</span>
       <ul class="collection">
-        <li class="collection-item" v-for="(aggregate, index) in topUsers" :key="aggregate.aggregate">
+        <li class="collection-item" v-for="(aggregate, index) in topUsers"
+          :key="aggregate.aggregate">
           <div class="left">{{ aggregate.aggregate }} - </div>
           <div class="right"> Number of builds  : {{ aggregate.builds }}</div>
           <i class="material-icons">
@@ -95,24 +96,27 @@ export default {
         datasets: [{ data: Object.values(builds) }],
       };
     },
-    
+
     topUsers() {
       if (this.aggregateBy !== 'user') {
         return [];
       }
       const builds = this.$store.getters[this.getterName](this.stateName, this.module);
       const Users = Object.keys(builds);
-      const aggregateBuilds = Users.map(aggregate => ({ aggregate, builds: builds[aggregate] }));
+      const aggregateBuilds = Users.map((aggregate) => 
+      ({ aggregate, builds: builds[aggregate] }));
       const sortedAggregateBuilds = aggregateBuilds.sort((a, b) => b.builds - a.builds);
       const topUsers = sortedAggregateBuilds.slice(0, 3);
-      return topUsers.map(aggregate => ({ aggregate: aggregate.aggregate, builds: aggregate.builds }));
+      return topUsers.map((aggregate) => 
+      ({ aggregate: aggregate.aggregate, builds: aggregate.builds }));
     },
 
     champion() {
       if (this.aggregateBy === 'user') {
         const builds = this.$store.getters[this.getterName](this.stateName, this.module);
         const Users = Object.keys(builds);
-        const aggregateBuilds = Users.map(aggregate => ({ aggregate, builds: builds[aggregate] }));
+        const aggregateBuilds = Users.map((aggregate) => 
+        ({ aggregate, builds: builds[aggregate] }));
         const sortedAggregateBuilds = aggregateBuilds.sort((a, b) => b.builds - a.builds);
         const topUser = sortedAggregateBuilds[0];
         return topUser ? topUser.aggregate : null;
@@ -167,7 +171,7 @@ export default {
 }
 
 .green-border {
-  border: 2px solid #00ff00; /* Replace #00ff00 with your desired bright green color */
+  border: 2px solid #29A19C;
   border-radius: 5px; /* Optional: Add rounded corners */
 }
 </style>
