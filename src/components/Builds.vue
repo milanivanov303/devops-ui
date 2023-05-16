@@ -118,12 +118,12 @@
                 >
                   <i class="material-icons">settings_backup_restore</i>
                 </a>
-                <a 
+                <a
                   v-if="
                   build.status !== 'building' &&
                   build.module === 'imx_fe' && canManageFeBuilds()"
                   @click="openRebuildModal(build)"
-                  data-tooltip="Rebuild" 
+                  data-tooltip="Rebuild"
                   class="deep-orange-text tooltipped"
                 >
                   <i class="material-icons">settings_backup_restore</i>
@@ -465,7 +465,7 @@ export default {
       this.showRebuildModal = false;
       this.rebuildStarted = true;
       let payload = {};
-      
+
       if (this.module === 'imx_be') {
         payload = {
           branch: build.details.branch,
@@ -479,11 +479,11 @@ export default {
           branch: build.details.branch,
           build: build.details.build || null,
           client: build.details.client,
-          endpoint: build.details.endpoint
+          endpoint: build.details.endpoint,
         };
       }
 
-      this.$store.dispatch(this.module + '/startBuild', payload)
+      this.$store.dispatch(`${this.module}/startBuild`, payload)
         .then((response) => {
           this.build.status = 'running';
           this.build.summary = 'Build will start shortly ...';
