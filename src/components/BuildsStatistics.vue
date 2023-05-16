@@ -103,8 +103,7 @@ export default {
       }
       const builds = this.$store.getters[this.getterName](this.stateName, this.module);
       const Users = Object.keys(builds);
-      const aggregateBuilds = Users.map((aggregate) => 
-      ({ aggregate, builds: builds[aggregate] }));
+      const aggregateBuilds = Users.map((aggregate) => ({ aggregate, builds: builds[aggregate] }));
       const sortedAggregateBuilds = aggregateBuilds.sort((a, b) => b.builds - a.builds);
       const topUsers = sortedAggregateBuilds.slice(0, 3);
       return topUsers.map((aggregate) => 
@@ -115,7 +114,7 @@ export default {
       if (this.aggregateBy === 'user') {
         const builds = this.$store.getters[this.getterName](this.stateName, this.module);
         const Users = Object.keys(builds);
-        const aggregateBuilds = Users.map((aggregate) => 
+        const aggregateBuilds = Users.map((aggregate) =>
         ({ aggregate, builds: builds[aggregate] }));
         const sortedAggregateBuilds = aggregateBuilds.sort((a, b) => b.builds - a.builds);
         const topUser = sortedAggregateBuilds[0];
