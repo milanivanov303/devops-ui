@@ -8,20 +8,27 @@
         sort-dir="asc"
         query-prefix="instances_"
         :noDataText="getNoDataText()"
-        :export-btn="false"
         :view-btn="false"
         :add-btn="false"
         :edit-btn="false"
+        :export-btn="false"
         :delete-btn="false"
       >
         <template v-slot:top-actions-before>
-          <div class="table-btns right"
-          v-if="$auth.can('esxi.add') && $auth.can('imx-component.add')">
+          <div class="table-btns right">
             <a @click="updateComponents()"
                class="btn-floating waves-effect waves-light right"
                data-tooltip="Refresh components"
             >
               <i class="material-icons">refresh</i>
+            </a>
+          </div>
+          <div class="table-btns right">
+            <a @click="exportInstanceComponents()"
+               class="btn-floating waves-effect waves-light right"
+               data-tooltip="Export to excel all instances with components and versions"
+            >
+              <i class="material-icons">description</i>
             </a>
           </div>
         </template>
@@ -175,7 +182,7 @@ export default {
       this.selected = instance;
     },
     updateComponents() {
-      const loader = this.$loading.show({ container: this.$refs.virtualMachines });
+      const loader = this.$loading.show({ container: this.$refs.instances });
 
       this.$store.dispatch('esxi/updateComponents')
         .then((response) => {
@@ -190,7 +197,24 @@ export default {
         })
         .catch((error) => {
           this.$M.toast({ html: error });
-        }).finally(() => loader.hide());
+        })
+        .finally(() => loader.hide());
+    },
+    exportInstanceComponents() {
+      const loader = this.$loading.show({ container: this.$refs.instances });
+
+      this.$store.dispatch('esxi/exportInstanceComponents')
+        .then((response) => {
+          const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+          const fileLink = document.createElement('a');
+
+          fileLink.href = fileURL;
+          fileLink.setAttribute('download', 'InstanceComponents.xlsx');
+          document.body.appendChild(fileLink);
+
+          fileLink.click();
+        })
+        .finally(() => loader.hide());
     },
   },
 
