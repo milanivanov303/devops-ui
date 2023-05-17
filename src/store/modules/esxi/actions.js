@@ -105,6 +105,14 @@ export default {
       .catch(() => commit('error', 'Could not get instances\' list', { root: true }));
     return promise;
   },
+  exportInstanceComponents({ commit }) {
+    const promise = api('devops').post('inventory/instances/export',
+      {},
+      { responseType: 'blob' });
+    promise
+      .catch((error) => commit('error', error));
+    return promise;
+  },
 
   getImxComponents({ commit }) {
     const promise = api('devops').get('inventory/imx-components');
