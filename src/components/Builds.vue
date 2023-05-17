@@ -111,7 +111,7 @@
                 <a
                   v-if="
                   build.status !== 'building' &&
-                  build.module === 'imx_be' && canManageBeBuilds()"
+                  build.module === 'imx_be'"
                   @click="openRebuildModal(build)"
                   data-tooltip="Rebuild"
                   class="deep-orange-text tooltipped"
@@ -121,7 +121,7 @@
                 <a
                   v-if="
                   build.status !== 'building' &&
-                  build.module === 'imx_fe' && canManageFeBuilds()"
+                  build.module === 'imx_fe'"
                   @click="openRebuildModal(build)"
                   data-tooltip="Rebuild"
                   class="deep-orange-text tooltipped"
@@ -377,14 +377,6 @@ export default {
       return this.$auth.getUser().username === build.created_by;
     },
 
-    canManageBeBuilds() {
-      return !!(this.$auth.can('imx_be.remove-builds') && this.$auth.can('imx_be.create-builds'));
-    },
-
-    canManageFeBuilds() {
-      return !!(this.$auth.can('imx_fe.remove-builds') && this.$auth.can('imx_fe.create-builds'));
-    },
-
     openRemoveModal(build) {
       this.build = build;
       this.removing = false;
@@ -471,6 +463,7 @@ export default {
           branch: build.details.branch,
           instance: build.details.instance,
           ttsKey: build.details.tts_key,
+          rebuild: true,
         };
       }
 
@@ -480,6 +473,7 @@ export default {
           build: build.details.build || null,
           client: build.details.client,
           endpoint: build.details.endpoint,
+          rebuild: true,
         };
       }
 
