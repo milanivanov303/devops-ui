@@ -92,7 +92,7 @@ export default {
           || JSON.stringify(file.content).toLowerCase().includes(this.search.toLowerCase()));
       }
       if (this.xTag.length) {
-        files = files.filter((file) => file.content.info['x-tag'] && this.xTag.some((tag) => file.content.info['x-tag'].includes(tag)));
+        files = files.filter((file) => file.content && file.content.info['x-tag'] && this.xTag.some((tag) => file.content.info['x-tag'].includes(tag)));
       }
       return files;
     },
