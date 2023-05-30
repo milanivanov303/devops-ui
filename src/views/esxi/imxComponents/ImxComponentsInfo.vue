@@ -178,7 +178,7 @@ export default {
         .finally(() => loader.hide());
     },
     sortComponentsVersions(versions) {
-      return versions
+      return versions.slice()
         .sort((a, b) => a.version.localeCompare(b.version, undefined, { numeric: true }));
     },
 
