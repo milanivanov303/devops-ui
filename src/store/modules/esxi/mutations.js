@@ -111,4 +111,8 @@ export default {
       1,
     );
   },
+
+  san(state, sanData) {
+    state.san = sanData;
+  },
 };

@@ -111,8 +111,17 @@
                 <a
                   v-if="
                   build.status !== 'building' &&
-                  build.module === 'imx_be' &&
-                  canManageBeBuilds()"
+                  build.module === 'imx_be'"
+                  @click="openRebuildModal(build)"
+                  data-tooltip="Rebuild"
+                  class="deep-orange-text tooltipped"
+                >
+                  <i class="material-icons">settings_backup_restore</i>
+                </a>
+                <a
+                  v-if="
+                  build.status !== 'building' &&
+                  build.module === 'imx_fe'"
                   @click="openRebuildModal(build)"
                   data-tooltip="Rebuild"
                   class="deep-orange-text tooltipped"
@@ -368,10 +377,6 @@ export default {
       return this.$auth.getUser().username === build.created_by;
     },
 
-    canManageBeBuilds() {
-      return !!(this.$auth.can('imx_be.remove-builds') && this.$auth.can('imx_be.create-builds'));
-    },
-
     openRemoveModal(build) {
       this.build = build;
       this.removing = false;
@@ -451,11 +456,28 @@ export default {
     rebuild(build) {
       this.showRebuildModal = false;
       this.rebuildStarted = true;
-      this.$store.dispatch('imx_be/startBuild', {
-        branch: build.details.branch,
-        instance: build.details.instance,
-        ttsKey: build.details.tts_key,
-      })
+      let payload = {};
+
+      if (this.module === 'imx_be') {
+        payload = {
+          branch: build.details.branch,
+          instance: build.details.instance,
+          ttsKey: build.details.tts_key,
+          rebuild: true,
+        };
+      }
+
+      if (this.module === 'imx_fe') {
+        payload = {
+          branch: build.details.branch,
+          build: build.details.build || null,
+          client: build.details.client,
+          endpoint: build.details.endpoint,
+          rebuild: true,
+        };
+      }
+
+      this.$store.dispatch(`${this.module}/startBuild`, payload)
         .then((response) => {
           this.build.status = 'running';
           this.build.summary = 'Build will start shortly ...';

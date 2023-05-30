@@ -75,7 +75,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="v in component.versions" :key="v.id">
+                  <tr v-for="v in sortComponentsVersions(component.versions)" :key="v.id">
                     <td>
                       <span v-if="v.approved" class="new badge green" data-badge-caption="">
                         Yes
@@ -176,6 +176,10 @@ export default {
           this.$M.toast({ html: `${error}`, classes: 'toast-fail' });
         })
         .finally(() => loader.hide());
+    },
+    sortComponentsVersions(versions) {
+      return versions
+        .sort((a, b) => a.version.localeCompare(b.version, undefined, { numeric: true }));
     },
 
     openAddEditModal(component, action) {

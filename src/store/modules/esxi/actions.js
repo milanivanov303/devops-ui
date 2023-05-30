@@ -105,6 +105,14 @@ export default {
       .catch(() => commit('error', 'Could not get instances\' list', { root: true }));
     return promise;
   },
+  exportInstanceComponents({ commit }) {
+    const promise = api('devops').post('inventory/instances/export',
+      {},
+      { responseType: 'blob' });
+    promise
+      .catch((error) => commit('error', error));
+    return promise;
+  },
 
   getImxComponents({ commit }) {
     const promise = api('devops').get('inventory/imx-components');
@@ -249,6 +257,15 @@ export default {
         commit('removeSavedEmail', payload.id);
       })
       .catch(() => commit('error', 'Could not remove saved email'));
+    return promise;
+  },
+
+  getSanData({ commit }) {
+    const promise = api('devops').get('inventory/san');
+
+    promise
+      .then((response) => commit('san', response.data))
+      .catch((error) => commit('error', error));
     return promise;
   },
 };

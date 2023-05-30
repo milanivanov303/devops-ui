@@ -89,10 +89,11 @@ export default {
 
       if (this.search !== '') {
         files = files.filter((file) => file.path.toLowerCase().includes(this.search.toLowerCase())
-          || JSON.stringify(file.content).toLowerCase().includes(this.search.toLowerCase()));
+          || (file.content
+                && JSON.stringify(file.content).toLowerCase().includes(this.search.toLowerCase())));
       }
       if (this.xTag.length) {
-        files = files.filter((file) => file.content.info['x-tag'] && this.xTag.some((tag) => file.content.info['x-tag'].includes(tag)));
+        files = files.filter((file) => file.content && file.content.info['x-tag'] && this.xTag.some((tag) => file.content.info['x-tag'].includes(tag)));
       }
       return files;
     },
