@@ -199,7 +199,7 @@ export default {
       this.form.endpoint = value.replace(/\/+$/, '');
     },
     'form.branch'() {
-      const loader = this.$loading.show({ container: this.$refs.list });
+      const loader = this.$loading.show({ container: this.$refs.modal });
 
       this.$store.dispatch('imx_fe/getClientByBranch', {
         branch: this.form.branch? this.form.branch.name : this.branch,
@@ -208,7 +208,8 @@ export default {
         this.form.client = response.data.client;
       })
       .catch((error) => {
-        console.error('Error retrieving client:', error);
+        this.$M.toast({ html: 'Error retrieving client please choose a client from the list',
+         classes: 'toast-fail' });
       })
       .finally(() => {
         loader.hide();
