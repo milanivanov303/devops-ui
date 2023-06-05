@@ -90,7 +90,7 @@ export default {
       const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
       const promise3 = this.$store.dispatch('mmpi/getEnvironmentTypes');
       const promise4 = this.$store.dispatch('mmpi/getInstanceTypesVersions');
-      const promise5 = this.$store.dispatch('esxi/getOsComponents');
+      const promise5 = this.$store.dispatch('esxi/getImxComponents');
 
       Promise.all([promise1, promise2, promise3, promise4, promise5])
         .then(() => {

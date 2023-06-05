@@ -398,6 +398,7 @@ export default {
         ],
       }),
       with: JSON.stringify({
+        activity: {},
         typeBusiness: {},
         languages: {},
         projectType: {},
