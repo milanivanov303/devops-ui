@@ -102,7 +102,6 @@
           </button>
         </template>
       </Modal>
-
     </div>
   </div>
 </template>
@@ -198,6 +197,22 @@ export default {
   watch: {
     endpoint(value) {
       this.form.endpoint = value.replace(/\/+$/, '');
+    },
+    'form.branch'() {
+      const loader = this.$loading.show({ container: this.$refs.list });
+
+      this.$store.dispatch('imx_fe/getClientByBranch', {
+        branch: this.form.branch? this.form.branch.name : this.branch,
+      })
+      .then((response) => {
+        this.form.client = response.data.client;
+      })
+      .catch((error) => {
+        console.error('Error retrieving client:', error);
+      })
+      .finally(() => {
+        loader.hide();
+      });
     },
   },
 
