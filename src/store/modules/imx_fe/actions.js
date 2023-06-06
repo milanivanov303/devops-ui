@@ -44,11 +44,10 @@ export default {
   },
 
   getClientByBranch({ commit }, branch) {
-  
     const promise = api('devops').get('imx-fe/getClientByBranch', branch);
-  
+
     commit('promise', { promise }, { root: true });
-  
+
     promise
       .then((response) => commit('client', response.data.client))
       .catch(() => commit('error', 'Could not get client by branch'));
