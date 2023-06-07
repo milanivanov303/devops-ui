@@ -97,7 +97,11 @@
             {{ esxiHost.power_details.max_consumed_watts }}
           </li>
           <li class="collection-item" v-for="slot in esxiHost.power_details.slots" :key="slot.id">
-            <b>{{ slot.name }}:</b> State: {{ slot.status.State }}, Health: {{ slot.status.Health }}
+            <b>{{ slot.name }}: </b>
+            <span v-if="slot.status.State || slot.status.Health">
+              State: {{ slot.status.State }}, Health: {{ slot.status.Health }}
+            </span>
+            <span v-if="typeof slot.status === 'string'">{{ slot.status }}</span>
           </li>
         </div>
         <div class="col s12 l6" v-if="esxiHost.firmware">
