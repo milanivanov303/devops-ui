@@ -41,6 +41,7 @@
                   v-model="form.client"
                   :invalid="$v.form.client.$error"
                   @blur="$v.form.client.$touch()"
+                  @input="debounceInput"
                 />
               </div>
               <div class="validator col s11 offset-s1 ">
@@ -102,7 +103,6 @@
           </button>
         </template>
       </Modal>
-
     </div>
   </div>
 </template>
@@ -112,6 +112,7 @@
 import { required } from 'vuelidate/lib/validators';
 import BuildProgress from '@/components/BuildProgress';
 import EventBus from '@/event-bus';
+import _ from 'lodash';
 
 function initialState() {
   return {
@@ -199,6 +200,26 @@ export default {
     endpoint(value) {
       this.form.endpoint = value.replace(/\/+$/, '');
     },
+    'form.branch': _.debounce(function () {
+      const loader = this.$loading.show({ container: this.$refs.modal });
+
+      this.$store
+        .dispatch('imx_fe/getClientByBranch', {
+          branch: this.form.branch ? this.form.branch.name : this.branch,
+        })
+        .then((response) => {
+          this.form.client = response.data.client;
+        })
+        .catch(() => {
+          this.$M.toast({
+            html: 'Error retrieving client. Please choose a client from the list',
+            classes: 'toast-fail',
+          });
+        })
+        .finally(() => {
+          loader.hide();
+        });
+    }, 1000),
   },
 
   methods: {

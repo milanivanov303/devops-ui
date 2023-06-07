@@ -19,4 +19,7 @@ export default {
       1,
     );
   },
+  client(state, client) {
+    state.client = client;
+  },
 };

@@ -82,8 +82,8 @@
           </li>
         </div>
       </div>
-      <div class="row" v-if="esxiHost.power_details">
-        <div class="col s12 l6">
+      <div class="row">
+        <div class="col s12 l6" v-if="esxiHost.power_details">
           <li class="collection-header">
             <span class="collection-section">POWER DETAILS</span>
           </li>
@@ -97,7 +97,19 @@
             {{ esxiHost.power_details.max_consumed_watts }}
           </li>
           <li class="collection-item" v-for="slot in esxiHost.power_details.slots" :key="slot.id">
-            <b>{{ slot.name }}:</b> State: {{ slot.status.State }}, Health: {{ slot.status.Health }}
+            <b>{{ slot.name }}: </b>
+            <span v-if="slot.status.State || slot.status.Health">
+              State: {{ slot.status.State }}, Health: {{ slot.status.Health }}
+            </span>
+            <span v-if="typeof slot.status === 'string'">{{ slot.status }}</span>
+          </li>
+        </div>
+        <div class="col s12 l6" v-if="esxiHost.firmware">
+          <li class="collection-header">
+            <span class="collection-section">FIRMWARE</span>
+          </li>
+          <li v-for="member in esxiHost.firmware" :key="member.id" class="collection-item">
+            <b>Name: </b>{{ member.name }}, <b> Version: </b>{{ member.version }}
           </li>
         </div>
       </div>

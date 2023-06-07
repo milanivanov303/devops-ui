@@ -8,6 +8,13 @@
         <li class="active" >
           <div class="collapsible-header"><i class="material-icons">laptop</i>Main Detail</div>
           <div class="collapsible-body">
+            <p v-if="instance.decommission_date">
+              <b>Decommission date: </b>{{ instance.decommission_date.date }}
+            </p>
+            <p v-if="instance.decommission_date">
+              <b>Decommission related task: </b>
+              <a class="tbl-link" :href="'https://tts.codix.eu/jira/browse/' + instance.decommission_date.tts_key">{{ instance.decommission_date.tts_key }}</a>
+            </p>
             <p><b>Home path: </b>{{ instance.home_path }}</p>
             <p><b>Patch Config Path: </b>{{ instance.patch_config_path }}</p>
           </div>

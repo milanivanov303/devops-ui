@@ -35,18 +35,21 @@
         <Column label="Instance" name="name" :show="(instance) => instance.name"/>
         <Column label="Last active on" name="last_activity" :show="(instance) =>
           (instance.ssl && instance.ssl.lastActive) ?
-          $date(instance.ssl.lastActive / 1000 ).toHuman() : 'n/a'"/>
+          $date(instance.ssl.lastActive / 1000 ).toHuman() : 'n/a'" width="10%"/>
         <Column label="Project" name="project" :show="(instance) => getProjectName(instance.name)"/>
         <Column show="client" width="10%"/>
         <Column label="Delivery Chain" name="delivery_chain"
           :show="(instance) => getDeliveryChain(instance.name)"/>
         <Column v-if="!instances" label="Virtual Machine" name="vm"
           :show="(instance) => getVMLink(instance.virtual_machine.name)"/>
-        <Column show="type" width="10%"/>
-        <Column show="activity" width="10%"/>
-        <Column show="version" class="dont-break-out" width="10%"/>
-        <Column show="pwd_hash_type" width="10%"/>
-        <Column show="creation_date" width="10%"/>
+        <Column show="type"/>
+        <Column show="environment"/>
+        <Column show="activity"/>
+        <Column show="version" class="dont-break-out" width="9%"/>
+        <Column show="pwd_hash_type" width="9%"/>
+        <Column show="creation_date" width="9%"/>
+        <Column label="Decommission date" name="decommission_date" width="10%"
+          :show="(instance) => instance.decommission_date ? instance.decommission_date.date : ''" />
         <template v-slot:actions-before="{ row }">
           <a v-if="row.error"
              target="_blank"
