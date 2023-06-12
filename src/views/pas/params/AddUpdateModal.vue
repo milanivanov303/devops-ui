@@ -11,7 +11,7 @@
           <div class="col s12 m6">
             <Autocomplete
                 label="Type"
-                :items="types"
+                :items="[{name: 'x4'}, {name: 'x5'}]"
                 v-model="param.type"
             />
             <div class="validator">
@@ -87,11 +87,6 @@ export default {
     };
   },
   computed: {
-    types() {
-      const types = this.$store.state.pas.params.map((params) => params.type);
-      return types.filter((key, idx) => types.indexOf(key) === idx)
-        .map((type) => ({ name: type }));
-    },
     categories() {
       const categories = this.$store.state.pas.params.map((params) => params.category);
       return categories.filter((key, idx) => categories.indexOf(key) === idx)
