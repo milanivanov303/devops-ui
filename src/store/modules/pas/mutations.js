@@ -23,25 +23,25 @@ export default {
     const configurations = state.configurations.filter((d) => d.id !== id);
     Vue.set(state, 'configurations', configurations);
   },
-  x4params(state, x4params) {
-    state.x4params = x4params;
+  params(state, params) {
+    state.params = params;
   },
-  createX4Param(state, x4param) {
-    const { x4params } = state;
-    x4params.push(x4param);
-    Vue.set(state, 'x4params', x4params);
+  createParam(state, param) {
+    const { params } = state;
+    params.push(param);
+    Vue.set(state, 'params', params);
   },
-  updateX4Param(state, x4param) {
-    state.x4params.map((x) => {
-      if (x.id === x4param.id) {
-        Vue.set(state.x4params, state.x4params.indexOf(x), x4param);
+  updateParam(state, param) {
+    state.params.map((x) => {
+      if (x.id === param.id) {
+        Vue.set(state.params, state.params.indexOf(x), param);
       }
-      return state.x4params;
+      return state.params;
     });
   },
-  deleteX4Param(state, id) {
-    const x4params = state.x4params.filter((x) => x.id !== id);
-    Vue.set(state, 'x4params', x4params);
+  deleteParam(state, id) {
+    const params = state.params.filter((x) => x.id !== id);
+    Vue.set(state, 'params', params);
   },
   hashes(state, hashes) {
     state.hashes = hashes;
