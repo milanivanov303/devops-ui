@@ -55,6 +55,11 @@
             <i class="material-icons">devices</i> iMX FE
           </router-link>
         </li>
+        <li :class="{ active: isActive('imx_combined') }">
+          <router-link to="/imx_combined/dashboard">
+            <i class="material-icons">link</i> iMX FE + iMX BE
+          </router-link>
+        </li>
         <li :class="{ active: isActive('documentation') }">
           <a class="collapsible-header">
             <i class="material-icons">library_books</i> Documentation

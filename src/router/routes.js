@@ -322,6 +322,50 @@ export default [
       module: 'imx_fe',
     },
   },
+  
+  // iMX Combined Tab
+  {
+    path: '/imx_combined',
+    redirect: '/imx_combined/dashboard',
+  },
+  {
+    path: '/imx_combined/dashboard',
+    name: 'imx_combined',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'iMX BE + FE Dashboard',
+    },
+    component: Dashboard,
+    props: {
+      module: 'imx_combined',
+    },
+  },
+  {
+    path: '/imx_combined/branches',
+    name: 'imx-combined-branches',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'iMX Combined Branches';
+
+        if (route.query.branch) {
+          title = `${route.query.branch} - ${title}`;
+        }
+
+        if (route.query.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Branches,
+    props: {
+      module: 'imx_combined',
+    },
+  },
 
   // Documentation
   {
