@@ -83,7 +83,6 @@
                 v-model="form.dev_instance"
                 :invalid="$v.form.dev_instance.$error"
                 @blur="$v.form.dev_instance.$touch()"
-                @change="getServlet"
             />
             <div class="validator">
               <div class="red-text" v-if="$v.form.dev_instance.$error">
@@ -237,9 +236,23 @@
             </div>
           </div>
         </div>
+        <div class="row" v-if="form.app_version && form.app_version.value === 'X5'">
+          <TextInput
+              class="col s12 m6"
+              :class="{readonly: action === 'view'}"
+              label="Api-client"
+              icon="compare_arrows"
+              v-model="form.api_client"
+          />
+          <TextInput
+              class="col s12 m6"
+              :class="{readonly: action === 'view'}"
+              label="Api-secret"
+              v-model="form.api_secret"
+          />
+        </div>
         <div class="row">
           <div class="col s12">
-            <label for="additional-info">Additional info</label>
             <div class="input-field">
               <i class="material-icons prefix">description</i>
               <textarea
@@ -249,6 +262,9 @@
                 :style="{'min-height': '70px',
                 'overflow-y': action === 'view' ? 'scroll' : 'auto'}"
               />
+              <label for="additional-info" :class="{active: form.additional_info}">
+                Additional info
+              </label>
             </div>
           </div>
         </div>
