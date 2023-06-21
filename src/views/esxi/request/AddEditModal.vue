@@ -116,7 +116,7 @@
           </div>
           <div class="row">
             <div class="col s12">
-              <TextInput
+              <TextArea
                   class="readonly"
                   label="Application languages"
                   :value="getApplicationLanguages(selected.project)"
@@ -563,9 +563,9 @@ export default {
   },
   methods: {
     getProjectBusinessArea(project) {
-      if (project.project_specifics.length > 0) {
-        return project.project_specifics.find((ps) => ps.project_specific_feature.subtype === 'business_type')
-          .project_specific_feature.value || '';
+      if (project.project_specifics && project.project_specifics.length > 0) {
+        const businessType = project.project_specifics.find((ps) => ps.project_specific_feature.subtype === 'business_type');
+        return businessType ? businessType.project_specific_feature.value : '';
       }
       return '';
     },
@@ -579,7 +579,7 @@ export default {
       return project.activity ? project.activity.key : '';
     },
     getApplicationLanguages(project) {
-      return project.languages.flatMap((language) => language.value).toString();
+      return project.languages.flatMap((language) => language.value).join(', ');
     },
     getDefaultDeliveryChainRole() {
       if (this.selected.delivery_chain && this.selected.delivery_chain.dc_role) {
