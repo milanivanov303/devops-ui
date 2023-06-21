@@ -39,8 +39,8 @@
                 <router-link to="/pas/soa-modification"> SOA</router-link>
               </li>
               <li v-if="$auth.can('can-manage-authorizations', getApplicationCode('devops'))"
-                  :class="{ active: isActive('pas/x4-params') }">
-                <router-link to="/pas/x4-params"> X4 Parameters</router-link>
+                  :class="{ active: isActive('pas/params') }">
+                <router-link to="/pas/params">Parameters</router-link>
               </li>
             </ul>
           </div>

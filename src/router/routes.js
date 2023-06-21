@@ -6,7 +6,8 @@ const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
 
 const Configurations = () => import(/* webpackChunkName: "pas" */ '../views/pas/configurations/Configurations');
-const X4Params = () => import(/* webpackChunkName: "pas" */ '../views/pas/x4-params/X4Params');
+// const X4Params = () => import(/* webpackChunkName: "pas" */ '../views/pas/params/X4Params');
+const Params = () => import(/* webpackChunkName: "pas" */ '../views/pas/params/Params');
 const SoaModification = () => import(/* webpackChunkName: "pas" */ '../views/pas/SOAdeployment');
 
 const Documentation = () => import(/* webpackChunkName: "demos" */ '../views/documentation/Documentation');
@@ -198,19 +199,26 @@ export default [
     },
   },
   {
-    path: '/pas/x4-params',
-    redirect: '/pas/x4-params/config',
+    path: '/pas/params',
+    redirect: '/pas/params/x4/config',
   },
   {
-    path: '/pas/x4-params/:type?/:id?',
-    name: 'x4-parameters',
+    path: '/pas/params/:type?/:category?/:id?',
+    name: 'parameters',
     meta: {
       requiresAuth: true,
       transitionName: 'slide',
-      title: 'X4 Parameters',
-      breadcrumb: 'X4 Parameters',
+      title: (route) => {
+        let title = 'Parameters';
+
+        if (route.params.type) {
+          title = `${route.params.type.toUpperCase()} ${title}`;
+        }
+
+        return title;
+      },
     },
-    component: X4Params,
+    component: Params,
   },
 
   // Debiteur Tab
