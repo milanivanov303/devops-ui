@@ -114,6 +114,9 @@ export default {
       }
 
       const payload = { ...this.param };
+      if (this.param.type.name) {
+        payload.type = this.param.type.name;
+      }
       if (this.param.category.name) {
         payload.category = this.param.category.name;
       }
