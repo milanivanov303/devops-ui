@@ -173,6 +173,51 @@ export default [
     },
   },
 
+  // Extranet X5 Tab
+  {
+    path: '/extranet-x5',
+    redirect: '/extranet-x5/dashboard',
+  },
+  {
+    path: '/extranet-x5/dashboard',
+    name: 'extranet-x5',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Extranet X5 Dashboard',
+      breadcrumb: 'Dashboard',
+    },
+    component: Dashboard,
+    props: {
+      module: 'extranet-x5',
+    },
+  },
+  {
+    path: '/extranet-x5/branches/:branch?',
+    name: 'extranet-x5-branches',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Extranet X5 Branches';
+
+        if (route.query.branch) {
+          title = `${route.query.branch} - ${title}`;
+        }
+
+        if (route.query.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Branches,
+    props: {
+      module: 'extranet-x5',
+    },
+  },
+
   {
     path: '/pas/configurations/:id?/:action?',
     name: 'configurations',

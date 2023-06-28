@@ -32,6 +32,9 @@
               <li :class="{ active: isActive('extranet-x4') }">
                 <router-link to="/extranet-x4/dashboard"> Extranet X4</router-link>
               </li>
+              <li :class="{ active: isActive('extranet-x5') }">
+                <router-link to="/extranet-x5/dashboard"> Extranet X5</router-link>
+              </li>
               <li :class="{ active: isActive('debiteur') }">
                 <router-link to="/debiteur/dashboard"> Debiteur</router-link>
               </li>
