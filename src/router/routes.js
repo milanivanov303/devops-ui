@@ -244,24 +244,12 @@ export default [
     },
   },
   {
-    path: '/pas/params',
-    redirect: '/pas/params/x4/config',
-  },
-  {
-    path: '/pas/params/:type?/:category?/:id?',
+    path: '/pas/params/:id?',
     name: 'parameters',
     meta: {
       requiresAuth: true,
       transitionName: 'slide',
-      title: (route) => {
-        let title = 'Parameters';
-
-        if (route.params.type) {
-          title = `${route.params.type.toUpperCase()} ${title}`;
-        }
-
-        return title;
-      },
+      title: 'Parameters',
     },
     component: Params,
   },
