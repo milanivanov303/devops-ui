@@ -16,7 +16,7 @@
               <div class="col s12" >
                 <Autocomplete
                   label="Branch"
-                  icon="dynamic_feed"
+                  icon="storage"
                   :items="branches"
                   v-model="form.branch"
                   :invalid="$v.form.branch.$error"
@@ -35,7 +35,7 @@
               <div class="col s12">
                 <Autocomplete
                   label="Instance"
-                  icon="dynamic_feed"
+                  icon="dns"
                   :items="instances"
                   v-model="form.instance"
                   :invalid="$v.form.instance.$error"
@@ -54,27 +54,24 @@
               <div class="col s12 m6">
                 <Autocomplete
                   label="Config"
-                  icon="dynamic_feed"
+                  icon="style"
                   :items="configs"
                   valueKey="name"
                   v-model="form.config"
                   :invalid="$v.form.config.$error"
                   @blur="$v.form.config.$touch()"
                 />
-              </div>
-              <div class="validator col s11 offset-s1">
-                <div class="red-text" v-if="$v.form.config.$error">
-                  <p v-if="!$v.form.config.required">
-                    Config field must not be empty.
-                  </p>
+                <div class="validator">
+                  <div class="red-text" v-if="$v.form.config.$error">
+                    <p v-if="!$v.form.config.required">
+                      Config field must not be empty.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="row">
               <div class="col s12 m6">
                 <Autocomplete
                     label="Project"
-                    icon="dynamic_feed"
                     :items="projects"
                     valueKey="name"
                     v-model="form.project"
@@ -85,7 +82,7 @@
               <div class="col s12" >
                 <Select
                   :options="images"
-                  icon="cloud_upload"
+                  icon="file_upload"
                   label="Deploy on"
                   displayed="label"
                   :default-option="false"
@@ -165,10 +162,10 @@ export default {
       return this.$store.state.mmpi.instances;
     },
     configs() {
-      return this.$store.getters['pas/getX4ParamsByType']('config');
+      return this.$store.state.pas.params.filter((x) => x.type === 'x4' && x.category === 'config');
     },
     projects() {
-      return this.$store.getters['pas/getX4ParamsByType']('project');
+      return this.$store.state.pas.params.filter((x) => x.type === 'x4' && x.category === 'project');
     },
     images() {
       return this.$store.state['extranet-x4'].images;
@@ -216,7 +213,7 @@ export default {
       this.$store.dispatch('extranet-x4/getBranches');
       this.$store.dispatch('mmpi/getInstances');
       this.$store.dispatch('extranet-x4/getImages');
-      this.$store.dispatch('pas/getX4Params');
+      this.$store.dispatch('pas/getParams');
     },
 
     open() {
