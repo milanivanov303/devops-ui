@@ -1,37 +1,37 @@
 <template>
   <div class="row">
     <div class="col s12">
-        <div class="data-table" ref="requested">
-          <Table
-              :data="requestedInstances"
-              sort-by="id"
-              sort-dir="asc"
-              :export-btn="false"
-              :view-btn="false"
-              :delete-btn="false"
-              @add="openAddEditModal({}, 'create')"
-              @edit="(row) => openAddEditModal(row, 'update')"
-          >
-            <Column show="project"/>
-            <Column show="delivery_chain"/>
-            <Column show="dc_role"/>
-            <Column show="instance_type"/>
-            <Column show="environment_type"/>
-            <Column show="comments"/>
-            <Column label="Requested on" name="requested_on"
-                    :show="(request) => $date(request.created_on).toHuman()"/>
-            <Column label="Requested by" name="requested_by"
-                    :show="(request) => request.created_by"/>
-          </Table>
-        </div>
+      <div class="data-table" ref="requested">
+        <Table
+          :data="requestedInstances"
+          sort-by="id"
+          sort-dir="asc"
+          :export-btn="false"
+          :view-btn="false"
+          :delete-btn="false"
+          @add="openAddEditModal({}, 'create')"
+          @edit="(row) => openAddEditModal(row, 'update')"
+        >
+          <Column show="project"/>
+          <Column show="delivery_chain"/>
+          <Column show="dc_role"/>
+          <Column show="environment_type"/>
+          <Column label="Instance Versions"
+            :show="(request) => getInstanceVersions(request.instance_version)"/>
+          <Column show="comments"/>
+          <Column label="Requested on" name="requested_on"
+            :show="(request) => $date(request.created_on).toHuman()"/>
+          <Column label="Requested by" name="requested_by"
+            :show="(request) => request.created_by"/>
+        </Table>
+      </div>
 
       <AddEditModal
-          v-if="showAddEditModal"
-          :request="selected"
-          :action="action"
-          @close="closeAddEditModal()"
+        v-if="showAddEditModal"
+        :request="selected"
+        :action="action"
+        @close="closeAddEditModal()"
       />
-
     </div>
   </div>
 </template>
@@ -54,6 +54,13 @@ export default {
     },
   },
   methods: {
+    getInstanceVersions(versions) {
+      let vers = '';
+      versions.forEach((version) => {
+        vers += `${version.module} - ${version.version}<br>`;
+      });
+      return vers;
+    },
     getRequested() {
       const loader = this.$loading.show({ container: this.$refs.requested });
       this.$store.dispatch('esxi/getRequestedInstances')

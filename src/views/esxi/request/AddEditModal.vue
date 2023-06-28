@@ -30,14 +30,21 @@
         <fieldset v-if="selected.project">
           <legend>Project Details from MMPI</legend>
           <div class="row">
-            <div class="col s12 m6">
+            <div class="col s12 m2">
+              <TextInput
+                  class="readonly"
+                  label="Project type"
+                  v-model="selected.project.project_type.value"
+              />
+            </div>
+            <div class="col s12 m5">
               <TextInput
                   class="readonly"
                   label="Client business area"
                   :value="getProjectBusinessArea(selected.project)"
               />
             </div>
-            <div class="col s12 m6">
+            <div class="col s12 m5">
               <TextInput
                   class="readonly"
                   label="Business Activity Domain Template"
@@ -57,7 +64,7 @@
               <TextInput
                   class="readonly"
                   label="G_ETUDE.ACTIVITE"
-                  :value="getProjectActivity(selected.project)"
+                  :value="getProjectActivity()"
               />
             </div>
             <div class="col s12 m4">
@@ -128,10 +135,10 @@
           <legend>Main requirements</legend>
           <div class="row">
             <div class="col s12 m6">
-              <TextInput
-                  class="readonly"
+              <Autocomplete
                   label="Instance Owner"
-                  v-model="selected.project.project_type.value"
+                  :items="[{ name: 'Client' }, { name: 'Codix'}]"
+                  v-model="selected.owner"
               />
             </div>
             <div class="col s12 m6">
@@ -187,8 +194,8 @@
           </div>
           <div class="row">
             <div class="input-field col s12 m6">
-              <input id="volume" v-model="selected.volume"/>
-              <label :class="{active: selected.volume}" for="volume">
+              <input id="volume" v-model="selected.dev_volume"/>
+              <label :class="{active: selected.dev_volume}" for="volume">
                 Expected new DEV during the customization
               </label>
               <span class="helper-text">small, medium, large, extra-large</span>
@@ -205,17 +212,6 @@
         </fieldset>
         <fieldset v-if="selected.project">
           <legend>Required iMX modules (instance version)</legend>
-<!--          <div class="row">-->
-<!--            <div class="col s12">-->
-<!--              <Select-->
-<!--                  class="instanceTypes"-->
-<!--                  :options="instanceTypes"-->
-<!--                  defaultOptionText="Instance type"-->
-<!--                  :multiple="true"-->
-<!--                  v-model="selected.instance_type"-->
-<!--              />-->
-<!--            </div>-->
-<!--          </div>-->
           <div class="row">
             <div class="col s12 m4">
               <Autocomplete
@@ -253,6 +249,8 @@
                 label="OS Platform (Hardware)"
                 :items="osPlatforms"
                 v-model="selected.os"
+                @change="delete selected.os_version"
+
               />
             </div>
             <div class="col s12 m6" v-if="selected.os">
@@ -268,34 +266,37 @@
             <div class="col s12">
               <TextInput
                   label="Oracle Fusion Middleware"
-                  v-model="selected.middleware"
+                  v-model="selected.oracle_middleware"
               />
             </div>
           </div>
           <div class="row">
-            <div class="col s12" :class="{'m6': selected.rdbms}">
+            <div class="col s12" :class="{'m6': selected.oracle_db}">
               <Autocomplete
                   label="Oracle DB(RDBMS)"
                   :items="osPlatforms"
-                  v-model="selected.rdbms"
+                  v-model="selected.oracle_db"
+                  @change="delete selected.oracle_version"
+
               />
             </div>
-            <div class="col s12 m6" v-if="selected.rdbms">
+            <div class="col s12 m6" v-if="selected.oracle_db">
               <Autocomplete
-                  label="Oracle DB(RDBMS)"
-                  :items="rdbmsVersions"
+                  label="Oracle DB(RDBMS) version"
+                  :items="oracleVersions"
                   valueKey="version"
-                  v-model="selected.rdbms_version"
+                  v-model="selected.oracle_version"
               />
             </div>
+
           </div>
           <div class="row">
             <div class="col s12 m4">
               <Autocomplete
                   label="WSL"
-                  :items="wlsVersions"
+                  :items="wslVersions"
                   valueKey="version"
-                  v-model="selected.wls"
+                  v-model="selected.wsl"
               />
             </div>
             <div class="col s12 m4">
@@ -322,6 +323,8 @@
                   :items="javaComponents"
                   valueKey="name"
                   v-model="selected.java"
+                  @change="delete selected.java_version"
+
               />
             </div>
             <div class="col s12 m6" v-if="selected.java">
@@ -339,14 +342,16 @@
           <div class="row">
             <div class="col s12 m6">
               <TextInput
+                  class="readonly"
                   label="$IMX_FORMSTAG"
-                  v-model="selected.imx_formstag"
+                  :value="getFormsTag()"
               />
             </div>
             <div class="col s12 m6">
               <TextInput
+                  class="readonly"
                   label="$IMX_FORMSACTIVITY"
-                  v-model="selected.imx_formsactivity"
+                  :value="getProjectActivity()"
               />
             </div>
           </div>
@@ -355,8 +360,8 @@
               <Select
                   class="languages"
                   displayed="name"
-                  :options="ui_languages"
-                  defaultOptionText="iMX UI Application Language/s ($FORMS_LNG)"
+                  label="iMX UI Application Language/s ($FORMS_LNG)"
+                  :options="languages"
                   :multiple="true"
                   v-model="selected.ui_lang"
               />
@@ -365,9 +370,9 @@
           <div class="row">
             <div class="col s12">
               <Select
-                  :options="selected.project.languages"
-                  displayed="value"
-                  defaultOptionText="Extranet application languages"
+                  :options="languages"
+                  displayed="name"
+                  label="Extranet application languages"
                   :multiple="true"
                   v-model="selected.extranet_lang"
               />
@@ -530,9 +535,9 @@ export default {
       }
       return [];
     },
-    rdbmsVersions() {
-      if (this.selected.rdbms) {
-        return this.selected.rdbms.versions.filter((version) => version.approved) || [];
+    oracleVersions() {
+      if (this.selected.oracle_db) {
+        return this.selected.oracle_db.versions.filter((version) => version.approved) || [];
       }
       return [];
     },
@@ -544,7 +549,7 @@ export default {
       return this.$store.state.esxi.imxComponents.find((component) => component.name
         .includes('Apache HTTP Server')).versions.filter((version) => version.approved) || [];
     },
-    wlsVersions() {
+    wslVersions() {
       return this.$store.state.esxi.imxComponents.find((component) => component.name
         .includes('WLS')).versions.filter((version) => version.approved) || [];
     },
@@ -557,7 +562,7 @@ export default {
       }
       return [];
     },
-    ui_languages() {
+    languages() {
       return this.$store.state.esxi.languages || [];
     },
   },
@@ -575,8 +580,8 @@ export default {
       }
       return '';
     },
-    getProjectActivity(project) {
-      return project.activity ? project.activity.key : '';
+    getProjectActivity() {
+      return this.selected.project.activity ? this.selected.project.activity.key : '';
     },
     getApplicationLanguages(project) {
       return project.languages.flatMap((language) => language.value).join(', ');
@@ -589,6 +594,133 @@ export default {
     showRequestTypeComment() {
       return this.type_of_request.type && this.type_of_request.type.name.includes('Custom');
     },
+    getFormsTag() {
+      return this.selected.project.imx_formstag
+        ?? this.selected.project.getdcli
+        ?? this.selected.project.clnt_code;
+    },
+
+    mapData() {
+      this.selected = { ...this.request };
+      this.selected.project = this.projects
+        .find((project) => project.name === this.request.project);
+      this.selected.owner = { name: this.request.owner };
+      this.selected.server_hosted = { name: this.request.server_hosted };
+      this.type_of_request = {
+        type: { name: this.request.type_of_request.type },
+        comment: this.request.type_of_request.comment ?? '',
+      };
+      this.selected.delivery_chain = this.projectDeliveryChains
+        .find((dc) => dc.title === this.request.delivery_chain);
+      this.selected.dc_role = this.deliveryChainRoles
+        .find((role) => role.value === this.request.dc_role);
+      this.selected.environment_type = this.environmentTypes
+        .find((type) => type.title === this.request.environment_type);
+
+      this.request.instance_version.forEach((version) => {
+        this.selected[`${version.module.toLowerCase()}_version`] = this.instanceTypesVersions
+          .find((vr) => vr.value === version.version);
+      });
+
+      this.selected.os = this.osPlatforms.find((os) => os.name === this.request.os.name);
+      this.selected.os_version = this.dbVersions
+        .find((version) => version.version === this.request.os.version);
+      this.selected.oracle_db = this.osPlatforms
+        .find((os) => os.name === this.request.oracle_db.name);
+      this.selected.oracle_version = this.oracleVersions
+        .find((version) => version.version === this.request.oracle_db.version);
+      this.selected.wsl = this.wslVersions.find((wsl) => wsl.version === this.request.wsl);
+      this.selected.tomcat = this.tomcatVersions
+        .find((tomcat) => tomcat.version === this.request.tomcat);
+      this.selected.httpd = this.httpdVersions
+        .find((httpd) => httpd.version === this.request.httpd);
+      this.selected.java = this.javaComponents.find((os) => os.name === this.request.java.name);
+      this.selected.java_version = this.javaVersions
+        .find((version) => version.version === this.request.java.version);
+    },
+    getPayloadData() {
+      const payload = {};
+
+      if (this.selected.id) {
+        payload.id = this.selected.id;
+      }
+
+      payload.project = this.selected.project.name;
+      payload.owner = this.selected.owner.name;
+      payload.server_hosted = this.selected.server_hosted.name;
+      payload.type_of_request = {
+        type: this.type_of_request.type.name,
+        comment: this.type_of_request.comment,
+      };
+      payload.delivery_chain = this.selected.delivery_chain.title;
+      payload.dc_role = this.selected.dc_role.value;
+      payload.environment_type = this.selected.environment_type.title;
+      payload.dev_volume = this.selected.dev_volume;
+
+      const versions = [];
+      if (this.selected.intranet_version) {
+        versions.push({ module: 'Intranet', version: this.selected.intranet_version.value });
+      }
+      if (this.selected.extranet_version) {
+        versions.push({ module: 'Extranet', version: this.selected.extranet_version.value });
+      }
+      if (this.selected.ad_version) {
+        versions.push({ module: 'Ad', version: this.selected.ad_version.value });
+      }
+      payload.instance_version = versions;
+
+      payload.os = { name: this.selected.os.name, version: this.selected.os_version.version };
+      payload.oracle_middleware = this.selected.oracle_middleware;
+      payload.oracle_db = {
+        name: this.selected.oracle_db.name,
+        version: this.selected.oracle_version.version,
+      };
+      payload.wsl = this.selected.wsl.version;
+      payload.tomcat = this.selected.tomcat.version;
+      payload.httpd = this.selected.httpd.version;
+      payload.java = { name: this.selected.java.name, version: this.selected.java_version.version };
+      payload.ui_lang = this.selected.ui_lang;
+      payload.extranet_lang = this.selected.extranet_lang;
+
+      if (this.selected.mail) {
+        payload.mail = 1;
+      }
+      if (this.selected.sms) {
+        payload.sms = 1;
+      }
+      if (this.selected.fax) {
+        payload.fax = 1;
+      }
+      if (this.selected.telephony) {
+        payload.telephony = 1;
+      }
+      if (this.selected.imagerie) {
+        payload.imagerie = 1;
+      }
+      if (this.selected.archivage) {
+        payload.archivage = 1;
+      }
+
+      payload.es = this.selected.es.name;
+      payload.lov = this.selected.lov.name;
+
+      if (this.selected.es_requirements) {
+        payload.es_requirements = 1;
+      }
+      if (this.selected.night_job) {
+        payload.night_job = 1;
+      }
+      if (this.selected.db_clean) {
+        payload.db_clean = 1;
+      }
+      if (this.selected.auto_synchronization) {
+        payload.auto_synchronization = 1;
+      }
+
+      payload.comments = this.selected.comments;
+
+      return payload;
+    },
 
     save() {
       this.$v.$touch();
@@ -596,52 +728,7 @@ export default {
         return;
       }
 
-      const payload = {};
-      if (this.selected.id) {
-        payload.id = this.selected.id;
-      }
-
-      payload.project = this.selected.project.name;
-      payload.server_hosted = this.selected.server_hosted.name;
-      payload.request_type = { ...this.type_of_request };
-      payload.delivery_chain = this.selected.delivery_chain.name;
-      payload.dc_role = this.selected.dc_role.name;
-      //   to do instance types and versions
-
-      payload.os = { name: this.selected.os, version: this.selected.os_version };
-      payload.middleware = this.selected.middleware;
-      payload.rdbms = { name: this.selected.rdbms, version: this.selected.rdbms_version };
-      payload.wls = {
-        name: this.$store.state.esxi.imxComponents.find((component) => component.name.includes('WLS')).name,
-        version: this.selected.wls,
-      };
-      payload.tomcat = {
-        name: this.$store.state.esxi.imxComponents.find((component) => component.name.includes('Apache Tomcat')).name,
-        version: this.selected.tomcat,
-      };
-      payload.httpd = {
-        name: this.$store.state.esxi.imxComponents.find((component) => component.name.includes('Apache HTTP Server')).name,
-        version: this.selected.httpd,
-      };
-      payload.java = { name: this.selected.os, version: this.selected.java_version };
-      payload.ui_lang = this.selected.ui_lang;
-      payload.extranet_lang = this.selected.extranet_lang;
-      payload.aditional_components = {
-        mail: this.selected.mail,
-        sms: this.selected.sms,
-        fax: this.selected.fax,
-        telephony: this.selected.telephony,
-        imagerie: this.selected.imagerie,
-        archivage: this.selected.archivage,
-      };
-      payload.es = this.selected.es.name;
-      payload.lov = this.selected.lov.name;
-      payload.es_requirements = this.selected.es_requirements;
-      payload.night_job = this.selected.night_job;
-      payload.db_clean = this.selected.db_clean;
-      payload.auto_synchronization = this.selected.auto_synchronization;
-
-      this.$store.dispatch(`esxi/${this.action}RequestedInstance`, payload)
+      this.$store.dispatch(`esxi/${this.action}RequestedInstance`, this.getPayloadData())
         .then(() => {
           this.$emit('close');
           if (this.action === 'create') {
@@ -666,7 +753,7 @@ export default {
 
   mounted() {
     if (this.action === 'update') {
-      this.selected = { ...this.request };
+      this.mapData();
     }
   },
 };
