@@ -139,14 +139,30 @@
                   label="Instance Owner"
                   :items="[{ name: 'Client' }, { name: 'Codix'}]"
                   v-model="selected.owner"
+                  :invalid="$v.selected.owner.$error"
+                  @blur="$v.selected.owner.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.owner.$error">
+                  <p v-if="!$v.selected.owner.required">Instance owner field must not be empty.</p>
+                </div>
+              </div>
             </div>
             <div class="col s12 m6">
               <Autocomplete
                   label="Server Hosted"
                   :items="[{ name: 'Codix Premises' }, { name: 'Oracle Cloud'}]"
                   v-model="selected.server_hosted"
+                  :invalid="$v.selected.server_hosted.$error"
+                  @blur="$v.selected.server_hosted.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.server_hosted.$error">
+                  <p v-if="!$v.selected.server_hosted.required">
+                    Server hosted field must not be empty.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">
@@ -163,7 +179,16 @@
                   { name:
                     'Custom (clone from already existing instance without refresh from REFBG2)'}
                 ]"
+                  :invalid="$v.type_of_request.type.$error"
+                  @blur="$v.type_of_request.type.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.type_of_request.type.$error">
+                  <p v-if="!$v.type_of_request.type.required">
+                    Type of instance requested field must not be empty.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row" v-if="showRequestTypeComment()">
@@ -171,7 +196,14 @@
                 class="col s12"
                 label="Specify from where to build (database, iMX sources)"
                 v-model="type_of_request.comment"
+                :invalid="$v.type_of_request.comment.$error"
+                @blur="$v.type_of_request.comment.$touch()"
             />
+            <div class="validator">
+              <div class="red-text" v-if="$v.type_of_request.comment.$error">
+                <p v-if="!$v.type_of_request.comment.required">Field must not be empty.</p>
+              </div>
+            </div>
           </div>
           <div class="row">
             <div class="col s12 m6">
@@ -181,7 +213,16 @@
                   :items="projectDeliveryChains"
                   v-model="selected.delivery_chain"
                   @change="delete selected.dc_role"
+                  :invalid="$v.selected.delivery_chain.$error"
+                  @blur="$v.selected.delivery_chain.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.delivery_chain.$error">
+                  <p v-if="!$v.selected.delivery_chain.required">
+                    Delivery chain field must not be empty.
+                  </p>
+                </div>
+              </div>
             </div>
             <div class="col s12 m6">
               <Autocomplete
@@ -189,16 +230,33 @@
                   :items="deliveryChainRoles"
                   valueKey="value"
                   v-model="selected.dc_role"
+                  :invalid="$v.selected.dc_role.$error"
+                  @blur="$v.selected.dc_role.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.dc_role.$error">
+                  <p v-if="!$v.selected.dc_role.required">
+                    Delivery chain role field must not be empty.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12 m6">
-              <input id="volume" v-model="selected.dev_volume"/>
+              <input id="volume"
+                     v-model="selected.dev_volume"
+                     :invalid="$v.selected.dev_volume.$error"
+                     @blur="$v.selected.dev_volume.$touch()"/>
               <label :class="{active: selected.dev_volume}" for="volume">
                 Expected new DEV during the customization
               </label>
               <span class="helper-text">small, medium, large, extra-large</span>
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.dev_volume.$error">
+                  <p v-if="!$v.selected.dev_volume.required">Field must not be empty.</p>
+                </div>
+              </div>
             </div>
             <div class="col s12 m6">
               <Autocomplete
@@ -206,7 +264,16 @@
                   :items="environmentTypes"
                   valueKey="title"
                   v-model="selected.environment_type"
+                  :invalid="$v.selected.environment_type.$error"
+                  @blur="$v.selected.environment_type.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.environment_type.$error">
+                  <p v-if="!$v.selected.environment_type.required">
+                    Purpose field must not be empty.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </fieldset>
@@ -237,6 +304,13 @@
                   v-model="selected.ad_version"
               />
             </div>
+            <div class="validator col s12">
+              <div class="red-text" v-if="$v.selected.intranet_version.$error">
+                <p v-if="!$v.selected.intranet_version.required">
+                  Please select at least one version.
+                </p>
+              </div>
+            </div>
           </div>
         </fieldset>
         <fieldset v-if="selected.project">
@@ -250,8 +324,14 @@
                 :items="osPlatforms"
                 v-model="selected.os"
                 @change="delete selected.os_version"
-
+                :invalid="$v.selected.os.$error"
+                @blur="$v.selected.os.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.os.$error">
+                  <p v-if="!$v.selected.os.required">OS field must not be empty.</p>
+                </div>
+              </div>
             </div>
             <div class="col s12 m6" v-if="selected.os">
               <Autocomplete
@@ -259,7 +339,14 @@
                   :items="dbVersions"
                   valueKey="version"
                   v-model="selected.os_version"
+                  :invalid="$v.selected.os_version.$error"
+                  @blur="$v.selected.os_version.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.os_version.$error">
+                  <p v-if="!$v.selected.os_version.required">OS version field must not be empty.</p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">
@@ -267,7 +354,16 @@
               <TextInput
                   label="Oracle Fusion Middleware"
                   v-model="selected.oracle_middleware"
+                  :invalid="$v.selected.oracle_middleware.$error"
+                  @blur="$v.selected.oracle_middleware.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.oracle_middleware.$error">
+                  <p v-if="!$v.selected.oracle_middleware.required">
+                    Oracle middleware field must not be empty.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">
@@ -277,8 +373,14 @@
                   :items="osPlatforms"
                   v-model="selected.oracle_db"
                   @change="delete selected.oracle_version"
-
+                  :invalid="$v.selected.oracle_db.$error"
+                  @blur="$v.selected.oracle_db.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.oracle_db.$error">
+                  <p v-if="!$v.selected.oracle_db.required">Oracle DB field must not be empty.</p>
+                </div>
+              </div>
             </div>
             <div class="col s12 m6" v-if="selected.oracle_db">
               <Autocomplete
@@ -286,9 +388,17 @@
                   :items="oracleVersions"
                   valueKey="version"
                   v-model="selected.oracle_version"
+                  :invalid="$v.selected.oracle_version.$error"
+                  @blur="$v.selected.oracle_version.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.oracle_version.$error">
+                  <p v-if="!$v.selected.oracle_version.required">
+                    Oracle DB version field must not be empty.
+                  </p>
+                </div>
+              </div>
             </div>
-
           </div>
           <div class="row">
             <div class="col s12 m4">
@@ -297,7 +407,14 @@
                   :items="wslVersions"
                   valueKey="version"
                   v-model="selected.wsl"
+                  :invalid="$v.selected.wsl.$error"
+                  @blur="$v.selected.wsl.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.wsl.$error">
+                  <p v-if="!$v.selected.wsl.required">WSL field must not be empty.</p>
+                </div>
+              </div>
             </div>
             <div class="col s12 m4">
               <Autocomplete
@@ -305,7 +422,14 @@
                   :items="tomcatVersions"
                   valueKey="version"
                   v-model="selected.tomcat"
+                  :invalid="$v.selected.tomcat.$error"
+                  @blur="$v.selected.tomcat.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.tomcat.$error">
+                  <p v-if="!$v.selected.tomcat.required">Tomcat field must not be empty.</p>
+                </div>
+              </div>
             </div>
             <div class="col s12 m4">
               <Autocomplete
@@ -313,7 +437,14 @@
                   :items="httpdVersions"
                   valueKey="version"
                   v-model="selected.httpd"
+                  :invalid="$v.selected.httpd.$error"
+                  @blur="$v.selected.httpd.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.httpd.$error">
+                  <p v-if="!$v.selected.httpd.required">HTTPD field must not be empty.</p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">
@@ -324,8 +455,14 @@
                   valueKey="name"
                   v-model="selected.java"
                   @change="delete selected.java_version"
-
+                  :invalid="$v.selected.java.$error"
+                  @blur="$v.selected.java.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.java.$error">
+                  <p v-if="!$v.selected.java.required">Java field must not be empty.</p>
+                </div>
+              </div>
             </div>
             <div class="col s12 m6" v-if="selected.java">
               <Autocomplete
@@ -333,7 +470,16 @@
                   :items="javaVersions"
                   valueKey="version"
                   v-model="selected.java_version"
+                  :invalid="$v.selected.java_version.$error"
+                  @blur="$v.selected.java_version.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.java_version.$error">
+                  <p v-if="!$v.selected.java_version.required">
+                    Java version field must not be empty.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </fieldset>
@@ -364,7 +510,16 @@
                   :options="languages"
                   :multiple="true"
                   v-model="selected.ui_lang"
+                  :invalid="$v.selected.ui_lang.$error"
+                  @blur="$v.selected.ui_lang.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.ui_lang.$error">
+                  <p v-if="!$v.selected.ui_lang.required">
+                    iMX UI application language field must not be empty.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">
@@ -375,7 +530,16 @@
                   label="Extranet application languages"
                   :multiple="true"
                   v-model="selected.extranet_lang"
+                  :invalid="$v.selected.extranet_lang.$error"
+                  @blur="$v.selected.extranet_lang.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.extranet_lang.$error">
+                  <p v-if="!$v.selected.extranet_lang.required">
+                    Extranet application languages field must not be empty.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </fieldset>
@@ -422,7 +586,14 @@
                   :items="[{ name: 'STD (from std reference instance)' },
                            { name: 'Specific requirement (copy from existing instance)' }]"
                   v-model="selected.es"
+                  :invalid="$v.selected.es.$error"
+                  @blur="$v.selected.es.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.es.$error">
+                  <p v-if="!$v.selected.es.required">ES field must not be empty.</p>
+                </div>
+              </div>
             </div>
             <div class="col s12 m6">
               <Autocomplete
@@ -431,7 +602,14 @@
                            { name: 'Specific requirements  (copy from existing instance)' },
                            { name: 'N/А (LOVs coming from data package)'}]"
                   v-model="selected.lov"
+                  :invalid="$v.selected.lov.$error"
+                  @blur="$v.selected.lov.$touch()"
               />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.lov.$error">
+                  <p v-if="!$v.selected.lov.required">LOV field must not be empty.</p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">
@@ -498,12 +676,92 @@ export default {
       type_of_request: {},
     };
   },
-  validations: {
-    selected: {
-      project: {
-        required,
+  validations() {
+    const validations = {
+      selected: {
+        project: {
+          required,
+        },
+        owner: {
+          required,
+        },
+        server_hosted: {
+          required,
+        },
+        delivery_chain: {
+          required,
+        },
+        dc_role: {
+          required,
+        },
+        dev_volume: {
+          required,
+        },
+        environment_type: {
+          required,
+        },
+        intranet_version: {},
+        os: {
+          required,
+        },
+        os_version: {
+          required,
+        },
+        oracle_middleware: {
+          required,
+        },
+        oracle_db: {
+          required,
+        },
+        oracle_version: {
+          required,
+        },
+        wsl: {
+          required,
+        },
+        tomcat: {
+          required,
+        },
+        httpd: {
+          required,
+        },
+        java: {
+          required,
+        },
+        java_version: {
+          required,
+        },
+        ui_lang: {
+          required,
+        },
+        extranet_lang: {
+          required,
+        },
+        es: {
+          required,
+        },
+        lov: {
+          required,
+        },
       },
-    },
+      type_of_request: {
+        type: {
+          required,
+        },
+        comment: {},
+      },
+    };
+
+    if (this.showRequestTypeComment()) {
+      validations.type_of_request.comment = { required };
+    }
+    if (!(this.selected.intranet_version
+          || this.selected.extranet_version
+          || this.selected.ad_version)) {
+      validations.selected.intranet_version = { required };
+    }
+
+    return validations;
   },
   computed: {
     projects() {
