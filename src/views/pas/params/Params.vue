@@ -1,12 +1,12 @@
 <template>
   <div class="row">
     <div class="col s12">
-      <div ref="x4-params" class="row">
+      <div ref="params" class="row">
         <div class="col s12">
           <div class="data-table">
             <Table
-                :data="x4params"
-                sort-by="name"
+                :data="params"
+                sort-by="type"
                 sort-dir="asc"
                 :export-btn="false"
                 :view-btn="false"
@@ -14,15 +14,9 @@
                 @edit="(row) => openAddEditModal(row, 'update')"
                 @delete="(row) => openDeleteModal(row)"
             >
-              <template v-slot:top-actions-after>
-                <Select class="col s12 m4"
-                        v-model="type"
-                        displayed="name"
-                        :options="typeOptions"
-                        @change="(e) => setCurrentType(e)"
-                />
-              </template>
               <Column show="name"/>
+              <Column show="type" :sortable="false" filter-type="dropdown"/>/>
+              <Column show="category" :sortable="false" filter-type="dropdown"/>/>
               <Column show="description"/>
               <Column label="Created on" :show="(item) => $date(item.created_on).toHuman()"/>
               <Column show="created_by"/>
@@ -63,37 +57,35 @@ export default {
       showRemoveModal: false,
       selected: {},
       action: '',
-      type: '',
-      typeOptions: ['config', 'project'],
     };
   },
   computed: {
-    x4params() {
-      return this.$store.state.pas.x4params;
+    params() {
+      return this.$store.state.pas.params;
     },
   },
   methods: {
     getData() {
-      const loader = this.$loading.show({ container: this.$refs['x4-params'] });
+      const loader = this.$loading.show({ container: this.$refs.params });
 
-      this.$store.dispatch('pas/getX4Params', this.type)
+      this.$store.dispatch('pas/getParams')
         .then(() => {
           if (this.$route.params.id) {
             if (this.$route.params.id === 'new') {
               this.showAddEditModal = true;
               this.action = 'create';
-              this.selected = { type: this.type };
+              this.selected = { };
               return;
             }
 
-            const param = this.x4params.find(
+            const param = this.params.find(
               (param) => param.id === parseInt(this.$route.params.id, 10),
             );
 
             if (param) {
               this.showAddEditModal = true;
               this.action = 'update';
-              this.selected = { ...param, type: this.type };
+              this.selected = { ...param };
               return;
             }
 
@@ -107,27 +99,19 @@ export default {
         .finally(() => loader.hide());
     },
 
-    setCurrentType(type) {
-      this.type = type;
-      this.$router.push({ params: { type: this.type } });
-      this.getData();
-    },
-
     openAddEditModal(item, action) {
       this.selected = { ...item };
       this.action = action;
       this.showAddEditModal = true;
 
       this.$router.push({
-        path: `/pas/x4-params/${this.type}/${encodeURIComponent(item.id || 'new')}`,
+        path: `/pas/params/${encodeURIComponent(item.id || 'new')}`,
       });
     },
     closeAddEditModal() {
       this.showAddEditModal = false;
 
-      this.$router.push({
-        path: `/pas/x4-params/${this.type}`,
-      });
+      this.$router.push({ path: '/pas/params' });
     },
 
     openDeleteModal(item) {
@@ -138,7 +122,6 @@ export default {
   },
 
   mounted() {
-    this.type = this.typeOptions.find((t) => t === this.$route.params.type);
     this.getData();
   },
 };

@@ -17,7 +17,6 @@ export default {
       .catch(() => commit('error', 'Could not get configurations list', { root: true }));
     return promise;
   },
-
   createConfiguration({ commit }, payload) {
     const promise = api('devops').post('pas/configurations', payload);
 
@@ -27,13 +26,11 @@ export default {
 
     return promise;
   },
-
   buildConfiguration({ commit }, { id, payload }) {
     const promise = api('devops').post(`pas/configurations/${id}/build`, payload);
     promise.catch((error) => commit('error', error, { root: true }));
     return promise;
   },
-
   updateConfiguration({ commit }, payload) {
     const promise = api('devops').put(`pas/configurations/${payload.id}`, payload);
 
@@ -43,7 +40,6 @@ export default {
 
     return promise;
   },
-
   deleteConfiguration({ commit }, id) {
     const promise = api('devops').delete(`pas/configurations/${id}`);
 
@@ -53,47 +49,39 @@ export default {
 
     return promise;
   },
-  getX4Params({ commit }, type) {
-    const promise = api('devops').get('pas/x4-params', {
-      filters: JSON.stringify({
-        allOf: [
-          {
-            type,
-          },
-        ],
-      }),
 
-    });
+  getParams({ commit }) {
+    const promise = api('devops').get('pas/params');
 
     promise
-      .then((response) => commit('x4params', response.data.data))
-      .catch(() => commit('error', 'Could not get X4 parameters list', { root: true }));
+      .then((response) => commit('params', response.data.data))
+      .catch(() => commit('error', 'Could not get parameters list', { root: true }));
     return promise;
   },
-  createX4Param({ commit }, payload) {
-    const promise = api('devops').post('pas/x4-params', payload);
+  createParam({ commit }, payload) {
+    const promise = api('devops').post('pas/params', payload);
 
     promise
-      .then((response) => commit('createX4Param', response.data.data))
-      .catch(() => commit('error', 'Could not create X4 parameter', { root: true }));
+      .then((response) => commit('createParam', response.data.data))
+      .catch(() => commit('error', 'Could not create parameter', { root: true }));
 
     return promise;
   },
-  updateX4Param({ commit }, payload) {
-    const promise = api('devops').put(`pas/x4-params/${payload.id}`, payload);
+  updateParam({ commit }, payload) {
+    const promise = api('devops').put(`pas/params/${payload.id}`, payload);
 
     promise
-      .then((response) => commit('updateX4Param', response.data.data))
-      .catch(() => commit('error', 'Could not update X4 parameter', { root: true }));
+      .then((response) => commit('updateParam', response.data.data))
+      .catch(() => commit('error', 'Could not update parameter', { root: true }));
 
     return promise;
   },
-  deleteX4Param({ commit }, id) {
-    const promise = api('devops').delete(`pas/x4-params/${id}`);
+  deleteParam({ commit }, id) {
+    const promise = api('devops').delete(`pas/params/${id}`);
 
     promise
-      .then(() => commit('deleteX4Param', id))
-      .catch(() => commit('error', 'Could not delete X4 parameter', { root: true }));
+      .then(() => commit('deleteParam', id))
+      .catch(() => commit('error', 'Could not delete parameter', { root: true }));
 
     return promise;
   },
@@ -106,7 +94,6 @@ export default {
       .catch(() => commit('error', 'Could not get hashes list', { root: true }));
     return promise;
   },
-
   getFeHashes({ commit }, branch) {
     const promise = api('devops').get('extranet/fe-hashes', { branch });
 

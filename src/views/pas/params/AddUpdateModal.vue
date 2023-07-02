@@ -1,12 +1,42 @@
 <template>
   <Modal class="right-sheet" @close="$emit('close')" >
     <template v-slot:header>
-      <span v-if="action === 'create'">Create {{selected.type}} parameter</span>
-      <span v-else>Update {{selected.type}} parameter</span>
+      <span v-if="action === 'create'">Create new parameter</span>
+      <span v-else>Update parameter {{ param.name }}</span>
     </template>
 
     <template v-slot:content>
       <form>
+        <div class="row">
+          <div class="col s12 m6">
+            <Autocomplete
+                label="Type"
+                :items="[{name: 'x4'}, {name: 'x5'}]"
+                v-model="param.type"
+            />
+            <div class="validator">
+              <div class="red-text" v-if="$v.param.type.$error">
+                <p v-if="!$v.param.type.required">
+                  Type field must not be empty.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col s12 m6">
+            <Autocomplete
+                label="Category"
+                :items="categories"
+                v-model="param.category"
+            />
+            <div class="validator">
+              <div class="red-text" v-if="$v.param.category.$error">
+                <p v-if="!$v.param.category.required">
+                  Category field must not be empty.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="row">
           <TextInput
               class="col s12"
@@ -56,9 +86,22 @@ export default {
       param: { ...this.selected },
     };
   },
+  computed: {
+    categories() {
+      const categories = this.$store.state.pas.params.map((params) => params.category);
+      return categories.filter((key, idx) => categories.indexOf(key) === idx)
+        .map((category) => ({ name: category }));
+    },
+  },
   validations: {
     param: {
       name: {
+        required,
+      },
+      type: {
+        required,
+      },
+      category: {
         required,
       },
     },
@@ -70,7 +113,15 @@ export default {
         return;
       }
 
-      this.$store.dispatch(`pas/${this.action}X4Param`, { ...this.param })
+      const payload = { ...this.param };
+      if (this.param.type.name) {
+        payload.type = this.param.type.name;
+      }
+      if (this.param.category.name) {
+        payload.category = this.param.category.name;
+      }
+
+      this.$store.dispatch(`pas/${this.action}Param`, payload)
         .then(() => {
           this.$M.toast({
             html: `The parameter has been ${this.action}d!`,

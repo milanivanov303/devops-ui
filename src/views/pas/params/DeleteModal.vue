@@ -41,7 +41,7 @@ export default {
   methods: {
     remove() {
       this.removing = true;
-      this.$store.dispatch('pas/deleteX4Param', this.selected.id)
+      this.$store.dispatch('pas/deleteParam', this.selected.id)
         .then(() => {
           this.removed = true;
           this.$emit('close');

@@ -32,6 +32,9 @@
               <li :class="{ active: isActive('extranet-x4') }">
                 <router-link to="/extranet-x4/dashboard"> Extranet X4</router-link>
               </li>
+              <li :class="{ active: isActive('extranet-x5') }">
+                <router-link to="/extranet-x5/dashboard"> Extranet X5</router-link>
+              </li>
               <li :class="{ active: isActive('debiteur') }">
                 <router-link to="/debiteur/dashboard"> Debiteur</router-link>
               </li>
@@ -39,8 +42,8 @@
                 <router-link to="/pas/soa-modification"> SOA</router-link>
               </li>
               <li v-if="$auth.can('can-manage-authorizations', getApplicationCode('devops'))"
-                  :class="{ active: isActive('pas/x4-params') }">
-                <router-link to="/pas/x4-params"> X4 Parameters</router-link>
+                  :class="{ active: isActive('pas/params') }">
+                <router-link to="/pas/params">Parameters</router-link>
               </li>
             </ul>
           </div>
