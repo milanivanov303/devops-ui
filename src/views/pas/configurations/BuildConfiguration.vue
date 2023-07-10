@@ -31,49 +31,42 @@
           </div>
         </div>
 
-        <div
-            v-if="configuration.app_type === 'extranet' && configuration.app_version === 'X4'"
-            class="row">
-          <div class="col s12">
+        <div v-if="configuration.app_type === 'extranet' &&
+                   configuration.app_version === 'X4'" class="row">
+          <div class="col s12 m6">
             <Autocomplete
                 label="X4Config"
-                icon="dynamic_feed"
-                :items="x4configs"
+                icon="style"
+                :items="x4ConfigParams"
                 valueKey="name"
                 v-model="x4config"
                 :invalid="$v.x4config.$error"
                 @blur="$v.x4config.$touch()"
             />
-          </div>
-          <div class="validator col s11 offset-s1">
-            <div class="red-text" v-if="$v.x4config.$error">
-              <p v-if="!$v.x4config.required">
-                Config field must not be empty.
-              </p>
+            <div class="validator">
+              <div class="red-text" v-if="$v.x4config.$error">
+                <p v-if="!$v.x4config.required">
+                  Config field must not be empty.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-        <div
-            v-if="configuration.app_type === 'extranet' && configuration.app_version === 'X4'"
-            class="row">
-          <div class="col s12">
+          <div class="col s12 m6">
             <Autocomplete
-                label="Project"
-                icon="dynamic_feed"
-                :items="projects"
+                label="Project parameter"
+                :items="x4ProjectParams"
                 valueKey="name"
                 v-model="project"
             />
-          </div>
-          <div class="validator col s11 offset-s1">
-            <div class="red-text" v-if="$v.project.$error">
-              <p v-if="!$v.project.required">
-                Project field must not be empty.
-              </p>
+            <div class="validator">
+              <div class="red-text" v-if="$v.project.$error">
+                <p v-if="!$v.project.required">
+                  Project field must not be empty.
+                </p>
+              </div>
             </div>
           </div>
         </div>
-
         <div class="row">
           <Select
               class="col s12"
@@ -272,12 +265,12 @@ export default {
   },
 
   computed: {
-    x4configs() {
-      return this.$store.getters['pas/getX4ParamsByType']('config');
+    x4ConfigParams() {
+      return this.$store.state.pas.params.filter((x) => x.type === 'x4' && x.category === 'config');
     },
 
-    projects() {
-      return this.$store.getters['pas/getX4ParamsByType']('project');
+    x4ProjectParams() {
+      return this.$store.state.pas.params.filter((x) => x.type === 'x4' && x.category === 'project');
     },
 
     binaryTypes() {
@@ -475,7 +468,7 @@ export default {
     this.$store.dispatch('extranet/getClients');
     this.$store.dispatch('debiteur/getClients');
     this.$store.dispatch('extranet-x4/getBranches');
-    this.$store.dispatch('pas/getX4Params');
+    this.$store.dispatch('pas/getParams');
   },
 };
 </script>

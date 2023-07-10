@@ -173,6 +173,51 @@ export default [
     },
   },
 
+  // Extranet X5 Tab
+  {
+    path: '/extranet-x5',
+    redirect: '/extranet-x5/dashboard',
+  },
+  {
+    path: '/extranet-x5/dashboard',
+    name: 'extranet-x5',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Extranet X5 Dashboard',
+      breadcrumb: 'Dashboard',
+    },
+    component: Dashboard,
+    props: {
+      module: 'extranet-x5',
+    },
+  },
+  {
+    path: '/extranet-x5/branches/:branch?',
+    name: 'extranet-x5-branches',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Extranet X5 Branches';
+
+        if (route.query.branch) {
+          title = `${route.query.branch} - ${title}`;
+        }
+
+        if (route.query.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Branches,
+    props: {
+      module: 'extranet-x5',
+    },
+  },
+
   {
     path: '/pas/configurations/:id?/:action?',
     name: 'configurations',
@@ -199,24 +244,12 @@ export default [
     },
   },
   {
-    path: '/pas/params',
-    redirect: '/pas/params/x4/config',
-  },
-  {
-    path: '/pas/params/:type?/:category?/:id?',
+    path: '/pas/params/:id?',
     name: 'parameters',
     meta: {
       requiresAuth: true,
       transitionName: 'slide',
-      title: (route) => {
-        let title = 'Parameters';
-
-        if (route.params.type) {
-          title = `${route.params.type.toUpperCase()} ${title}`;
-        }
-
-        return title;
-      },
+      title: 'Parameters',
     },
     component: Params,
   },

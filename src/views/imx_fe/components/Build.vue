@@ -200,7 +200,7 @@ export default {
     endpoint(value) {
       this.form.endpoint = value.replace(/\/+$/, '');
     },
-    'form.branch': _.debounce(function () {
+    'form.branch': _.debounce(function fn() {
       const loader = this.$loading.show({ container: this.$refs.modal });
 
       this.$store
