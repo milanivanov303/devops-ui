@@ -350,10 +350,12 @@
             </div>
           </div>
           <div class="row">
-            <div class="col s12">
-              <TextInput
+            <div class="col s12" :class="{'m6': selected.oracle_middleware}">
+              <Autocomplete
                   label="Oracle Fusion Middleware"
+                  :items="middlewareOptions"
                   v-model="selected.oracle_middleware"
+                  @change="delete selected.middleware_version"
                   :invalid="$v.selected.oracle_middleware.$error"
                   @blur="$v.selected.oracle_middleware.$touch()"
               />
@@ -362,6 +364,22 @@
                   <p v-if="!$v.selected.oracle_middleware.required">
                     Oracle middleware field must not be empty.
                   </p>
+                </div>
+              </div>
+            </div>
+            <div class="col s12 m6" v-if="selected.oracle_middleware">
+              <Autocomplete
+                  label="Oracle Fusion Middleware version"
+                  :items="middlewareVersions"
+                  valueKey="version"
+                  v-model="selected.middleware_version"
+                  :invalid="$v.selected.middleware_version.$error"
+                  @blur="$v.selected.middleware_version.$touch()"
+              />
+              <div class="validator">
+                <div class="red-text" v-if="$v.selected.middleware_version.$error">
+                  <p v-if="!$v.selected.middleware_version.required">
+                    Middleware version field must not be empty.</p>
                 </div>
               </div>
             </div>
@@ -710,6 +728,9 @@ export default {
         oracle_middleware: {
           required,
         },
+        middleware_version: {
+          required,
+        },
         oracle_db: {
           required,
         },
@@ -799,6 +820,17 @@ export default {
       }
       return [];
     },
+    middlewareOptions() {
+      return this.$store.state.esxi.imxComponents
+        .filter((component) => component.name_key === 'OFM' || component.name_key === 'OIC') || [];
+    },
+    middlewareVersions() {
+      if (this.selected.oracle_middleware) {
+        return this.selected.oracle_middleware.versions.filter((version) => version.approved) || [];
+      }
+      return [];
+    },
+
     tomcatVersions() {
       return this.$store.state.esxi.imxComponents.find((component) => component.name
         .includes('Apache Tomcat')).versions.filter((version) => version.approved) || [];
@@ -883,6 +915,10 @@ export default {
       this.selected.os = this.osPlatforms.find((os) => os.name === this.request.os.name);
       this.selected.os_version = this.dbVersions
         .find((version) => version.version === this.request.os.version);
+      this.selected.oracle_middleware = this.middlewareOptions
+        .find((mid) => mid.name === this.request.oracle_middleware.name);
+      this.selected.middleware_version = this.middlewareVersions
+        .find((version) => version.version === this.request.oracle_middleware.version);
       this.selected.oracle_db = this.osPlatforms
         .find((os) => os.name === this.request.oracle_db.name);
       this.selected.oracle_version = this.oracleVersions
@@ -928,7 +964,10 @@ export default {
       payload.instance_version = versions;
 
       payload.os = { name: this.selected.os.name, version: this.selected.os_version.version };
-      payload.oracle_middleware = this.selected.oracle_middleware;
+      payload.oracle_middleware = {
+        name: this.selected.oracle_middleware.name,
+        version: this.selected.middleware_version.version,
+      };
       payload.oracle_db = {
         name: this.selected.oracle_db.name,
         version: this.selected.oracle_version.version,
