@@ -80,6 +80,26 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col s12" >
+                <TextInput
+                    label="Backend url"
+                    icon="link"
+                    v-model="form.be_url"
+                    :readonly="be_url !== null"
+                    :invalid="$v.form.be_url.$error"
+                    @blur="$v.form.be_url.$touch()"
+                    @input="debounceInput"
+                />
+              </div>
+              <div class="validator col s11 offset-s1 ">
+                <div class="red-text" v-if="$v.form.be_url.$error">
+                  <p v-if="!$v.form.be_url.required">
+                    Backend url field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
           <BuildProgress
               v-else
@@ -108,7 +128,8 @@
 
 import { required } from 'vuelidate/lib/validators';
 import BuildProgress from '@/components/BuildProgress';
-// import EventBus from '@/event-bus';
+import _ from 'lodash';
+import EventBus from '@/event-bus';
 
 function initialState() {
   return {
@@ -119,6 +140,7 @@ function initialState() {
       instance: null,
       api_client: null,
       api_secret: null,
+      be_url: null,
     },
     build: {
       started: false,
@@ -153,6 +175,13 @@ export default {
     configurations() {
       return this.$store.state.pas.configurations;
     },
+    be_url() {
+      if (!this.form.build || !this.form.build.details) {
+        return null;
+      }
+
+      return this.form.build.details.be_url.replace(/\/+$/, '');
+    },
   },
 
   validations() {
@@ -168,6 +197,9 @@ export default {
           required,
         },
         api_secret: {
+          required,
+        },
+        be_url: {
           required,
         },
       },
@@ -186,16 +218,36 @@ export default {
   },
 
   watch: {
-    'form.instance': function fn() {
-      const x5record = this.configurations.find(
-        (configuration) => configuration.app_type === 'extranet'
-              && configuration.app_version === 'X5'
-              && configuration.dev_instance === this.form.instance.name,
-      );
+    'form.instance': _.debounce(function fn() {
+      const loader = this.$loading.show({ container: this.$refs.modal });
 
-      this.form.api_client = x5record ? x5record.api_client : null;
-      this.form.api_secret = x5record ? x5record.api_secret : null;
-    },
+      if (!this.form.instance.name) {
+        loader.hide();
+        return false;
+      }
+
+      this.setApiArguments(this.form.instance.name);
+
+      return this.$store
+        .dispatch('extranet-x5/getBackendUrl', {
+          instanceName: this.form.instance.name,
+          instanceHost: this.form.instance.host,
+          instanceUser: this.form.instance.user,
+        })
+        .then((response) => {
+          this.form.be_url = response.data.be_url;
+        })
+        .catch(() => {
+          this.form.be_url = null;
+          this.$M.toast({
+            html: 'Error retrieving backend url. Please type manually',
+            classes: 'toast-fail',
+          });
+        })
+        .finally(() => {
+          loader.hide();
+        });
+    }, 1000),
   },
 
   methods: {
@@ -227,33 +279,41 @@ export default {
       }
 
       this.isButtonDisabled = true;
-      const branch1 = this.form.branch ? this.form.branch.name : this.branch;
-      const instance1 = this.form.instance;
 
-      alert(`Will trigger pipeline with the following parameters: ${branch1} ${instance1.name} ${this.form.api_client} ${this.form.api_client}`);
+      this.$store.dispatch('extranet-x5/startBuild', {
+        branch: this.form.branch ? this.form.branch.name : this.branch,
+        instance: this.form.instance,
+        api_client: this.form.api_client,
+        api_secret: this.form.api_secret,
+        be_url: this.form.be_url,
+      })
+        .then((response) => {
+          this.build.status = 'running';
+          this.build.summary = 'Build will start shortly ...';
+          this.build.broadcast = response.data.broadcast;
+          EventBus.$emit('build.created');
+        })
+        .catch((error) => {
+          this.build.status = 'failed';
+          this.build.summary = 'Could not start build';
+          if (error.response.status === 403) {
+            this.build.error = 'You do not have insufficient rights to create build';
+          } else {
+            this.build.error = error;
+          }
+        })
+        .finally(() => { this.build.started = true; });
+    },
 
-      // this.$store.dispatch('extranet-x5/startBuild', {
-      //   branch: this.form.branch ? this.form.branch.name : this.branch,
-      //   instance: this.form.instance,
-      //   api_client: this.form.api_client,
-      //   api_secret: this.form.api_secret,
-      // })
-      //   .then((response) => {
-      //     this.build.status = 'running';
-      //     this.build.summary = 'Build will start shortly ...';
-      //     this.build.broadcast = response.data.broadcast;
-      //     EventBus.$emit('build.created');
-      //   })
-      //   .catch((error) => {
-      //     this.build.status = 'failed';
-      //     this.build.summary = 'Could not start build';
-      //     if (error.response.status === 403) {
-      //       this.build.error = 'You do not have insufficient rights to create build';
-      //     } else {
-      //       this.build.error = error;
-      //     }
-      //   })
-      //   .finally(() => { this.build.started = true; });
+    setApiArguments(instanceName) {
+      const x5record = this.configurations.find(
+        (configuration) => configuration.app_type === 'extranet'
+              && configuration.app_version === 'X5'
+              && configuration.dev_instance === instanceName,
+      );
+
+      this.form.api_client = x5record ? x5record.api_client : null;
+      this.form.api_secret = x5record ? x5record.api_secret : null;
     },
   },
 };
