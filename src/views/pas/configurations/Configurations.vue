@@ -16,7 +16,7 @@
       <Column show="branch" :sortable="false" filter-type="search"/>
       <Column show="dev_instance"/>
       <Column show="val_instance"/>
-      <Column show="delivery_chain"/>
+      <Column label="Delivery Chain" :show="(row) => row.delivery_chain.name"/>
       <Column show="prefix"/>
       <Column show="app_version" :sortable="false" filter-type="dropdown"/>
       <Column show="servlet_container"/>
