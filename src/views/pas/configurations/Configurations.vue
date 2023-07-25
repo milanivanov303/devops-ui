@@ -30,7 +30,7 @@
       </template>
       <template v-slot:actions-before="{ row }">
         <a
-          v-if="canBeBuild(row)"
+          v-if="canBeBuilt(row)"
           @click="openBuildModal('build', row)"
           class="green-text"
           title="Start Build">
@@ -174,9 +174,9 @@ export default {
       return `<a href="${data}" target="_blank"> ${dataToDisplay} </a>`;
     },
 
-    canBeBuild(build) {
-      if (build.app_version && build.project_type && build.branch && build.prefix
-          && build.app_version === 'X4'
+    canBeBuilt(configuration) {
+      if (configuration.project_type && configuration.branch && configuration.prefix
+          && configuration.standard_deploy === 1
           && this.$auth.can('pas.manage-configurations')) {
         return true;
       }
