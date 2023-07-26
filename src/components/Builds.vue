@@ -458,7 +458,7 @@ export default {
       this.rebuildStarted = true;
       let payload = {};
 
-      if (this.module === 'imx_be') {
+      if (build.module === 'imx_be') {
         payload = {
           branch: build.details.branch,
           instance: build.details.instance,
@@ -467,7 +467,7 @@ export default {
         };
       }
 
-      if (this.module === 'imx_fe') {
+      if (build.module === 'imx_fe') {
         payload = {
           branch: build.details.branch,
           build: build.details.build || null,
@@ -477,7 +477,7 @@ export default {
         };
       }
 
-      this.$store.dispatch(`${this.module}/startBuild`, payload)
+      this.$store.dispatch(`${build.module}/startBuild`, payload)
         .then((response) => {
           this.build.status = 'running';
           this.build.summary = 'Build will start shortly ...';
