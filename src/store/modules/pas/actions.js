@@ -8,9 +8,7 @@ export default {
       return this.state.promises[name];
     }
 
-    const promise = api('devops').get('pas/configurations', {
-      with: JSON.stringify(['deliveryChain']),
-    });
+    const promise = api('devops').get('pas/configurations');
 
     commit('promise', { name, promise }, { root: true });
 

@@ -16,7 +16,7 @@
                 :items="projects"
                 v-model="form.project"
                 :invalid="$v.form.project.$error"
-                @change="delete form.delivery_chain &&
+                @change="delete form &&
                         delete form.dev_instance &&
                         delete form.val_instance"
                 @blur="$v.form.project.$touch()"
@@ -464,7 +464,7 @@ export default {
       this.form.project = this.projects
         .find((project) => project.name === this.configuration.project);
       this.form.delivery_chain = this.deliveryChains
-        .find((deliveryChain) => deliveryChain.id === this.configuration.delivery_chain_id);
+        .find((deliveryChain) => deliveryChain.title === this.configuration.delivery_chain);
       this.form.dev_instance = this.dev_instances
         .find((instance) => instance.name === this.configuration.dev_instance);
       this.form.app_type = this.appTypes
@@ -509,7 +509,7 @@ export default {
       payload.project_type = this.form.project_type.value;
       payload.app_version = this.form.app_version.value;
       payload.project = this.form.project.name;
-      payload.delivery_chain_id = this.form.delivery_chain.id;
+      payload.delivery_chain = this.form.delivery_chain.title;
       payload.dev_instance = this.form.dev_instance.name;
       if (this.form.val_instance) {
         payload.val_instance = this.form.val_instance.name;
