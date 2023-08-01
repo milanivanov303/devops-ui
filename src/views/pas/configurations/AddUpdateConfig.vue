@@ -16,7 +16,7 @@
                 :items="projects"
                 v-model="form.project"
                 :invalid="$v.form.project.$error"
-                @change="delete form &&
+                @change="delete form.delivery_chain &&
                         delete form.dev_instance &&
                         delete form.val_instance"
                 @blur="$v.form.project.$touch()"
