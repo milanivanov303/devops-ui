@@ -92,6 +92,26 @@ export default {
     endpoint(value) {
       this.form.endpoint = value.replace(/\/+$/, '');
     },
+    'form.branch': _.debounce(function fn() {
+      const loader = this.$loading.show({ container: this.$refs.modal });
+
+      this.$store
+        .dispatch('imx_fe/getClientByBranch', {
+          branch: this.form.branch ? this.form.branch.name : this.branch,
+        })
+        .then((response) => {
+          this.form.client = response.data.client;
+        })
+        .catch(() => {
+          this.$M.toast({
+            html: 'Error retrieving client. Please choose a client from the list',
+            classes: 'toast-fail',
+          });
+        })
+        .finally(() => {
+          loader.hide();
+        });
+    }, 1000),
   },
 
   methods: {

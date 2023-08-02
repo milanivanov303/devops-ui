@@ -7,7 +7,8 @@ const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/B
 const ConnectedBuilds = () => import(/* webpackChunkName: "connected-builds" */ '@/components/ConnectedBuilds');
 
 const Configurations = () => import(/* webpackChunkName: "pas" */ '../views/pas/configurations/Configurations');
-const X4Params = () => import(/* webpackChunkName: "pas" */ '../views/pas/x4-params/X4Params');
+// const X4Params = () => import(/* webpackChunkName: "pas" */ '../views/pas/params/X4Params');
+const Params = () => import(/* webpackChunkName: "pas" */ '../views/pas/params/Params');
 const SoaModification = () => import(/* webpackChunkName: "pas" */ '../views/pas/SOAdeployment');
 
 const Documentation = () => import(/* webpackChunkName: "demos" */ '../views/documentation/Documentation');
@@ -173,6 +174,51 @@ export default [
     },
   },
 
+  // Extranet X5 Tab
+  {
+    path: '/extranet-x5',
+    redirect: '/extranet-x5/dashboard',
+  },
+  {
+    path: '/extranet-x5/dashboard',
+    name: 'extranet-x5',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Extranet X5 Dashboard',
+      breadcrumb: 'Dashboard',
+    },
+    component: Dashboard,
+    props: {
+      module: 'extranet-x5',
+    },
+  },
+  {
+    path: '/extranet-x5/branches/:branch?',
+    name: 'extranet-x5-branches',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Extranet X5 Branches';
+
+        if (route.query.branch) {
+          title = `${route.query.branch} - ${title}`;
+        }
+
+        if (route.query.action === 'docs') {
+          title = `Documentation - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: Branches,
+    props: {
+      module: 'extranet-x5',
+    },
+  },
+
   {
     path: '/pas/configurations/:id?/:action?',
     name: 'configurations',
@@ -199,19 +245,14 @@ export default [
     },
   },
   {
-    path: '/pas/x4-params',
-    redirect: '/pas/x4-params/config',
-  },
-  {
-    path: '/pas/x4-params/:type?/:id?',
-    name: 'x4-parameters',
+    path: '/pas/params/:id?',
+    name: 'parameters',
     meta: {
       requiresAuth: true,
       transitionName: 'slide',
-      title: 'X4 Parameters',
-      breadcrumb: 'X4 Parameters',
+      title: 'Parameters',
     },
-    component: X4Params,
+    component: Params,
   },
 
   // Debiteur Tab
