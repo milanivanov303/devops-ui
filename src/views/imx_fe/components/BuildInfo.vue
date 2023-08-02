@@ -53,6 +53,14 @@
           :value="build.removed_by"
         />
       </div>
+      <div class="row">
+        <TextInput v-if="build.details.tts_key"
+          class="col s12 readonly"
+          label="TTS Key"
+          icon="vpn_key"
+          :value="build.details.tts_key"
+        />
+      </div>
       <div class="row" v-if="build.status === 'running'">
         <div class="input-field col s12">
           <i class="material-icons prefix">link</i>

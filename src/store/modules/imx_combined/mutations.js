@@ -22,4 +22,4 @@ export default {
   client(state, client) {
     state.client = client;
   },
-};  
+};

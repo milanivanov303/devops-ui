@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col s12" >
+    <div class="col s12">
       <button
         v-if="$auth.can('imx_fe.create-builds')"
         class="btn"
@@ -8,111 +8,27 @@
         <i class="material-icons left">add</i> New build
       </button>
 
-      <Modal v-if="showModal" @close="close()" class="right-sheet">
-        <template v-slot:header>{{ branch }} // Create new build <br></template>
-        <template v-slot:content>
-          <div v-if="build.started === false" class="col s12 l11" key="form" >
-            <div class="row" v-if="!branch">
-              <div class="col s12" >
-                <Autocomplete
-                  label="Branch"
-                  icon="dynamic_feed"
-                  :items="branches"
-                  v-model="form.branch"
-                  :invalid="$v.form.branch.$error"
-                  @blur="$v.form.branch.$touch()"
-                />
-              </div>
-              <div class="validator col s11 offset-s1">
-                <div class="red-text" v-if="$v.form.branch.$error">
-                  <p v-if="!$v.form.branch.required">
-                    Branch field must not be empty.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="row" v-if="!client">
-              <div class="col s12" >
-                <Autocomplete
-                  label="Client"
-                  icon="people"
-                  :items="clients"
-                  :valueKey="clientKeyColumn"
-                  v-model="form.client"
-                  :invalid="$v.form.client.$error"
-                  @blur="$v.form.client.$touch()"
-                  @input="debounceInput"
-                />
-              </div>
-              <div class="validator col s11 offset-s1 ">
-                <div class="red-text" v-if="$v.form.client.$error">
-                  <p v-if="!$v.form.client.required">
-                    Client field must not be empty.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s12" >
-                <Autocomplete
-                  label="BE Build"
-                  icon="laptop_chromebook"
-                  :items="builds"
-                  v-model="form.build"
-                />
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s12">
-                <TextInput
-                  label="Endpoint"
-                  icon="link"
-                  v-model="form.endpoint"
-                  :readonly="endpoint !== null"
-                  :invalid="$v.form.endpoint.$error"
-                  @blur="$v.form.endpoint.$touch()"
-                />
-              </div>
+      <CreateImxFeBuild
+        v-if="showModal"
+        @close="close()"
+        :branch="form.branch"
+        :client="form.client"
+        :form="form"
+        :build="build"
+        :branches="branches"
+        :builds="builds"
+        :isButtonDisabled="isButtonDisabled"
+        class="right-sheet"
+        @start="start()"
+      ></CreateImxFeBuild>
 
-              <div class="validator col s11 offset-s1 ">
-                <div class="red-text" v-if="$v.form.endpoint.$error">
-                  <p v-if="!$v.form.endpoint.required">
-                    Endpoint field must not be empty.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <BuildProgress
-            v-else
-            :broadcast="build.broadcast"
-            :status="build.status"
-            :summary="build.summary"
-            :error="build.error"
-          ></BuildProgress>
-        </template>
-        <template v-slot:footer>
-          <button
-            id="start-btn"
-            v-if="!build.started"
-            class="waves-effect btn"
-            @click="start()"
-            :disabled="isButtonDisabled"
-          >
-            <i class="material-icons left">play_arrow</i> Start
-          </button>
-        </template>
-      </Modal>
     </div>
   </div>
 </template>
 
 <script>
-
-import { required } from 'vuelidate/lib/validators';
-import BuildProgress from '@/components/BuildProgress';
+import CreateImxFeBuild from '@/components/CreateImxFeBuild';
 import EventBus from '@/event-bus';
-import _ from 'lodash';
 
 function initialState() {
   return {
@@ -122,6 +38,7 @@ function initialState() {
       client: null,
       build: null,
       endpoint: null,
+      ttsKey: '',
     },
     build: {
       started: false,
@@ -137,7 +54,7 @@ function initialState() {
 
 export default {
   components: {
-    BuildProgress,
+    CreateImxFeBuild,
   },
 
   props: {
@@ -154,8 +71,7 @@ export default {
       return this.$store.state.imx_fe.branches;
     },
     builds() {
-      return this.$store.getters['builds/getActiveByModule']('imx_be')
-        .filter((build) => build.status !== 'building');
+      return this.$store.getters['builds/getActiveByModule']('imx_be').filter((build) => build.status !== 'building');
     },
     endpoint() {
       if (!this.form.build || !this.form.build.details) {
@@ -172,54 +88,10 @@ export default {
     },
   },
 
-  validations() {
-    const validations = {
-      form: {
-        client: {
-          required,
-        },
-        endpoint: {
-          required,
-        },
-      },
-    };
-
-    if (!this.branch) {
-      validations.form.branch = {
-        required,
-        name: {
-          required,
-        },
-      };
-    }
-
-    return validations;
-  },
-
   watch: {
     endpoint(value) {
       this.form.endpoint = value.replace(/\/+$/, '');
     },
-    'form.branch': _.debounce(function () {
-      const loader = this.$loading.show({ container: this.$refs.modal });
-
-      this.$store
-        .dispatch('imx_fe/getClientByBranch', {
-          branch: this.form.branch ? this.form.branch.name : this.branch,
-        })
-        .then((response) => {
-          this.form.client = response.data.client;
-        })
-        .catch(() => {
-          this.$M.toast({
-            html: 'Error retrieving client. Please choose a client from the list',
-            classes: 'toast-fail',
-          });
-        })
-        .finally(() => {
-          loader.hide();
-        });
-    }, 1000),
   },
 
   methods: {
@@ -239,7 +111,6 @@ export default {
     },
 
     close() {
-      this.$v.$reset();
       this.showModal = false;
       this.isButtonDisabled = false;
     },
@@ -251,14 +122,15 @@ export default {
       }
 
       this.isButtonDisabled = true;
-      this.$store.dispatch('imx_fe/startBuild', {
-        branch: this.form.branch ? this.form.branch.name : this.branch,
-        client: this.form.client[this.clientKeyColumn]
-          ? this.form.client[this.clientKeyColumn]
-          : this.form.client,
-        build: this.form.build,
-        endpoint: this.form.endpoint,
-      })
+      this.$store
+        .dispatch('imx_fe/startBuild', {
+          branch: this.form.branch ? this.form.branch.name : this.branch,
+          client: this.form.client[this.clientKeyColumn]
+            ? this.form.client[this.clientKeyColumn]
+            : this.form.client,
+          build: this.form.build,
+          endpoint: this.form.endpoint,
+        })
         .then((response) => {
           this.build.status = 'running';
           this.build.summary = 'Build will start shortly ...';
@@ -274,7 +146,9 @@ export default {
             this.build.error = error;
           }
         })
-        .finally(() => { this.build.started = true; });
+        .finally(() => {
+          this.build.started = true;
+        });
     },
   },
 };

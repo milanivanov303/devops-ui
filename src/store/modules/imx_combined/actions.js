@@ -34,4 +34,4 @@ export default {
       .catch((error) => commit('error', error, { root: true }));
     return promise;
   },
-};  
+};

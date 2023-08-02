@@ -4,25 +4,25 @@
       <div class="row">
         <TextInput
           class="col s12 readonly"
-          label="BE Branch"
-          icon="laptop_chromebook"
+          :label="build.type === 'be' ? 'BE Branch' : 'FE Branch'"
+          :icon="build.type === 'be' ? 'laptop_chromebook' : 'laptop'"
           :value="build.details.branch"
         />
       </div>
       <div class="row">
         <TextInput
           class="col s12 readonly"
-          label="Instance"
-          icon="dynamic_feed"
-          :value="build.details.instance.name"
+          :label="build.type === 'be' ? 'Instance' : 'Client'"
+          :icon="build.type === 'be' ? 'dynamic_feed' : 'people'"
+          :value="build.type === 'be' ? build.details.instance.name : build.details.client"
         />
       </div>
-      <div class="row">
-        <TextInput v-if="build.details.tts_key"
+      <div class="row" v-if="build.type === 'fe'">
+        <TextInput
           class="col s12 readonly"
-          label="TTS Key"
-          icon="dynamic_feed"
-          :value="build.details.tts_key"
+          label="Endpoint"
+          icon="link"
+          :value="build.details.endpoint"
         />
       </div>
       <div class="row">
