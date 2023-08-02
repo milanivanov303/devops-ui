@@ -29,6 +29,7 @@ export default {
     if (!state.active) {
       return [];
     }
+
     return state.active.filter((build) => build.module === module);
   },
 
