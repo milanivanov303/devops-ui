@@ -136,6 +136,7 @@ export default {
             .finally(() => loader.hide());
         })
         .catch((error) => {
+          // eslint-disable-next-line no-console
           console.error(error);
           loader.hide();
         });
