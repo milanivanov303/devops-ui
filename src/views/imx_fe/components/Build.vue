@@ -29,6 +29,7 @@
 <script>
 import CreateImxFeBuild from '@/components/CreateImxFeBuild';
 import EventBus from '@/event-bus';
+import _ from 'lodash';
 
 function initialState() {
   return {
