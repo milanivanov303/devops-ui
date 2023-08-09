@@ -81,6 +81,36 @@
               </div>
             </div>
             <div class="row">
+              <TextInput
+                class="col s12 readonly"
+                label="Client ID Password"
+                icon="vpn_key"
+                v-model="form.client_id_password"
+              />
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.client_id_password.$error">
+                  <p v-if="!$v.form.client_id_password.required">
+                    Client ID Password field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <TextInput
+                class="col s12 readonly"
+                label="Client Secret Password"
+                icon="vpn_key"
+                v-model="form.client_secret_password"
+              />
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.client_secret_password.$error">
+                  <p v-if="!$v.form.client_secret_password.required">
+                    Client Secret Password field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
               <div class="col s12" >
                 <TextInput
                     label="Backend url"
@@ -140,6 +170,8 @@ function initialState() {
       instance: null,
       api_client: null,
       api_secret: null,
+      client_id_password: null,
+      client_secret_password: null,
       be_url: null,
     },
     build: {
@@ -197,6 +229,12 @@ export default {
           required,
         },
         api_secret: {
+          required,
+        },
+        client_id_password: {
+          required,
+        },
+        client_secret_password: {
           required,
         },
         be_url: {
@@ -285,6 +323,8 @@ export default {
         instance: this.form.instance,
         api_client: this.form.api_client,
         api_secret: this.form.api_secret,
+        client_id_password: this.form.client_id_password,
+        client_secret_password: this.form.client_secret_password,
         be_url: this.form.be_url,
       })
         .then((response) => {
@@ -314,6 +354,8 @@ export default {
 
       this.form.api_client = x5record ? x5record.api_client : null;
       this.form.api_secret = x5record ? x5record.api_secret : null;
+      this.form.client_id_password = x5record ? x5record.client_id_password : null;
+      this.form.client_secret_password = x5record ? x5record.client_secret_password : null;
     },
   },
 };

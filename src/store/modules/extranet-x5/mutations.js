@@ -7,6 +7,9 @@ export default {
   host(state, host) {
     state.host = host;
   },
+  be_url(state, url) {
+    state.be_url = url;
+  },
   removeBuild(state, id) {
     state.services.splice(
       state.services.findIndex((service) => service.ID === id),
