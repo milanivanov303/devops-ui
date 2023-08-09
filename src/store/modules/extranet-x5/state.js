@@ -3,4 +3,5 @@
 export default {
   branches: [],
   host: '',
+  be_url: '',
 };
