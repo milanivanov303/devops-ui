@@ -251,6 +251,21 @@
               v-model="form.api_secret"
           />
         </div>
+        <div class="row" v-if="form.app_version && form.app_version.value === 'X5'">
+          <TextInput
+              class="col s12 m6"
+              :class="{readonly: action === 'view'}"
+              label="Client ID Password"
+              icon="vpn_key"
+              v-model="form.client_id_password"
+          />
+          <TextInput
+              class="col s12 m6"
+              :class="{readonly: action === 'view'}"
+              label="Client Secret Password"
+              v-model="form.client_secret_password"
+          />
+        </div>
         <div class="row">
           <div class="col s12">
             <div class="input-field">

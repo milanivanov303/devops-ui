@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div v-if="module !== 'imx_combined'" class="card">
     <div class="card-content">
       <span class="card-title">
         Builds by branch
