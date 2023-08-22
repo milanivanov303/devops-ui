@@ -45,6 +45,11 @@
                 class="new badge blue-grey"
                 data-badge-caption="deployed">{{ build.builds.deployed }}
             </span>
+            <span
+                v-if="build.builds.staged"
+                class="new badge blue-grey"
+                data-badge-caption="staged">{{ build.builds.staged }}
+            </span>
           </td>
         </tr>
         <tr v-if="builds.length === 0">
