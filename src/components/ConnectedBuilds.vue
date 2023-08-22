@@ -144,7 +144,7 @@ export default {
 
     getStatus() {
       if (this.status.indexOf('active') !== -1) {
-        return this.status.concat(['running', 'building', 'stopped', 'deployed']);
+        return this.status.concat(['running', 'building', 'stopped']);
       }
 
       return this.status;
