@@ -17,8 +17,10 @@
                 v-model="form.project"
                 :invalid="$v.form.project.$error"
                 @change="delete form.delivery_chain &&
-                        delete form.dev_instance &&
-                        delete form.val_instance"
+                  delete form.dev_instance &&
+                  delete form.val_instance &&
+                  delete form.deploy_dev_instance &&
+                  delete form.deploy_val_instance"
                 @blur="$v.form.project.$touch()"
             />
             <div class="validator">
@@ -54,15 +56,10 @@
               :items="deliveryChains"
               v-model="form.delivery_chain"
               :invalid="$v.form.delivery_chain.$error"
-              @change="
-                delete form.dev_instance
-                &&
-                delete form.val_instance
-                &&
-                delete form.deploy_dev_instance
-                &&
-                delete form.deploy_val_instance
-              "
+              @change="delete form.dev_instance &&
+                delete form.val_instance &&
+                delete form.deploy_dev_instance &&
+                delete form.deploy_val_instance"
               @blur="$v.form.delivery_chain.$touch()"
           />
           <div class="validator col s12">
@@ -136,8 +133,7 @@
               displayed="name"
               :options="appTypes"
               v-model="form.app_type"
-              @change="delete form.branch &&
-                     delete form.prefix"
+              @change="delete form.branch && delete form.prefix"
             />
             <div class="validator">
               <div class="red-text" v-if="$v.form.app_type.$error">
@@ -489,7 +485,7 @@ export default {
       this.form.project = this.projects
         .find((project) => project.name === this.configuration.project);
       this.form.delivery_chain = this.deliveryChains
-        .find((deliveryChain) => deliveryChain.title === this.configuration.delivery_chain);
+        .find((deliveryChain) => deliveryChain.title === this.configuration.delivery_chain.name);
       this.form.dev_instance = this.dev_instances
         .find((instance) => instance.name === this.configuration.dev_instance);
       this.form.deploy_dev_instance = this.deploy_instances
@@ -532,7 +528,10 @@ export default {
       payload.project_type = this.form.project_type.value;
       payload.app_version = this.form.app_version.value;
       payload.project = this.form.project.name;
-      payload.delivery_chain = this.form.delivery_chain.title;
+      payload.delivery_chain = {
+        id: this.form.delivery_chain.id,
+        name: this.form.delivery_chain.title,
+      };
       payload.dev_instance = this.form.dev_instance.name;
       payload.deploy_dev_instance = this.form.deploy_dev_instance.name;
       if (this.form.val_instance) {
