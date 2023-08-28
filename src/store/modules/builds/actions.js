@@ -18,7 +18,7 @@ export default {
           {
             status: {
               operator: 'in',
-              value: ['running', 'stopped', 'building', 'deployed'],
+              value: ['running', 'stopped', 'building', 'deployed', 'staged'],
             },
           },
         ],

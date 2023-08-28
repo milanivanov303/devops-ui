@@ -110,6 +110,13 @@
               :items="deploy_instances"
               v-model="form.deploy_dev_instance"
             />
+            <div class="validator">
+              <div class="red-text" v-if="$v.form.deploy_dev_instance.$error">
+                <p v-if="!$v.form.deploy_dev_instance.required">
+                  Deploy Dev Instance field must not be empty.
+                </p>
+              </div>
+            </div>
           </div>
           <div class="col s12 m6">
             <Autocomplete
@@ -249,6 +256,21 @@
               :class="{readonly: action === 'view'}"
               label="Api-secret"
               v-model="form.api_secret"
+          />
+        </div>
+        <div class="row" v-if="form.app_version && form.app_version.value === 'X5'">
+          <TextInput
+              class="col s12 m6"
+              :class="{readonly: action === 'view'}"
+              label="Client ID Password"
+              icon="vpn_key"
+              v-model="form.client_id_password"
+          />
+          <TextInput
+              class="col s12 m6"
+              :class="{readonly: action === 'view'}"
+              label="Client Secret Password"
+              v-model="form.client_secret_password"
           />
         </div>
         <div class="row">
@@ -423,6 +445,9 @@ export default {
       dev_instance: {
         required,
       },
+      deploy_dev_instance: {
+        required,
+      },
       branch: {
         required,
       },
@@ -467,6 +492,8 @@ export default {
         .find((deliveryChain) => deliveryChain.title === this.configuration.delivery_chain);
       this.form.dev_instance = this.dev_instances
         .find((instance) => instance.name === this.configuration.dev_instance);
+      this.form.deploy_dev_instance = this.deploy_instances
+        .find((instance) => instance.name === this.configuration.deploy_dev_instance);
       this.form.app_type = this.appTypes
         .find((appType) => appType.value === this.configuration.app_type);
 
@@ -477,10 +504,6 @@ export default {
       if (this.configuration.val_instance) {
         this.form.val_instance = this.val_instances
           .find((instance) => instance.name === this.configuration.val_instance);
-      }
-      if (this.configuration.deploy_dev_instance) {
-        this.form.deploy_dev_instance = this.deploy_instances
-          .find((instance) => instance.name === this.configuration.deploy_dev_instance);
       }
       if (this.configuration.deploy_val_instance) {
         this.form.deploy_val_instance = this.deploy_instances
@@ -511,11 +534,9 @@ export default {
       payload.project = this.form.project.name;
       payload.delivery_chain = this.form.delivery_chain.title;
       payload.dev_instance = this.form.dev_instance.name;
+      payload.deploy_dev_instance = this.form.deploy_dev_instance.name;
       if (this.form.val_instance) {
         payload.val_instance = this.form.val_instance.name;
-      }
-      if (this.form.deploy_dev_instance) {
-        payload.deploy_dev_instance = this.form.deploy_dev_instance.name;
       }
       if (this.form.deploy_val_instance) {
         payload.deploy_val_instance = this.form.deploy_val_instance.name;

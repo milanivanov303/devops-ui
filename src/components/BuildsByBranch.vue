@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div v-if="module !== 'imx_combined'" class="card">
     <div class="card-content">
       <span class="card-title">
         Builds by branch
@@ -44,6 +44,11 @@
                 v-if="build.builds.deployed"
                 class="new badge blue-grey"
                 data-badge-caption="deployed">{{ build.builds.deployed }}
+            </span>
+            <span
+                v-if="build.builds.staged"
+                class="new badge blue-grey"
+                data-badge-caption="staged">{{ build.builds.staged }}
             </span>
           </td>
         </tr>

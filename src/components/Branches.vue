@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="module !== 'imx_combined'">
     <div class="row">
       <div class="col s12 m6 l5">
         <TextInput label="Search" icon="search" v-model="search"/>
@@ -53,7 +53,6 @@
         />
       </div>
     </div>
-
   </div>
 </template>
 

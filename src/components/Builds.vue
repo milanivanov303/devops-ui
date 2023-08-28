@@ -30,9 +30,10 @@
             <th>Created On</th>
             <th>Status</th>
             <th>Quick Actions</th>
+            <th v-if="hasTTSKey">TTS Key</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="module !== 'imx_combined'">
           <tr v-for="(build, index) in builds" :key="index">
             <td>{{ (page - 1) * perPage + index + 1 }}</td>
             <td>{{ build.name }}</td>
@@ -136,6 +137,236 @@
                 >
                   <i class="material-icons">delete</i>
                 </a>
+              </div>
+            </td>
+            <td>
+              <div v-if="build.details.tts_key">
+                {{ build.details.tts_key }}
+              </div>
+            </td>
+          </tr>
+          <tr v-if="builds.length === 0">
+            <td colspan="7">There are no builds</td>
+          </tr>
+        </tbody>
+        <tbody v-else-if="module === 'imx_combined' && filteredBuilds.length !== 0">
+          <tr v-for="(build, index) in filteredBuilds" :key="index">
+            <td>{{ (page - 1) * perPage + index + 1 }}</td>
+            <td>{{ build.name }}</td>
+            <td>{{ build.module }}</td>
+            <td>{{ build.created_by }}</td>
+            <td>{{ $date(build.created_on).toHuman() }}</td>
+            <td v-html="getStatusText(build)"></td>
+            <td class="quick-actions">
+              <Progress v-if="updating === build.id" />
+              <div v-else>
+                <a
+                  @click="start(build)"
+                  target="_blank"
+                  data-tooltip="Start"
+                  class="green-text tooltipped"
+                  v-if="build.status === 'stopped'"
+                >
+                  <i class="material-icons">play_arrow</i>
+                </a>
+                <a
+                  @click="stop(build)"
+                  target="_blank"
+                  data-tooltip="Stop"
+                  class="red-text tooltipped"
+                  v-if="build.status === 'running'"
+                >
+                  <i class="material-icons">stop</i>
+                </a>
+                <a
+                  :href="getBuildUrl(build)"
+                  target="_blank"
+                  data-tooltip="Open"
+                  class="green-text tooltipped"
+                  v-if="build.status === 'running'"
+                >
+                  <i class="material-icons">launch</i>
+                </a>
+                <a
+                  @click="openBuildDetailsModal(build)"
+                  data-tooltip="Details"
+                  class="blue-text tooltipped"
+                >
+                  <i class="material-icons">error_outline</i>
+                </a>
+                <a
+                  v-if="build.details.artifactory_url"
+                  :href="build.details.artifactory_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-tooltip="Download"
+                  class="teal-text text-darken-1 tooltipped"
+                >
+                  <i class="material-icons">file_download</i>
+                </a>
+                <a
+                  @click="openProgressModal(build)"
+                  target="_blank"
+                  data-tooltip="Progress"
+                  class="tooltipped"
+                  v-if="build.status === 'building'"
+                >
+                  <i class="material-icons">update</i>
+                </a>
+                <a
+                  :href="getWebssh2Url(build)"
+                  target="_blank"
+                  data-tooltip="Open terminal"
+                  class="tooltipped"
+                  v-if="build.module !== 'imx_be' && build.status === 'running'"
+                >
+                  <i class="material-icons">wysiwyg</i>
+                </a>
+                <a
+                  v-if="build.status !== 'building' && build.module === 'imx_be'"
+                  @click="openRebuildModal(build)"
+                  data-tooltip="Rebuild"
+                  class="deep-orange-text tooltipped"
+                >
+                  <i class="material-icons">settings_backup_restore</i>
+                </a>
+                <a
+                  v-if="build.status !== 'building' && build.module === 'imx_fe'"
+                  @click="openRebuildModal(build)"
+                  data-tooltip="Rebuild"
+                  class="deep-orange-text tooltipped"
+                >
+                  <i class="material-icons">settings_backup_restore</i>
+                </a>
+                <a
+                  v-if="canRemove(build)"
+                  @click="openRemoveModal(build)"
+                  data-tooltip="Remove"
+                  class="red-text tooltipped"
+                >
+                  <i class="material-icons">delete</i>
+                </a>
+              </div>
+            </td>
+            <td>
+              <div v-if="build.details && build.details.tts_key">
+                {{ build.details.tts_key }}
+              </div>
+            </td>
+          </tr>
+          <tr v-if="filteredBuilds.length === 0">
+            <td colspan="8">There are no combined module builds</td>
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <tr v-for="(build, index) in builds" :key="index">
+            <td>{{ (page - 1) * perPage + index + 1 }}</td>
+            <td>{{ build.name }}</td>
+            <td v-if="!module">{{ build.module }}</td>
+            <td v-if="!createdBy">{{ build.created_by }}</td>
+            <td>{{ $date(build.created_on).toHuman() }}</td>
+            <td v-html="getStatusText(build)"></td>
+            <td class="quick-actions">
+              <Progress v-if="updating === build.id"/>
+              <div v-else>
+                <a
+                  @click="start(build)"
+                  target="_blank"
+                  data-tooltip="Start"
+                  class="green-text tooltipped"
+                  v-if="build.status === 'stopped'"
+                >
+                  <i class="material-icons">play_arrow</i>
+                </a>
+                <a
+                  @click="stop(build)"
+                  target="_blank"
+                  data-tooltip="Stop"
+                  class="red-text tooltipped"
+                  v-if="build.status === 'running'"
+                >
+                  <i class="material-icons">stop</i>
+                </a>
+                <a
+                  :href="getBuildUrl(build)"
+                  target="_blank"
+                  data-tooltip="Open"
+                  class="green-text tooltipped"
+                  v-if="build.status === 'running'"
+                >
+                  <i class="material-icons">launch</i>
+                </a>
+                <a
+                  @click="openBuildDetailsModal(build)"
+                  data-tooltip="Details"
+                  class="blue-text tooltipped"
+                >
+                  <i class="material-icons">error_outline</i>
+                </a>
+                <a
+                    v-if="
+                      (build.status === 'running' || build.status === 'stopped')
+                      &&
+                      build.details.artifactory_url
+                    "
+                    :href="build.details.artifactory_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-tooltip="Download"
+                    class="teal-text text-darken-1 tooltipped"
+                >
+                  <i class="material-icons">file_download</i>
+                </a>
+                <a
+                  @click="openProgressModal(build)"
+                  target="_blank"
+                  data-tooltip="Progress"
+                  class="tooltipped"
+                  v-if="build.status === 'building'"
+                >
+                  <i class="material-icons">update</i>
+                </a>
+                <a
+                  :href="getWebssh2Url(build)"
+                  target="_blank"
+                  data-tooltip="Open terminal"
+                  class="tooltipped"
+                  v-if="build.module !== 'imx_be' && build.status === 'running'">
+                  <i class="material-icons">wysiwyg</i>
+                </a>
+                <a
+                  v-if="
+                  build.status !== 'building' &&
+                  build.module === 'imx_be'"
+                  @click="openRebuildModal(build)"
+                  data-tooltip="Rebuild"
+                  class="deep-orange-text tooltipped"
+                >
+                  <i class="material-icons">settings_backup_restore</i>
+                </a>
+                <a
+                  v-if="
+                  build.status !== 'building' &&
+                  build.module === 'imx_fe'"
+                  @click="openRebuildModal(build)"
+                  data-tooltip="Rebuild"
+                  class="deep-orange-text tooltipped"
+                >
+                  <i class="material-icons">settings_backup_restore</i>
+                </a>
+                <a
+                  v-if="canRemove(build)"
+                  @click="openRemoveModal(build)"
+                  data-tooltip="Remove"
+                  class="red-text tooltipped"
+                >
+                  <i class="material-icons">delete</i>
+                </a>
+              </div>
+            </td>
+            <td>
+              <div v-if="build.details.tts_key">
+                {{ build.details.tts_key }}
               </div>
             </td>
           </tr>
@@ -257,7 +488,10 @@ export default {
   props: {
     module: String,
     branch: String,
-    ttsKey: String,
+    ttsKey: {
+      type: String,
+      default: '',
+    },
     createdBy: String,
   },
 
@@ -270,6 +504,8 @@ export default {
       searchTimeout: null,
 
       status: ['active'],
+
+      currentModule: this.module,
 
       showRemoveModal: false,
       showRebuildModal: false,
@@ -289,30 +525,87 @@ export default {
       perPageOptions: [10, 20, 30, 50],
     };
   },
+  computed: {
+    hasTTSKey() {
+      return this.builds.some((build) => build.details && build.details.tts_key);
+    },
+    filteredBuilds() {
+      return this.builds.filter((build) => build.details && build.details.tts_key === this.ttsKey);
+    },
+  },
 
   methods: {
     getBuilds() {
       const loader = this.$loading.show({ container: this.$refs.builds });
 
-      this.$store.dispatch('builds/getBuildsByStatus', {
-        branch: this.branch,
-        module: this.module,
-        status: this.getStatus(),
-        createdBy: this.createdBy,
-        perPage: this.perPage,
-        page: this.page,
-        search: this.search.trim(),
-      })
-        .then((response) => {
-          this.builds = response.data.data;
-          this.lastPage = response.data.meta.last_page;
+      if (this.module === 'imx_combined') {
+        // Dispatch the action for 'imx_be' module
+        this.$store.dispatch('builds/getBuildsByStatus', {
+          branch: this.branch,
+          module: 'imx_be',
+          status: this.getStatus(),
+          createdBy: this.createdBy,
+          perPage: this.perPage,
+          page: this.page,
+          search: this.search.trim(),
+          ttsKey: this.selectedTtsKey,
         })
-        .finally(() => loader.hide());
+          .then((response) => {
+            const imxBeBuilds = response.data.data;
+
+            // Dispatch the action for 'imx_fe' module
+            this.$store.dispatch('builds/getBuildsByStatus', {
+              branch: this.branch,
+              module: 'imx_fe',
+              status: this.getStatus(),
+              createdBy: this.createdBy,
+              perPage: this.perPage,
+              page: this.page,
+              search: this.search.trim(),
+              ttsKey: this.selectedTtsKey,
+            })
+              .then((response) => {
+                const imxFeBuilds = response.data.data;
+
+                // Combine data for 'imx_be' and 'imx_fe' builds
+                this.builds = [...imxBeBuilds, ...imxFeBuilds];
+
+                // Set the last page based on the combined builds
+                this.lastPage = Math.max(
+                  response.data.meta?.last_page || 0,
+                  imxBeBuilds.meta?.last_page || 0,
+                  imxFeBuilds.meta?.last_page || 0,
+                );
+              })
+              .finally(() => loader.hide());
+          })
+          .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error(error);
+            loader.hide();
+          });
+      } else {
+        // Dispatch the default action
+        this.$store.dispatch('builds/getBuildsByStatus', {
+          branch: this.branch,
+          module: this.module,
+          status: this.getStatus(),
+          createdBy: this.createdBy,
+          perPage: this.perPage,
+          page: this.page,
+          search: this.search.trim(),
+        })
+          .then((response) => {
+            this.builds = response.data.data;
+            this.lastPage = response.data.meta?.last_page || 0;
+          })
+          .finally(() => loader.hide());
+      }
     },
 
     getStatus() {
       if (this.status.indexOf('active') !== -1) {
-        return this.status.concat(['running', 'building', 'stopped', 'deployed']);
+        return this.status.concat(['running', 'building', 'stopped', 'deployed', 'staged']);
       }
 
       return this.status;
@@ -348,7 +641,7 @@ export default {
       if (build.status === 'stopped' || build.status === 'failed') {
         return `<span class="new badge red" data-badge-caption="">${build.status}</span>`;
       }
-      if (build.status === 'deployed') {
+      if (build.status === 'deployed' || build.status === 'staged') {
         return `<span class="new badge blue-grey" data-badge-caption="">${build.status}</span>`;
       }
       return `<span class="new badge" data-badge-caption="">${build.status}</span>`;
@@ -360,7 +653,7 @@ export default {
     },
 
     canRemove(build) {
-      if (build.status !== 'running' && build.status !== 'stopped' && build.status !== 'deployed') {
+      if (build.status !== 'running' && build.status !== 'stopped') {
         return false;
       }
 
@@ -458,16 +751,35 @@ export default {
       this.rebuildStarted = true;
       let payload = {};
 
-      if (this.module === 'imx_be') {
+      if (this.currentModule === 'imx_combined') {
+        // Check if it's an 'imx_be' build based on the name
+        if (build.name.includes('imx-be')) {
+          payload = {
+            branch: build.details.branch,
+            instance: build.details.instance,
+            ttsKey: build.details.tts_key,
+            rebuild: true,
+          };
+          this.currentModule = 'imx_be'; // Update the data property to 'imx_be'
+        } else {
+          // It's an 'imx_fe' build
+          payload = {
+            branch: build.details.branch,
+            build: build.details.build || null,
+            client: build.details.client,
+            endpoint: build.details.endpoint,
+            rebuild: true,
+          };
+          this.currentModule = 'imx_fe'; // Update the data property to 'imx_fe'
+        }
+      } else if (this.currentModule === 'imx_be') {
         payload = {
           branch: build.details.branch,
           instance: build.details.instance,
           ttsKey: build.details.tts_key,
           rebuild: true,
         };
-      }
-
-      if (this.module === 'imx_fe') {
+      } else if (this.currentModule === 'imx_fe') {
         payload = {
           branch: build.details.branch,
           build: build.details.build || null,
@@ -477,7 +789,7 @@ export default {
         };
       }
 
-      this.$store.dispatch(`${this.module}/startBuild`, payload)
+      this.$store.dispatch(`${this.currentModule}/startBuild`, payload)
         .then((response) => {
           this.build.status = 'running';
           this.build.summary = 'Build will start shortly ...';

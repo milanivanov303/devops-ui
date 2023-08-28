@@ -1,5 +1,5 @@
 <template>
-  <pre ref="build-logs">{{logs}}</pre>
+  <pre ref="build-logs" id="build-logs">{{logs}}</pre>
 </template>
 
 <script>
@@ -25,9 +25,13 @@ export default {
         .post(`builds/${this.build.id}/logs`)
         .then((response) => {
           this.logs = response.data;
+          loader.hide();
         })
-        .catch((error) => error.message)
-        .finally(() => loader.hide());
+        .catch((error) => error.message, loader.hide())
+        .finally(() => {
+          const logElement = document.getElementById('build-logs');
+          logElement.innerHTML = logElement.innerHTML.replace(/(https?:\/\/[^"\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+        });
     },
   },
 

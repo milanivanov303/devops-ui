@@ -4,6 +4,7 @@ const Builds = () => import(/* webpackChunkName: "dashboard" */ '../views/Builds
 
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
 const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
+const ConnectedBuilds = () => import(/* webpackChunkName: "connected-builds" */ '@/components/ConnectedBuilds');
 
 const Configurations = () => import(/* webpackChunkName: "pas" */ '../views/pas/configurations/Configurations');
 // const X4Params = () => import(/* webpackChunkName: "pas" */ '../views/pas/params/X4Params');
@@ -361,6 +362,46 @@ export default [
     component: Branches,
     props: {
       module: 'imx_fe',
+    },
+  },
+
+  // iMX Combined Tab
+  {
+    path: '/imx_combined',
+    redirect: '/imx_combined/dashboard',
+  },
+  {
+    path: '/imx_combined/dashboard',
+    name: 'imx_combined',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'iMX BE + FE Dashboard',
+    },
+    component: Dashboard,
+    props: {
+      module: 'imx_combined',
+    },
+  },
+  {
+    path: '/imx_combined/connected-builds',
+    name: 'imx-combined-connected-builds',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'iMX Combined Branches';
+
+        if (route.query.tts_key) {
+          title = `${route.query.tts_key} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: ConnectedBuilds,
+    props: {
+      module: 'imx_combined',
     },
   },
 

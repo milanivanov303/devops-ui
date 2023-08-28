@@ -10,6 +10,51 @@
         />
       </div>
 
+      <div class="row">
+        <TextInput
+            class="col s12 readonly"
+            label="Instance"
+            icon="laptop_chromebook"
+            :value="build.details.instance.name"
+        />
+      </div>
+
+      <div class="row">
+        <TextInput
+            class="col s12 readonly"
+            label="Api-client"
+            icon="compare_arrows"
+            :value="build.details.api_client"
+        />
+      </div>
+
+      <div class="row">
+        <TextInput
+            class="col s12 readonly"
+            label="Api-secret"
+            icon="compare_arrows"
+            :value="build.details.api_secret"
+        />
+      </div>
+
+      <div class="row">
+        <TextInput
+            class="col s12 readonly"
+            label="Backend url"
+            icon="link"
+            :value="build.details.be_url"
+        />
+      </div>
+
+      <div class="row">
+        <TextInput
+            class="col s12 readonly"
+            label="Image"
+            icon="dynamic_feed"
+            :value="build.details.tagged_image"
+        />
+      </div>
+
       <div class="row" v-if="build.status === 'running'">
         <div class="input-field col s12">
           <i class="material-icons prefix">link</i>
@@ -22,8 +67,6 @@
           <label :class="{active: build.details.url}" for="deploy-url">Deploy URL</label>
         </div>
       </div>
-
-      <DeployOn :build="build" module="extranet-x5"/>
 
       <div class="row">
         <TextInput
@@ -59,13 +102,7 @@
 
 <script>
 
-import DeployOn from '@/components/DeployOn';
-
 export default {
-  components: {
-    DeployOn,
-  },
-
   props: {
     build: {
       type: Object,

@@ -3,6 +3,7 @@
       <div class="col s12 l8">
         <MyBuilds :module="module" :key="module"/>
         <BuildsByBranch :module="module" :loading="loading"/>
+        <BuildsByTtsKey :module="module" :loading="loading"/>
       </div>
       <div class="col s12 l4">
         <BuildsStatistics :module="module" aggregate-by="user"/>
@@ -18,12 +19,14 @@ import EventBus from '@/event-bus';
 const BuildsStatistics = () => import('@/components/BuildsStatistics');
 const MyBuilds = () => import('@/components/MyBuilds');
 const BuildsByBranch = () => import('@/components/BuildsByBranch');
+const BuildsByTtsKey = () => import('@/components/BuildsByTtsKey');
 
 export default {
   components: {
     BuildsStatistics,
     MyBuilds,
     BuildsByBranch,
+    BuildsByTtsKey,
   },
 
   props: {
