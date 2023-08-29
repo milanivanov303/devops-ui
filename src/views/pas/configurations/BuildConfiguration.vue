@@ -301,7 +301,7 @@ export default {
         fe_branch: this.configuration.branch,
         instance: this.instance,
         deploy_instance: this.deployInstance,
-        delivery_chain: this.configuration.delivery_chain,
+        delivery_chain: this.configuration.delivery_chain.name,
         client: this.client,
         x4config: this.x4config ? this.x4config.name : null,
         project: this.project ? this.project.name : null,
