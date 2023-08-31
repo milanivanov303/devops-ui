@@ -32,7 +32,6 @@
               v-model="form.client"
               :invalid="$v.form.client.$error"
               @blur="$v.form.client.$touch()"
-              @input="debounceInput"
             />
           </div>
           <div class="validator col s11 offset-s1 ">
