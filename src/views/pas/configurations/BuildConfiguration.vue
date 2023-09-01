@@ -102,56 +102,7 @@
             icon="comment">
           </text-area>
         </div>
-        <div>
-          <h6 class="center">CHOOSE HASH/BRANCH
-            <span v-if="repository">
-              from repository <a :href="repositoryUrl">{{repository}}</a>
-            </span>
-            <span v-if="feRepository">
-              and FE repository <a :href="feRepositoryUrl">{{feRepository}}</a>
-            </span>
-          </h6>
-          <div class="row">
-            <Autocomplete
-              class="col s12"
-              label="Hash"
-              icon="devices"
-              valueKey="summary"
-              :items="hashes"
-              v-model="hash"
-              :invalid="$v.hash.$error"
-              @blur="$v.hash.$touch()"
-            />
-            <div class="validator col s12">
-              <div class="red-text" v-if="$v.hash.$error">
-                <p v-if="!$v.hash.required"> BE hash field must not be empty.</p>
-              </div>
-            </div>
-            <div v-if="hash" class="col s12">
-              <pre>{{ hash.description }}</pre>
-            </div>
-          </div>
-          <div class="row" v-if="feHashes.length">
-            <Autocomplete
-              class="col s12"
-              label="Fe Hash"
-              icon="devices"
-              valueKey="summary"
-              :items="feHashes"
-              v-model="feHash"
-              :invalid="$v.feHash.$error"
-              @blur="$v.feHash.$touch()"
-            />
-            <div class="validator col s12">
-              <div class="red-text" v-if="$v.feHash.$error">
-                <p v-if="!$v.feHash.required">FE hash field must not be empty.</p>
-              </div>
-            </div>
-            <div v-if="feHash" class="col s12">
-              <pre>{{ feHash.description }}</pre>
-            </div>
-          </div>
-        </div>
+
       </form>
       <BuildProgress
         v-else
@@ -202,12 +153,6 @@ export default {
       binaryType: {},
       configName: '',
       comments: '',
-      hash: null,
-      feHash: null,
-      repository: null,
-      repositoryUrl: null,
-      feRepository: null,
-      feRepositoryUrl: null,
       x4config: null,
       project: null,
       build: {
@@ -227,28 +172,7 @@ export default {
       }
       this.debounceCheckIssue();
     },
-    hashes() {
-      if (this.hashes && this.hashes.length > 0) {
-        if (this.hashes[0].repository) {
-          this.repository = this.hashes[0].repository;
-        }
 
-        if (this.hashes[0].repositoryUrl) {
-          this.repositoryUrl = this.hashes[0].repositoryUrl;
-        }
-      }
-    },
-    feHashes() {
-      if (this.feHashes && this.feHashes.length > 0) {
-        if (this.feHashes[0].repository) {
-          this.feRepository = this.feHashes[0].repository;
-        }
-
-        if (this.feHashes[0].repositoryUrl) {
-          this.feRepositoryUrl = this.feHashes[0].repositoryUrl;
-        }
-      }
-    },
     project() {
       if (this.project && this.project.name === 'xnet') {
         const found = this.binaryTypes.filter((obj) => Object.keys(obj).some(() => obj.subtype === 'xnet'));
@@ -275,27 +199,6 @@ export default {
 
     binaryTypes() {
       return this.$store.state.mmpi.binaryTypes;
-    },
-
-    hashes() {
-      return this.configuration.app_version === 'X4' && this.configuration.app_type === 'extranet'
-        ? this.$store.state['extranet-x4'].branches.map((hash) => {
-          hash.summary = hash.name;
-          return hash;
-        })
-        : this.$store.state.pas.hashes.map((hash) => {
-          hash.summary = `${hash.commit} by ${hash.user} on ${this.$date(hash.date).toHuman()}`;
-          return hash;
-        });
-    },
-
-    feHashes() {
-      return this.configuration.app_version === 'X4' && this.configuration.app_type === 'extranet'
-        ? []
-        : this.$store.state.pas.feHashes.map((hash) => {
-          hash.summary = `${hash.commit} by ${hash.user} on ${this.$date(hash.date).toHuman()}`;
-          return hash;
-        });
     },
 
     client() {
@@ -341,22 +244,7 @@ export default {
       configName: {
         required: requiredIf((formModel) => formModel.binaryType.subtype === 'manual'),
       },
-      hash: {
-        required,
-        commit: {
-          required,
-        },
-      },
     };
-
-    if (this.feHashes.length) {
-      rules.feHash = {
-        required,
-        commit: {
-          required,
-        },
-      };
-    }
 
     if (this.configuration.app_type === 'extranet' && this.configuration.app_version === 'X4') {
       rules.x4config = {
@@ -407,12 +295,13 @@ export default {
       }
 
       this.isButtonDisabled = true;
+
       const payload = {
-        branch: this.configuration.app_type === 'extranet' && this.configuration.app_version === 'X4' ? this.hash.name : this.hash.commit,
-        fe_branch: this.feHash ? this.feHash.commit : null,
+        branch: this.configuration.branch,
+        fe_branch: this.configuration.branch,
         instance: this.instance,
         deploy_instance: this.deployInstance,
-        delivery_chain: this.configuration.delivery_chain,
+        delivery_chain: this.configuration.delivery_chain.name,
         client: this.client,
         x4config: this.x4config ? this.x4config.name : null,
         project: this.project ? this.project.name : null,
@@ -463,8 +352,6 @@ export default {
 
     this.$store.dispatch('mmpi/getDeployInstances');
     this.$store.dispatch('mmpi/getInstances');
-    this.$store.dispatch('pas/getHashes', this.configuration.branch);
-    this.$store.dispatch('pas/getFeHashes', this.configuration.branch);
     this.$store.dispatch('extranet/getClients');
     this.$store.dispatch('debiteur/getClients');
     this.$store.dispatch('extranet-x4/getBranches');
