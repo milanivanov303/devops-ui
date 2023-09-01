@@ -3,18 +3,21 @@
 export default {
   error: '',
   projects: [],
-  activeProjects: [],
-  delivery_chains: [],
-  delivery_chain_roles: [],
-  deliveryChains: [],
-  app_versions: [],
   instances: [],
-  instanceTypes: [],
-  instanceStatus: [],
-  devInstances: [],
+  // DevOps Matrix
+  app_versions: [],
   deploy_instances: [],
-  environmentTypes: [],
-  operationType: [],
   binaryTypes: [],
+  // CMS
+  deliveryChains: [],
+  devInstances: [],
+  // Modifications Tab
+  operationType: [],
   miscellaneous: [],
+  instanceStatus: [],
+  // Request instance tab
+  requestProjects: [],
+  delivery_chain_roles: [],
+  environmentTypes: [],
+  instanceTypesVersions: [],
 };
