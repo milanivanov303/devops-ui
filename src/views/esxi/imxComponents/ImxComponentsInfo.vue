@@ -67,7 +67,7 @@
                     <th>Approved by Codix</th>
                     <th>Version</th>
                     <th>Version type</th>
-                    <th>End of support date (extended)</th>
+                    <th>End of support date (regular)</th>
                     <th>End of support date (extended)</th>
                   </tr>
                 </thead>
