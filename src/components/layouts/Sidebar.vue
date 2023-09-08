@@ -189,7 +189,7 @@
               <li :class="{ active: isActive('inventory/imxComponents') }">
                 <router-link to="/inventory/imxComponents"> iMX Components</router-link>
               </li>
-              <li v-if="$auth.can('can-request-instances')"
+              <li
                   :class="{ active: isActive('inventory/request') }">
                 <router-link to="/inventory/request"> Instance Request</router-link>
               </li>

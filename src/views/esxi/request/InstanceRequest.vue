@@ -1,37 +1,37 @@
 <template>
   <div class="row">
     <div class="col s12">
-        <div class="data-table" ref="requested">
-          <Table
-              :data="requestedInstances"
-              sort-by="id"
-              sort-dir="asc"
-              :export-btn="false"
-              :view-btn="false"
-              :delete-btn="false"
-              @add="openAddEditModal({}, 'create')"
-              @edit="(row) => openAddEditModal(row, 'update')"
-          >
-            <Column show="project"/>
-            <Column show="delivery_chain"/>
-            <Column show="dc_role"/>
-            <Column show="instance_type"/>
-            <Column show="environment_type"/>
-            <Column show="comments"/>
-            <Column label="Requested on" name="requested_on"
-                    :show="(request) => $date(request.created_on).toHuman()"/>
-            <Column label="Requested by" name="requested_by"
-                    :show="(request) => request.created_by"/>
-          </Table>
-        </div>
+      <div class="data-table" ref="requested">
+        <Table
+          :data="requestedInstances"
+          sort-by="id"
+          sort-dir="asc"
+          :export-btn="false"
+          :view-btn="false"
+          :delete-btn="false"
+          @add="openAddEditModal({}, 'create')"
+          @edit="(row) => openAddEditModal(row, 'update')"
+        >
+          <Column show="project"/>
+          <Column show="delivery_chain"/>
+          <Column show="dc_role"/>
+          <Column show="environment_type"/>
+          <Column label="Instance Versions"
+            :show="(request) => getInstanceVersions(request.instance_version)"/>
+          <Column show="comments"/>
+          <Column label="Requested on" name="requested_on"
+            :show="(request) => $date(request.created_on).toHuman()"/>
+          <Column label="Requested by" name="requested_by"
+            :show="(request) => request.created_by"/>
+        </Table>
+      </div>
 
       <AddEditModal
-          v-if="showAddEditModal"
-          :request="selected"
-          :action="action"
-          @close="closeAddEditModal()"
+        v-if="showAddEditModal"
+        :request="selected"
+        :action="action"
+        @close="closeAddEditModal()"
       />
-
     </div>
   </div>
 </template>
@@ -54,15 +54,13 @@ export default {
     },
   },
   methods: {
-    // getStatus(status) {
-    //   if (status === 'on') {
-    //     return `<span class="new badge green" data-badge-caption="">${status}</span>`;
-    //   }
-    //   if (status === 'off') {
-    //     return `<span class="new badge red" data-badge-caption="">${status}</span>`;
-    //   }
-    //   return `<span class="new badge" data-badge-caption="">${status}</span>`;
-    // },
+    getInstanceVersions(versions) {
+      let vers = '';
+      versions.forEach((version) => {
+        vers += `${version.module} - ${version.version}<br>`;
+      });
+      return vers;
+    },
     getRequested() {
       const loader = this.$loading.show({ container: this.$refs.requested });
       this.$store.dispatch('esxi/getRequestedInstances')
@@ -94,11 +92,12 @@ export default {
       this.selected = { ...request };
       this.action = action;
 
-      const promise1 = this.$store.dispatch('mmpi/getProjects');
+      const loader = this.$loading.show({ container: this.$refs.requested });
+      const promise1 = this.$store.dispatch('mmpi/getProjectsForInstanceRequest');
       const promise2 = this.$store.dispatch('mmpi/getDeliveryChainRoles');
-      const promise3 = this.$store.dispatch('mmpi/getInstanceTypes');
-      const promise4 = this.$store.dispatch('mmpi/getEnvironmentTypes');
-      const promise5 = this.$store.dispatch('mmpi/getActiveProjects');
+      const promise3 = this.$store.dispatch('mmpi/getEnvironmentTypes');
+      const promise4 = this.$store.dispatch('mmpi/getInstanceTypesVersions');
+      const promise5 = this.$store.dispatch('esxi/getImxComponents');
 
       Promise.all([promise1, promise2, promise3, promise4, promise5])
         .then(() => {
@@ -107,7 +106,8 @@ export default {
             path: `/inventory/request/${encodeURIComponent(this.selected.id || 'new')}`,
           });
         })
-        .catch((error) => this.$M.toast({ html: error, classes: 'toast-fail' }));
+        .catch((error) => this.$M.toast({ html: error, classes: 'toast-fail' }))
+        .finally(() => loader.hide());
     },
     closeAddEditModal() {
       this.showAddEditModal = false;

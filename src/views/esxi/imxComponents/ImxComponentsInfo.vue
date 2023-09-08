@@ -35,13 +35,11 @@
                 tooltip="Lifecycle URL"
               />
               <TooltipButton
-                v-if="$auth.can('imx-component.add')"
                 icon="create"
                 tooltip="Edit component"
                 @click="openAddEditModal(component, 'update')"
               />
               <TooltipButton
-                v-if="$auth.can('imx-component.delete')"
                 icon="delete"
                 tooltip="Delete component"
                 @click="openDeleteModal(component, 'delete')"
@@ -49,19 +47,18 @@
             </div>
             <p v-if="component.url">
               <b>Url: </b><span>{{ component.url }}</span>
-
+            </p>
+            <p v-if="component.type">
+              <b>Type: </b><span>{{ component.type }}</span>
+            </p>
             <p v-if="component.name_key">
               <b>Name key: </b><span>{{ component.name_key }}</span>
             </p>
-
             <p v-if="component.maintenance_team">
               <b>Maintenance team: </b><span>{{ showTeam(component.maintenance_team) }}</span>
             </p>
             <p v-if="component.intranet_command">
               <b>Intranet command: </b><span>{{ component.intranet_command }}</span>
-            </p>
-            <p v-if="component.extranet_command">
-              <b>Extranet command: </b><span>{{ component.extranet_command }}</span>
             </p>
             <div class="data-table" v-if="component.versions">
               <table>
@@ -70,7 +67,7 @@
                     <th>Approved by Codix</th>
                     <th>Version</th>
                     <th>Version type</th>
-                    <th>End of support date (extended)</th>
+                    <th>End of support date (regular)</th>
                     <th>End of support date (extended)</th>
                   </tr>
                 </thead>
