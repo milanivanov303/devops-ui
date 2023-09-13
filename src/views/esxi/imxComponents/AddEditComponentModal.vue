@@ -204,7 +204,7 @@
                        for="extended_eos_date">EOS date (extended)
                 </label>
               </div>
-              <p class="col s12 l2">
+              <p class="col s12 l1" style="padding-left: 0px;">
                 <label>
                   <input class="with-gap"
                          type="checkbox"
@@ -212,12 +212,15 @@
                   <span>Approved by Codix</span>
                 </label>
               </p>
-              <div class="col s12 l1 right-align" v-if="newVersion.version">
+              <div class="col s12 l1 right-align">
                 <TooltipButton
+                  :class="{'readonly': !newVersion.version}"
+                  tooltip="Add"
                   class="btn-floating btn-small"
                   icon="add"
-                  @click="addToVersions()">
-                </TooltipButton>
+                  @click="addToVersions()"
+                  style="margin-top: 5px;"
+                />
               </div>
               <div class="validator col s12 offset-l1 offset-m1">
                 <div class="red-text" v-if="!$v.newVersion.version.versionValidator">
@@ -432,5 +435,8 @@ label {
   line-height: 12px !important;
   font-size: 13px !important;
   padding-left: 21px !important;
+}
+.readonly {
+  background-color: #CBCBCB;
 }
 </style>
