@@ -237,7 +237,7 @@ export default {
     ttsKey: {
       required,
       validKey(value) {
-        return /^[A-Z]+-[0-9]+$/.test(value);
+        return /^[A-Z0-9]+-[0-9]+$/.test(value);
       },
     },
     deliveryChain: {
