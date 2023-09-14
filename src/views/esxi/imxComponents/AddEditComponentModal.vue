@@ -1,5 +1,5 @@
 <template>
-  <Modal @close="$emit('close')" class="right-sheet">
+  <Modal @close="$emit('close')">
     <template v-slot:header>
       <div v-if="action === 'update'">Edit {{ selected.name }} component</div>
       <div v-else>Add new iMX component</div>
@@ -7,7 +7,7 @@
     <template v-slot:content>
       <div class="row">
         <Alert v-if="error" :msg="error"/>
-        <form class="col s12 l11">
+        <form class="col s12">
           <fieldset>
             <legend>Main details</legend>
             <div class="row">
@@ -54,14 +54,14 @@
               />
             </div>
             <div class="row">
-              <Select
+              <Autocomplete
                 id="type"
                 class="col s12"
-                :class="{invalid: $v.selected.type.$error || selected.type === 'undefined'}"
+                :class="{invalid: $v.selected.type.$error}"
                 icon="list"
-                label="Types"
+                label="Type"
                 v-model="selected.type"
-                :options="typeOptions"
+                :items="typeOptions"
                 @blur="$v.selected.type.$touch()"
               />
               <div class="validator col s12 offset-l1 offset-m1">
@@ -89,16 +89,14 @@
             </div>
             <div class="row">
               <Select
-                class="col s12"
+                class="col s12 m6"
                 icon="person"
                 label="Maintenance team"
                 v-model="selectedTeam"
                 :options="teamOptions"
               />
-            </div>
-            <div class="row">
               <Select
-                class="col s12"
+                class="col s12 m6"
                 icon="person"
                 label="Email address"
                 v-model="selectedEmail"
@@ -109,25 +107,17 @@
           <fieldset v-if="selected.versions">
             <legend>Versions</legend>
             <div class="row" v-for="version in selected.versions" :key="version.id">
-              <div class="col s12 l1 right-align">
-                <TooltipButton
-                  class="btn-floating btn-small red"
-                  icon="remove"
-                  @click="removeFromVersions(version)">
-                </TooltipButton>
-              </div>
               <TextInput
-                class="col s12 l2"
+                class="col s12 m6 l1"
                 label="Version"
                 v-model="version.version"
               />
               <TextInput
-                class="col s12 l2"
+                class="col s12 m6 l2"
                 label="Version Type"
                 v-model="version.version_type"
               />
-              <div class="input-field col s12 l3">
-                <i class="material-icons prefix">date_range</i>
+              <div class="input-field col s12 m6 l2">
                 <datetime :input-id="'regular_eos_date_'.concat(version.version)"
                           input-class="datetime-input"
                           type="date"
@@ -139,8 +129,7 @@
                        :for="'regular_eos_date_'.concat(version.version)">EOS date (regular)
                 </label>
               </div>
-              <div class="input-field col s12 l3">
-                <i class="material-icons prefix">date_range</i>
+              <div class="input-field col s12 m6 l2">
                 <datetime :input-id="'extended_eos_date'.concat(version.version)"
                           input-class="datetime-input"
                           type="date"
@@ -152,22 +141,35 @@
                        :for="'extended_eos_date'.concat(version.version)">EOS date (extended)
                 </label>
               </div>
-              <p :title="(version.approved ? '' : 'Not ' ).concat('Approved by Codix')">
-                <label>
-                  <input class="with-gap"
-                         type="checkbox"
-                         v-model="version.approved"
-                  />
-                  <span></span>
-                </label>
-              </p>
+              <Select
+                  class="col s12 m6 l2"
+                  label="Approved by Codix"
+                  v-model="version.approved"
+                  defaultOptionText="Choose option"
+                  :options="['Yes', 'No', 'In progress']"
+              />
+              <Select
+                  class="col s12 m6 l2"
+                  label="Security validated"
+                  v-model="version.secured"
+                  defaultOptionText="Choose option"
+                  :options="['Yes', 'No']"
+              />
+              <div class="col s12 l1 right-align">
+                <TooltipButton
+                    class="red btn-floating btn-small"
+                    icon="remove"
+                    @click="removeFromVersions(version)"
+                    style="margin-top: 5px;"
+                />
+              </div>
             </div>
           </fieldset>
           <fieldset>
             <legend>Add new version</legend>
             <div class="row">
               <TextInput
-                class="col s12 l2"
+                class="col s12 l1"
                 :class="{invalid: !$v.newVersion.version.versionValidator}"
                 label="Version"
                 v-model="newVersion.version"
@@ -178,8 +180,7 @@
                 label="Version Type"
                 v-model="newVersion.version_type"
               />
-              <div class="input-field col s12 l3">
-                <i class="material-icons prefix">date_range</i>
+              <div class="input-field col s12 l2">
                 <datetime input-id="regular_eos_date"
                           input-class="datetime-input"
                           type="date"
@@ -191,8 +192,7 @@
                        for="regular_eos_date">EOS date (regular)
                 </label>
               </div>
-              <div class="input-field col s12 l3">
-                <i class="material-icons prefix">date_range</i>
+              <div class="input-field col s12 l2">
                 <datetime input-id="extended_eos_date"
                           input-class="datetime-input"
                           type="date"
@@ -204,14 +204,20 @@
                        for="extended_eos_date">EOS date (extended)
                 </label>
               </div>
-              <p class="col s12 l1" style="padding-left: 0px;">
-                <label>
-                  <input class="with-gap"
-                         type="checkbox"
-                         v-model="newVersion.approved"/>
-                  <span>Approved by Codix</span>
-                </label>
-              </p>
+              <Select
+                  class="col s12 l2"
+                  label="Approved by Codix"
+                  v-model="newVersion.approved"
+                  defaultOptionText="Choose option"
+                  :options="['Yes', 'No', 'In progress']"
+              />
+              <Select
+                  class="col s12 l2"
+                  label="Security validated"
+                  v-model="newVersion.secured"
+                  defaultOptionText="Choose option"
+                  :options="['Yes', 'No']"
+              />
               <div class="col s12 l1 right-align">
                 <TooltipButton
                   :class="{'readonly': !newVersion.version}"
@@ -230,6 +236,9 @@
                 </div>
               </div>
             </div>
+            <span>
+              NOTE: Please, make sure to include the new version to the list above before saving
+            </span>
           </fieldset>
         </form>
       </div>
@@ -248,7 +257,6 @@
 </template>
 
 <script>
-import { DateTime } from 'luxon';
 import { Datetime } from 'vue-datetime';
 import 'vue-datetime/dist/vue-datetime.css';
 
@@ -256,6 +264,7 @@ import { required, helpers } from 'vuelidate/lib/validators';
 
 const versionValidator = helpers.regex('versionValidator', /^\d+(\.\d+)*$/);
 const keyValidator = helpers.regex('keyValidator', /^(?=^[a-zA-Z]+(?:_[a-zA-Z]+)*)\w{1,30}?$/);
+
 const TooltipButton = () => import('@/components/partials/TooltipButton');
 
 export default {
@@ -277,18 +286,19 @@ export default {
 
   data() {
     return {
-      selected: this.component,
-      email: '',
-      selectedTeam: '',
-      selectedEmail: '',
-      newVersion: {
-        approved: false,
-      },
-      dateNow: DateTime.local().toISO(),
+      selected: { ...this.component },
+      selectedTeam: this.component.maintenance_team ? this.component.maintenance_team.name : '',
+      selectedEmail: this.component.maintenance_team ? this.component.maintenance_team.email_address : '',
+      newVersion: {},
       teamOptions: ['SA', 'DevOps', 'IMX V9'],
-      typeOptions: ['OS', 'DB', 'SDK', 'Library', 'Cross-platform software'],
+      typeOptions: [
+        { name: 'OS' },
+        { name: 'DB' },
+        { name: 'SDK' },
+        { name: 'Library' },
+        { name: 'Cross-platform software' },
+      ],
       error: null,
-      chooseOptions: ['Yes', 'No'],
     };
   },
   validations: {
@@ -303,11 +313,6 @@ export default {
         required,
       },
     },
-    email: {
-      validKey(value) {
-        return /(^$|^.*@.*\..*$)/.test(value);
-      },
-    },
     newVersion: {
       version: {
         versionValidator,
@@ -319,6 +324,10 @@ export default {
     savedEmails() {
       return this.$store.state.esxi.savedEmails.map((email) => `${email.name}:${email.email_address}`);
     },
+    sortedVersions() {
+      return this.component.versions.slice()
+        .sort((a, b) => a.version.localeCompare(b.version, undefined, { numeric: true }));
+    },
   },
 
   methods: {
@@ -327,7 +336,15 @@ export default {
       if (this.$v.$invalid) {
         return;
       }
-      this.setMaintenanceTeam();
+
+      this.selected.type = this.selected.type.name;
+
+      if (this.selectedTeam || this.selectedEmail) {
+        this.selected.maintenance_team = {
+          name: this.selectedTeam || '',
+          email_address: this.selectedEmail ? this.selectedEmail.split(':')[1] || '' : '',
+        };
+      }
 
       this.$store.dispatch(`esxi/${this.action}ImxComponent`, this.selected)
         .then(() => {
@@ -354,7 +371,6 @@ export default {
       this.selected.versions.push(this.newVersion);
       this.newVersion = {};
     },
-
     removeFromVersions(version) {
       const idx = this.selected.versions.findIndex((v) => v.version === version.version);
       this.selected.versions.splice(idx, 1);
@@ -369,57 +385,13 @@ export default {
       }
       return true;
     },
-
-    setMaintenanceTeam() {
-      this.selectedEmail = this.selectedEmail.split(':');
-
-      this.selected.maintenance_team = JSON.stringify({
-        name: this.selectedTeam || '',
-        email_address: this.selectedEmail[1] || '',
-      });
-    },
-
-    getSavedEmails() {
-      const loader = this.$loading.show({ container: this.$refs.savedEmails });
-
-      this.$store.dispatch('esxi/getSavedEmails')
-        .then(() => {
-          loader.hide();
-        }).catch((error) => {
-          this.error = error;
-        });
-    },
-
-    getMaintenanceTeam() {
-      try {
-        const objectData = JSON.parse(this.selected.maintenance_team);
-
-        this.selectedTeam = objectData.name || '';
-        if (objectData.email_address) {
-          // eslint-disable-next-line array-callback-return,consistent-return
-          const emailAddress = this.savedEmails.find((email) => {
-            if (email.includes(objectData.email_address)) {
-              return email;
-            }
-          });
-          this.selectedEmail = emailAddress || '';
-        }
-        // eslint-disable-next-line no-empty
-      } catch (ignore) {}
-    },
   },
 
   created() {
-    this.getSavedEmails();
-  },
-  watch: {
-    '$store.state.esxi.savedEmails': {
-      handler(newVal) {
-        if (newVal.length > 0) {
-          this.getMaintenanceTeam();
-        }
-      },
-    },
+    this.$store.dispatch('esxi/getSavedEmails');
+    if (this.selected.type) {
+      this.selected.type = { name: this.selected.type };
+    }
   },
 };
 
@@ -431,12 +403,13 @@ label {
 .input-field > label:not(.label-icon).active {
   transform: translateY(-7px) scale(1) !important;
 }
-[type="checkbox"] + span:not(.lever) {
-  line-height: 12px !important;
-  font-size: 13px !important;
-  padding-left: 21px !important;
-}
 .readonly {
   background-color: #CBCBCB;
+}
+.datetime-input {
+  max-width: 100% !important;
+}
+.modal-content {
+  overflow-x: hidden;
 }
 </style>
