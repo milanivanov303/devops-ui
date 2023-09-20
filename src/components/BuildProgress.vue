@@ -37,7 +37,9 @@
 
     <div class="row">
       <div class="col s12">
-        <div ref="log" class="log" id="log">{{ currentLog }}</div>
+        <div ref="log" class="log" id="log">
+          <p v-for="(line, index) in parseLog(currentLog)" :key="index" v-html="line"></p>
+        </div>
       </div>
     </div>
   </div>
@@ -75,12 +77,17 @@ export default {
   methods: {
     scrollLogContainer() {
       setTimeout(() => {
-        const logElement = document.getElementById('log');
-        logElement.innerHTML = logElement.innerHTML.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
-
         const container = this.$refs.log;
         container.scrollTop = container.scrollHeight;
       }, 100);
+    },
+
+    parseLog(log) {
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+      const lines = log.split('\n');
+
+      return lines.map((line) => line.replace(urlRegex, '<a href="$1" target="_blank">$1</a>'));
     },
 
     setStagesData(data) {

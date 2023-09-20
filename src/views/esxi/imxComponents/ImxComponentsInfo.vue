@@ -26,61 +26,56 @@
             <i class="material-icons">blur_on</i> {{ component.name }}
           </div>
           <div class="collapsible-body">
-            <div class="right">
-              <TooltipButton
-                v-if="component.url"
-                :href="component.url"
-                target="_blank"
-                icon="laptop_chromebook"
-                tooltip="Lifecycle URL"
-              />
-              <TooltipButton
-                icon="create"
-                tooltip="Edit component"
-                @click="openAddEditModal(component, 'update')"
-              />
-              <TooltipButton
-                icon="delete"
-                tooltip="Delete component"
-                @click="openDeleteModal(component, 'delete')"
-              />
+            <div class="component_info">
+              <div class="right">
+                <TooltipButton
+                    v-if="component.url"
+                    :href="component.url"
+                    target="_blank"
+                    icon="laptop_chromebook"
+                    tooltip="Lifecycle URL"
+                />
+                <TooltipButton
+                    icon="create"
+                    tooltip="Edit component"
+                    @click="openAddEditModal(component, 'update')"
+                />
+                <TooltipButton
+                    icon="delete"
+                    tooltip="Delete component"
+                    @click="openDeleteModal(component, 'delete')"
+                />
+              </div>
+              <p v-if="component.url">
+                <b>Url: </b><span>{{ component.url }}</span>
+              </p>
+              <p v-if="component.type">
+                <b>Type: </b><span>{{ component.type }}</span>
+              </p>
+              <p v-if="component.name_key">
+                <b>Name key: </b><span>{{ component.name_key }}</span>
+              </p>
+              <p v-if="component.maintenance_team">
+                <b>Maintenance team: </b><span>{{ showTeam(component.maintenance_team) }}</span>
+              </p>
+              <p v-if="component.intranet_command">
+                <b>Intranet command: </b><span>{{ component.intranet_command }}</span>
+              </p>
             </div>
-            <p v-if="component.url">
-              <b>Url: </b><span>{{ component.url }}</span>
-            </p>
-            <p v-if="component.type">
-              <b>Type: </b><span>{{ component.type }}</span>
-            </p>
-            <p v-if="component.name_key">
-              <b>Name key: </b><span>{{ component.name_key }}</span>
-            </p>
-            <p v-if="component.maintenance_team">
-              <b>Maintenance team: </b><span>{{ showTeam(component.maintenance_team) }}</span>
-            </p>
-            <p v-if="component.intranet_command">
-              <b>Intranet command: </b><span>{{ component.intranet_command }}</span>
-            </p>
             <div class="data-table" v-if="component.versions">
               <table>
                 <thead>
                   <tr>
-                    <th>Approved by Codix</th>
                     <th>Version</th>
                     <th>Version type</th>
                     <th>End of support date (regular)</th>
                     <th>End of support date (extended)</th>
+                    <th>Approved by Codix</th>
+                    <th>Security validated</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="v in sortComponentsVersions(component.versions)" :key="v.id">
-                    <td>
-                      <span v-if="v.approved" class="new badge green" data-badge-caption="">
-                        Yes
-                      </span>
-                      <span v-else class="new badge red" data-badge-caption="">
-                        No
-                      </span>
-                    </td>
                     <td>{{ v.version }}</td>
                     <td>{{ v.version_type }}</td>
                     <td>{{ v.regular_eos_date ?
@@ -89,6 +84,8 @@
                     <td>{{ v.extended_eos_date ?
                         $date(v.extended_eos_date).toHuman('dd-MM-yyyy') : '' }}
                     </td>
+                    <td v-html="getLabel(v.approved)"></td>
+                    <td v-html="getLabel(v.secured)"></td>
                   </tr>
                 </tbody>
               </table>
@@ -187,25 +184,36 @@ export default {
     openSaveEmails() {
       this.showSaveMailsModal = true;
     },
+    close() {
+      this.showAddEditModal = false;
+      this.showSaveMailsModal = false;
+    },
+
     openDeleteModal(component, action) {
       this.showDeleteComponent = true;
       this.imxComponent = component;
       this.action = action;
     },
-
     closeDelete() {
       this.showDeleteComponent = false;
     },
 
-    close() {
-      this.showAddEditModal = false;
-      this.showSaveMailsModal = false;
-    },
     showTeam(data) {
-      const objectData = JSON.parse(data);
-      const email = objectData.email_address || 'Not defined';
-      const name = objectData.name || 'Not defined';
+      const email = data.email_address || 'Not defined';
+      const name = data.name || 'Not defined';
       return `Name: ${name}, Email: ${email}.`;
+    },
+    getLabel(value) {
+      if (value === 'Yes') {
+        return `<span class="new badge green" data-badge-caption="">${value}</span>`;
+      }
+      if (value === 'No') {
+        return `<span class="new badge red" data-badge-caption="">${value}</span>`;
+      }
+      if (value === 'In progress') {
+        return `<span class="new badge yellow dark-text" data-badge-caption="">${value}</span>`;
+      }
+      return '';
     },
   },
 
@@ -218,3 +226,8 @@ export default {
   },
 };
 </script>
+<style scooped>
+.dark-text {
+  color: #003A52 !important;
+}
+</style>
