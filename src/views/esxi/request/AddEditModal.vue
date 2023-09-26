@@ -356,16 +356,7 @@
                   :items="middlewareOptions"
                   v-model="selected.oracle_middleware"
                   @change="delete selected.middleware_version"
-                  :invalid="$v.selected.oracle_middleware.$error"
-                  @blur="$v.selected.oracle_middleware.$touch()"
               />
-              <div class="validator">
-                <div class="red-text" v-if="$v.selected.oracle_middleware.$error">
-                  <p v-if="!$v.selected.oracle_middleware.required">
-                    Oracle middleware field must not be empty.
-                  </p>
-                </div>
-              </div>
             </div>
             <div class="col s12 m6" v-if="selected.oracle_middleware">
               <Autocomplete
@@ -723,9 +714,6 @@ export default {
           required,
         },
         os_version: {
-          required,
-        },
-        oracle_middleware: {
           required,
         },
         middleware_version: {
