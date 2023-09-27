@@ -379,7 +379,7 @@
             <div class="col s12" :class="{'m6': selected.oracle_db}">
               <Autocomplete
                   label="Oracle DB(RDBMS)"
-                  :items="osPlatforms"
+                  :items="oracleDb"
                   v-model="selected.oracle_db"
                   @change="delete selected.oracle_version"
                   :invalid="$v.selected.oracle_db.$error"
@@ -796,6 +796,9 @@ export default {
     osPlatforms() {
       return this.$store.state.esxi.imxComponents.filter((component) => component.type === 'OS') || [];
     },
+    oracleDb() {
+      return this.$store.state.esxi.imxComponents.filter((component) => component.type === 'DB') || [];
+    },
     dbVersions() {
       if (this.selected.os) {
         return this.selected.os.versions.filter((version) => version.approved) || [];
@@ -907,7 +910,7 @@ export default {
         .find((mid) => mid.name === this.request.oracle_middleware.name);
       this.selected.middleware_version = this.middlewareVersions
         .find((version) => version.version === this.request.oracle_middleware.version);
-      this.selected.oracle_db = this.osPlatforms
+      this.selected.oracle_db = this.oracleDb
         .find((os) => os.name === this.request.oracle_db.name);
       this.selected.oracle_version = this.oracleVersions
         .find((version) => version.version === this.request.oracle_db.version);
