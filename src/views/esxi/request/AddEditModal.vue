@@ -356,16 +356,7 @@
                   :items="middlewareOptions"
                   v-model="selected.oracle_middleware"
                   @change="delete selected.middleware_version"
-                  :invalid="$v.selected.oracle_middleware.$error"
-                  @blur="$v.selected.oracle_middleware.$touch()"
               />
-              <div class="validator">
-                <div class="red-text" v-if="$v.selected.oracle_middleware.$error">
-                  <p v-if="!$v.selected.oracle_middleware.required">
-                    Oracle middleware field must not be empty.
-                  </p>
-                </div>
-              </div>
             </div>
             <div class="col s12 m6" v-if="selected.oracle_middleware">
               <Autocomplete
@@ -388,7 +379,7 @@
             <div class="col s12" :class="{'m6': selected.oracle_db}">
               <Autocomplete
                   label="Oracle DB(RDBMS)"
-                  :items="osPlatforms"
+                  :items="oracleDb"
                   v-model="selected.oracle_db"
                   @change="delete selected.oracle_version"
                   :invalid="$v.selected.oracle_db.$error"
@@ -725,9 +716,6 @@ export default {
         os_version: {
           required,
         },
-        oracle_middleware: {
-          required,
-        },
         middleware_version: {
           required,
         },
@@ -807,6 +795,9 @@ export default {
     },
     osPlatforms() {
       return this.$store.state.esxi.imxComponents.filter((component) => component.type === 'OS') || [];
+    },
+    oracleDb() {
+      return this.$store.state.esxi.imxComponents.filter((component) => component.type === 'DB') || [];
     },
     dbVersions() {
       if (this.selected.os) {
@@ -919,7 +910,7 @@ export default {
         .find((mid) => mid.name === this.request.oracle_middleware.name);
       this.selected.middleware_version = this.middlewareVersions
         .find((version) => version.version === this.request.oracle_middleware.version);
-      this.selected.oracle_db = this.osPlatforms
+      this.selected.oracle_db = this.oracleDb
         .find((os) => os.name === this.request.oracle_db.name);
       this.selected.oracle_version = this.oracleVersions
         .find((version) => version.version === this.request.oracle_db.version);
