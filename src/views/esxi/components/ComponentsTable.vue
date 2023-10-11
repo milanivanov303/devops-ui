@@ -1,20 +1,20 @@
 <template>
   <div ref="components">
     <div class="data-table">
-      <Table
-        :data="components"
-        sort-by="name"
-        sort-dir="asc"
-        query-prefix="components_"
-        :export-btn="false"
-        :view-btn="false"
-        :add-btn="false"
-        :edit-btn="false"
-        :delete-btn="false"
-      >
-        <Column show="name"/>
-        <Column show="version"/>
-      </Table>
+      <table>
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Version</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr v-for="component in components" :key="component.id">
+            <td>{{ component.name }}</td>
+            <td>{{ component.version }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>

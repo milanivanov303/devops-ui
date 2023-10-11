@@ -427,7 +427,7 @@
             </div>
             <div class="col s12 m4">
               <Autocomplete
-                  label="Tomcat"
+                  label="Tomcat/WAS"
                   :items="tomcatVersions"
                   valueKey="version"
                   v-model="selected.tomcat"
@@ -801,13 +801,13 @@ export default {
     },
     dbVersions() {
       if (this.selected.os) {
-        return this.selected.os.versions.filter((version) => version.approved) || [];
+        return this.selected.os.versions.filter((version) => version.approved === 'Yes') || [];
       }
       return [];
     },
     oracleVersions() {
       if (this.selected.oracle_db) {
-        return this.selected.oracle_db.versions.filter((version) => version.approved) || [];
+        return this.selected.oracle_db.versions.filter((version) => version.approved === 'Yes') || [];
       }
       return [];
     },
@@ -817,29 +817,32 @@ export default {
     },
     middlewareVersions() {
       if (this.selected.oracle_middleware) {
-        return this.selected.oracle_middleware.versions.filter((version) => version.approved) || [];
+        return this.selected.oracle_middleware.versions.filter((version) => version.approved === 'Yes') || [];
       }
       return [];
     },
 
     tomcatVersions() {
-      return this.$store.state.esxi.imxComponents.find((component) => component.name
-        .includes('Apache Tomcat')).versions.filter((version) => version.approved) || [];
+      const tomcatVersions = this.$store.state.esxi.imxComponents.find((component) => component.name
+        .includes('Apache Tomcat')).versions.filter((version) => version.approved === 'Yes') || [];
+      const wasVersions = this.$store.state.esxi.imxComponents.find((component) => component.name_key === 'WAS')
+        .versions.filter((version) => version.approved === 'Yes') || [];
+      return tomcatVersions.concat(wasVersions);
     },
     httpdVersions() {
       return this.$store.state.esxi.imxComponents.find((component) => component.name
-        .includes('Apache HTTP Server')).versions.filter((version) => version.approved) || [];
+        .includes('Apache HTTP Server')).versions.filter((version) => version.approved === 'Yes') || [];
     },
     wslVersions() {
       return this.$store.state.esxi.imxComponents.find((component) => component.name
-        .includes('WLS')).versions.filter((version) => version.approved) || [];
+        .includes('WLS')).versions.filter((version) => version.approved === 'Yes') || [];
     },
     javaComponents() {
       return this.$store.state.esxi.imxComponents.filter((component) => component.type === 'SDK') || [];
     },
     javaVersions() {
       if (this.selected.java) {
-        return this.selected.java.versions.filter((version) => version.approved ?? false) || [];
+        return this.selected.java.versions.filter((version) => version.approved === 'Yes') || [];
       }
       return [];
     },
