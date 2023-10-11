@@ -821,13 +821,12 @@ export default {
       }
       return [];
     },
-
     tomcatVersions() {
-      const tomcatVersions = this.$store.state.esxi.imxComponents.find((component) => component.name
-        .includes('Apache Tomcat')).versions.filter((version) => version.approved === 'Yes') || [];
-      const wasVersions = this.$store.state.esxi.imxComponents.find((component) => component.name_key === 'WAS')
-        .versions.filter((version) => version.approved === 'Yes') || [];
-      return tomcatVersions.concat(wasVersions);
+      // Tomcat + WAS
+      const versions = this.$store.state.esxi.imxComponents
+        .filter((component) => component.name.includes('Apache Tomcat') || component.name_key === 'WAS')
+        .flatMap((component) => component.versions) ?? [];
+      return versions.filter((version) => version.approved === 'Yes') || [];
     },
     httpdVersions() {
       return this.$store.state.esxi.imxComponents.find((component) => component.name
