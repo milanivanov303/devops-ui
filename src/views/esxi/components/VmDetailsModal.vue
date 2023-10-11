@@ -217,7 +217,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scooped>
+<style lang="scss" scoped>
 span {
   margin-top: 4px;
 }

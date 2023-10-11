@@ -226,7 +226,7 @@ export default {
   },
 };
 </script>
-<style scooped>
+<style scoped>
 .dark-text {
   color: #003A52 !important;
 }
