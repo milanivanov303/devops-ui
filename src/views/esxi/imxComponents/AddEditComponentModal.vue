@@ -396,7 +396,7 @@ export default {
 };
 
 </script>
-<style scooped>
+<style lang='scss' scoped>
 label {
   font-size: 13px !important;
 }

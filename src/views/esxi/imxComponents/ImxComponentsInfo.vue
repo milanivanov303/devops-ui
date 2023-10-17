@@ -211,7 +211,7 @@ export default {
         return `<span class="new badge red" data-badge-caption="">${value}</span>`;
       }
       if (value === 'In progress') {
-        return `<span class="new badge yellow dark-text" data-badge-caption="">${value}</span>`;
+        return `<span class="new badge yellow dark-text" data-badge-caption="" style="color: #003A52">${value}</span>`;
       }
       return '';
     },
@@ -226,8 +226,3 @@ export default {
   },
 };
 </script>
-<style scooped>
-.dark-text {
-  color: #003A52 !important;
-}
-</style>
