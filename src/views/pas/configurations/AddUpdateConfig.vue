@@ -286,6 +286,22 @@
             </div>
           </div>
         </div>
+        <div
+            class="row"
+            v-if="form.app_version &&
+            ['X1', 'X2', 'X2_3', 'X2_4', 'X3'].includes(form.app_version.value)"
+        >
+          <div class="col s12" style="margin-left: 6px">
+            <label :class="{readonly: action === 'view'}">
+              <input
+                  type="checkbox"
+                  v-model="form.auto_deploy"
+                  checked
+              />
+              <span>Auto deploy</span>
+            </label>
+          </div>
+        </div>
         <div class="row" v-if="form.created_on">
           <TextInput
               class="col s12 m6"
@@ -542,6 +558,7 @@ export default {
       }
       payload.branch = this.form.branch.name;
       payload.prefix = this.form.prefix.package;
+      payload.auto_deploy = this.form.auto_deploy === false ? 0 : 1;
 
       delete payload.created_on;
       delete payload.created_by;
