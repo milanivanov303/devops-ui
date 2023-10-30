@@ -305,6 +305,7 @@ export default {
         client: this.client,
         x4config: this.x4config ? this.x4config.name : null,
         project: this.project ? this.project.name : null,
+        do_release: true,
         mmpi: {
           binary_type: this.binaryType,
           config_name: this.configName,
