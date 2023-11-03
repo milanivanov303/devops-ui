@@ -79,6 +79,9 @@
               <li :class="{ active: isActive('documentation/API_Platform') }">
                 <router-link to="/documentation/API_Platform">API Platform</router-link>
               </li>
+              <li :class="{ active: isActive('documentation/modules') }">
+                <router-link to="/documentation/modules">Modules</router-link>
+              </li>
             </ul>
           </div>
         </li>
