@@ -111,14 +111,11 @@ export default {
   methods: {
     getFiles() {
       const loader = this.$loading.show({ container: this.$refs.files });
-      const payload = {
-        repo: this.repo,
-      };
-      if (this.module !== 'modules') {
-        payload.apis_dir = this.module;
-      }
 
-      this.$store.dispatch('documentation/getSpecs', payload)
+      this.$store.dispatch('documentation/getSpecs', {
+        repo: this.repo,
+        apis_dir: this.module,
+      })
         .then(() => {
           const file = this.files.find((file) => file.path === this.$route.query.file);
           if (file) {
