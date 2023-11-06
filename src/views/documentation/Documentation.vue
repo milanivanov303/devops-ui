@@ -113,10 +113,8 @@ export default {
       const loader = this.$loading.show({ container: this.$refs.files });
       const payload = {
         repo: this.repo,
+        apis_dir = this.module,
       };
-      if (this.module !== 'modules') {
-        payload.apis_dir = this.module;
-      }
 
       this.$store.dispatch('documentation/getSpecs', payload)
         .then(() => {
