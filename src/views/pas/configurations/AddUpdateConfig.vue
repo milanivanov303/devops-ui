@@ -196,9 +196,14 @@
         </div>
         <div class="row">
           <div class="col s12 m6">
-            <TextInput
+            <Select
                 :class="{readonly: action === 'view'}"
                 label="Servlet container"
+                :options="[
+                  'Apache Tomcat',
+                  'Oracle WebLogic Server (WLS)',
+                  'IBM WebSphere Application Server'
+                ]"
                 icon="storage"
                 v-model="form.servlet_container"
                 :invalid="$v.form.servlet_container.$error"

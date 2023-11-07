@@ -20,7 +20,7 @@
         :show="(row) => row.delivery_chain ? row.delivery_chain.name : ''"/>
       <Column show="prefix"/>
       <Column show="app_version" :sortable="false" filter-type="dropdown"/>
-      <Column show="servlet_container"/>
+      <Column show="servlet_container" :sortable="false" filter-type="dropdown"/>
       <Column
         label="Additional info" name="additional_info"
         :show="(row) => getAdditionalInfoLink(row.additional_info)"
