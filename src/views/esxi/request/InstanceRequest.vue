@@ -23,6 +23,14 @@
             :show="(request) => $date(request.created_on).toHuman()"/>
           <Column label="Requested by" name="requested_by"
             :show="(request) => request.created_by"/>
+          <template v-slot:actions-before="{ row }">
+            <a
+                @click="exportRecord(row)"
+                class="tooltipped"
+                data-tooltip="Export record">
+              <i class="material-icons">description</i>
+            </a>
+          </template>
         </Table>
       </div>
 
@@ -114,6 +122,12 @@ export default {
       this.$router.history.replace({
         path: '/inventory/request',
       });
+    },
+
+    exportRecord(requested) {
+      const loader = this.$loading.show({ container: this.$refs.requested });
+      this.$store.dispatch('esxi/exportRecord', requested.id)
+        .finally(() => loader.hide());
     },
   },
 
