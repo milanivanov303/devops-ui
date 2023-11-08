@@ -195,6 +195,24 @@ export default {
       .catch((error) => commit('error', error));
     return promise;
   },
+  exportRecord({ commit }, id) {
+    const promise = api('devops').post(`inventory/requested-instances/export/${id}`,
+      {},
+      { responseType: 'blob' });
+    promise
+      .then((response) => {
+        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        const fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', 'Request_Instance_Details.xlsx');
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      })
+      .catch((error) => commit('error', error));
+    return promise;
+  },
 
   getExpiringComponents({ commit }) {
     const promise = api('devops').get('inventory/imx-components/expiring');
