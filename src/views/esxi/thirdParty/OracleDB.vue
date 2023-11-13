@@ -69,7 +69,7 @@ export default {
 
       if (components && components.oracle_db && db) {
         const approved = db.versions.filter((version) => version.approved === 'Yes');
-        if (approved.find((a) => a.version === components.oracle_db)) {
+        if (approved.find((a) => new RegExp(`^${a.version}`, 'i').test(components.oracle_db))) {
           return `<span class="new badge green" data-badge-caption="">${components.oracle_db}</span>`;
         }
         return `<span class="new badge red" data-badge-caption="">${components.oracle_db}</span>`;
