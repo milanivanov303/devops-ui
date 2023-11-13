@@ -189,11 +189,13 @@
               <li :class="{ active: isActive('inventory/instances') }">
                 <router-link to="/inventory/instances"> Instances</router-link>
               </li>
+              <li :class="{ active: isActive('inventory/thirdParties') }">
+                <router-link to="/inventory/thirdParties"> Third-Party Matrix</router-link>
+              </li>
               <li :class="{ active: isActive('inventory/imxComponents') }">
                 <router-link to="/inventory/imxComponents"> iMX Components</router-link>
               </li>
-              <li
-                  :class="{ active: isActive('inventory/request') }">
+              <li :class="{ active: isActive('inventory/request') }">
                 <router-link to="/inventory/request"> Instance Request</router-link>
               </li>
               <li><div class="divider"></div></li>
