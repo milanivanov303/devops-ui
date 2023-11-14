@@ -11,17 +11,21 @@
       <div class="row">
         <div id="tabs" class="col s12">
           <ul class="tabs row">
-            <li class="tab col s3">
-              <a href="#psu">Oracle PSU</a>
+            <li class="tab col s3" @click="switchUrl('psu')">
+              <a href="#psu"
+                :class="{active: !$route.params.module || $route.params.module === 'psu'}"
+              >Oracle PSU</a>
             </li>
-            <li class="tab col s3">
-              <a href="#tomcat">Tomcat/HTTPD</a>
+            <li class="tab col s3" @click="switchUrl('tomcat')">
+              <a href="#tomcat"
+                :class="{active: $route.params.module === 'tomcat'}"
+              >Tomcat/HTTPD</a>
             </li>
-            <li class="tab col s3">
-              <a href="#db">Oracle DB</a>
+            <li class="tab col s3" @click="switchUrl('db')">
+              <a href="#db" :class="{active: $route.params.module === 'db'}">Oracle DB</a>
             </li>
-            <li class="tab col s3">
-              <a href="#os">OS</a>
+            <li class="tab col s3" @click="switchUrl('os')">
+              <a href="#os" :class="{active: $route.params.module === 'os'}">OS</a>
             </li>
           </ul>
           <div id="psu" class="comp-divs">
@@ -96,6 +100,11 @@ export default {
 
       Promise.all([promise1, promise2, promise3, promise4])
         .finally(() => loader.hide());
+    },
+    switchUrl(module) {
+      this.$router.push({
+        path: `/inventory/thirdParties/${module}`,
+      });
     },
   },
   mounted() {

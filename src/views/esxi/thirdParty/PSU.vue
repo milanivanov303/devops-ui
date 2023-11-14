@@ -57,7 +57,7 @@ export default {
       return project ? project.name : '-';
     },
     getVMName(id) {
-      return id ? this.virtualMachines.find((vm) => vm.id === id).name : '';
+      return id && this.virtualMachines.length ? this.virtualMachines.find((vm) => vm.id === id).name : '';
     },
   },
 };
