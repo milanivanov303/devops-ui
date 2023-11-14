@@ -12,7 +12,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="instance in instances" :key="instance.id">
+        <tr v-for="instance in intranet" :key="instance.id">
           <td>{{ instance.name }}</td>
           <td>{{ getVMName(instance.virtual_machine_id) }}</td>
           <td>{{ getProjectName(instance.name) }}</td>
@@ -31,23 +31,26 @@ export default {
     instances: {
       type: Array,
       required: true,
-      default: () => {},
+      default: () => [],
     },
     virtualMachines: {
       type: Array,
       required: true,
-      default: () => {},
+      default: () => [],
     },
     projects: {
       type: Array,
       required: true,
-      default: () => {},
+      default: () => [],
     },
   },
   computed: {
     imxComponents() {
       return this.$store.state.esxi.imxComponents || [];
     },
+    intranet() {
+      return this.instances.filter((instance) => instance.type === 'intranet');
+    }
   },
   methods: {
     getProjectName(instance) {
