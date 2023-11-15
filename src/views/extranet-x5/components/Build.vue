@@ -51,66 +51,6 @@
               </div>
             </div>
             <div class="row">
-              <TextInput
-                  class="col s12 readonly"
-                  label="Api-client"
-                  icon="compare_arrows"
-                  v-model="form.api_client"
-              />
-              <div class="validator col s11 offset-s1">
-                <div class="red-text" v-if="$v.form.api_client.$error">
-                  <p v-if="!$v.form.api_client.required">
-                    Api-client field must not be empty. Check X5 records in Devops matrix.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <TextInput
-                  class="col s12 readonly"
-                  label="Api-secret"
-                  icon="compare_arrows"
-                  v-model="form.api_secret"
-              />
-              <div class="validator col s11 offset-s1">
-                <div class="red-text" v-if="$v.form.api_secret.$error">
-                  <p v-if="!$v.form.api_secret.required">
-                    Api-secret field must not be empty. Check X5 records in Devops matrix.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <TextInput
-                class="col s12 readonly"
-                label="Client ID Password"
-                icon="vpn_key"
-                v-model="form.client_id_password"
-              />
-              <div class="validator col s11 offset-s1">
-                <div class="red-text" v-if="$v.form.client_id_password.$error">
-                  <p v-if="!$v.form.client_id_password.required">
-                    Client ID Password field must not be empty.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <TextInput
-                class="col s12 readonly"
-                label="Client Secret Password"
-                icon="vpn_key"
-                v-model="form.client_secret_password"
-              />
-              <div class="validator col s11 offset-s1">
-                <div class="red-text" v-if="$v.form.client_secret_password.$error">
-                  <p v-if="!$v.form.client_secret_password.required">
-                    Client Secret Password field must not be empty.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="row">
               <div class="col s12" >
                 <TextInput
                     label="Backend url"
@@ -126,6 +66,102 @@
                 <div class="red-text" v-if="$v.form.be_url.$error">
                   <p v-if="!$v.form.be_url.required">
                     Backend url field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12 readonly">
+                <div class="col s1">
+                  <i class="material-icons sensitive-info">keyboard_arrow_right</i>
+                </div>
+                <div class="col s3">
+                  <p>Api client_id:</p>
+                </div>
+                <div class="col s8">
+                  <i v-if="form.api_client && form.api_client.trim() !== ''"
+                     class="material-icons green-text">
+                    check
+                  </i>
+                  <i v-else class="material-icons red-text">close</i>
+                </div>
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.api_client.$error">
+                  <p v-if="!$v.form.api_client.required">
+                    Api-client field must not be empty. Check X5 records in Devops matrix.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12 readonly">
+                <div class="col s1">
+                  <i class="material-icons sensitive-info">keyboard_arrow_right</i>
+                </div>
+                <div class="col s3">
+                  <p>Api client_secret:</p>
+                </div>
+                <div class="col s8">
+                  <i v-if="form.api_secret && form.api_secret.trim() !== ''"
+                     class="material-icons green-text">
+                    check
+                  </i>
+                  <i v-else class="material-icons red-text">close</i>
+                </div>
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.api_secret.$error">
+                  <p v-if="!$v.form.api_secret.required">
+                    Api client_secret field must not be empty. Check X5 records in Devops matrix.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12 readonly">
+                <div class="col s1">
+                  <i class="material-icons sensitive-info">keyboard_arrow_right</i>
+                </div>
+                <div class="col s3">
+                  <p>Config client_id:</p>
+                </div>
+                <div class="col s8">
+                  <i v-if="form.client_id_password && form.client_id_password.trim() !== ''"
+                     class="material-icons green-text">
+                    check
+                  </i>
+                  <i v-else class="material-icons red-text">close</i>
+                </div>
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.client_id_password.$error">
+                  <p v-if="!$v.form.client_id_password.required">
+                    Config client_id field must not be empty.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12 readonly">
+                <div class="col s1">
+                  <i class="material-icons sensitive-info">keyboard_arrow_right</i>
+                </div>
+                <div class="col s3">
+                  <p>Config client_secret:</p>
+                </div>
+                <div class="col s8">
+                  <i v-if="form.client_secret_password && form.client_secret_password.trim() !== ''"
+                     class="material-icons green-text">
+                    check
+                  </i>
+                  <i v-else class="material-icons red-text">close</i>
+                </div>
+              </div>
+              <div class="validator col s11 offset-s1">
+                <div class="red-text" v-if="$v.form.client_secret_password.$error">
+                  <p v-if="!$v.form.client_secret_password.required">
+                    Config client_secret field must not be empty.
                   </p>
                 </div>
               </div>
@@ -202,7 +238,26 @@ export default {
       return this.$store.state['extranet-x5'].branches;
     },
     instances() {
-      return this.$store.state.mmpi.instances;
+      const mmpiInstances = this.$store.state.mmpi.instances;
+
+      let x5instances = this.configurations.reduce((accumulator, configuration) => {
+        if (configuration.app_type === 'extranet' && configuration.app_version === 'X5') {
+          accumulator.push(
+            configuration.dev_instance,
+            configuration.val_instance,
+            configuration.deploy_dev_instance,
+          );
+        }
+        return accumulator;
+      }, []);
+
+      x5instances = x5instances.filter((el) => el);
+
+      const instances = mmpiInstances.filter(
+        (mmpiInstance) => x5instances.includes(mmpiInstance.name),
+      );
+
+      return instances;
     },
     configurations() {
       return this.$store.state.pas.configurations;
@@ -259,7 +314,7 @@ export default {
     'form.instance': _.debounce(function fn() {
       const loader = this.$loading.show({ container: this.$refs.modal });
 
-      if (!this.form.instance.name) {
+      if (!this.form.instance || !this.form.instance.name) {
         loader.hide();
         return false;
       }
@@ -289,18 +344,9 @@ export default {
   },
 
   methods: {
-    getData() {
-      this.$store.dispatch('extranet-x5/getBranches');
-      this.$store.dispatch('mmpi/getInstances');
-      this.$store.dispatch('pas/getConfigurations');
-    },
-
     open() {
       this.form = initialState().form;
       this.build = initialState().build;
-
-      this.getData();
-
       this.showModal = true;
     },
 
@@ -358,5 +404,15 @@ export default {
       this.form.client_secret_password = x5record ? x5record.client_secret_password : null;
     },
   },
+  beforeCreate() {
+    this.$store.dispatch('extranet-x5/getBranches');
+    this.$store.dispatch('mmpi/getInstances');
+    this.$store.dispatch('pas/getConfigurations');
+  },
 };
 </script>
+<style scoped>
+.sensitive-info{
+  margin-left: 26px;
+}
+</style>
