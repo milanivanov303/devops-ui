@@ -35,8 +35,23 @@
                    configuration.app_version === 'X4'" class="row">
           <div class="col s12 m6">
             <Autocomplete
-                label="X4Config"
+                label="Application"
                 icon="style"
+                :items="x4ProjectParams"
+                valueKey="name"
+                v-model="project"
+            />
+            <div class="validator">
+              <div class="red-text" v-if="$v.project.$error">
+                <p v-if="!$v.project.required">
+                  Project field must not be empty.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col s12 m6">
+            <Autocomplete
+                label="Configuration"
                 :items="x4ConfigParams"
                 valueKey="name"
                 v-model="x4config"
@@ -51,23 +66,8 @@
               </div>
             </div>
           </div>
-          <div class="col s12 m6">
-            <Autocomplete
-                label="Project parameter"
-                :items="x4ProjectParams"
-                valueKey="name"
-                v-model="project"
-            />
-            <div class="validator">
-              <div class="red-text" v-if="$v.project.$error">
-                <p v-if="!$v.project.required">
-                  Project field must not be empty.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
-        <div class="row">
+        <div v-if="configuration.app_version !== 'X4'" class="row">
           <Select
               class="col s12"
               label="Define Binary Type"
