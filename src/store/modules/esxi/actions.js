@@ -74,6 +74,26 @@ export default {
       .catch(() => commit('error', 'Could not get virtual machines', { root: true }));
     return promise;
   },
+  getVirtualMachinesSimple({ commit }) {
+    const name = 'virtualMachines-simple';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('devops').get('inventory/virtual-machines', {
+      orders: JSON.stringify({
+        name: 'asc',
+      }),
+    });
+
+    promise
+      .then((response) => {
+        commit('virtualMachines', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get virtual machines', { root: true }));
+    return promise;
+  },
   updateVirtualMachine({ commit }, payload) {
     const promise = api('devops').put(`inventory/virtual-machines/${payload.id}`, payload);
 
@@ -95,6 +115,26 @@ export default {
         virtualMachine: {
           esxiHost: {},
         },
+      }),
+    });
+
+    promise
+      .then((response) => {
+        commit('instances', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get instances\' list', { root: true }));
+    return promise;
+  },
+  getInstancesSimple({ commit }) {
+    const name = 'instances-simple';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('devops').get('inventory/instances', {
+      orders: JSON.stringify({
+        name: 'asc',
       }),
     });
 
@@ -192,6 +232,24 @@ export default {
 
     promise
       .then((response) => commit('updateRequestedInstances', response.data.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+  exportRecord({ commit }, id) {
+    const promise = api('devops').post(`inventory/requested-instances/export/${id}`,
+      {},
+      { responseType: 'blob' });
+    promise
+      .then((response) => {
+        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        const fileLink = document.createElement('a');
+
+        fileLink.href = fileURL;
+        fileLink.setAttribute('download', 'Request_Instance_Details.xlsx');
+        document.body.appendChild(fileLink);
+
+        fileLink.click();
+      })
       .catch((error) => commit('error', error));
     return promise;
   },

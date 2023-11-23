@@ -29,6 +29,7 @@ const San = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/san/Dashb
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
 const VirtualMachines = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/virtualMachines/VirtualMachines');
 const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
+const ThirdParty = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/thirdParty/ThirdParty');
 const ImxComponents = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/imxComponents/ImxComponents');
 const InstanceRequest = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/request/InstanceRequest');
 
@@ -618,6 +619,24 @@ export default [
       },
     },
     component: Instances,
+  },
+  {
+    path: '/inventory/thirdParties/:module?',
+    name: 'inventory-third-parties',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'Third-Party Matrix';
+
+        if (route.query.module) {
+          title = `${route.query.module} - ${title}`;
+        }
+
+        return title;
+      },
+    },
+    component: ThirdParty,
   },
   {
     path: '/inventory/imxComponents/:id?',

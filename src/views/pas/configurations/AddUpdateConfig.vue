@@ -248,14 +248,14 @@
           <TextInput
               class="col s12 m6"
               :class="{readonly: action === 'view'}"
-              label="Api-client"
+              label="Api client_id"
               icon="compare_arrows"
               v-model="form.api_client"
           />
           <TextInput
               class="col s12 m6"
               :class="{readonly: action === 'view'}"
-              label="Api-secret"
+              label="Api client_secret"
               v-model="form.api_secret"
           />
         </div>
@@ -263,14 +263,14 @@
           <TextInput
               class="col s12 m6"
               :class="{readonly: action === 'view'}"
-              label="Client ID Password"
+              label="Config client_id"
               icon="vpn_key"
               v-model="form.client_id_password"
           />
           <TextInput
               class="col s12 m6"
               :class="{readonly: action === 'view'}"
-              label="Client Secret Password"
+              label="Config client_secret"
               v-model="form.client_secret_password"
           />
         </div>
