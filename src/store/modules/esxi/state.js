@@ -2,6 +2,10 @@
 
 export default {
   error: '',
+  san: {},
+  ociRegions: [],
+  ociCompartments: [],
+  ociInstances: [],
   esxiHosts: [],
   virtualMachines: [],
   instances: [],
@@ -10,7 +14,6 @@ export default {
   requestedInstances: [],
   expiringComponents: [],
   savedEmails: [],
-  san: {},
   languages: [
     { name: 'Arabic' },
     { name: 'Bulgarian' },

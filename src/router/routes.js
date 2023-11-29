@@ -26,6 +26,7 @@ const ModulesSubmodules = () => import(/* webpackChunkName: "modules-submodules"
 
 const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
 const San = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/san/Dashboard');
+const OciInvenotry = () => import(/* webpackChunkName: "oci" */ '../views/esxi/oci/Dashboard');
 const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
 const VirtualMachines = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/virtualMachines/VirtualMachines');
 const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
@@ -562,6 +563,24 @@ export default [
       title: 'SAN Dashboard',
     },
     component: San,
+  },
+  {
+    path: '/inventory/oci/:module?',
+    name: 'inventory-oci',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'OCi Inventory';
+
+        if (route.query.module) {
+          title = `${title} - ${route.query.module}`;
+        }
+
+        return title;
+      },
+    },
+    component: OciInvenotry,
   },
   {
     path: '/inventory/esxiHosts/:name?',

@@ -6,6 +6,20 @@ export default {
     state.error = error;
   },
 
+  san(state, sanData) {
+    state.san = sanData;
+  },
+
+  ociRegions(state, regions) {
+    state.ociRegions = regions;
+  },
+  ociCompartments(state, compartments) {
+    state.ociCompartments = compartments;
+  },
+  ociInstances(state, instances) {
+    state.ociInstances = instances;
+  },
+
   esxiHosts(state, esxiHosts) {
     state.esxiHosts = esxiHosts;
   },
@@ -110,9 +124,5 @@ export default {
       state.savedEmails.findIndex((req) => req.id === id),
       1,
     );
-  },
-
-  san(state, sanData) {
-    state.san = sanData;
   },
 };
