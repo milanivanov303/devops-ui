@@ -49,7 +49,7 @@ export default {
       return this.$store.state.esxi.imxComponents || [];
     },
     intranet() {
-      return this.instances.filter((instance) => instance.type === 'intranet');
+      return this.instances.filter((instance) => instance.type === 'intranet' && instance.version !== '8');
     },
   },
   methods: {
@@ -87,7 +87,7 @@ export default {
 
       if (components && components.apache && apache) {
         const approved = apache.versions.filter((version) => version.approved === 'Yes');
-        if (approved.find((a) => a.version === components.tomcat)) {
+        if (approved.find((a) => a.version === components.apache)) {
           return `<span class="new badge green" data-badge-caption="">${components.apache}</span>`;
         }
         return `<span class="new badge red" data-badge-caption="">${components.apache}</span>`;
