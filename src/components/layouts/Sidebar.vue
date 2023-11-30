@@ -180,6 +180,9 @@
               <li :class="{ active: isActive('inventory/sanDashboard') }">
                 <router-link to="/inventory/sanDashboard"> SAN</router-link>
               </li>
+              <li :class="{ active: isActive('inventory/oci') }">
+                <router-link to="/inventory/oci"> OCi</router-link>
+              </li>
               <li :class="{ active: isActive('inventory/esxiHosts') }">
                 <router-link to="/inventory/esxiHosts"> ESXi Hosts</router-link>
               </li>
