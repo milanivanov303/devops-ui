@@ -84,7 +84,7 @@ export default {
       return this.$store.state.esxi.instances || [];
     },
     virtualMachines() {
-      return this.$store.state.esxi.virtualMachines || [];
+      return this.$store.state.esxi.virtualMachines.filter((vm) => vm.powered === 'on') || [];
     },
     projects() {
       return this.$store.state.mmpi.projects || [];
