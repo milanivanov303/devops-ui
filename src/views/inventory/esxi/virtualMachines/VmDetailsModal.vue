@@ -128,7 +128,7 @@
 </template>
 
 <script>
-import ComponentsTable from './ComponentsTable';
+import ComponentsTable from '../instances/ComponentsTable';
 
 export default {
   components: {
@@ -211,7 +211,6 @@ export default {
   mounted() {
     const elems = document.querySelectorAll('.collapsible');
     this.$M.Collapsible.init(elems);
-    this.$store.dispatch('mmpi/getProjects');
   },
 
 };

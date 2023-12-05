@@ -6,7 +6,6 @@
         :data="currentInstances"
         sort-by="name"
         sort-dir="asc"
-        query-prefix="instances_"
         :noDataText="getNoDataText()"
         :view-btn="false"
         :add-btn="false"
@@ -95,8 +94,8 @@
 </template>
 
 <script>
-const InstanceDetailsModal = () => import('../components/InstanceDetailsModal');
-const ComponentsTable = () => import('../components/ComponentsTable');
+const InstanceDetailsModal = () => import('./InstanceDetailsModal');
+const ComponentsTable = () => import('./ComponentsTable');
 
 export default {
   components: { InstanceDetailsModal, ComponentsTable },
@@ -168,7 +167,6 @@ export default {
       this.$store.dispatch('esxi/getInstances')
         .finally(() => loader.hide());
     },
-
     getInstanceComponents() {
       const components = [];
       Object.entries(this.selected.components).forEach(([component, version]) => {
@@ -179,7 +177,6 @@ export default {
       });
       return components;
     },
-
     openDetailsModal(instance) {
       this.showDetailsModal = true;
       this.selected = instance;
@@ -220,7 +217,6 @@ export default {
         .finally(() => loader.hide());
     },
   },
-
   created() {
     this.getInstances();
     this.$store.dispatch('mmpi/getProjects');
@@ -229,7 +225,6 @@ export default {
 </script>
 <style>
 .dont-break-out {
-
   /* These are technically the same, but use both */
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -245,6 +240,5 @@ export default {
   -moz-hyphens: auto;
   -webkit-hyphens: auto;
   hyphens: auto;
-
 }
 </style>

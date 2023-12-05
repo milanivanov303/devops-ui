@@ -70,9 +70,9 @@
 const BranchSkeleton = () => import('@/components/BranchSkeleton');
 const Paginate = () => import('@/components/partials/Paginate');
 
-const Host = () => import('./esxiHosts/Host');
-const HostDetails = () => import('./esxiHosts/HostDetails');
-const AddEditHostModal = () => import('./esxiHosts/AddEditHostModal');
+const Host = () => import('./Host');
+const HostDetails = () => import('./HostDetails');
+const AddEditHostModal = () => import('./AddEditHostModal');
 
 export default {
   components: {

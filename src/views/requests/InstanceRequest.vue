@@ -111,7 +111,7 @@ export default {
         .then(() => {
           this.showAddEditModal = true;
           this.$router.push({
-            path: `/inventory/request/${encodeURIComponent(this.selected.id || 'new')}`,
+            path: `/request/${encodeURIComponent(this.selected.id || 'new')}`,
           });
         })
         .catch((error) => this.$M.toast({ html: error, classes: 'toast-fail' }))
@@ -120,7 +120,7 @@ export default {
     closeAddEditModal() {
       this.showAddEditModal = false;
       this.$router.history.replace({
-        path: '/inventory/request',
+        path: '/request',
       });
     },
 
