@@ -676,7 +676,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import TextArea from '../../../components/TextArea';
+import TextArea from '../../components/TextArea';
 
 export default {
   components: { TextArea },

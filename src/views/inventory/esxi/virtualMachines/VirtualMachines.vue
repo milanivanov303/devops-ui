@@ -69,7 +69,7 @@
 </template>
 
 <script>
-const VmDetailsModal = () => import('../components/VmDetailsModal');
+const VmDetailsModal = () => import('./VmDetailsModal');
 
 export default {
   components: { VmDetailsModal },
@@ -168,7 +168,6 @@ export default {
       return formattedKernel;
     },
   },
-
   created() {
     this.getVirtualMachines();
   },

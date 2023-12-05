@@ -167,6 +167,11 @@
             </ul>
           </div>
         </li>
+        <li :class="{ active: isActive('request') }">
+          <router-link to="/request">
+            <i class="material-icons">aspect_ratio</i> Instance Request
+          </router-link>
+        </li>
         <li :class="{ active: isActive('inventory') }">
           <a class="collapsible-header">
             <i class="material-icons">view_list</i> Inventory
@@ -174,17 +179,19 @@
           </a>
           <div class="collapsible-body">
             <ul>
-              <li :class="{ active: isActive('inventory/dashboard') }">
-                <router-link to="/inventory/dashboard"> Dashboard</router-link>
-              </li>
-              <li :class="{ active: isActive('inventory/sanDashboard') }">
-                <router-link to="/inventory/sanDashboard"> SAN</router-link>
+              <li :class="{ active: isActive('inventory/san') }">
+                <router-link to="/inventory/san" class="invt-header"> SAN</router-link>
               </li>
               <li :class="{ active: isActive('inventory/oci') }">
-                <router-link to="/inventory/oci"> OCi</router-link>
+                <router-link to="/inventory/oci" class="invt-header"> OCi</router-link>
+              </li>
+              <li><div class="divider"></div></li>
+              <div class="subheader">ESXi</div>
+              <li :class="{ active: isActive('inventory/esxiDashboard') }">
+                <router-link to="/inventory/esxiDashboard"> Dashboard</router-link>
               </li>
               <li :class="{ active: isActive('inventory/esxiHosts') }">
-                <router-link to="/inventory/esxiHosts"> ESXi Hosts</router-link>
+                <router-link to="/inventory/esxiHosts"> Hosts</router-link>
               </li>
               <li :class="{ active: isActive('inventory/virtualMachines') }">
                 <router-link to="/inventory/virtualMachines"> Virtual Machines</router-link>
@@ -192,14 +199,14 @@
               <li :class="{ active: isActive('inventory/instances') }">
                 <router-link to="/inventory/instances"> Instances</router-link>
               </li>
+              <li><div class="divider"></div></li>
               <li :class="{ active: isActive('inventory/thirdParties') }">
-                <router-link to="/inventory/thirdParties"> Third-Party Matrix</router-link>
+                <router-link to="/inventory/thirdParties" class="invt-header">
+                  Third-Party Matrix</router-link>
               </li>
               <li :class="{ active: isActive('inventory/imxComponents') }">
-                <router-link to="/inventory/imxComponents"> iMX Components</router-link>
-              </li>
-              <li :class="{ active: isActive('inventory/request') }">
-                <router-link to="/inventory/request"> Instance Request</router-link>
+                <router-link to="/inventory/imxComponents" class="invt-header">
+                   iMX Components</router-link>
               </li>
               <li><div class="divider"></div></li>
             </ul>
@@ -310,5 +317,10 @@ li.active {
   li > a > i.material-icons {
     margin: 0 14px 0 0 ;
   }
+}
+
+.invt-header {
+  padding: 0 15px !important;
+  font-size: 13px;
 }
 </style>

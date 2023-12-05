@@ -94,17 +94,16 @@
         </table>
       </template>
     </Modal>
-
   </div>
 </template>
 
 <script>
-import CPUcoresCounter from '@/views/esxi/dashboard/statistics/CPUcoresCounter';
-import CPUcoresStatistics from '@/views/esxi/dashboard/statistics/CPUcoresStatistics';
-import RAMbyHostsStatistics from '@/views/esxi/dashboard/statistics/RAMbyHostsStatistics';
-import PieChartRAMStatistics from '@/views/esxi/dashboard/statistics/PieChartRAMStatistics';
-import PoweredVmCounter from '@/views/esxi/dashboard/statistics/PoweredVmCounter';
-import InstancesByType from '@/views/esxi/dashboard/statistics/InstancesByType';
+import CPUcoresCounter from './statistics/CPUcoresCounter';
+import CPUcoresStatistics from './statistics/CPUcoresStatistics';
+import RAMbyHostsStatistics from './statistics/RAMbyHostsStatistics';
+import PieChartRAMStatistics from './statistics/PieChartRAMStatistics';
+import PoweredVmCounter from './statistics/PoweredVmCounter';
+import InstancesByType from './statistics/InstancesByType';
 
 export default {
   components: {
@@ -135,7 +134,7 @@ export default {
     },
   },
   methods: {
-    getEsxiHosts() {
+    getData() {
       const loader = this.$loading.show({ container: this.$refs.inventory });
 
       const promise1 = this.$store.dispatch('esxi/getEsxiHosts');
@@ -165,12 +164,9 @@ export default {
 
       return ` - ${years ? `${years} years` : ''} ${months ? `${months} months` : ''} ${days ? `${days} days` : ''}`;
     },
-    openModal() {
-      this.$refs.modal.show();
-    },
   },
   created() {
-    this.getEsxiHosts();
+    this.getData();
   },
 };
 </script>
