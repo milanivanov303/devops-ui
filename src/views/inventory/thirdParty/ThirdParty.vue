@@ -60,7 +60,7 @@
               <tbody>
               <tr v-for="vm in virtualMachines" :key="vm.id">
                 <td>{{ vm.name }}</td>
-                <td>{{ vm.os ? vm.os.name + ' - ' + vm.os.version : ''}}</td>
+                <td v-html="vm.os ? getOSLabel(vm.os): ''"></td>
               </tr>
               </tbody>
             </table>
@@ -89,6 +89,9 @@ export default {
     projects() {
       return this.$store.state.mmpi.projects || [];
     },
+    imxComponents() {
+      return this.$store.state.esxi.imxComponents || [];
+    },
   },
   methods: {
     getData() {
@@ -105,6 +108,25 @@ export default {
       this.$router.push({
         path: `/inventory/thirdParties/${module}`,
       });
+    },
+
+    getOSLabel(vmOs) {
+      if (vmOs.error) {
+        return `${vmOs.error}`;
+      }
+      const os = this.imxComponents
+        .filter((component) => component.type === 'OS')
+        .find((component) => vmOs.name.includes(component.name));
+
+      if (os) {
+        const approved = os.versions.filter((version) => version.approved === 'Yes');
+        if (approved.find((a) => new RegExp(`^${a.version}`, 'i').test(vmOs.version))) {
+          return `<span class="new badge green" data-badge-caption="">${vmOs.name} - ${vmOs.version}</span>`;
+        }
+        return `<span class="new badge red" data-badge-caption="">${vmOs.name} - ${vmOs.version}</span>`;
+      }
+
+      return `No matching iMX component for ${vmOs.name} - ${vmOs.version}`;
     },
   },
   mounted() {
