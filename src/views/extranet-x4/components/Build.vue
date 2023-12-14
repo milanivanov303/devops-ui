@@ -246,6 +246,7 @@ export default {
             this.form.project !== null && typeof this.form.project.name !== 'undefined' ? this.form.project.name : null,
         image: this.form.image,
         do_release: null,
+        do_dev_deploy: null,
       })
         .then((response) => {
           this.build.status = 'running';
