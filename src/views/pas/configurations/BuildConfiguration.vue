@@ -92,6 +92,22 @@
           </div>
         </div>
 
+        <div v-if="configuration.app_type === 'extranet' &&
+        configuration.app_version === 'X4'" class="row">
+          <div class="col s6">
+            <label>
+              <input type="checkbox" v-model="doRelease" />
+              <span>Do Release</span>
+            </label>
+          </div>
+          <div class="col s6">
+            <label>
+              <input type="checkbox" v-model="doDevDeploy" />
+              <span>Do Dev Deploy</span>
+            </label>
+          </div>
+        </div>
+
         <div class="row">
           <text-area
               class="col s12"
@@ -152,6 +168,8 @@ export default {
       issueError: null,
       binaryType: {},
       configName: '',
+      doRelease: true,
+      doDevDeploy: false,
       comments: '',
       x4config: null,
       project: null,
@@ -305,7 +323,8 @@ export default {
         client: this.client,
         x4config: this.x4config ? this.x4config.name : null,
         project: this.project ? this.project.name : null,
-        do_release: true,
+        do_release: this.doRelease,
+        do_dev_deploy: this.doDevDeploy,
         mmpi: {
           binary_type: this.binaryType,
           config_name: this.configName,

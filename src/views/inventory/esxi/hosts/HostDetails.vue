@@ -121,7 +121,7 @@
 </template>
 
 <script>
-const VirtualMachinesTable = () => import('../components/VirtualMachinesTable');
+const VirtualMachinesTable = () => import('../virtualMachines/VirtualMachinesTable');
 const EsxiDetails = () => import('./EsxiDetails');
 const MemorySlots = () => import('./MemorySlots');
 const AddEditHostModal = () => import('./AddEditHostModal');

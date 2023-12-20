@@ -2,9 +2,9 @@ const SeTransferModif = () => import(/* webpackChunkName: "expert-system" */ '..
 const MainDashboard = () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard');
 const Builds = () => import(/* webpackChunkName: "dashboard" */ '../views/Builds');
 
-const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard');
-const Branches = () => import(/* webpackChunkName: "branches" */ '@/components/Branches');
-const ConnectedBuilds = () => import(/* webpackChunkName: "connected-builds" */ '@/components/ConnectedBuilds');
+const Dashboard = () => import(/* webpackChunkName: "dashboard" */ '../components/Dashboard');
+const Branches = () => import(/* webpackChunkName: "branches" */ '../components/Branches');
+const ConnectedBuilds = () => import(/* webpackChunkName: "connected-builds" */ '../components/ConnectedBuilds');
 
 const Configurations = () => import(/* webpackChunkName: "pas" */ '../views/pas/configurations/Configurations');
 // const X4Params = () => import(/* webpackChunkName: "pas" */ '../views/pas/params/X4Params');
@@ -24,14 +24,16 @@ const Modification = () => import(/* webpackChunkName: "cms" */ '../views/cms/Mo
 const CmsConfigurations = () => import(/* webpackChunkName: "cms" */ '../views/cms/Conf');
 const ModulesSubmodules = () => import(/* webpackChunkName: "modules-submodules" */ '../views/cms/ModulesSubmodules');
 
-const EsxiDashboard = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/dashboard/Dashboard');
-const San = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/san/Dashboard');
-const Items = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/Items');
-const VirtualMachines = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/virtualMachines/VirtualMachines');
-const Instances = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/instances/Instances');
-const ThirdParty = () => import(/* webpackChunkName: "esxi" */ '@/views/esxi/thirdParty/ThirdParty');
-const ImxComponents = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/imxComponents/ImxComponents');
-const InstanceRequest = () => import(/* webpackChunkName: "esxi" */ '../views/esxi/request/InstanceRequest');
+const San = () => import(/* webpackChunkName: "inventory" */ '../views/inventory/san/Dashboard');
+const Oci = () => import(/* webpackChunkName: "inventory" */ '../views/inventory/oci/Dashboard');
+const EsxiDashboard = () => import(/* webpackChunkName: "inventory" */ '../views/inventory/esxi/dashboard/Dashboard');
+const EsxiHost = () => import(/* webpackChunkName: "inventory" */ '../views/inventory/esxi/hosts/Items');
+const VirtualMachines = () => import(/* webpackChunkName: "inventory" */ '../views/inventory/esxi/virtualMachines/VirtualMachines');
+const Instances = () => import(/* webpackChunkName: "inventory" */ '../views/inventory/esxi/instances/Instances');
+const ImxComponents = () => import(/* webpackChunkName: "inventory" */ '../views/inventory/imxComponents/ImxComponents');
+const ThirdParty = () => import(/* webpackChunkName: "inventory" */ '../views/inventory/thirdParty/ThirdParty');
+
+const InstanceRequest = () => import(/* webpackChunkName: "request" */ '../views/requests/InstanceRequest');
 
 const DevopsUsersAdministration = () => import(/* webpackChunkName: "administration-users" */ '../views/administration/devops/Users');
 const DevopsRolesAdministration = () => import(/* webpackChunkName: "administration-roles" */ '../views/administration/devops/Roles');
@@ -538,30 +540,58 @@ export default [
     },
     component: ModulesSubmodules,
   },
+  {
+    path: '/request/:id?',
+    meta: {
+      requiresAuth: true,
+      name: 'instance-request',
+      transitionName: 'slide',
+      title: 'Instance request',
+    },
+    component: InstanceRequest,
+  },
   // Inventory Tab
   {
     path: '/inventory',
-    redirect: '/inventory/dashboard',
+    redirect: '/inventory/esxiDashboard',
   },
   {
-    path: '/inventory/dashboard',
-    name: 'inventory',
-    meta: {
-      requiresAuth: true,
-      transitionName: 'slide',
-      title: 'ESXI Dashboard',
-    },
-    component: EsxiDashboard,
-  },
-  {
-    path: '/inventory/sanDashboard',
-    name: 'san',
+    path: '/inventory/san',
+    name: 'inventory-san',
     meta: {
       requiresAuth: true,
       transitionName: 'slide',
       title: 'SAN Dashboard',
     },
     component: San,
+  },
+  {
+    path: '/inventory/oci/:module?',
+    name: 'inventory-oci',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: (route) => {
+        let title = 'OCi Inventory';
+
+        if (route.query.module) {
+          title = `${title} - ${route.query.module}`;
+        }
+
+        return title;
+      },
+    },
+    component: Oci,
+  },
+  {
+    path: '/inventory/esxiDashboard',
+    name: 'inventory',
+    meta: {
+      requiresAuth: true,
+      transitionName: 'slide',
+      title: 'Esxi Dashboard',
+    },
+    component: EsxiDashboard,
   },
   {
     path: '/inventory/esxiHosts/:name?',
@@ -579,7 +609,7 @@ export default [
         return title;
       },
     },
-    component: Items,
+    component: EsxiHost,
     props: {
       module: 'esxiHosts',
     },
@@ -655,16 +685,6 @@ export default [
       },
     },
     component: ImxComponents,
-  },
-  {
-    path: '/inventory/request/:id?',
-    meta: {
-      requiresAuth: true,
-      name: 'instance-request',
-      transitionName: 'slide',
-      title: 'Instance request',
-    },
-    component: InstanceRequest,
   },
   // Devops Administration Tab
   {

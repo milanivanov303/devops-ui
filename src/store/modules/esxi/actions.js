@@ -2,6 +2,68 @@
 import { DateTime } from 'luxon';
 
 export default {
+  // SAN
+  getSanData({ commit }) {
+    const promise = api('devops').get('inventory/san');
+
+    promise
+      .then((response) => commit('san', response.data))
+      .catch((error) => commit('error', error));
+    return promise;
+  },
+
+  // OCi
+  getOciRegions({ commit }) {
+    const name = 'oci-regions';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('devops').get('inventory/oci/regions');
+
+    promise
+      .then((response) => {
+        commit('ociRegions', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get a list with OCi regions', { root: true }));
+    return promise;
+  },
+  getOciCompartments({ commit }) {
+    const name = 'oci-compartments';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('devops').get('inventory/oci/compartments');
+
+    promise
+      .then((response) => {
+        commit('ociCompartments', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get a list with OCi compartments', { root: true }));
+    return promise;
+  },
+  getOciInstances({ commit }) {
+    const name = 'oci-instances';
+
+    if (this.state.promises[name]) {
+      return this.state.promises[name];
+    }
+
+    const promise = api('devops').get('inventory/oci/instances', {
+      with: JSON.stringify(['compartment']),
+    });
+
+    promise
+      .then((response) => {
+        commit('ociInstances', response.data.data);
+      })
+      .catch(() => commit('error', 'Could not get a list with OCi instances', { root: true }));
+    return promise;
+  },
+
   updateSingleHost({ commit }, payload) {
     const promise = api('devops').post('inventory/start-single-update', payload);
     promise
@@ -315,15 +377,6 @@ export default {
         commit('removeSavedEmail', payload.id);
       })
       .catch(() => commit('error', 'Could not remove saved email'));
-    return promise;
-  },
-
-  getSanData({ commit }) {
-    const promise = api('devops').get('inventory/san');
-
-    promise
-      .then((response) => commit('san', response.data))
-      .catch((error) => commit('error', error));
     return promise;
   },
 };
