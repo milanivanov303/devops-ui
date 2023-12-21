@@ -22,4 +22,7 @@ export default {
       1,
     );
   },
+  servletContainer(state, servletContainer) {
+    state.servletContainer = servletContainer;
+  },
 };

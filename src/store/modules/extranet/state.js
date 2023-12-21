@@ -7,4 +7,5 @@ export default {
   configurations: [],
   host: '',
   images: [],
+  servletContainer: '',
 };
