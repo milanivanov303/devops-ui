@@ -275,6 +275,7 @@ export default {
         instance: this.form.instance,
         fe_branch: this.form.feBranch ? this.form.feBranch.name : null,
         image: this.form.image,
+        new_release: 'N',
       })
         .then((response) => {
           this.build.status = 'running';
