@@ -71,4 +71,14 @@ export default {
       .catch((error) => commit('error', error, { root: true }));
     return promise;
   },
+
+  getServletContainer({ commit }, deployDevInstance) {
+    const promise = api('devops').get(`extranet/servlet-container/${deployDevInstance}`);
+
+    promise
+      .then((response) => commit('servletContainer', response.data))
+      .catch(() => commit('error', 'Could not get servlet container version', { root: true }));
+
+    return promise;
+  },
 };

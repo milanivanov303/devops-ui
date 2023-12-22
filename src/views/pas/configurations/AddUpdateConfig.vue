@@ -195,26 +195,37 @@
           </div>
         </div>
         <div class="row">
-          <div class="col s12 m6">
-            <Select
-                :class="{readonly: action === 'view'}"
-                label="Servlet container"
-                :options="[
-                  'Apache Tomcat',
-                  'Oracle WebLogic Server (WLS)',
-                  'IBM WebSphere Application Server'
-                ]"
-                icon="storage"
-                v-model="form.servlet_container"
-                :invalid="$v.form.servlet_container.$error"
-                @blur="$v.form.servlet_container.$touch()"
+          <div class="col s12 m6"  v-if="form.servlet_container && form.servlet_container !== ''">
+            <TextInput
+              :class="{ readonly: action === 'view' }"
+              icon="move_to_inbox"
+              label="Servlet container"
+              v-model="form.servlet_container"
+              :invalid="$v.form.servlet_container.$error"
+              @blur="$v.form.servlet_container.$touch()"
+              disabled
             />
-            <div class="validator">
-              <div class="red-text" v-if="$v.form.servlet_container.$error">
-                <p v-if="!$v.form.servlet_container.required">
-                  Servlet container field must not be empty.
-                </p>
-              </div>
+          </div>
+          <div class="col s12 m6" v-else>
+            <Select
+              :class="{ readonly: action === 'view' }"
+              label="Servlet container"
+              icon="move_to_inbox"
+              :options="[
+                'Apache Tomcat',
+                'Oracle WebSphere Server WSL',
+                'IBM WebSphere Application Server'
+              ]"
+              v-model="form.servlet_container"
+              :invalid="$v.form.servlet_container.$error"
+              @blur="$v.form.servlet_container.$touch()"
+            />
+          </div>
+          <div class="validator" v-if="$v.form.servlet_container.$error">
+            <div class="red-text">
+              <p v-if="!$v.form.servlet_container.required">
+                Servlet container field must not be empty.
+              </p>
             </div>
           </div>
           <div class="col s12 m3">
@@ -350,6 +361,7 @@
 </template>
 <script>
 import { required } from 'vuelidate/lib/validators';
+import debounce from 'lodash/debounce';
 
 export default {
   props: {
@@ -440,6 +452,17 @@ export default {
       }
 
       return [];
+    },
+    showTomcatSelect() {
+      const servletContainer = this.form.servlet_container;
+      if (!servletContainer || !/Tomcat: \d+(\.\d+)*$/.test(servletContainer)) {
+        return true;
+      }
+      const tomcatVersion = servletContainer.split(' ')[1];
+      if (!/^\d+(\.\d+)*$/.test(tomcatVersion)) {
+        return true;
+      }
+      return false;
     },
   },
   validations: {
@@ -595,6 +618,46 @@ export default {
         });
     },
   },
+
+  watch: {
+    'form.deploy_dev_instance': {
+      handler: debounce(function (newValue) {
+        const instanceName = newValue ? newValue.name : '';
+
+        this.$store.dispatch('extranet/getServletContainer', instanceName)
+          .then((response) => {
+            const servletContainer = response.data.servlet_container;
+            if (servletContainer) {
+              const tomcatVersion = servletContainer.split(' ')[1];
+              if (/^\d+(\.\d+)*$/.test(tomcatVersion)) {
+                this.form.servlet_container = servletContainer;
+              } else {
+                this.form.servlet_container = '';
+                this.$M.toast({
+                  html: 'Invalid servlet container version',
+                  classes: 'toast-fail',
+                });
+              }
+            } else {
+              this.form.servlet_container = '';
+              this.$M.toast({
+                html: 'Servlet container not found',
+                classes: 'toast-fail',
+              });
+            }
+          })
+          .catch((error) => {
+            this.form.servlet_container = '';
+            this.$M.toast({
+              html: `Error: ${error.response.data.error}`,
+              classes: 'toast-fail',
+            });
+          });
+      }, 2000),
+      deep: true,
+    },
+  },
+
   created() {
     this.getData();
   },
