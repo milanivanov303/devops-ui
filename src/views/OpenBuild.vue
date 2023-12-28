@@ -137,7 +137,8 @@ export default {
         api.post(`builds/${this.build.id}/start`)
           .then(() => {
             this.header = '- Build started successfully - ';
-            this.message = 'Waiting for tomcat to start...';
+            this.message = 'Waiting for application server to start. It usually takes more than 10 minutes. ' +
+                'Please hard reload the page or clear browser cache if the build does not start.';
 
             document.getElementById('buildProgress').classList.add('hidden');
             document.getElementById('tomcatProgress').classList.remove('hidden');
